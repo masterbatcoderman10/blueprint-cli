@@ -21,7 +21,7 @@ Developers and technical teams who manage multiple related software projects and
 - **Access model:** Open local CLI usage
 - **Authentication:** No account required for local usage
 - **Distribution model:** Open source npm package
-- **License:** Open source license (TBD, must be explicitly declared before first public release)
+- **License:** MIT
 - **Experience constraints:** Commands should be predictable, low-friction, and readable in terminal output
 
 ## Milestones

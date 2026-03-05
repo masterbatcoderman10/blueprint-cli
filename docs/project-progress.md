@@ -16,6 +16,7 @@
 - 2026-03-05: Selected Vitest as the default forward-only testing framework for new CLI work.
 - 2026-03-05: Set MVP boundary after Milestone 1; Milestone 2 and later are optional post-MVP scope.
 - 2026-03-05: Confirmed the project is open source and requires an explicit LICENSE declaration before first public release.
+- 2026-03-05: Selected MIT as the project license.
 
 ---
 
