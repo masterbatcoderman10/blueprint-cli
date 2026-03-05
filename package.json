@@ -1,0 +1,25 @@
+{
+  "name": "blueprint-cli",
+  "version": "0.1.0",
+  "description": "Blueprint CLI — project scaffolding and workflow tool",
+  "bin": {
+    "blueprint": "./dist/index.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "scripts": {
+    "dev": "tsx src/index.ts",
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "tsx": "^4.0.0",
+    "typescript": "^5.0.0",
+    "vitest": "^2.0.0"
+  }
+}

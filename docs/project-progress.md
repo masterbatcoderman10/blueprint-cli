@@ -3,7 +3,7 @@
 **Project**: blueprint-cli
 **Kanban**: blueprint-cli
 **Current Milestone**: M1 — Project Bootstrap
-**Current Phase**: Phase 1 — CLI Foundation
+**Current Phase**: TBD — pending phase planning
 **Status**: Planning
 
 ---
@@ -17,6 +17,7 @@
 - 2026-03-05: Set MVP boundary after Milestone 1; Milestone 2 and later are optional post-MVP scope.
 - 2026-03-05: Confirmed the project is open source and requires an explicit LICENSE declaration before first public release.
 - 2026-03-05: Selected MIT as the project license.
+- 2026-03-05: Phase 1 — CLI Foundation completed. All tasks done, DoD satisfied, full test suite green.
 
 ---
 
@@ -37,7 +38,7 @@
 
 ```text
 M1 — Project Bootstrap
-├── Phase 1 — CLI Foundation ○
+├── Phase 1 — CLI Foundation ✓
 ├── Phase 2 — Scaffold Engine ○
 ├── Phase 3 — Template Integrity ○
 └── Phase 4 — Testing Setup & Release Readiness ○
