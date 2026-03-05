@@ -1,0 +1,282 @@
+# Alignment
+
+This module bootstraps a new Blueprint project by analyzing what exists
+and producing the foundational documents. It runs when project-progress.md
+is empty — meaning Blueprint has been scaffolded but no planning has
+been done yet.
+
+---
+
+<AlignmentFlow>
+  PURPOSE: Assess the current state of the project, confirm findings with
+  the user, and produce the initial planning documents.
+
+  STEP 1 — ASSESS WHAT EXISTS
+    Run a scan of the project to determine what is available:
+
+    CHECK — Does docs/knowledge-base/ exist and contain documents?
+    CHECK — Does a codebase exist outside of docs/?
+    CHECK — Does a git history exist?
+
+    Based on findings, classify:
+
+    IF knowledge-base/ has documents AND codebase exists:
+      → STATE = EXISTING_WITH_DOCS
+      → Analyze both knowledge-base docs and codebase.
+
+    IF no knowledge-base/ BUT codebase exists:
+      → STATE = EXISTING_NO_DOCS
+      → Analyze codebase and git history only.
+
+    IF no knowledge-base/ AND no codebase:
+      → STATE = EMPTY
+      → Skip to <KanbanSetup>, then dispatch to prd-planning.md.
+
+  STEP 2 — ANALYZE (only for EXISTING_WITH_DOCS and EXISTING_NO_DOCS)
+
+    FOR ARCHIVED DOCS (if present):
+      - Read all documents in docs/knowledge-base/
+      - Identify: product description, listed features, planned features,
+        user types, technical decisions, any existing milestones or roadmap
+      - Note which features appear to be planned vs implemented
+
+    FOR CODEBASE:
+      - Scan project structure — directories, entry points, config files
+      - Identify tech stack: language, framework, database, notable libraries
+      - Identify file organization patterns and conventions
+      - Review git history for scope of implemented work
+      - Check for test infrastructure: test runner config files
+        (jest.config, vitest.config, pytest.ini, etc.), test directories,
+        existing test files, test scripts in package.json or equivalent.
+
+    FOR FEATURE STATUS:
+      - Cross-reference documented features (from knowledge-base docs) with
+        the codebase to determine:
+        - Features that are implemented and working
+        - Features that are partially implemented
+        - Features that are documented but not yet built
+      - If no knowledge-base docs exist, derive the feature list from
+        what the codebase already does
+
+  STEP 3 — CONFIRM WITH USER
+    Present findings to the user in a structured summary:
+
+    - "Here is what I found in the project:"
+      - Tech stack and key libraries
+      - File organization pattern
+      - Features that appear to be implemented
+      - Features that appear to be planned but not built
+      - Any architectural decisions or patterns observed
+      - Test infrastructure: framework and runner if found,
+        or "no test infrastructure detected"
+
+    - Ask the user to confirm, correct, or add to these findings
+    - Ask about anything ambiguous — do not assume
+
+    Do NOT proceed to document creation until the user confirms
+    the summary is accurate.
+
+  STEP 4 — KANBAN SETUP
+    → GOTO <KanbanSetup>
+
+  STEP 5 — PRODUCE DOCUMENTS
+    → GOTO <DocumentProduction>
+</AlignmentFlow>
+
+---
+
+<KanbanSetup>
+  A vibe-kanban project is required for task management in Blueprint.
+
+  CHECK — Does a vibe-kanban project exist for this project?
+
+  IF the kanban MCP is not connected:
+    Inform user: "Blueprint uses vibe-kanban MCP for task management.
+    Please connect the vibe-kanban MCP tool before proceeding with
+    task execution. You can continue with planning without it, but
+    task work will be blocked until it is available."
+
+  IF the kanban MCP is connected but no project exists:
+    Ask user for the kanban project name to create.
+
+  IF the kanban MCP is connected and a project exists:
+    Confirm the project name with the user.
+
+  Record the kanban project name (or "TBD" if not yet set up)
+  for inclusion in project-progress.md.
+</KanbanSetup>
+
+---
+
+<DocumentProduction>
+  Alignment produces three documents and populates a fourth.
+  Each document is created using its respective planning module.
+
+  CRITICAL RULE — ONE DOCUMENT AT A TIME
+    Planning documents are created sequentially, one at a time.
+    Each document must be drafted, reviewed with the user, and
+    confirmed before the next document begins.
+
+    Do NOT batch-generate multiple planning documents in a single
+    response. Each document may surface questions, missing features,
+    or corrections that affect subsequent documents. Rushing ahead
+    without confirmation produces documents the user has not
+    validated.
+
+    The sequence is: draft → present to user → incorporate feedback
+    → user confirms → move to the next document.
+
+  ORDER OF CREATION:
+
+  1. docs/conventions.md
+     - IF codebase exists: populate from analysis — tech stack, language,
+       framework, database, notable libraries, file organization,
+       coding patterns observed in the codebase
+     - IF no codebase (STATE = EMPTY): ask the user for their intended
+       tech stack and preferences, then populate
+     - Confirm contents with user before finalizing.
+       Do NOT write conventions.md without explicit user approval.
+       The user may have preferences, corrections, or additions
+       that the codebase analysis cannot reveal.
+
+     STRUCTURE (sections in order):
+       ## Tech Stack
+         Language, framework, database, key runtime dependencies.
+       ## Libraries & Tools
+         Notable libraries, build tools, package managers, linters,
+         formatters, and their versions if pinned.
+       ## File Structure
+         How the project organizes its source code. Describe the
+         directory layout pattern (e.g., feature-based, layer-based)
+         and where key file types live.
+       ## Coding Standards
+         Naming conventions, formatting rules, import ordering,
+         and any project-specific patterns the codebase follows.
+       ## Testing
+         Testing framework, test runner command, test file location
+         and naming conventions (e.g., *.test.ts co-located with
+         source, or tests/ directory with mirrored structure).
+         This section is REQUIRED. test-planning.md, execution,
+         review, and phase completion all depend on it.
+       ## Anti-Patterns
+         Patterns to avoid in this project. Include both general
+         anti-patterns and stack-specific ones observed or mandated.
+       ## Agent Tools
+         MCP servers, skills, or external tools agents should use
+         during execution. Include connection details or references
+         where applicable.
+       ## Project-Specific Notes
+         Anything that does not fit above — deployment constraints,
+         environment variables, authentication patterns, third-party
+         integration notes, or user-specified conventions.
+
+     Not all sections need content on day one. Populate what is
+     known; leave others as placeholders for later refinement.
+     The Testing section must always be populated — at minimum
+     a chosen framework, test runner command, and file conventions.
+
+     TESTING FRAMEWORK SELECTION:
+       The agent SHOULD suggest a testing framework based on the
+       tech stack rather than asking the user to choose from scratch.
+       Well-established defaults exist for most stacks. Suggest the
+       standard choice and let the user override if they prefer
+       something different.
+
+       IF STATE = EMPTY (new project):
+         Suggest the standard testing framework for the chosen stack.
+         Record the user's choice (or the default if they accept).
+
+       IF STATE = EXISTING_WITH_DOCS or EXISTING_NO_DOCS:
+         IF test infrastructure exists (detected in STEP 2):
+           Document what exists — framework, runner, file patterns.
+         IF no test infrastructure exists:
+           Suggest a framework based on the detected tech stack.
+           Record the chosen framework and note that infrastructure
+           setup is pending. This becomes a gate task in the first
+           phase.
+           Testing is FORWARD-ONLY. Tests cover new work from this
+           point forward. Do not retroactively write tests for
+           existing untested code — that would block all forward
+           progress. Existing code gets tested only when it is
+           modified as part of new work, bug fixes, or revisions.
+
+  2. docs/prd.md
+     - Load docs/core/prd-planning.md. Follow its process.
+     - IF features were identified during analysis, use them as input
+       to the PRD conversation — but still confirm and refine with user
+     - IF STATE = EMPTY, start from scratch with the user
+     - Implemented features and planned features should be organized
+       into milestones per prd-planning.md conventions
+
+  3. First milestone document
+     - Load docs/core/planning.md, then docs/core/milestone-planning.md.
+       Follow their process.
+     - The first milestone typically covers what has already been built
+       plus the immediate next increment
+     - If significant work is already implemented, the first milestone
+       may be partially or fully complete — reflect this in the document
+
+  4. docs/project-progress.md
+     - Populate using the following template:
+
+       # Project Progress
+
+       **Project**: {{PROJECT_NAME}}
+       **Kanban**: {{KANBAN_PROJECT_NAME or "TBD"}}
+       **Current Milestone**: {{MILESTONE_NUMBER}} — {{MILESTONE_NAME}}
+       **Current Phase**: Phase {{PHASE_NUMBER}} — {{PHASE_NAME}}
+       **Status**: {{Planning | In Progress | Complete}}
+
+       ---
+
+       ## Decisions
+
+       > Append entries as decisions are made. Never delete. Oldest at top.
+
+       - {{YYYY-MM-DD}}: {{Decision made and rationale}}
+
+       ---
+
+       ## Milestone Overview
+
+       | Milestone | Name | Status |
+       |-----------|------|--------|
+       | M1 | {{Name}} | {{Not Started | In Progress | Complete}} |
+
+       > Add rows as milestones are defined.
+
+       ---
+
+       ## Phase Graph
+
+       > Visual history of all phases. Updated by the phase completion
+       > agent. Use ✓ for complete, ● for in progress, ○ for not started.
+
+       ```
+       M1 — {{Milestone Name}}
+       └── Phase 1 — {{Name}} ○
+       ```
+
+       > Extend as phases and milestones are added:
+       > M1 — Recipe Collection
+       > ├── Phase 1 — Data Foundation ✓
+       > ├── Phase 2 — Real-Time Editing ✓
+       > ├── Phase 3 — Presence & Awareness ●
+       > └── Phase 4 — Permissions & Sharing ○
+       > M2 — Collaborative Editing
+       > └── Phase 1 — Sync Infrastructure ○
+
+       ---
+
+       ## Pending Revisions
+
+       > Track revisions that have been identified but not yet executed.
+       > The agent should surface these at session start.
+
+       (none)
+
+     - Fill in project name, kanban project name (or "TBD"),
+       current milestone reference, and set current phase to
+       "TBD — pending phase planning" unless a phase is obvious
+     - This makes the project ACTIVE for future sessions
+</DocumentProduction>
