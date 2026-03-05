@@ -1,9 +1,9 @@
 # Project Progress
 
 **Project**: blueprint-cli
-**Kanban**: TBD
+**Kanban**: blueprint-cli
 **Current Milestone**: M1 — Project Bootstrap
-**Current Phase**: TBD — pending phase planning
+**Current Phase**: Phase 1 — CLI Foundation
 **Status**: Planning
 
 ---
