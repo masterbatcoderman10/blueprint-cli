@@ -9,7 +9,24 @@
  * projects (ManifestState with present: false) rather than hard failures.
  */
 
+import * as fs from 'fs/promises'
+import * as path from 'path'
+
 export const TEMPLATE_VERSION = '1.0.0'
+
+let cachedCliVersion: string | null = null
+
+export async function getCliVersion(): Promise<string> {
+  if (cachedCliVersion !== null) {
+    return cachedCliVersion
+  }
+
+  const packageJsonPath = path.join(__dirname, '../../package.json')
+  const content = await fs.readFile(packageJsonPath, 'utf-8')
+  const pkg = JSON.parse(content) as { version: string }
+  cachedCliVersion = pkg.version
+  return cachedCliVersion
+}
 
 export interface ManifestData {
   templateVersion: string
@@ -50,15 +67,58 @@ export function validateManifest(raw: unknown): ManifestValidationResult {
   }
 }
 
-/**
- * ManifestState represents whether a Blueprint manifest is present in the project.
- *
- * present: true  — manifest exists and contains valid data
- * present: false — manifest is absent; this is a repairable legacy bootstrap case,
- *                  not a hard error. The integrity engine should offer to create it.
- */
 export type ManifestState =
   | { present: true; data: ManifestData }
-  | { present: false }
+  | { present: false; reason: 'missing' }
+  | { present: false; reason: 'invalid'; error: string }
 
 export const MANIFEST_RELATIVE_PATH = 'docs/.blueprint/manifest.json'
+
+export function getManifestPath(projectPath: string): string {
+  return path.join(projectPath, MANIFEST_RELATIVE_PATH)
+}
+
+export async function writeManifest(
+  projectPath: string,
+  data: ManifestData
+): Promise<void> {
+  const manifestPath = getManifestPath(projectPath)
+  const manifestDir = path.dirname(manifestPath)
+
+  try {
+    await fs.mkdir(manifestDir, { recursive: true })
+  } catch (err) {
+    const error = err as { code?: string }
+    if (error.code !== 'EEXIST') {
+      throw err
+    }
+  }
+
+  await fs.writeFile(manifestPath, JSON.stringify(data, null, 2) + '\n', 'utf-8')
+}
+
+export async function readManifest(
+  projectPath: string
+): Promise<ManifestState> {
+  const manifestPath = getManifestPath(projectPath)
+
+  try {
+    await fs.access(manifestPath)
+  } catch {
+    return { present: false, reason: 'missing' }
+  }
+
+  try {
+    const raw = JSON.parse(await fs.readFile(manifestPath, 'utf-8'))
+    const validation = validateManifest(raw)
+
+    if (!validation.valid) {
+      return { present: false, reason: 'invalid', error: validation.error }
+    }
+
+    return { present: true, data: validation.data }
+  } catch (err) {
+    const error = err as { message?: string }
+    return { present: false, reason: 'invalid', error: error.message ?? 'Unknown error' }
+  }
+}

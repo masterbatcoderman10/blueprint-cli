@@ -68,7 +68,7 @@ export async function loadManifestState(projectDir: string): Promise<ManifestSta
   } catch (error) {
     const nodeError = error as { code?: string }
     if (nodeError.code === 'ENOENT') {
-      return { present: false }
+      return { present: false, reason: 'missing' }
     }
     throw error
   }

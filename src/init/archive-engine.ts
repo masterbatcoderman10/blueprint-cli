@@ -3,8 +3,17 @@ import { copyFile, mkdir, rename, unlink, stat, readdir, readFile, writeFile } f
 
 import { type InitOptions, type ScaffoldResult, defaultArchiveDirectoryName } from './types'
 import { safeMkdirP, moveFileSafe, copyFileSafe } from './fs-utils'
+import { TEMPLATE_VERSION, writeManifest, getCliVersion } from '../doctor/manifest'
 
 const TEMPLATES_DIR = join(__dirname, '../../templates')
+
+export function resolveSelectedAgents(options: InitOptions): string[] {
+  const selectedAgents = [...options.agents.selected]
+  if (!selectedAgents.includes('CLAUDE.md')) {
+    selectedAgents.unshift('CLAUDE.md')
+  }
+  return selectedAgents
+}
 
 async function fileExists(filePath: string): Promise<boolean> {
   try {
@@ -176,11 +185,7 @@ export async function generateAgentFiles(
   rootDir: string,
   options: InitOptions,
 ): Promise<void> {
-  const selectedAgents = [...options.agents.selected]
-
-  if (!selectedAgents.includes('CLAUDE.md')) {
-    selectedAgents.unshift('CLAUDE.md')
-  }
+  const selectedAgents = resolveSelectedAgents(options)
 
   for (const fileName of selectedAgents) {
     const templatePath = join(TEMPLATES_DIR, fileName)
@@ -190,6 +195,20 @@ export async function generateAgentFiles(
       await copyFile(templatePath, destPath)
     }
   }
+}
+
+export async function generateManifest(
+  rootDir: string,
+  options: InitOptions,
+): Promise<void> {
+  const selectedAgents = resolveSelectedAgents(options)
+  const cliVersion = await getCliVersion()
+
+  await writeManifest(rootDir, {
+    templateVersion: TEMPLATE_VERSION,
+    cliVersion,
+    managedFiles: selectedAgents,
+  })
 }
 
 export async function initializeGitRepository(
@@ -231,6 +250,7 @@ export async function executeScaffold(
     copiedPaths: [],
     gitInitialized: false,
     mainBranchConfigured: false,
+    managedAgents: [],
   }
 
   if (options.docs.hasExistingDocsDirectory && options.docs.shouldArchiveExistingDocs) {
@@ -263,13 +283,14 @@ export async function executeScaffold(
   result.createdDirectories.push('docs/', 'docs/core/', 'docs/knowledge-base/', 'docs/milestones/')
 
   await generateAgentFiles(rootDir, options)
-  const selectedAgents = [...options.agents.selected]
-  if (!selectedAgents.includes('CLAUDE.md')) {
-    selectedAgents.unshift('CLAUDE.md')
-  }
+  const selectedAgents = resolveSelectedAgents(options)
   for (const fileName of selectedAgents) {
     result.createdFiles.push(fileName)
   }
+  result.managedAgents = selectedAgents
+
+  await generateManifest(rootDir, options)
+  result.createdFiles.push('docs/.blueprint/manifest.json')
 
   if (options.git.shouldInitialize) {
     await initializeGitRepository(rootDir, options)

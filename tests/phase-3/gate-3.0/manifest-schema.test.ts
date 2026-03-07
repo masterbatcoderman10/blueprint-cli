@@ -68,19 +68,28 @@ describe('T-3.0.1.2: manifest validation rejects malformed metadata', () => {
 })
 
 describe('T-3.0.1.3: legacy projects are classified as repairable bootstrap cases', () => {
-  it('ManifestState present:false is the explicit representation of a missing manifest', () => {
-    const state: ManifestState = { present: false }
+  it('ManifestState present:false with reason:missing is the explicit representation of a missing manifest', () => {
+    const state: ManifestState = { present: false, reason: 'missing' }
     expect(state.present).toBe(false)
+    expect(state.reason).toBe('missing')
   })
 
   it('missing manifest state is distinct from a present manifest state', () => {
-    const missingState: ManifestState = { present: false }
+    const missingState: ManifestState = { present: false, reason: 'missing' }
     const presentState: ManifestState = {
       present: true,
       data: { templateVersion: '1.0.0', cliVersion: '0.1.0', managedFiles: [] },
     }
     expect(missingState.present).toBe(false)
     expect(presentState.present).toBe(true)
+  })
+
+  it('invalid manifest state is distinct from missing manifest state', () => {
+    const missingState: ManifestState = { present: false, reason: 'missing' }
+    const invalidState: ManifestState = { present: false, reason: 'invalid', error: 'test error' }
+    expect(missingState.reason).toBe('missing')
+    expect(invalidState.reason).toBe('invalid')
+    expect(invalidState.error).toBe('test error')
   })
 
   it('TEMPLATE_VERSION is a non-empty string constant', () => {

@@ -40,6 +40,7 @@ export interface ScaffoldResult {
   copiedPaths: string[]
   gitInitialized: boolean
   mainBranchConfigured: boolean
+  managedAgents: string[]
 }
 
 export interface OnboardingStep<TContext> {

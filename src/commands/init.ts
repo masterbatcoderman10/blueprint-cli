@@ -40,6 +40,10 @@ export const initCommand: CommandDefinition = {
       summaryLines.push('Git initialized' + (result.mainBranchConfigured ? ' with main branch' : ''))
     }
 
+    if (result.managedAgents.length > 0) {
+      summaryLines.push(`Managed agents: ${result.managedAgents.join(', ')}`)
+    }
+
     clackPromptApi.outro('Blueprint initialization complete!\n' + summaryLines.join('\n'))
 
     return { exitCode: 0 }
