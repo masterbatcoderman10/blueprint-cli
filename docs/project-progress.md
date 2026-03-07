@@ -4,7 +4,7 @@
 **Kanban**: blueprint-cli
 **Current Milestone**: M1 — Project Bootstrap
 **Current Phase**: TBD — pending phase planning
-**Status**: Planning
+**Status**: Active
 
 ---
 
@@ -18,6 +18,8 @@
 - 2026-03-05: Confirmed the project is open source and requires an explicit LICENSE declaration before first public release.
 - 2026-03-05: Selected MIT as the project license.
 - 2026-03-05: Phase 1 — CLI Foundation completed. All tasks done, DoD satisfied, full test suite green.
+- 2026-03-05: Phase 2 Stream C (Execution Engine & Integration) completed. Archive engine, scaffold engine, agent file generator, git initializer, and summary reporter implemented. All 19 Stream C tests pass. Full test suite: 115 tests green.
+- 2026-03-05: Phase 2 — Scaffold Engine completed. All tasks done, DoD satisfied, full test suite green (118 tests, 16 files).
 
 ---
 
@@ -39,7 +41,7 @@
 ```text
 M1 — Project Bootstrap
 ├── Phase 1 — CLI Foundation ✓
-├── Phase 2 — Scaffold Engine ○
+├── Phase 2 — Scaffold Engine ✓
 ├── Phase 3 — Template Integrity ○
 └── Phase 4 — Testing Setup & Release Readiness ○
 M2 — Cross-Project Context (Optional Post-MVP)

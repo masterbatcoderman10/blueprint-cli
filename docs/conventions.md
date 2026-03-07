@@ -15,9 +15,10 @@
 ## Libraries & Tools
 
 - **TypeScript** for type-safe CLI implementation
-- **Node built-ins:** `fs`, `path`, `process`
-- **CLI framework:** TBD (likely `commander` or equivalent)
-- **Dev tooling:** `tsc` + local runner (`tsx` or equivalent), npm scripts
+- **Node built-ins:** `fs`, `path`, `process`, `child_process`
+- **Interactive prompts:** `@clack/prompts` (lightweight, styled terminal UI)
+- **CLI framework:** custom command runtime (registration + dispatch, no external framework)
+- **Dev tooling:** `tsc` + local runner (`tsx`), npm scripts
 
 ## File Structure
 

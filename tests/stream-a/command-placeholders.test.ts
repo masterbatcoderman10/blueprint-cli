@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { placeholderCommands } from '../../src/commands'
+import { contextCommand, initCommand, linkCommand, placeholderCommands } from '../../src/commands'
 
 describe('T-A.3: Placeholder command boundaries', () => {
   it('exports init, link, and context command boundaries', () => {
@@ -11,8 +11,8 @@ describe('T-A.3: Placeholder command boundaries', () => {
     ])
   })
 
-  it('uses no-op handlers with no feature side effects', async () => {
-    for (const command of placeholderCommands) {
+  it('keeps link/context handlers as no-op boundaries', async () => {
+    for (const command of [linkCommand, contextCommand]) {
       const result = await command.handler({
         commandName: command.name,
         args: [],
@@ -21,5 +21,10 @@ describe('T-A.3: Placeholder command boundaries', () => {
 
       expect(result).toEqual({ exitCode: 0 })
     }
+  })
+
+  it('keeps init boundary available for onboarding wiring', () => {
+    expect(initCommand.name).toBe('init')
+    expect(typeof initCommand.handler).toBe('function')
   })
 })
