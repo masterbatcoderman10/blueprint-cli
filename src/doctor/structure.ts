@@ -28,6 +28,8 @@ export const CANONICAL_CORE_FILES: string[] = [
   'docs/core/test-planning.md',
 ]
 
+export const REQUIRED_BLUEPRINT_DIRECTORIES: string[] = ['docs', 'docs/core']
+
 /**
  * User-owned editable project docs. These are scaffolded as shells but
  * thereafter belong to the project. Doctor never flags them for drift.
