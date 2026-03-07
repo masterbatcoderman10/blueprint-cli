@@ -1,7 +1,8 @@
 import { contextCommand } from './context'
+import { doctorCommand } from './doctor'
 import { initCommand } from './init'
 import { linkCommand } from './link'
 
-export { contextCommand, initCommand, linkCommand }
+export { contextCommand, doctorCommand, initCommand, linkCommand }
 
-export const placeholderCommands = [initCommand, linkCommand, contextCommand]
+export const placeholderCommands = [initCommand, linkCommand, contextCommand, doctorCommand]
