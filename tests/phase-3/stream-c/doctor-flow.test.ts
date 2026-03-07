@@ -6,241 +6,145 @@
  * confirm repairs, execute fixes, rerun validation, and show summary.
  */
 
-import { describe, it, expect, beforeEach } from 'vitest'
+import { describe, it, expect, afterEach, vi } from 'vitest'
 import { mkdir, readFile, writeFile, rm } from 'node:fs/promises'
 import { join } from 'node:path'
 import { tmpdir } from 'node:os'
-import { runDoctorAudit } from '../../../src/doctor/audit'
-import { createRepairPlan } from '../../../src/doctor/repair'
-import { executeRepairs } from '../../../src/doctor/executor'
+import { invokeCli } from '../../helpers/cli'
+import { writeCanonicalProject } from '../stream-b/test-project'
 import { MANIFEST_RELATIVE_PATH, TEMPLATE_VERSION } from '../../../src/doctor/manifest'
 
+vi.mock('@clack/prompts', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@clack/prompts')>()
+  return {
+    ...actual,
+    intro: vi.fn(),
+    log: {
+      ...actual.log,
+    },
+    confirm: vi.fn(() => Promise.resolve(true)),
+    cancel: vi.fn(),
+  }
+})
+
+const tempDirs: string[] = []
+
+afterEach(async () => {
+  for (const dir of tempDirs.splice(0)) {
+    await rm(dir, { recursive: true, force: true })
+  }
+  vi.clearAllMocks()
+})
+
 describe('T-C.3: Doctor End-to-End Flow', () => {
-  let projectDir: string
-
-  beforeEach(async () => {
-    projectDir = await mkdtemp(join(tmpdir(), 'blueprint-doctor-e2e-'))
-  })
-
-  async function mkdtemp(prefix: string): Promise<string> {
-    const fs = await import('node:fs/promises')
-    return fs.mkdtemp(prefix)
-  }
-
-  async function setupTemplates() {
-    const templatesDir = join(projectDir, 'templates', 'docs', 'core')
-    await mkdir(templatesDir, { recursive: true })
-    
-    // Create template files
-    await writeFile(join(templatesDir, 'execution.md'), '# Execution Protocol\n')
-    await writeFile(join(templatesDir, 'health-check.md'), '# Health Check Protocol\n')
-    
-    // Create agent template
-    await writeFile(join(projectDir, 'templates', 'CLAUDE.md'), '# Claude Agent\n')
-  }
-
-  describe('T-C.3.1: Full repair flow for drifted legacy project', () => {
+  describe('T-C.3.1: Full repair flow with post-repair validation', () => {
     it('analyzes, repairs, reruns validation, and reports clean result', async () => {
-      // Setup: Create a legacy project with drifted files and no manifest
-      await setupTemplates()
-      await mkdir(join(projectDir, 'docs', 'core'), { recursive: true })
-      
-      // Create drifted file (different content from template)
-      await writeFile(
-        join(projectDir, 'docs/core/execution.md'),
-        '# Old Drifted Content\n'
-      )
-      
-      // Create agent file to be detected
-      await writeFile(join(projectDir, 'CLAUDE.md'), '# Old Agent\n')
+      const projectDir = await mkdtempJoinTmpdir('blueprint-doctor-e2e-')
+      await writeCanonicalProject(projectDir)
 
-      // Step 1: Run initial audit
-      const auditResult = await runDoctorAudit(projectDir)
-      
-      expect(auditResult.isClean).toBe(false)
-      expect(auditResult.findings.length).toBeGreaterThan(0)
-      
-      // Should detect: drifted execution.md, missing manifest, drifted CLAUDE.md
-      const findingKinds = auditResult.findings.map(f => f.kind)
-      expect(findingKinds).toContain('drifted-file')
-      expect(findingKinds).toContain('missing-manifest')
+      const executionPath = join(projectDir, 'docs', 'core', 'execution.md')
+      await writeFile(executionPath, '# Drifted Content\n')
 
-      // Step 2: Create repair plan
-      const repairPlan = await createRepairPlan(auditResult.findings, projectDir)
-      
-      expect(repairPlan.hasBlockingFindings).toBe(false)
-      expect(repairPlan.actions.length).toBeGreaterThan(0)
+      const originalCwd = process.cwd()
+      process.chdir(projectDir)
 
-      // Step 3: Execute repairs
-      const repairResult = await executeRepairs(repairPlan.actions, projectDir)
-      
-      expect(repairResult.success).toBe(true)
-      expect(repairResult.failed).toBe(0)
+      try {
+        const result = await invokeCli(['doctor'])
+        
+        expect(result.exitCode).toBe(0)
+        expect(result.stdout).toContain('Blueprint Doctor')
+        expect(result.stdout).toContain('repair')
+        expect(result.stdout).toContain('clean')
+      } finally {
+        process.chdir(originalCwd)
+      }
 
-      // Step 4: Verify manifest was created
+      const repairedContent = await readFile(executionPath, 'utf-8')
+      expect(repairedContent).not.toContain('# Drifted Content')
+      
       const manifestContent = await readFile(
         join(projectDir, MANIFEST_RELATIVE_PATH),
         'utf-8'
       )
       const manifest = JSON.parse(manifestContent)
       expect(manifest.templateVersion).toBe(TEMPLATE_VERSION)
-      expect(manifest.managedFiles).toContain('CLAUDE.md')
-
-      // Step 5: Re-run validation
-      const postRepairResult = await runDoctorAudit(projectDir)
-      
-      // Note: execution.md will still be drifted because we didn't update the template
-      // But manifest should be clean
-      expect(postRepairResult.findings.some(f => f.kind === 'missing-manifest')).toBe(false)
     })
   })
 
-  describe('T-C.3.2: User declines repairs', () => {
+  describe('T-C.3.2: Doctor reports clean project', () => {
+    it('exits with 0 and reports no issues for a clean canonical project', async () => {
+      const projectDir = await mkdtempJoinTmpdir('blueprint-doctor-clean-')
+      await writeCanonicalProject(projectDir)
+
+      const originalCwd = process.cwd()
+      process.chdir(projectDir)
+
+      try {
+        const result = await invokeCli(['doctor'])
+        
+        expect(result.exitCode).toBe(0)
+        expect(result.stdout).toContain('clean')
+      } finally {
+        process.chdir(originalCwd)
+      }
+    })
+  })
+
+  describe('T-C.3.3: User declines repairs', () => {
     it('leaves working tree unchanged when repairs are cancelled', async () => {
-      // Setup: Create a project with issues
-      await setupTemplates()
-      await mkdir(join(projectDir, 'docs', 'core'), { recursive: true })
-      
-      // Create a file that will be detected as missing
-      // (don't create health-check.md in project, but it exists in templates)
+      const projectDir = await mkdtempJoinTmpdir('blueprint-doctor-cancel-')
+      await writeCanonicalProject(projectDir)
 
-      const initialFiles = ['CLAUDE.md'] // Only agent file, no docs/core files
+      const executionPath = join(projectDir, 'docs', 'core', 'execution.md')
+      await writeFile(executionPath, '# Drifted Content\n')
 
-      // Step 1: Run audit
-      const auditResult = await runDoctorAudit(projectDir)
-      
-      expect(auditResult.isClean).toBe(false)
+      const clackPrompts = await import('@clack/prompts')
+      vi.mocked(clackPrompts.confirm).mockReturnValueOnce(Promise.resolve(false))
 
-      // Step 2: Create repair plan
-      const repairPlan = await createRepairPlan(auditResult.findings, projectDir)
-      
-      // Simulate user declining: don't execute repairs
-      // In the real flow, this happens when confirm() returns false
+      const originalCwd = process.cwd()
+      process.chdir(projectDir)
 
-      // Step 3: Verify no changes were made
-      // The repair plan exists but was not executed
-      expect(repairPlan.actions.length).toBeGreaterThan(0)
+      try {
+        const result = await invokeCli(['doctor'])
+        
+        expect(result.exitCode).toBe(0)
+      } finally {
+        process.chdir(originalCwd)
+      }
       
-      // Verify files that would have been created still don't exist
-      // (because we didn't call executeRepairs)
-      const manifestPath = join(projectDir, MANIFEST_RELATIVE_PATH)
-      await expect(readFile(manifestPath, 'utf-8')).rejects.toThrow()
+      const content = await readFile(executionPath, 'utf-8')
+      expect(content).toContain('# Drifted Content')
     })
   })
 
   describe('Doctor flow edge cases', () => {
-    it('handles clean project with no repairs needed', async () => {
-      // Setup: Create a clean project by copying all required templates
-      await setupTemplates()
-      await mkdir(join(projectDir, 'docs', 'core'), { recursive: true })
-      await mkdir(join(projectDir, 'docs/.blueprint'), { recursive: true })
-      
-      // Copy ALL required core templates to project
-      const coreFiles = [
-        'alignment.md',
-        'blueprint-structure.md',
-        'bug-resolution.md',
-        'execution.md',
-        'git-execution-workflow.md',
-        'git-review-workflow.md',
-        'health-check.md',
-        'hierarchy.md',
-        'milestone-planning.md',
-        'phase-completion.md',
-        'phase-planning.md',
-        'planning.md',
-        'prd-planning.md',
-        'review.md',
-        'revision-planning.md',
-        'scope-change.md',
-        'test-planning.md',
-      ]
-      
-      for (const file of coreFiles) {
-        const templatePath = join(projectDir, 'templates', 'docs', 'core', file)
-        // Create template if it doesn't exist
-        try {
-          await readFile(templatePath, 'utf-8')
-        } catch {
-          await writeFile(templatePath, `# ${file.replace('.md', '')}\n`)
-        }
-        const content = await readFile(templatePath, 'utf-8')
-        await writeFile(join(projectDir, 'docs', 'core', file), content)
-      }
-      
-      // Create manifest
-      await writeFile(
-        join(projectDir, MANIFEST_RELATIVE_PATH),
-        JSON.stringify({
-          templateVersion: TEMPLATE_VERSION,
-          cliVersion: '0.1.0',
-          managedFiles: [],
-        }, null, 2)
-      )
-
-      // Run audit
-      const result = await runDoctorAudit(projectDir)
-      
-      // Note: This test may still show findings if templates don't match exactly
-      // The important thing is the repair plan handles it correctly
-      const plan = await createRepairPlan(result.findings, projectDir)
-      expect(plan.hasBlockingFindings).toBe(false)
-    })
-
     it('handles blocking manifest validation error', async () => {
-      // Setup: Create project with invalid manifest
-      await mkdir(join(projectDir, 'docs/.blueprint'), { recursive: true })
+      const projectDir = await mkdtempJoinTmpdir('blueprint-doctor-blocking-')
+      await writeCanonicalProject(projectDir)
+      
       await writeFile(
         join(projectDir, MANIFEST_RELATIVE_PATH),
         'invalid json {{{'
       )
 
-      // Run audit
-      const result = await runDoctorAudit(projectDir)
-      
-      expect(result.hasBlockingFindings).toBe(true)
-      expect(result.findings.some(f => f.kind === 'manifest-validation-error')).toBe(true)
+      const originalCwd = process.cwd()
+      process.chdir(projectDir)
 
-      // Create repair plan
-      const plan = await createRepairPlan(result.findings, projectDir)
-      
-      expect(plan.hasBlockingFindings).toBe(true)
-      // Blocking findings prevent repairs, but other findings may still generate actions
-      // The key is that hasBlockingFindings is true
-    })
-
-    it('handles combined missing manifest and drifted files', async () => {
-      // Setup: Legacy project with both issues
-      await setupTemplates()
-      await mkdir(join(projectDir, 'docs', 'core'), { recursive: true })
-      
-      // Create drifted file
-      await writeFile(join(projectDir, 'docs/core/execution.md'), '# Drifted\n')
-      
-      // Don't create manifest (legacy project)
-
-      // Run audit
-      const auditResult = await runDoctorAudit(projectDir)
-      
-      const kinds = auditResult.findings.map(f => f.kind)
-      expect(kinds).toContain('missing-manifest')
-      expect(kinds).toContain('drifted-file')
-
-      // Create and execute repair plan
-      const repairPlan = await createRepairPlan(auditResult.findings, projectDir)
-      
-      expect(repairPlan.hasBlockingFindings).toBe(false)
-      
-      const repairResult = await executeRepairs(repairPlan.actions, projectDir)
-      
-      expect(repairResult.success).toBe(true)
-      
-      // Verify both issues were addressed
-      const manifestExists = await readFile(
-        join(projectDir, MANIFEST_RELATIVE_PATH),
-        'utf-8'
-      )
-      expect(JSON.parse(manifestExists)).toBeDefined()
+      try {
+        const result = await invokeCli(['doctor'])
+        
+        expect(result.exitCode).toBe(1)
+        expect(result.stdout).toContain('Manifest validation errors')
+      } finally {
+        process.chdir(originalCwd)
+      }
     })
   })
 })
+
+async function mkdtempJoinTmpdir(prefix: string): Promise<string> {
+  const fs = await import('node:fs/promises')
+  const dir = await fs.mkdtemp(join(tmpdir(), prefix))
+  tempDirs.push(dir)
+  return dir
+}
