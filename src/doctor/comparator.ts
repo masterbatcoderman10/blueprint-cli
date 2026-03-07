@@ -56,7 +56,7 @@ export async function compareFileContent(
  *   { matches: false, projectVersion, bundledVersion, recommendation } — mismatch detected
  *
  * The recommendation string describes the local action the user can take
- * (re-run `blueprint doctor --repair`) without implying remote fetch or update.
+ * (run `blueprint doctor` and confirm repairs) without implying remote fetch or update.
  */
 export function compareTemplateVersion(
   projectVersion: string,
@@ -68,8 +68,8 @@ export function compareTemplateVersion(
 
   const recommendation =
     `This project was scaffolded with template version ${projectVersion}, but the installed CLI ` +
-    `bundles template version ${bundledVersion}. Run \`blueprint doctor --repair\` to apply the ` +
-    `bundled templates and bring the project in sync with the installed CLI.`
+    `bundles template version ${bundledVersion}. Run \`blueprint doctor\` and confirm repairs to ` +
+    `apply the bundled templates and bring the project in sync with the installed CLI.`
 
   return {
     matches: false,
