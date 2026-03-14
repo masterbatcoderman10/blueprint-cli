@@ -4,14 +4,16 @@ import { join, resolve } from 'node:path'
 import { describe, expect, it } from 'vitest'
 
 /**
- * The canonical set of 16 core protocol files that must exist
+ * The canonical set of 17 core protocol files that must exist
  * under templates/docs/core/ for the scaffold engine.
  */
 const CANONICAL_CORE_FILES = [
   'alignment.md',
   'blueprint-structure.md',
   'bug-resolution.md',
-  'git-workflow.md',
+  'execution.md',
+  'git-execution-workflow.md',
+  'git-review-workflow.md',
   'health-check.md',
   'hierarchy.md',
   'milestone-planning.md',
@@ -22,19 +24,18 @@ const CANONICAL_CORE_FILES = [
   'review.md',
   'revision-planning.md',
   'scope-change.md',
-  'task-management-protocol.md',
   'test-planning.md',
 ] as const
 
 const TEMPLATES_CORE_DIR = resolve(__dirname, '..', '..', 'templates', 'docs', 'core')
 
 describe('T-A.2: Core protocol template files', () => {
-  it('T-A.2.1: all 16 core protocol files exist under templates/docs/core/', async () => {
+  it('T-A.2.1: all 17 core protocol files exist under templates/docs/core/', async () => {
     const entries = await readdir(TEMPLATES_CORE_DIR)
     const mdFiles = entries.filter((f) => f.endsWith('.md')).sort()
 
     expect(mdFiles).toEqual([...CANONICAL_CORE_FILES].sort())
-    expect(mdFiles).toHaveLength(16)
+    expect(mdFiles).toHaveLength(17)
   })
 
   it('T-A.2.2: core protocol template files are valid Markdown (non-empty, begin with heading)', async () => {

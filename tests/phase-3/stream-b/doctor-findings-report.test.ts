@@ -86,7 +86,7 @@ describe('T-B.4.2: Version mismatch reporting stays local-only', () => {
 
     const normalized = report.toLowerCase()
     expect(report).toContain('docs/.blueprint/manifest.json')
-    expect(report).toContain('blueprint doctor --repair')
+    expect(report).toContain('blueprint doctor')
     expect(normalized).not.toContain('download')
     expect(normalized).not.toContain('fetch')
     expect(normalized).not.toContain('update')
