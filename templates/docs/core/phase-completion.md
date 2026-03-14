@@ -101,6 +101,8 @@ module writes to these fields.
            set current phase to "TBD — pending phase planning".
     d. Update the Phase Graph with the completed phase
        (mark it with ✓).
+    e. Commit the updated project-progress.md:
+       git add . && git commit -m "Phase {{N}} — {{Name}} complete"
 
     Report to the user:
     - "Phase {{N}} — {{Name}} is complete."
