@@ -55,6 +55,15 @@ A phase cannot begin execution without a completed Test Plan section.
 
     Update the Definition of Done to include:
       - "All tests in the Test Plan pass"
+
+  STEP 5 — COMMIT
+    Commit the updated phase document (with Test Plan appended)
+    to preserve the planning state before execution begins.
+
+  BOUNDARY:
+    Test planning ends here. Do NOT proceed to execution
+    in the same session. Execution is a separate workflow
+    triggered by a separate user command.
 </TestPlanningProcess>
 
 ---

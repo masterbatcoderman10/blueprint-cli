@@ -30,10 +30,15 @@ the kanban board and either approves it or leaves structured feedback.
       Inform user: "No tasks found in review."
       STOP.
 
-    Load docs/core/git-review-workflow.md. Follow its
-    WorktreeVerification process to confirm the worktree exists
-    and navigate into it. All code examination happens inside
-    the worktree directory.
+    IF reviewing bug fix tasks ([BUG] prefix):
+      Bug fixes work on main. No worktree verification needed.
+      Review the code on main directly.
+
+    IF reviewing gate or stream tasks:
+      Load docs/core/git-review-workflow.md. Follow its
+      WorktreeVerification process to confirm the worktree exists
+      and navigate into it. All code examination happens inside
+      the worktree directory.
 
   STEP 2 -- REVIEW EACH TASK (sequentially)
     For each task in IN-REVIEW:
@@ -77,14 +82,19 @@ the kanban board and either approves it or leaves structured feedback.
       Continue to STEP 4.
 
   STEP 4 -- MERGE (only if all tasks are clean)
-    IF every task in the gate or stream was moved to DONE
-    (no tasks remain in IN-REVIEW with notes):
-      Follow the MergeProcess in docs/core/git-review-workflow.md
-      to merge the branch to main and clean up the worktree.
+    IF reviewing bug fix tasks:
+      No merge needed -- bug fixes are already on main.
+      Skip to STEP 5.
 
-    IF any tasks still have review notes (not all clean):
-      Do NOT merge. The branch stays as-is until the
-      re-review cycle completes all tasks to DONE.
+    IF reviewing gate or stream tasks:
+      IF every task in the gate or stream was moved to DONE
+      (no tasks remain in IN-REVIEW with notes):
+        Follow the MergeProcess in docs/core/git-review-workflow.md
+        to merge the branch to main and clean up the worktree.
+
+      IF any tasks still have review notes (not all clean):
+        Do NOT merge. The branch stays as-is until the
+        re-review cycle completes all tasks to DONE.
 
   STEP 5 -- REPORT
     After all tasks have been reviewed, report to the user:

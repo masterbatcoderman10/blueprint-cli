@@ -23,12 +23,12 @@ Loaded by review.md at the start of ReviewProcess.
 
   STEP 2 — VERIFY
     IF the worktree exists:
-      → Navigate to worktrees/<n>/
-      → All code examination happens inside this directory.
+      Navigate to worktrees/<n>/
+      All code examination happens inside this directory.
 
     IF the worktree does not exist:
-      → STOP. Inform user: "Worktree for <gate/stream> not found.
-        Cannot review without the working directory."
+      STOP. Inform user: "Worktree for <gate/stream> not found.
+      Cannot review without the working directory."
 </WorktreeVerification>
 
 ---
@@ -67,17 +67,16 @@ Loaded by review.md at the start of ReviewProcess.
 ---
 
 <WorktreeCleanup>
-  After a successful merge, remove the worktree:
+  After a successful merge, immediately remove the worktree
+  and delete the branch. Do not ask the user for confirmation.
+  This is automatic cleanup, not a decision point.
 
     git worktree remove worktrees/<n>
-
-  The branch may be kept or deleted per user preference.
-  The worktree directory must be removed to avoid clutter
-  as phases progress.
+    git branch -d <branch name>
 
   IF the merge had conflicts that were resolved:
-    → Clean up only after the user confirms the resolution
-      is complete and correct.
+    Clean up only after confirming the resolution is complete
+    and the merge is on main.
 </WorktreeCleanup>
 
 ---

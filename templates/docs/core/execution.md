@@ -145,8 +145,9 @@ and applying review notes after a review cycle.
 
     Repeat until all tasks in the gate or stream are in IN-REVIEW.
 
-  STEP 4 -- STOP
+  STEP 4 -- COMMIT AND STOP
     When all tasks in the gate or stream are in IN-REVIEW:
+    - Commit per docs/core/git-execution-workflow.md CommitOnCompletion.
     - Report completion to the user.
     - Do NOT proceed to the next gate or stream.
     - Do NOT move any task to DONE.
@@ -231,8 +232,9 @@ and applying review notes after a review cycle.
 
     Repeat for the next task.
 
-  STEP 4 -- STOP
+  STEP 4 -- COMMIT AND STOP
     When all addressed tasks are back in IN-REVIEW:
+    - Commit per docs/core/git-execution-workflow.md CommitOnCompletion.
     - Report to the user which tasks were addressed.
     - Do NOT move any task to DONE.
     - Wait for the reviewer to re-review.

@@ -67,6 +67,18 @@ and parallel streams of tasks.
       with the user — this affects parallelism
     - If scope grows significantly, consider splitting into
       a new phase rather than expanding the current one
+
+  BOUNDARY:
+    Phase planning ends here. Do NOT proceed to test planning
+    in the same session. Test planning is a separate workflow
+    triggered by a separate user command. The user may want to
+    review the phase document, adjust scope, or take a break
+    before planning tests.
+
+    The Test Scenarios section in the phase document is a
+    high-level sketch of happy paths and edge cases — it is
+    NOT the formal Test Plan. The formal Test Plan is created
+    by docs/core/test-planning.md in a separate step.
 </PhaseProcess>
 
 ---

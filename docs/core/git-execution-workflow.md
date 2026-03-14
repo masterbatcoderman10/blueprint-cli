@@ -2,9 +2,11 @@
 
 This module defines how the executing agent uses Git during task
 execution. It covers worktree creation, naming, dependency
-verification, and the rules for working inside a worktree.
+verification, commit discipline, and the rules for working
+inside a worktree.
 
-Loaded by execution.md at the start of StartGateOrStream.
+Loaded by execution.md at the start of StartGateOrStream and
+referenced again at completion for commit.
 
 ---
 
@@ -84,3 +86,31 @@ Loaded by execution.md at the start of StartGateOrStream.
   - The executing agent does NOT merge or remove worktrees.
     That is the reviewer's responsibility after a clean review.
 </WorktreeExecutionRules>
+
+---
+
+<CommitOnCompletion>
+  PURPOSE: Ensure all changes are committed before handing off
+  to the reviewer. No uncommitted code should ever reach review.
+
+  WHEN EXECUTION COMPLETES (all tasks in IN-REVIEW):
+    git add .
+    git commit -m "<gate/stream ID>: all tasks complete, ready for review"
+
+  WHEN REVIEW NOTES ARE ADDRESSED (all tasks back in IN-REVIEW):
+    git add .
+    git commit -m "<gate/stream ID>: review notes addressed, ready for re-review"
+
+  FOR BUG FIX TASKS (on main, no worktree):
+    git add .
+    git commit -m "[BUG] <task title>: fix complete, ready for review"
+
+  RULES:
+  - The executing agent ALWAYS commits before moving tasks to
+    IN-REVIEW. This is not optional.
+  - One commit per handoff. Do not commit per-task during
+    execution — commit once when the full gate or stream is
+    ready for review, or when all review notes are addressed.
+  - Commit messages must identify the gate, stream, or bug task
+    so the reviewer and git history are traceable.
+</CommitOnCompletion>

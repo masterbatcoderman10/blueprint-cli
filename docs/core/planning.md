@@ -53,6 +53,16 @@ throughout the planning session.
       - Dependencies — what must exist before this work starts
       - Open decisions — are there choices the user needs to make
 
+    QUESTION STYLE:
+      Ask in small, digestible chunks — 2-3 questions at a time,
+      not a wall of 10 questions in one message. Each exchange
+      should be readable and conversational.
+
+      Do NOT front-load every possible question into one message.
+      Ask the most important questions first. Let the user's
+      answers guide the next round of questions. This is a
+      conversation, not a questionnaire.
+
     IF the user's answers raise new questions → ask those too.
     IF the user's answers are complete and cover the scope → stop asking.
     There is no fixed number of questions. The goal is full understanding
@@ -73,9 +83,16 @@ throughout the planning session.
     Present the draft. Ask if anything needs adjustment.
     Do not treat the first draft as final.
 
+  STEP 5 — COMMIT
+    After the user confirms the document is final, commit it.
+    Planning documents must be committed before the next
+    workflow step begins. This preserves the planning state
+    and ensures the document is in version control before
+    execution or further planning builds on it.
+
   RULE — ONE DOCUMENT PER CYCLE
     Each planning document goes through its own full cycle:
-    ask → confirm understanding → draft → review → finalize.
+    ask → confirm understanding → draft → review → commit.
 
     Never batch-generate multiple planning documents. Even when
     several documents are needed in sequence (e.g., during

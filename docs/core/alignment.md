@@ -58,10 +58,24 @@ been done yet.
       - Scan project structure — directories, entry points, config files
       - Identify tech stack: language, framework, database, notable libraries
       - Identify file organization patterns and conventions
-      - Review git history for scope of implemented work
       - Check for test infrastructure: test runner config files
         (jest.config, vitest.config, pytest.ini, etc.), test directories,
         existing test files, test scripts in package.json or equivalent.
+
+    FOR GIT HISTORY (if git is initialized and has commits):
+      - Analyze the commit history to understand the development
+        timeline. Review commit messages, file changes, and the
+        progression of features over time.
+      - Derive a concise summary of what was built and in what
+        order — group related commits into logical phases of work
+        (e.g., "initial setup", "auth system", "API endpoints",
+        "frontend components").
+      - This becomes the basis for retroactive milestone and phase
+        documents. The goal is a clear picture of "what exists and
+        how it got here", not a commit-by-commit log.
+      - Keep this concise. A project with 200 commits does not
+        need 200 lines of analysis — it needs 5-10 logical groups
+        that describe the major development arcs.
 
     FOR FEATURE STATUS:
       - Cross-reference documented features (from knowledge-base docs) with
@@ -84,6 +98,8 @@ been done yet.
       - Test infrastructure: framework and runner if found,
         or "no test infrastructure detected"
       - Conventions from agent instruction files (if found)
+      - Development timeline derived from git history (if present):
+        major phases of work identified from commits
 
     Then ASK — do not just wait for a nod. Actively question:
       - "Are there features or capabilities I missed?"
@@ -96,7 +112,9 @@ been done yet.
 
     This is a conversation, not a report. The knowledge base
     and codebase may be incomplete. The user knows things that
-    the documents do not capture. Ask until there are no open
+    the documents do not capture. Ask in small chunks — 2-3
+    questions at a time, not everything at once. Let each
+    answer guide the next round. Ask until there are no open
     questions on either side.
 
     Do NOT proceed to document creation until the user confirms
@@ -242,10 +260,20 @@ been done yet.
   3. First milestone document
      - Load docs/core/planning.md, then docs/core/milestone-planning.md.
        Follow their process.
+     - IF git history analysis produced a development timeline:
+       Use it as the basis for structuring what has already been
+       built. The logical groups from the git analysis map to
+       phases within the milestone. This gives the milestone
+       document an accurate picture of completed work without
+       requiring the user to reconstruct it from memory.
      - The first milestone typically covers what has already been built
        plus the immediate next increment
      - If significant work is already implemented, the first milestone
        may be partially or fully complete — reflect this in the document
+     - After establishing what exists, ask the user about what
+       comes next — the future direction, upcoming features, and
+       priorities. The git history tells you where the project has
+       been; the user tells you where it is going.
 
   4. docs/project-progress.md
      - Populate using the following template:

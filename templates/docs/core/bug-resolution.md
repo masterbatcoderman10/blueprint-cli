@@ -204,6 +204,40 @@ specified.
 
 ---
 
+<BugTaskExecution>
+  Bug fix tasks follow the same execution steps as any task
+  in execution.md, but they work on main (no worktree) and
+  do not belong to a gate or stream.
+
+  FOR EACH BUG TASK:
+
+  a. Move task to IN-PROGRESS.
+  b. Write agent identity as author on the task.
+  c. Write a regression test that reproduces the bug (TDD).
+     The test should FAIL before the fix and PASS after.
+     If the bug is not testable (e.g., visual-only), note
+     this in the task description and proceed without a test.
+  d. Implement the fix.
+  e. Run linting on files modified. Fix lint errors.
+  f. Run the tests for the affected area. All tests must pass.
+     If the fix touches code from a prior phase, run that
+     phase's tests as well.
+  g. Update task notes with files modified, test written,
+     and what was changed.
+  h. Commit per docs/core/git-execution-workflow.md CommitOnCompletion.
+  i. Move task to IN-REVIEW.
+
+  After all bug tasks are in IN-REVIEW, the reviewer picks
+  them up through the normal review process in review.md.
+  Bug fix reviews follow the same ReviewProcess — the reviewer
+  examines the code on main, checks the regression test,
+  and either marks clean or leaves notes.
+
+  The executing agent NEVER moves a bug fix task to DONE.
+</BugTaskExecution>
+
+---
+
 <ActiveDevelopmentBugs>
   Bugs discovered during active development (current phase) have
   a shorter path when the origin is clear.
