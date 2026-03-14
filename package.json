@@ -1,9 +1,12 @@
 {
-  "name": "blueprint-cli",
+  "name": "@splitwireml/blueprint",
   "version": "0.1.0",
   "description": "Blueprint CLI — project scaffolding and workflow tool",
   "bin": {
     "blueprint": "./dist/index.js"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "files": [
     "dist",
@@ -16,7 +19,12 @@
     "dev": "tsx src/index.ts",
     "build": "tsc",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run"
+    "test": "vitest run",
+    "release:pack:verify": "tsx src/release/verify-package-artifact.ts",
+    "release:check": "tsx src/release/run-release-check.ts",
+    "release:check:ci": "npm run release:check",
+    "release:check:publish": "npm run release:check",
+    "release:publish:preflight": "tsx src/release/run-publish-preflight.ts"
   },
   "devDependencies": {
     "@types/node": "^25.3.3",
