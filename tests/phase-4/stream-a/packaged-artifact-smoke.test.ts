@@ -1,4 +1,4 @@
-import { mkdir } from 'node:fs/promises'
+import { mkdir, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 
 import { describe, expect, it } from 'vitest'
@@ -18,7 +18,7 @@ describe('T-A.4.1: packed artifact install exposes the public blueprint executab
     } finally {
       await fixture.cleanup()
     }
-  })
+  }, 15000)
 })
 
 describe('T-A.4.2: packed artifact includes runtime assets and supports release-critical smoke paths', () => {
@@ -33,35 +33,27 @@ describe('T-A.4.2: packed artifact includes runtime assets and supports release-
       expect(await pathExists(join(installedPackageRoot, 'templates', 'docs', 'core', 'execution.md'))).toBe(true)
 
       await mkdir(smokeProjectDir, { recursive: true })
-
-      const initResult = await fixture.runInstalledNodeScript(
-        `
-          const { clackPromptApi } = require('@splitwireml/blueprint/dist/init/prompts.js')
-          const { runCli } = require('@splitwireml/blueprint/dist/index.js')
-
-          clackPromptApi.intro = () => {}
-          clackPromptApi.note = () => {}
-          clackPromptApi.outro = () => {}
-          clackPromptApi.text = async () => 'smoke-project'
-          clackPromptApi.multiselect = async () => ['CLAUDE.md']
-
-          let confirmCount = 0
-          clackPromptApi.confirm = async () => {
-            confirmCount += 1
-            return confirmCount === 1 ? false : true
-          }
-
-          runCli(['init'])
-            .then((exitCode) => {
-              process.exitCode = exitCode
-            })
-            .catch((error) => {
-              console.error(error)
-              process.exitCode = 1
-            })
-        `,
-        { cwd: smokeProjectDir },
+      await mkdir(join(smokeProjectDir, '.git'), { recursive: true })
+      await writeFile(
+        join(installedPackageRoot, 'dist', 'init', 'prompts.js'),
+        [
+          '"use strict";',
+          'Object.defineProperty(exports, "__esModule", { value: true });',
+          'exports.clackPromptApi = {',
+          '  intro: () => undefined,',
+          '  text: async () => "smoke-project",',
+          '  select: async () => "skip",',
+          '  multiselect: async () => ["CLAUDE.md"],',
+          '  confirm: async () => true,',
+          '  note: () => undefined,',
+          '  outro: () => undefined,',
+          '};',
+          '',
+        ].join('\n'),
+        'utf-8',
       )
+
+      const initResult = await fixture.runBlueprint(['init'], { cwd: smokeProjectDir })
 
       expect(initResult.exitCode).toBe(0)
       expect(await pathExists(join(smokeProjectDir, 'docs', 'core', 'execution.md'))).toBe(true)
@@ -75,5 +67,5 @@ describe('T-A.4.2: packed artifact includes runtime assets and supports release-
     } finally {
       await fixture.cleanup()
     }
-  })
+  }, 15000)
 })

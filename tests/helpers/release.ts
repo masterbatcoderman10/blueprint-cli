@@ -1,4 +1,4 @@
-import { execFile } from 'node:child_process'
+import { execFile, spawn } from 'node:child_process'
 import { access, mkdtemp, mkdir, readFile, rm, writeFile } from 'node:fs/promises'
 import { constants } from 'node:fs'
 import { tmpdir } from 'node:os'
@@ -28,6 +28,7 @@ export interface IsolatedTempProject {
 export interface PackedCliFixture extends IsolatedTempProject {
   binPath: string
   runBlueprint(args: string[], options?: { cwd?: string }): Promise<CliExecutionResult>
+  runBlueprintInteractive(args: string[], input: string, options?: { cwd?: string; allowNonZeroExit?: boolean }): Promise<CliExecutionResult>
   runInstalledNodeScript(script: string, options?: { cwd?: string; allowNonZeroExit?: boolean }): Promise<CliExecutionResult>
 }
 
@@ -95,6 +96,12 @@ export async function installPackedCliFixture(): Promise<PackedCliFixture> {
           allowNonZeroExit: true,
         })
       },
+      async runBlueprintInteractive(args: string[], input: string, options = {}) {
+        return runInteractiveCommand(binPath, args, input, {
+          cwd: options.cwd ?? project.rootDir,
+          allowNonZeroExit: options.allowNonZeroExit,
+        })
+      },
       async runInstalledNodeScript(script: string, options = {}) {
         return runCommand(process.execPath, ['-e', script], {
           cwd: options.cwd ?? project.rootDir,
@@ -111,6 +118,58 @@ export async function installPackedCliFixture(): Promise<PackedCliFixture> {
     await rm(packDir, { recursive: true, force: true })
     throw error
   }
+}
+
+async function runInteractiveCommand(
+  command: string,
+  args: string[],
+  input: string,
+  options: {
+    cwd: string
+    allowNonZeroExit?: boolean
+  },
+): Promise<CliExecutionResult> {
+  return new Promise((resolve, reject) => {
+    const child = spawn(command, args, {
+      cwd: options.cwd,
+      env: {
+        ...process.env,
+        NO_COLOR: '1',
+      },
+      stdio: ['pipe', 'pipe', 'pipe'],
+    })
+
+    let stdout = ''
+    let stderr = ''
+
+    child.stdout.on('data', (chunk) => {
+      stdout += chunk.toString()
+    })
+
+    child.stderr.on('data', (chunk) => {
+      stderr += chunk.toString()
+    })
+
+    child.on('error', reject)
+
+    child.on('close', (code) => {
+      const result: CliExecutionResult = {
+        exitCode: typeof code === 'number' ? code : 1,
+        stdout,
+        stderr,
+      }
+
+      if (result.exitCode !== 0 && !options.allowNonZeroExit) {
+        reject(new Error(`Command failed with exit code ${result.exitCode}\n${stderr || stdout}`))
+        return
+      }
+
+      resolve(result)
+    })
+
+    child.stdin.write(input)
+    child.stdin.end()
+  })
 }
 
 async function runCommand(

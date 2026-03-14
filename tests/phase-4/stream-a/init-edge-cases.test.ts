@@ -1,12 +1,15 @@
 import { join } from 'node:path'
 
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
 import { readManifest } from '../../../src/doctor/manifest'
 import { executeScaffold } from '../../../src/init/archive-engine'
 import { discoverMarkdownFilesForMigration } from '../../../src/init/onboarding'
+import { clackPromptApi } from '../../../src/init/prompts'
 import type { InitOptions } from '../../../src/init/types'
 import { createIsolatedTempProject, pathExists } from '../../helpers/release'
+import { writeCanonicalProject } from '../../phase-3/stream-b/test-project'
+import { initCommand } from '../../../src/commands/init'
 
 function buildInitOptions(projectRoot: string, overrides: Partial<InitOptions> = {}): InitOptions {
   const baseOptions: InitOptions = {
@@ -64,32 +67,66 @@ function buildInitOptions(projectRoot: string, overrides: Partial<InitOptions> =
 }
 
 describe('T-A.2.1: init preserves unselected user-owned markdown files', () => {
-  it('moves only explicitly selected markdown files into the archive boundary', async () => {
+  it('archives existing Blueprint state before regenerating and leaves unselected user-owned files untouched', async () => {
     const project = await createIsolatedTempProject('blueprint-init-edge-')
+    const originalIntro = clackPromptApi.intro
+    const originalText = clackPromptApi.text
+    const originalSelect = clackPromptApi.select
+    const originalMultiselect = clackPromptApi.multiselect
+    const originalConfirm = clackPromptApi.confirm
+    const originalNote = clackPromptApi.note
+    const originalOutro = clackPromptApi.outro
 
     try {
-      await project.writeFile('README.md', '# selected\n')
+      await writeCanonicalProject(project.rootDir)
+      await project.writeFile('docs/core/execution.md', '# Existing Blueprint Docs\n')
+      await project.writeFile('CLAUDE.md', '# Existing Agent\n')
       await project.writeFile('notes/private.md', '# keep\n')
 
-      await executeScaffold(
-        project.rootDir,
-        buildInitOptions(project.rootDir, {
-          markdownMigration: {
-            discoveredMarkdownPaths: [
-              join(project.rootDir, 'README.md'),
-              join(project.rootDir, 'notes/private.md'),
-            ],
-            transferMode: 'move',
-            selectedPaths: [join(project.rootDir, 'README.md')],
-          },
-        }),
-      )
+      clackPromptApi.intro = vi.fn() as typeof clackPromptApi.intro
+      clackPromptApi.text = vi.fn().mockResolvedValue('phase-4-edge') as typeof clackPromptApi.text
+      clackPromptApi.select = vi.fn().mockResolvedValueOnce('global').mockResolvedValueOnce('skip') as typeof clackPromptApi.select
+      clackPromptApi.multiselect = vi.fn().mockResolvedValue(['CLAUDE.md']) as typeof clackPromptApi.multiselect
+      clackPromptApi.confirm = vi
+        .fn()
+        .mockResolvedValueOnce(true)
+        .mockResolvedValueOnce(true)
+        .mockResolvedValueOnce(true)
+        .mockResolvedValueOnce(true) as typeof clackPromptApi.confirm
+      clackPromptApi.note = vi.fn() as typeof clackPromptApi.note
+      clackPromptApi.outro = vi.fn() as typeof clackPromptApi.outro
 
-      expect(await pathExists(join(project.rootDir, 'README.md'))).toBe(false)
-      expect(await pathExists(join(project.rootDir, 'knowledge-base', 'README.md'))).toBe(true)
+      const originalCwd = process.cwd()
+      process.chdir(project.rootDir)
+
+      try {
+        const result = await initCommand.handler({
+          commandName: 'init',
+          args: [],
+          rawArgv: ['init'],
+        })
+
+        expect(result).toEqual({ exitCode: 0 })
+      } finally {
+        process.chdir(originalCwd)
+      }
+
+      expect(await pathExists(join(project.rootDir, 'knowledge-base', 'docs-archived', 'core', 'execution.md'))).toBe(true)
+      expect(await pathExists(join(project.rootDir, 'knowledge-base', 'CLAUDE.md'))).toBe(true)
+      expect(await project.readFile('knowledge-base/docs-archived/core/execution.md')).toBe('# Existing Blueprint Docs\n')
+      expect(await project.readFile('knowledge-base/CLAUDE.md')).toBe('# Existing Agent\n')
+      expect(await pathExists(join(project.rootDir, 'docs', 'core', 'execution.md'))).toBe(true)
+      expect(await pathExists(join(project.rootDir, 'CLAUDE.md'))).toBe(true)
       expect(await project.readFile('notes/private.md')).toBe('# keep\n')
       expect(await pathExists(join(project.rootDir, 'knowledge-base', 'notes', 'private.md'))).toBe(false)
     } finally {
+      clackPromptApi.intro = originalIntro
+      clackPromptApi.text = originalText
+      clackPromptApi.select = originalSelect
+      clackPromptApi.multiselect = originalMultiselect
+      clackPromptApi.confirm = originalConfirm
+      clackPromptApi.note = originalNote
+      clackPromptApi.outro = originalOutro
       await project.cleanup()
     }
   })
