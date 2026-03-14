@@ -2,6 +2,21 @@
   "name": "@splitwireml/blueprint",
   "version": "0.1.0",
   "description": "Blueprint CLI — project scaffolding and workflow tool",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/masterbatcoderman10/blueprint-cli.git"
+  },
+  "homepage": "https://github.com/masterbatcoderman10/blueprint-cli#readme",
+  "bugs": {
+    "url": "https://github.com/masterbatcoderman10/blueprint-cli/issues"
+  },
+  "keywords": [
+    "blueprint",
+    "cli",
+    "project-scaffolding",
+    "workflow"
+  ],
   "bin": {
     "blueprint": "./dist/index.js"
   },
