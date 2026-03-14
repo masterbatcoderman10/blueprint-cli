@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 import { placeholderCommands } from './commands'
 import { createCommandRuntime } from './runtime'
 
