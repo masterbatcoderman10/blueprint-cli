@@ -17,6 +17,10 @@ describe('T-C.2.1: README covers the implemented public release surface', () => 
 
     expect(readme).toContain('# Blueprint CLI')
     expect(readme).toContain('npm install -g @splitwireml/blueprint')
+    expect(readme).toContain(
+      'https://github.com/masterbatcoderman10/blueprint-cli/blob/main/docs/release-contract.md',
+    )
+    expect(readme).not.toContain('[`docs/release-contract.md`](docs/release-contract.md)')
     expect(readme).toContain('```mermaid')
     expect(readme).toContain('blueprint init')
     expect(readme).toContain('blueprint doctor')
