@@ -12,7 +12,7 @@ This document is the Phase 4 source of truth for the public M1 release baseline.
 
 - Release publishing is triggered only by stable semver tags in the format `vMAJOR.MINOR.PATCH`
 - Examples: `v0.1.0`, `v1.2.3`
-- Ineligible tags include branch names, prefixed tags such as `release/v0.1.0`, partial versions, and prerelease tags such as `v0.1.0-beta.1`
+- Ineligible tags include branch names, prefixed tags such as `release/v0.1.0`, partial versions, prerelease tags such as `v0.1.0-beta.1`, and tags with leading-zero numeric identifiers such as `v01.2.3`
 
 ## Shared Release Verification
 
