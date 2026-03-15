@@ -7,6 +7,7 @@ const defaultIgnoredDirectories = new Set([
   'dist',
   'build',
   'coverage',
+  'knowledge-base',
   '.next',
   '.turbo',
   'out',
