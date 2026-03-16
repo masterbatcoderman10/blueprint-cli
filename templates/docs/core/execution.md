@@ -53,6 +53,14 @@ and applying review notes after a review cycle.
   - Kanban MCP is reachable
   - User has specified which gate or stream to start
 
+  CONTEXT INFERENCE:
+    The current milestone and phase are read from
+    docs/project-progress.md. When the user says "start stream A"
+    or "start gate", infer the milestone and phase from
+    project-progress.md. Do NOT ask the user which milestone
+    or phase they mean unless project-progress.md is ambiguous
+    or does not reference an active phase.
+
   IF the phase document does not contain a Test Plan section:
     STOP. Inform user: "This phase has no test plan. Run test
     planning before starting execution."
@@ -186,6 +194,11 @@ and applying review notes after a review cycle.
   - The specified gate or stream has been through at least one
     review cycle
   - Clean tasks have already been moved to DONE by the reviewer
+
+  CONTEXT INFERENCE:
+    Same as StartGateOrStream — infer the current milestone and
+    phase from docs/project-progress.md. Do not ask the user
+    unless project-progress.md is ambiguous.
 
   FLOW:
 

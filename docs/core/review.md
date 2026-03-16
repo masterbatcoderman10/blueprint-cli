@@ -20,6 +20,14 @@ the kanban board and either approves it or leaves structured feedback.
   - Kanban MCP is reachable
   - User has specified which gate, stream, or agent's work to review
 
+  CONTEXT INFERENCE:
+    The current milestone and phase are read from
+    docs/project-progress.md. When the user says "review stream A"
+    or "review gate", infer the milestone and phase from
+    project-progress.md. Do NOT ask the user which milestone
+    or phase they mean unless project-progress.md is ambiguous
+    or does not reference an active phase.
+
   FLOW:
 
   STEP 1 -- IDENTIFY TASKS AND WORKTREE
