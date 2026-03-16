@@ -8,7 +8,7 @@ Blueprint CLI is the public command-line release for Blueprint scaffolding and p
 npm install -g @splitwireml/blueprint
 ```
 
-- Supported Node.js: `>=18.0.0`
+- Supported Node.js: `>=20.0.0`
 - Public release contract: [release contract](https://github.com/masterbatcoderman10/blueprint-cli/blob/main/docs/release-contract.md)
 
 ## What M1 Supports

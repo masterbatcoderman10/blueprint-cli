@@ -6,7 +6,7 @@ This document is the Phase 4 source of truth for the public M1 release baseline.
 
 - npm package: `@splitwireml/blueprint`
 - Installed executable: `blueprint`
-- Supported Node.js policy: `>=18.0.0`
+- Supported Node.js policy: `>=20.0.0`
 
 ## Release Tags
 

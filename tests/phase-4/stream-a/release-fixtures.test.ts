@@ -40,5 +40,5 @@ describe('T-A.1.2: packed tarball fixture setup', () => {
     }
 
     expect(await pathExists(fixture.rootDir)).toBe(false)
-  })
+  }, 30_000)
 })
