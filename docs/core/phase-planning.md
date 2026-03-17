@@ -52,6 +52,10 @@ and parallel streams of tasks.
       on each other, they belong in separate streams. If a task only
       depends on part of another stream's output, make that dependency
       explicit rather than blocking on the entire stream.
+      There is no artificial limit on stream count. If the phase has
+      five independent feature areas, create five streams. Do not
+      collapse independent work into fewer streams just for simplicity
+      — parallelism is a primary advantage of the gate/stream model.
     - Break streams into tasks — each task should be completable
       in a single focused session (≤ 2 duration units)
     - Write acceptance criteria for each gate and stream
