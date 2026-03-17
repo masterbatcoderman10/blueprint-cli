@@ -2,10 +2,15 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest'
 import * as fs from 'fs'
 import * as path from 'path'
 import * as os from 'os'
+import { createRequire } from 'module'
 
 import { executeScaffold } from '../../../src/init/archive-engine'
 import { readManifest, MANIFEST_RELATIVE_PATH } from '../../../src/doctor/manifest'
 import type { InitOptions } from '../../../src/init/types'
+
+const require = createRequire(import.meta.url)
+const pkg = require('../../../package.json')
+const CLI_VERSION: string = pkg.version
 
 function createMinimalOptions(projectName: string = 'test-project'): InitOptions {
   return {
@@ -70,7 +75,7 @@ describe('T-A.2.1: init creates manifest in freshly scaffolded project', () => {
     if (manifestState.present) {
       expect(manifestState.data).toMatchObject({
         templateVersion: '1.0.0',
-        cliVersion: '0.1.0',
+        cliVersion: CLI_VERSION,
         managedFiles: expect.any(Array),
       })
     }
