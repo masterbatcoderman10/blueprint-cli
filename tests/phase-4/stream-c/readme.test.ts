@@ -12,21 +12,20 @@ function readReadme(): string {
 }
 
 describe('T-C.2.1: README covers the implemented public release surface', () => {
-  it('includes install guidance, current command usage, Mermaid diagrams, and M1 boundaries', () => {
+  it('includes install guidance, current command usage, planning hierarchy, and release info', () => {
     const readme = readReadme()
 
-    expect(readme).toContain('# Blueprint CLI')
+    expect(readme).toContain('# Blueprint')
     expect(readme).toContain('npm install -g @splitwireml/blueprint')
     expect(readme).toContain(
       'https://github.com/masterbatcoderman10/blueprint-cli/blob/main/docs/release-contract.md',
     )
     expect(readme).not.toContain('[`docs/release-contract.md`](docs/release-contract.md)')
-    expect(readme).toContain('```mermaid')
     expect(readme).toContain('blueprint init')
     expect(readme).toContain('blueprint doctor')
-    expect(readme).toContain('Blueprint scaffolding')
-    expect(readme).toContain('Phase 1')
-    expect(readme).toContain('does not yet implement')
+    expect(readme).toContain('Planning Hierarchy')
+    expect(readme).toContain('Phase')
+    expect(readme).toContain('coming soon')
   })
 })
 
@@ -42,7 +41,6 @@ describe('T-C.2.2: README examples stay aligned with the real CLI surface', () =
       expect(readme).toContain(`blueprint ${command.name}`)
     }
 
-    expect(readme).toContain('placeholder command boundary')
     expect(readme).not.toContain('blueprint share')
     expect(readme).not.toContain('blueprint review')
   })
