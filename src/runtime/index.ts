@@ -17,7 +17,20 @@ export interface CommandDefinition {
   handler: CommandHandler
 }
 
-export type DispatchReason = 'no-command' | 'unknown-command' | 'handled'
+export interface RootHelpContext {
+  rawArgv: string[]
+}
+
+export type RootHelpHandler =
+  | ((context: RootHelpContext) => CommandHandlerResult | void)
+  | ((context: RootHelpContext) => Promise<CommandHandlerResult | void>)
+
+export interface CommandRuntimeOptions {
+  isRootHelpInvocation?: (argv: string[]) => boolean
+  rootHelpHandler?: RootHelpHandler
+}
+
+export type DispatchReason = 'no-command' | 'unknown-command' | 'handled' | 'root-help'
 
 export interface CommandDispatchResult {
   matched: boolean
@@ -32,7 +45,9 @@ export interface CommandRuntime {
   listCommands(): string[]
 }
 
-export function createCommandRuntime(): CommandRuntime {
+export function createCommandRuntime(options: CommandRuntimeOptions = {}): CommandRuntime {
+  const isRootHelpInvocation = options.isRootHelpInvocation ?? (() => false)
+  const rootHelpHandler = options.rootHelpHandler
   const commands = new Map<string, CommandDefinition>()
 
   return {
@@ -44,6 +59,19 @@ export function createCommandRuntime(): CommandRuntime {
       commands.set(command.name, command)
     },
     async dispatch(argv) {
+      if (rootHelpHandler && isRootHelpInvocation(argv)) {
+        const maybeResult = await rootHelpHandler({
+          rawArgv: argv,
+        })
+
+        return {
+          matched: true,
+          commandName: argv[0],
+          exitCode: typeof maybeResult?.exitCode === 'number' ? maybeResult.exitCode : 0,
+          reason: 'root-help',
+        }
+      }
+
       if (argv.length === 0) {
         return {
           matched: false,

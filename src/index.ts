@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 import { placeholderCommands } from './commands'
+import { isSupportedRootHelpInvocation, writeRootHelp } from './help/root'
 import { createCommandRuntime } from './runtime'
 
 declare const require:
@@ -28,7 +29,13 @@ export async function runCli(argv: string[]): Promise<number> {
     return 1
   }
 
-  const runtime = createCommandRuntime()
+  const runtime = createCommandRuntime({
+    isRootHelpInvocation: isSupportedRootHelpInvocation,
+    rootHelpHandler: () => {
+      writeRootHelp()
+      return { exitCode: 0 }
+    },
+  })
   for (const command of placeholderCommands) {
     runtime.register(command)
   }
