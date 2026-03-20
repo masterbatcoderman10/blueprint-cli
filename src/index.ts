@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 
 import { placeholderCommands } from './commands'
+import { parseCommandHelpInvocation, writeCommandHelp } from './help/command'
+import { writeUnknownCommandRecovery } from './help/recovery'
 import { isSupportedRootHelpInvocation, writeRootHelp } from './help/root'
 import { createCommandRuntime } from './runtime'
 
@@ -40,7 +42,22 @@ export async function runCli(argv: string[]): Promise<number> {
     runtime.register(command)
   }
 
+  const commandHelpRequest = parseCommandHelpInvocation(argv)
+  if (commandHelpRequest) {
+    if (commandHelpRequest.isImplemented) {
+      writeCommandHelp(commandHelpRequest.targetCommand)
+      return 0
+    }
+    writeUnknownCommandRecovery(commandHelpRequest.targetCommand)
+    return 1
+  }
+
   const result = await runtime.dispatch(argv)
+
+  if (result.reason === 'unknown-command' && result.commandName) {
+    writeUnknownCommandRecovery(result.commandName)
+  }
+
   return result.exitCode
 }
 
