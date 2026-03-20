@@ -2,9 +2,9 @@
 
 **Project**: blueprint-cli
 **Kanban**: blueprint-cli
-**Current Milestone**: Revision 1 — CLI Discoverability & Help (Planning Complete)
-**Current Phase**: Phase 1 — Root Help & Dispatch Contract (Ready for execution)
-**Status**: MVP Complete; Revision 1 Phase 1 planned and test-planned
+**Current Milestone**: Revision 1 — CLI Discoverability & Help (In Progress)
+**Current Phase**: Phase 2 — Incorrect Command Recovery & Command-Level Guidance (TBD — pending phase planning)
+**Status**: MVP Complete; Revision 1 Phase 1 complete
 
 ---
 
@@ -27,6 +27,7 @@
 - 2026-03-16: Milestone 1 — Project Bootstrap completed. All phases done.
 - 2026-03-20: Identified Revision 1 — CLI Discoverability & Help to change root invocation and incorrect-command behavior for the existing M1 CLI surface. Impact spans M1 Phases 1, 3, and 4; revision document created at `docs/milestones/revision-1-cli-discoverability/`.
 - 2026-03-20: Revision 1 Phase 1 — Root Help & Dispatch Contract was planned and test-planned. Phase document committed and ready for execution.
+- 2026-03-21: Revision 1 Phase 1 — Root Help & Dispatch Contract completed. All tasks done, DoD satisfied, full test suite green (286 tests, 48 files).
 
 ---
 
@@ -51,6 +52,10 @@ M1 — Project Bootstrap
 ├── Phase 2 — Scaffold Engine ✓
 ├── Phase 3 — Template Integrity ✓
 └── Phase 4 — Testing Setup & Release Readiness ✓
+R1 — CLI Discoverability & Help
+├── Phase 1 — Root Help & Dispatch Contract ✓
+├── Phase 2 — Incorrect Command Recovery & Command-Level Guidance ○
+└── Phase 3 — Documentation & Regression Coverage Alignment ○
 M2 — Cross-Project Context (Optional Post-MVP)
 └── Phase 1 — TBD ○
 M3 — Workflow Visibility Enhancements (Optional Future)
@@ -65,9 +70,9 @@ M3 — Workflow Visibility Enhancements (Optional Future)
 > The agent should surface these at session start.
 
 - **Revision 1 — CLI Discoverability & Help**
-  - **Status:** Phase 1 planned and test-planned; ready for execution
+  - **Status:** Phase 1 complete; Phase 2 pending planning
   - **Priority:** Next
   - **Scope:** Revise root CLI discoverability so `blueprint`, root help flags, and incorrect or unrecognized commands produce actionable usage guidance.
   - **Impact:** M1 Phases 1, 3, and 4
   - **Document:** `docs/milestones/revision-1-cli-discoverability/revision-1-cli-discoverability.md`
-  - **Active Phase:** `docs/milestones/revision-1-cli-discoverability/phase-1-root-help-dispatch-contract.md`
+  - **Active Phase:** Phase 2 — Incorrect Command Recovery & Command-Level Guidance (pending planning)
