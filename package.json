@@ -1,6 +1,6 @@
 {
   "name": "@splitwireml/blueprint",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Blueprint CLI — project scaffolding and workflow tool",
   "license": "MIT",
   "repository": {
