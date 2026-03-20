@@ -35,3 +35,47 @@ describe('T-B.1.1: Command-help metadata for implemented commands', () => {
     expect(contextResult.stderr).toContain('Unknown command: context')
   })
 })
+
+describe('T-B.2.1: blueprint help <command> renders command-level guidance', () => {
+  it('blueprint help init renders command-level usage guidance', async () => {
+    const result = await invokeCli(['help', 'init'])
+
+    expect(result.exitCode).toBe(0)
+    expect(result.stdout).toContain('Usage: blueprint init')
+    expect(result.stdout).toContain('Scaffold')
+    expect(result.stderr).toBe('')
+  })
+
+  it('blueprint help doctor renders command-level usage guidance', async () => {
+    const result = await invokeCli(['help', 'doctor'])
+
+    expect(result.exitCode).toBe(0)
+    expect(result.stdout).toContain('Usage: blueprint doctor')
+    expect(result.stdout).toContain('Audit')
+    expect(result.stderr).toBe('')
+  })
+})
+
+describe('T-B.3.1 and T-B.3.2: <command> --help renders help without executing', () => {
+  it('blueprint init --help renders help without executing onboarding or scaffold', async () => {
+    const result = await invokeCli(['init', '--help'])
+
+    expect(result.exitCode).toBe(0)
+    expect(result.stdout).toContain('Usage: blueprint init')
+    expect(result.stdout).toContain('Scaffold')
+    expect(result.stderr).toBe('')
+    expect(result.stdout).not.toContain('project name')
+    expect(result.stdout).not.toContain('Blueprint initialization complete')
+  })
+
+  it('blueprint doctor --help renders help without running audit, repair, or prompts', async () => {
+    const result = await invokeCli(['doctor', '--help'])
+
+    expect(result.exitCode).toBe(0)
+    expect(result.stdout).toContain('Usage: blueprint doctor')
+    expect(result.stdout).toContain('Audit')
+    expect(result.stderr).toBe('')
+    expect(result.stdout).not.toContain('Checking')
+    expect(result.stdout).not.toContain('Issues found')
+  })
+})
