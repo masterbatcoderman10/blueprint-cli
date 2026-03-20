@@ -25,6 +25,7 @@
 - 2026-03-14: Phase 3 — Template Integrity completed. All tasks done, DoD satisfied, full test suite green (217 tests, 31 files).
 - 2026-03-16: Phase 4 — Testing Setup & Release Readiness completed. All tasks done, DoD satisfied, full test suite green (266 tests, 45 files).
 - 2026-03-16: Milestone 1 — Project Bootstrap completed. All phases done.
+- 2026-03-20: Identified Revision 1 — CLI Discoverability & Help to change root invocation and incorrect-command behavior for the existing M1 CLI surface. Impact spans M1 Phases 1, 3, and 4; revision document created at `docs/milestones/revision-1-cli-discoverability/`.
 
 ---
 
@@ -62,4 +63,9 @@ M3 — Workflow Visibility Enhancements (Optional Future)
 > Track revisions that have been identified but not yet executed.
 > The agent should surface these at session start.
 
-(none)
+- **Revision 1 — CLI Discoverability & Help**
+  - **Status:** Pending planning follow-through
+  - **Priority:** User scheduling not yet specified
+  - **Scope:** Revise root CLI discoverability so `blueprint`, root help flags, and incorrect or unrecognized commands produce actionable usage guidance.
+  - **Impact:** M1 Phases 1, 3, and 4
+  - **Document:** `docs/milestones/revision-1-cli-discoverability/revision-1-cli-discoverability.md`
