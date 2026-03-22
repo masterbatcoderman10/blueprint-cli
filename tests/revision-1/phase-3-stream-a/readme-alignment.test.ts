@@ -41,8 +41,10 @@ describe('T-A.1.1: README quick-start and command sections reflect current disco
 
   it('README describes incorrect-command recovery behavior', () => {
     const readme = readFileSync(readmePath, 'utf-8')
-    expect(readme).toMatch(/command not found/)
-    expect(readme).toMatch(/Available commands:.*init.*doctor/)
+    expect(readme).toMatch(/Unknown command:/)
+    expect(readme).toMatch(/Usage: blueprint <command>/)
+    expect(readme).toMatch(/init.*Scaffold a Blueprint project/)
+    expect(readme).toMatch(/doctor.*Audit and repair/)
   })
 })
 

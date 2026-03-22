@@ -188,11 +188,17 @@ blueprint init --help   # Same as above
 blueprint doctor --help # Same as above
 ```
 
-If you run a command Blueprint doesn't recognize, it will tell you which commands are available and how to get help:
+If you run a command Blueprint doesn't recognize, it will tell you which commands are available:
 
 ```bash
-blueprint foo
-# Output: "foo: command not found. Available commands: init, doctor"
+$ blueprint foo
+Unknown command: foo
+
+Usage: blueprint <command>
+
+Commands:
+  init    Scaffold a Blueprint project.
+  doctor  Audit and repair the current Blueprint project.
 ```
 
 Run `blueprint doctor` at any time to validate your project structure and repair any drift:
