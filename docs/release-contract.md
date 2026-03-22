@@ -38,5 +38,6 @@ This document is the Phase 4 source of truth for the public M1 release baseline.
 
 ## M1 Public Boundary
 
-- Public M1 CLI scope is limited to the currently implemented commands: `init`, `link`, `context`, and `doctor`
+- Public M1 CLI scope is limited to the currently implemented commands: `init` and `doctor`
+- `blueprint link` and `blueprint context` are documented as coming soon and are not part of the current implemented guidance surface
 - This release baseline does not promise unreleased milestone features, cross-project context automation, or workflow visibility features from later milestones
