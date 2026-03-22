@@ -3,8 +3,8 @@
 **Project**: blueprint-cli
 **Kanban**: blueprint-cli
 **Current Milestone**: Revision 1 — CLI Discoverability & Help (In Progress)
-**Current Phase**: Phase 2 — Incorrect Command Recovery & Command-Level Guidance (TBD — pending phase planning)
-**Status**: MVP Complete; Revision 1 Phase 1 complete
+**Current Phase**: Phase 2 — Incorrect Command Recovery & Command-Level Guidance (In Progress)
+**Status**: MVP Complete; Revision 1 Phase 1 complete; Phase 2 Gate 2.0, Stream A, Stream B complete; Stream C complete, in review
 
 ---
 
@@ -28,6 +28,7 @@
 - 2026-03-20: Identified Revision 1 — CLI Discoverability & Help to change root invocation and incorrect-command behavior for the existing M1 CLI surface. Impact spans M1 Phases 1, 3, and 4; revision document created at `docs/milestones/revision-1-cli-discoverability/`.
 - 2026-03-20: Revision 1 Phase 1 — Root Help & Dispatch Contract was planned and test-planned. Phase document committed and ready for execution.
 - 2026-03-21: Revision 1 Phase 1 — Root Help & Dispatch Contract completed. All tasks done, DoD satisfied, full test suite green (286 tests, 48 files).
+- 2026-03-22: Revision 1 Phase 2 Stream C (Regression Coverage & Boundary Protection) completed. All 19 Stream C regression tests pass, protecting the unknown-command recovery contract, command-help entrypoint alignment, and Phase 1 root-help boundary. Full test suite: 321 tests (7 pre-existing failures from Phase 4 build-related tests).
 
 ---
 
@@ -54,7 +55,7 @@ M1 — Project Bootstrap
 └── Phase 4 — Testing Setup & Release Readiness ✓
 R1 — CLI Discoverability & Help
 ├── Phase 1 — Root Help & Dispatch Contract ✓
-├── Phase 2 — Incorrect Command Recovery & Command-Level Guidance ○
+├── Phase 2 — Incorrect Command Recovery & Command-Level Guidance ●
 └── Phase 3 — Documentation & Regression Coverage Alignment ○
 M2 — Cross-Project Context (Optional Post-MVP)
 └── Phase 1 — TBD ○
