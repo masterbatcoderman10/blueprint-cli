@@ -188,6 +188,13 @@ blueprint init --help   # Same as above
 blueprint doctor --help # Same as above
 ```
 
+If you run a command Blueprint doesn't recognize, it will tell you which commands are available and how to get help:
+
+```bash
+blueprint foo
+# Output: "foo: command not found. Available commands: init, doctor"
+```
+
 Run `blueprint doctor` at any time to validate your project structure and repair any drift:
 
 ```bash

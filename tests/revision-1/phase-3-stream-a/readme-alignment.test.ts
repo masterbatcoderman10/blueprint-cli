@@ -38,6 +38,12 @@ describe('T-A.1.1: README quick-start and command sections reflect current disco
     expect(initSection).not.toBeNull()
     expect(doctorSection).not.toBeNull()
   })
+
+  it('README describes incorrect-command recovery behavior', () => {
+    const readme = readFileSync(readmePath, 'utf-8')
+    expect(readme).toMatch(/command not found/)
+    expect(readme).toMatch(/Available commands:.*init.*doctor/)
+  })
 })
 
 describe('T-A.2.1: README keeps link and context as coming-soon references', () => {
@@ -78,9 +84,18 @@ describe('T-A.3.1: README install, executable, and examples stay aligned with CL
     expect(readme).toMatch(/npm\s+install\s+-g\s+@splitwireml\/blueprint/)
   })
 
-  it('README refers to blueprint executable consistently', () => {
+  it('README refers to blueprint executable in Install section', () => {
     const readme = readFileSync(readmePath, 'utf-8')
-    expect(readme).toMatch(/\bblueprint\b/)
+    const installSection = readme.match(/## Install[\s\S]*?(?=##|\n#|$)/)
+    expect(installSection).not.toBeNull()
+    expect(installSection![0]).toMatch(/\bblueprint\b/)
+  })
+
+  it('README refers to blueprint executable in Release Info section', () => {
+    const readme = readFileSync(readmePath, 'utf-8')
+    const releaseInfoSection = readme.match(/## Release Info[\s\S]*?(?=##|\n#|$)/)
+    expect(releaseInfoSection).not.toBeNull()
+    expect(releaseInfoSection![0]).toMatch(/\bblueprint\b/)
   })
 
   it('README release-contract link points to the correct docs path', () => {
