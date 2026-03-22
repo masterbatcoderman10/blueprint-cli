@@ -174,6 +174,33 @@ blueprint init
 
 This scaffolds the full Blueprint docs and templates into your repository — PRD, milestone tracker, phase docs, testing contracts, conventions file, and managed agent files — giving you and your AI tools a shared foundation from day one.
 
+### Getting Help
+
+Blueprint provides contextual help at every level:
+
+```bash
+blueprint           # Show root help with available commands
+blueprint --help   # Same as above
+blueprint -h       # Same as above
+blueprint help init    # Show help for init command
+blueprint help doctor  # Show help for doctor command
+blueprint init --help   # Same as above
+blueprint doctor --help # Same as above
+```
+
+If you run a command Blueprint doesn't recognize, it will tell you which commands are available:
+
+```bash
+$ blueprint foo
+Unknown command: foo
+
+Usage: blueprint <command>
+
+Commands:
+  init    Scaffold a Blueprint project.
+  doctor  Audit and repair the current Blueprint project.
+```
+
 Run `blueprint doctor` at any time to validate your project structure and repair any drift:
 
 ```bash
@@ -218,4 +245,4 @@ Cross-project context surfacing — giving agents and developers a full picture 
 - **Executable:** `blueprint`
 - **Node.js:** `>=20.0.0`
 - **Versioning:** stable semver `vMAJOR.MINOR.PATCH`
-- [Release contract](https://github.com/masterbatcoderman10/blueprint-cli/blob/main/docs/release-contract.md)
+- [Release contract](docs/release-contract.md)
