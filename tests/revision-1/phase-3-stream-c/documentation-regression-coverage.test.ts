@@ -1,8 +1,8 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, beforeAll, afterAll } from 'vitest'
 import { invokeCli } from '../../helpers/cli'
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
-import { installPackedCliFixture, pathExists } from '../../helpers/release'
+import { installPackedCliFixture } from '../../helpers/release'
 
 const workspaceRoot = join(__dirname, '..', '..', '..')
 
@@ -46,7 +46,7 @@ describe('Stream C: Regression Coverage & Packaged Help Smoke', () => {
   })
 
   describe('T-C.2.1: Source-checkout CLI examples match documented behavior', () => {
-    it('blueprint (no args) renders help surface matching README examples', async () => {
+    it('blueprint (no args) renders help surface matching README documented contract', async () => {
       const readme = readFileSync(join(workspaceRoot, 'README.md'), 'utf-8')
       const result = await invokeCli([])
 
@@ -55,7 +55,9 @@ describe('Stream C: Regression Coverage & Packaged Help Smoke', () => {
       expect(result.stdout).toContain('Commands:')
       expect(result.stdout).toContain('init')
       expect(result.stdout).toContain('doctor')
-      expect(readme).toMatch(/blueprint\s*(\n|$)/)
+      expect(readme).toMatch(/Usage: blueprint <command>/)
+      expect(readme).toMatch(/init.*Scaffold a Blueprint project/)
+      expect(readme).toMatch(/doctor.*Audit and repair/)
     })
 
     it('blueprint --help renders same output as README describes', async () => {
@@ -138,158 +140,118 @@ describe('Stream C: Regression Coverage & Packaged Help Smoke', () => {
   })
 
   describe('T-C.3.1: Packaged artifact root help smoke', () => {
+    let fixture: Awaited<ReturnType<typeof installPackedCliFixture>>
+
+    beforeAll(async () => {
+      fixture = await installPackedCliFixture()
+    }, 30000)
+
+    afterAll(async () => {
+      await fixture.cleanup()
+    })
+
     it('installed blueprint renders root help for blueprint (no args)', async () => {
-      const fixture = await installPackedCliFixture()
+      const result = await fixture.runBlueprint([])
 
-      try {
-        const result = await fixture.runBlueprint([])
-
-        expect(result.exitCode).toBe(0)
-        expect(result.stdout).toContain('Usage: blueprint <command>')
-        expect(result.stdout).toContain('Commands:')
-        expect(result.stdout).toContain('init')
-        expect(result.stdout).toContain('doctor')
-      } finally {
-        await fixture.cleanup()
-      }
-    }, 20000)
+      expect(result.exitCode).toBe(0)
+      expect(result.stdout).toContain('Usage: blueprint <command>')
+      expect(result.stdout).toContain('Commands:')
+      expect(result.stdout).toContain('init')
+      expect(result.stdout).toContain('doctor')
+    })
 
     it('installed blueprint renders root help for blueprint --help', async () => {
-      const fixture = await installPackedCliFixture()
+      const result = await fixture.runBlueprint(['--help'])
 
-      try {
-        const result = await fixture.runBlueprint(['--help'])
-
-        expect(result.exitCode).toBe(0)
-        expect(result.stdout).toContain('Usage: blueprint <command>')
-        expect(result.stdout).toContain('Commands:')
-        expect(result.stdout).toContain('init')
-        expect(result.stdout).toContain('doctor')
-      } finally {
-        await fixture.cleanup()
-      }
-    }, 20000)
+      expect(result.exitCode).toBe(0)
+      expect(result.stdout).toContain('Usage: blueprint <command>')
+      expect(result.stdout).toContain('Commands:')
+      expect(result.stdout).toContain('init')
+      expect(result.stdout).toContain('doctor')
+    })
 
     it('installed blueprint renders root help for blueprint -h', async () => {
-      const fixture = await installPackedCliFixture()
+      const result = await fixture.runBlueprint(['-h'])
 
-      try {
-        const result = await fixture.runBlueprint(['-h'])
-
-        expect(result.exitCode).toBe(0)
-        expect(result.stdout).toContain('Usage: blueprint <command>')
-        expect(result.stdout).toContain('Commands:')
-        expect(result.stdout).toContain('init')
-        expect(result.stdout).toContain('doctor')
-      } finally {
-        await fixture.cleanup()
-      }
-    }, 20000)
+      expect(result.exitCode).toBe(0)
+      expect(result.stdout).toContain('Usage: blueprint <command>')
+      expect(result.stdout).toContain('Commands:')
+      expect(result.stdout).toContain('init')
+      expect(result.stdout).toContain('doctor')
+    })
 
     it('installed blueprint root help is consistent across all entrypoints', async () => {
-      const fixture = await installPackedCliFixture()
+      const [noArgs, helpFlag, hFlag] = await Promise.all([
+        fixture.runBlueprint([]),
+        fixture.runBlueprint(['--help']),
+        fixture.runBlueprint(['-h']),
+      ])
 
-      try {
-        const [noArgs, helpFlag, hFlag] = await Promise.all([
-          fixture.runBlueprint([]),
-          fixture.runBlueprint(['--help']),
-          fixture.runBlueprint(['-h']),
-        ])
-
-        expect(noArgs.stdout).toBe(helpFlag.stdout)
-        expect(helpFlag.stdout).toBe(hFlag.stdout)
-      } finally {
-        await fixture.cleanup()
-      }
-    }, 20000)
+      expect(noArgs.stdout).toBe(helpFlag.stdout)
+      expect(helpFlag.stdout).toBe(hFlag.stdout)
+    })
   })
 
   describe('T-C.3.2: Packaged artifact command help and recovery smoke', () => {
+    let fixture: Awaited<ReturnType<typeof installPackedCliFixture>>
+
+    beforeAll(async () => {
+      fixture = await installPackedCliFixture()
+    }, 30000)
+
+    afterAll(async () => {
+      await fixture.cleanup()
+    })
+
     it('installed blueprint renders help for init command', async () => {
-      const fixture = await installPackedCliFixture()
+      const result = await fixture.runBlueprint(['help', 'init'])
 
-      try {
-        const result = await fixture.runBlueprint(['help', 'init'])
-
-        expect(result.exitCode).toBe(0)
-        expect(result.stdout).toContain('init')
-      } finally {
-        await fixture.cleanup()
-      }
-    }, 20000)
+      expect(result.exitCode).toBe(0)
+      expect(result.stdout).toContain('init')
+    })
 
     it('installed blueprint renders help for doctor command', async () => {
-      const fixture = await installPackedCliFixture()
+      const result = await fixture.runBlueprint(['help', 'doctor'])
 
-      try {
-        const result = await fixture.runBlueprint(['help', 'doctor'])
-
-        expect(result.exitCode).toBe(0)
-        expect(result.stdout).toContain('doctor')
-      } finally {
-        await fixture.cleanup()
-      }
-    }, 20000)
+      expect(result.exitCode).toBe(0)
+      expect(result.stdout).toContain('doctor')
+    })
 
     it('installed blueprint init --help renders same as help init', async () => {
-      const fixture = await installPackedCliFixture()
+      const [helpInit, initHelp] = await Promise.all([
+        fixture.runBlueprint(['help', 'init']),
+        fixture.runBlueprint(['init', '--help']),
+      ])
 
-      try {
-        const [helpInit, initHelp] = await Promise.all([
-          fixture.runBlueprint(['help', 'init']),
-          fixture.runBlueprint(['init', '--help']),
-        ])
-
-        expect(helpInit.stdout).toBe(initHelp.stdout)
-      } finally {
-        await fixture.cleanup()
-      }
-    }, 20000)
+      expect(helpInit.stdout).toBe(initHelp.stdout)
+    })
 
     it('installed blueprint doctor --help renders same as help doctor', async () => {
-      const fixture = await installPackedCliFixture()
+      const [helpDoctor, doctorHelp] = await Promise.all([
+        fixture.runBlueprint(['help', 'doctor']),
+        fixture.runBlueprint(['doctor', '--help']),
+      ])
 
-      try {
-        const [helpDoctor, doctorHelp] = await Promise.all([
-          fixture.runBlueprint(['help', 'doctor']),
-          fixture.runBlueprint(['doctor', '--help']),
-        ])
-
-        expect(helpDoctor.stdout).toBe(doctorHelp.stdout)
-      } finally {
-        await fixture.cleanup()
-      }
-    }, 20000)
+      expect(helpDoctor.stdout).toBe(doctorHelp.stdout)
+    })
 
     it('installed blueprint unknown command recovery matches source-checkout behavior', async () => {
-      const fixture = await installPackedCliFixture()
+      const result = await fixture.runBlueprint(['ghost'])
 
-      try {
-        const result = await fixture.runBlueprint(['ghost'])
-
-        expect(result.exitCode).toBe(1)
-        expect(result.stderr).toContain('Unknown command: ghost')
-        expect(result.stderr).toContain('Usage: blueprint <command>')
-        expect(result.stderr).toContain('init')
-        expect(result.stderr).toContain('doctor')
-        expect(result.stderr).not.toContain('link')
-        expect(result.stderr).not.toContain('context')
-      } finally {
-        await fixture.cleanup()
-      }
-    }, 20000)
+      expect(result.exitCode).toBe(1)
+      expect(result.stderr).toContain('Unknown command: ghost')
+      expect(result.stderr).toContain('Usage: blueprint <command>')
+      expect(result.stderr).toContain('init')
+      expect(result.stderr).toContain('doctor')
+      expect(result.stderr).not.toContain('link')
+      expect(result.stderr).not.toContain('context')
+    })
 
     it('installed blueprint does not surface link or context in recovery output', async () => {
-      const fixture = await installPackedCliFixture()
+      const result = await fixture.runBlueprint(['unknowncmd'])
 
-      try {
-        const result = await fixture.runBlueprint(['unknowncmd'])
-
-        expect(result.stderr).not.toContain('link')
-        expect(result.stderr).not.toContain('context')
-      } finally {
-        await fixture.cleanup()
-      }
-    }, 20000)
+      expect(result.stderr).not.toContain('link')
+      expect(result.stderr).not.toContain('context')
+    })
   })
 })
