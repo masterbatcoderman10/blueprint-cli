@@ -78,3 +78,13 @@ Check these first:
 ## Automation Boundary
 
 This repository already defines the release contract and the reusable script entrypoints. GitHub Actions CI and tag-triggered publish automation are introduced separately in Stream B, and they should consume the same script contract rather than inventing new release commands.
+
+## CLI Help and Recovery Behavior
+
+The released `blueprint` executable provides the following help and recovery surface:
+
+- **Root help**: Running `blueprint`, `blueprint --help`, or `blueprint -h` displays usage guidance listing only implemented commands (`init` and `doctor`)
+- **Command help**: Running `blueprint help <command>` or `<command> --help` provides detailed help for `init` and `doctor`
+- **Unknown command recovery**: Unrecognized commands receive generic guidance pointing users toward `init` and `doctor` without surfacing placeholder commands
+
+The help surface intentionally excludes `link` and `context` from guided output. These commands remain documented as coming soon in release-facing documentation but do not appear in runtime help or recovery messages.
