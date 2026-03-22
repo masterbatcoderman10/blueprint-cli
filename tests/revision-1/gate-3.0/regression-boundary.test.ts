@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { readdirSync, statSync } from 'node:fs'
+import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 
 const workspaceRoot = join(__dirname, '..', '..', '..')
@@ -53,7 +53,7 @@ describe('T-3.0.3.1 — Regression boundary covers multiple surfaces', () => {
 
     expect(packedSmokeTests.length).toBeGreaterThan(0)
 
-    const smokeContent = require('node:fs').readFileSync(packedSmokeTests[0], 'utf-8')
+    const smokeContent = readFileSync(packedSmokeTests[0], 'utf-8')
 
     expect(smokeContent).toContain('blueprint')
     expect(smokeContent).toContain('init')
@@ -66,7 +66,7 @@ describe('T-3.0.3.1 — Regression boundary covers multiple surfaces', () => {
     expect(docTests.length).toBeGreaterThan(0)
 
     const hasInitDoctorTest = docTests.some(f => {
-      const content = require('node:fs').readFileSync(f, 'utf-8')
+      const content = readFileSync(f, 'utf-8')
       return content.includes('init') && content.includes('doctor')
     })
 
