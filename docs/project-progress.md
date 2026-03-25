@@ -32,6 +32,7 @@
 - 2026-03-22: Phase 2 — Incorrect Command Recovery & Command-Level Guidance completed. All tasks done, DoD satisfied, full test suite green (340 tests, 54 files).
 - 2026-03-22: Revision 1 Phase 3 — Documentation & Regression Coverage Alignment completed. All tasks done, DoD satisfied, full test suite green (410 tests, 60 files).
 - 2026-03-22: Revision 1 — CLI Discoverability & Help completed. All phases done.
+- 2026-03-25: Identified Revision 2 — Tweak Contract to add a lightweight in-phase correction mechanism. Impact spans M1 Phases 2 and 3 (templates and Doctor); purely additive. Revision document created at `docs/milestones/revision-2-tweak-contract/`.
 
 ---
 
@@ -79,3 +80,10 @@ M3 — Workflow Visibility Enhancements (Optional Future)
   - **Scope:** Revise root CLI discoverability so `blueprint`, root help flags, and incorrect or unrecognized commands produce actionable usage guidance.
   - **Impact:** M1 Phases 1, 3, and 4
   - **Document:** `docs/milestones/revision-1-cli-discoverability/revision-1-cli-discoverability.md`
+
+- **Revision 2 — Tweak Contract**
+  - **Status:** Planning
+  - **Priority:** Immediate
+  - **Scope:** Add a lightweight in-phase correction contract (tweak) — new core module, phase template update, routing, Doctor registration.
+  - **Impact:** M1 Phases 2 and 3
+  - **Document:** `docs/milestones/revision-2-tweak-contract/revision-2-tweak-contract.md`
