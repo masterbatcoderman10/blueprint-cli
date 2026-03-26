@@ -25,6 +25,8 @@ alignment, and grows as the project gains clarity.
       gains detail over time
     - Traceable - each requirement has a stable identity and change
       history
+    - Atomic - each requirement captures one meaningful capability
+      or obligation
     - Intermediate - more detailed than the PRD, less detailed than
       a phase plan
 
@@ -44,6 +46,20 @@ alignment, and grows as the project gains clarity.
     - A portion of one milestone
     - An entire milestone
     - Multiple phases within one milestone
+
+  ATOMICITY RULE:
+    A requirement should describe one meaningful capability.
+
+    Good:
+      - The system must allow users to save recipes manually.
+      - The system must allow users to browse saved recipes.
+      - The system must allow users to organize recipes into collections.
+
+    Too dense:
+      - The system must allow users to save, organize, and browse recipes.
+
+    IF a requirement sentence contains multiple independent capabilities,
+    split it into separate requirement IDs.
 
   The SRS stays focused on requirement meaning, requirement identity,
   and shared product traceability.
@@ -142,6 +158,19 @@ alignment, and grows as the project gains clarity.
   |----|-------|----------|--------|--------------------|
   | SRS-001 | {{Title}} | Must | active | M1 - {{Name}} |
 
+  ## Requirements
+
+  ### Must Have
+
+  #### SRS-001 - {{Requirement Title}}
+
+  {{Human-readable requirement text. This section should stay clean and
+  readable. It explains what the requirement means, not its metadata.}}
+
+  ### Should Have
+  ### Could Have
+  ### Won't Have
+
   ## Requirement Metadata
 
   ### SRS-001
@@ -161,19 +190,6 @@ alignment, and grows as the project gains clarity.
   - YYYY-MM-DD - Reassigned from {{old milestone}} to {{new milestone}}
   - YYYY-MM-DD - Superseded by {{new requirement ID}}
 
-  ## Requirements
-
-  ### Must Have
-
-  #### SRS-001 - {{Requirement Title}}
-
-  {{Human-readable requirement text. This section should stay clean and
-  readable. It explains what the requirement means, not its metadata.}}
-
-  ### Should Have
-  ### Could Have
-  ### Won't Have
-
   ## Data Schema
 
   > The shared data schema lives here and grows over time. It is not
@@ -190,6 +206,8 @@ alignment, and grows as the project gains clarity.
     - Every requirement appears under exactly one MoSCoW section
     - Requirement IDs remain unique across the full document, not
       per section
+    - The readable Requirements section appears before Requirement
+      Metadata so humans encounter the requirement text first
     - Requirement metadata lives in Requirement Metadata, not inside
       the readable requirement sections
     - Requirement Index must reflect the latest title, priority,
@@ -197,6 +215,8 @@ alignment, and grows as the project gains clarity.
     - The Data Schema section is shared across requirements and grows
       over time as more of the product becomes clear
     - Data-schema entries may reference requirement IDs for traceability
+    - Each requirement should be atomic; if one line hides multiple
+      independent capabilities, split it into separate requirement IDs
 
   DETAIL PROGRESSION:
     - The initial SRS may contain only short requirement text and
@@ -225,6 +245,8 @@ alignment, and grows as the project gains clarity.
       - Distill requirements from source material; do not invent them
       - Start sparse when detail is not available
       - Use one requirement per meaningful capability
+      - Split dense multi-capability statements into multiple
+        requirement IDs
       - Assign the next available SRS ID to each new requirement
       - Record metadata for each requirement immediately
       - Write readable requirement text separately from metadata
@@ -326,6 +348,8 @@ alignment, and grows as the project gains clarity.
     - No substantive requirement change is silent.
     - Reassignment does not create a new ID.
     - Superseded requirements remain visible for audit trace.
+    - Requirements should be atomic. One requirement should not hide
+      multiple independent capabilities behind a single sentence.
     - Requirement metadata lives separately from readable requirement
       text.
     - The shared Data Schema lives in its own section and grows over time.
@@ -352,54 +376,46 @@ alignment, and grows as the project gains clarity.
 
   | ID | Title | Priority | Status | Assigned Milestone |
   |----|-------|----------|--------|--------------------|
-  | SRS-001 | Personal recipe library | Must | active | M1 - Recipe Collection |
-  | SRS-002 | Weekly meal planning | Should | active | M2 - Meal Planning & Shopping |
-
-  ## Requirement Metadata
-
-  ### SRS-001
-
-  - Title: Personal recipe library
-  - Priority: Must
-  - Status: active
-  - Assigned milestone: M1 - Recipe Collection
-  - Source: Knowledge base summary
-  - Introduced by: Alignment
-  - Supersedes: None
-  - Superseded by: None
-
-  Change log:
-  - 2026-03-26 - Created from knowledge-base recipe collection notes
-
-  ### SRS-002
-
-  - Title: Weekly meal planning
-  - Priority: Should
-  - Status: active
-  - Assigned milestone: M2 - Meal Planning & Shopping
-  - Source: Product planning conversation
-  - Introduced by: Alignment
-  - Supersedes: None
-  - Superseded by: None
-
-  Change log:
-  - 2026-03-26 - Created from product planning conversation
+  | SRS-001 | Manual recipe saving | Must | active | M1 - Recipe Collection |
+  | SRS-002 | URL recipe import | Must | active | M1 - Recipe Collection |
+  | SRS-003 | Recipe browsing | Must | active | M1 - Recipe Collection |
+  | SRS-004 | Recipe search | Should | active | M1 - Recipe Collection |
+  | SRS-005 | Recipe collections | Should | active | M1 - Recipe Collection |
+  | SRS-006 | Weekly meal planning | Should | active | M2 - Meal Planning & Shopping |
 
   ## Requirements
 
   ### Must Have
 
-  #### SRS-001 - Personal recipe library
+  #### SRS-001 - Manual recipe saving
 
-  Users can save, organize, and browse their recipes in one place
-  instead of relying on scattered notes and bookmarks.
+  The system must allow users to save recipes manually.
+
+  - The system must capture a recipe title.
+  - The system must capture an ingredient list.
+  - The system must capture ordered preparation steps.
+
+  #### SRS-002 - URL recipe import
+
+  The system must allow users to create a recipe by importing from a URL.
+
+  #### SRS-003 - Recipe browsing
+
+  The system must allow users to browse saved recipes from their library.
 
   ### Should Have
 
-  #### SRS-002 - Weekly meal planning
+  #### SRS-004 - Recipe search
 
-  Users can assemble recipes into a week-based meal plan so they can
-  decide what to cook ahead of time.
+  The system should allow users to search saved recipes.
+
+  #### SRS-005 - Recipe collections
+
+  The system should allow users to organize saved recipes into collections.
+
+  #### SRS-006 - Weekly meal planning
+
+  The system should allow users to place recipes onto a weekly meal plan.
 
   ### Could Have
 
@@ -413,7 +429,7 @@ alignment, and grows as the project gains clarity.
 
   ### Recipe
 
-  - Related requirements: SRS-001
+  - Related requirements: SRS-001, SRS-002, SRS-003, SRS-004, SRS-005
   - Notes: Core saved cooking entry owned by the user
   - Fields:
     - title: Human-readable recipe name
@@ -422,9 +438,95 @@ alignment, and grows as the project gains clarity.
 
   ### Meal Plan Entry
 
-  - Related requirements: SRS-002
+  - Related requirements: SRS-006
   - Notes: A scheduled recipe placed onto a calendar period
   - Fields:
     - recipeId: Linked recipe reference
     - date: Planned cooking date
+
+  ## Requirement Metadata
+
+  ### SRS-001
+
+  - Title: Manual recipe saving
+  - Priority: Must
+  - Status: active
+  - Assigned milestone: M1 - Recipe Collection
+  - Source: Knowledge base summary
+  - Introduced by: Alignment
+  - Supersedes: None
+  - Superseded by: None
+
+  Change log:
+  - 2026-03-26 - Created from knowledge-base recipe creation notes
+
+  ### SRS-002
+
+  - Title: URL recipe import
+  - Priority: Must
+  - Status: active
+  - Assigned milestone: M1 - Recipe Collection
+  - Source: Product planning conversation
+  - Introduced by: Alignment
+  - Supersedes: None
+  - Superseded by: None
+
+  Change log:
+  - 2026-03-26 - Created from product planning conversation
+
+  ### SRS-003
+
+  - Title: Recipe browsing
+  - Priority: Must
+  - Status: active
+  - Assigned milestone: M1 - Recipe Collection
+  - Source: Knowledge base summary
+  - Introduced by: Alignment
+  - Supersedes: None
+  - Superseded by: None
+
+  Change log:
+  - 2026-03-26 - Created from knowledge-base browsing notes
+
+  ### SRS-004
+
+  - Title: Recipe search
+  - Priority: Should
+  - Status: active
+  - Assigned milestone: M1 - Recipe Collection
+  - Source: Product planning conversation
+  - Introduced by: Alignment
+  - Supersedes: None
+  - Superseded by: None
+
+  Change log:
+  - 2026-03-26 - Created from product planning conversation
+
+  ### SRS-005
+
+  - Title: Recipe collections
+  - Priority: Should
+  - Status: active
+  - Assigned milestone: M1 - Recipe Collection
+  - Source: Product planning conversation
+  - Introduced by: Alignment
+  - Supersedes: None
+  - Superseded by: None
+
+  Change log:
+  - 2026-03-26 - Created from product planning conversation
+
+  ### SRS-006
+
+  - Title: Weekly meal planning
+  - Priority: Should
+  - Status: active
+  - Assigned milestone: M2 - Meal Planning & Shopping
+  - Source: Product planning conversation
+  - Introduced by: Alignment
+  - Supersedes: None
+  - Superseded by: None
+
+  Change log:
+  - 2026-03-26 - Created from product planning conversation
 </SRSExample>
