@@ -1,4 +1,4 @@
-import { access, mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises'
+import { access, mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { tmpdir } from 'node:os'
 
@@ -13,10 +13,17 @@ import { writeCanonicalProject } from '../../phase-3/stream-b/test-project'
 
 const tempDirs: string[] = []
 
-async function makeTempDir(): Promise<string> {
-  const dir = await mkdtemp(join(tmpdir(), 'blueprint-r3-stream-b-'))
-  tempDirs.push(dir)
-  return dir
+async function makeTempDir(projectName?: string): Promise<string> {
+  const parentDir = await mkdtemp(join(tmpdir(), 'blueprint-r3-stream-b-'))
+  tempDirs.push(parentDir)
+
+  if (!projectName) {
+    return parentDir
+  }
+
+  const projectDir = join(parentDir, projectName)
+  await mkdir(projectDir, { recursive: true })
+  return projectDir
 }
 
 async function writeCustomSrsDoc(projectDir: string, content = '# Custom SRS\n'): Promise<void> {
@@ -69,8 +76,8 @@ describe('T-R3-1.B.2.3: Doctor does not emit drift findings for customized docs/
 })
 
 describe('T-R3-1.B.2.4: Doctor repair restores docs/srs.md from the bundled template', () => {
-  it('creates docs/srs.md and clears the missing-file finding on re-audit', async () => {
-    const projectDir = await makeTempDir()
+  it('creates docs/srs.md with project-name interpolation and clears the missing-file finding on re-audit', async () => {
+    const projectDir = await makeTempDir('legacy-srs-project')
     await writeCanonicalProject(projectDir)
 
     const firstAudit = await runDoctorAudit(projectDir)
@@ -84,7 +91,11 @@ describe('T-R3-1.B.2.4: Doctor repair restores docs/srs.md from the bundled temp
     const repairResult = await executeRepairs(repairPlan.actions, projectDir)
     expect(repairResult.success).toBe(true)
 
-    await expect(access(join(projectDir, 'docs', 'srs.md'))).resolves.toBeUndefined()
+    const repairedSrsPath = join(projectDir, 'docs', 'srs.md')
+    await expect(access(repairedSrsPath)).resolves.toBeUndefined()
+    const repairedSrsContent = await readFile(repairedSrsPath, 'utf-8')
+    expect(repairedSrsContent).toContain('# legacy-srs-project - Software Requirements Specification')
+    expect(repairedSrsContent).not.toContain('{{project-name}}')
 
     const secondAudit = await runDoctorAudit(projectDir)
     const srsFindings = secondAudit.findings.filter((finding) => finding.targetPath === 'docs/srs.md')
@@ -93,8 +104,8 @@ describe('T-R3-1.B.2.4: Doctor repair restores docs/srs.md from the bundled temp
 })
 
 describe('T-R3-1.B.3.1: Legacy project upgrade path remains stable through audit -> repair -> re-audit', () => {
-  it('reaches a clean post-repair state without affecting other editable docs', async () => {
-    const projectDir = await makeTempDir()
+  it('reaches a clean post-repair state without affecting other editable docs and interpolates the repaired SRS shell', async () => {
+    const projectDir = await makeTempDir('compat-upgrade-project')
     await writeCanonicalProject(projectDir, {
       editableDocs: {
         'docs/prd.md': '# Custom PRD\n',
@@ -122,5 +133,13 @@ describe('T-R3-1.B.3.1: Legacy project upgrade path remains stable through audit
     await expect(access(join(projectDir, 'docs', 'prd.md'))).resolves.toBeUndefined()
     await expect(access(join(projectDir, 'docs', 'project-progress.md'))).resolves.toBeUndefined()
     await expect(access(join(projectDir, 'docs', 'conventions.md'))).resolves.toBeUndefined()
+
+    const repairedSrsContent = await readFile(join(projectDir, 'docs', 'srs.md'), 'utf-8')
+    expect(repairedSrsContent).toContain('# compat-upgrade-project - Software Requirements Specification')
+    expect(repairedSrsContent).not.toContain('{{project-name}}')
+
+    await expect(readFile(join(projectDir, 'docs', 'prd.md'), 'utf-8')).resolves.toBe('# Custom PRD\n')
+    await expect(readFile(join(projectDir, 'docs', 'project-progress.md'), 'utf-8')).resolves.toBe('# Custom Progress\n')
+    await expect(readFile(join(projectDir, 'docs', 'conventions.md'), 'utf-8')).resolves.toBe('# Custom Conventions\n')
   })
 })
