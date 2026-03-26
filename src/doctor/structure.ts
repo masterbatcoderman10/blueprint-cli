@@ -40,6 +40,7 @@ export const EDITABLE_PROJECT_DOCS: string[] = [
   'docs/prd.md',
   'docs/project-progress.md',
   'docs/conventions.md',
+  'docs/srs.md',
 ]
 
 /**

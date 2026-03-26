@@ -515,6 +515,9 @@ describe('Phase 2 Stream C — Archive and Scaffold Engine', () => {
         // Verify git initialized
         await expect(directoryExists(join(tempDir, '.git'))).resolves.toBe(true)
 
+        // Verify editable shells created
+        await expect(access(join(tempDir, 'docs', 'srs.md'))).resolves.toBeUndefined()
+
         // Verify result tracking
         expect(result.createdFiles).toContain('CLAUDE.md')
         expect(result.createdFiles).toContain('GEMINI.md')
@@ -579,13 +582,16 @@ describe('Phase 2 Stream C — Archive and Scaffold Engine', () => {
         const projectProgressContent = await readFile(join(tempDir, 'docs', 'project-progress.md'), 'utf-8')
         const prdContent = await readFile(join(tempDir, 'docs', 'prd.md'), 'utf-8')
         const conventionsContent = await readFile(join(tempDir, 'docs', 'conventions.md'), 'utf-8')
+        const srsContent = await readFile(join(tempDir, 'docs', 'srs.md'), 'utf-8')
 
         expect(projectProgressContent).toContain('my-awesome-project')
         expect(prdContent).toContain('my-awesome-project')
         expect(conventionsContent).toContain('my-awesome-project')
+        expect(srsContent).toContain('my-awesome-project')
         expect(projectProgressContent).not.toContain('{{project-name}}')
         expect(prdContent).not.toContain('{{project-name}}')
         expect(conventionsContent).not.toContain('{{project-name}}')
+        expect(srsContent).not.toContain('{{project-name}}')
       })
     })
   })
