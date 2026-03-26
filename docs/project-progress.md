@@ -4,7 +4,7 @@
 **Kanban**: blueprint-cli
 **Current Milestone**: None active
 **Current Phase**: None active
-**Status**: MVP Complete; Revision 1 — CLI Discoverability & Help complete (all 3 phases done)
+**Status**: MVP Complete; Revision 2 — Tweak Contract complete (1 phase done)
 
 ---
 
@@ -33,6 +33,8 @@
 - 2026-03-22: Revision 1 Phase 3 — Documentation & Regression Coverage Alignment completed. All tasks done, DoD satisfied, full test suite green (410 tests, 60 files).
 - 2026-03-22: Revision 1 — CLI Discoverability & Help completed. All phases done.
 - 2026-03-25: Identified Revision 2 — Tweak Contract to add a lightweight in-phase correction mechanism. Impact spans M1 Phases 2 and 3 (templates and Doctor); purely additive. Revision document created at `docs/milestones/revision-2-tweak-contract/`.
+- 2026-03-26: Revision 2 Phase 1 — Tweak Contract & Template Integration completed. All tasks done, DoD satisfied, full test suite green (425 tests, 61 files).
+- 2026-03-26: Revision 2 — Tweak Contract completed. All phases done.
 
 ---
 
@@ -61,6 +63,8 @@ R1 — CLI Discoverability & Help
 ├── Phase 1 — Root Help & Dispatch Contract ✓
 ├── Phase 2 — Incorrect Command Recovery & Command-Level Guidance ✓
 └── Phase 3 — Documentation & Regression Coverage Alignment ✓
+R2 — Tweak Contract
+└── Phase 1 — Tweak Contract & Template Integration ✓
 M2 — Cross-Project Context (Optional Post-MVP)
 └── Phase 1 — TBD ○
 M3 — Workflow Visibility Enhancements (Optional Future)
@@ -82,8 +86,8 @@ M3 — Workflow Visibility Enhancements (Optional Future)
   - **Document:** `docs/milestones/revision-1-cli-discoverability/revision-1-cli-discoverability.md`
 
 - **Revision 2 — Tweak Contract**
-  - **Status:** Planning
-  - **Priority:** Immediate
+  - **Status:** Complete (1 phase done)
+  - **Priority:** Done
   - **Scope:** Add a lightweight in-phase correction contract (tweak) — new core module, phase template update, routing, Doctor registration.
   - **Impact:** M1 Phases 2 and 3
   - **Document:** `docs/milestones/revision-2-tweak-contract/revision-2-tweak-contract.md`
