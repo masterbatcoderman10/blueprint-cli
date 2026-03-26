@@ -18,6 +18,12 @@ throughout the planning session.
     → No technical detail. No implementation. No task breakdown.
     → Written in the language of the product, not the codebase.
 
+  SRS
+    → WHAT the product requirements mean and how they are grouped.
+    → More detailed than the PRD, less detailed than milestone planning.
+    → SRS between PRD and milestone planning.
+    → Still a requirement document, not a task list.
+
   Milestone
     → HOW to group it. Feature areas organized into tracks.
     → Semi-technical — names capabilities, not implementations.
@@ -132,6 +138,8 @@ throughout the planning session.
   │ Planning for        │ Load                                 │
   ├─────────────────────┼──────────────────────────────────────┤
   │ PRD                 │ docs/core/prd-planning.md            │
+  ├─────────────────────┼──────────────────────────────────────┤
+  │ SRS                 │ docs/core/srs-planning.md            │
   ├─────────────────────┼──────────────────────────────────────┤
   │ Milestone           │ docs/core/milestone-planning.md      │
   ├─────────────────────┼──────────────────────────────────────┤
