@@ -1,7 +1,6 @@
 import { readFile, access, mkdtemp, rm, mkdir, writeFile } from 'node:fs/promises'
-import { join } from 'node:path'
+import { join, resolve, dirname } from 'node:path'
 import { tmpdir } from 'node:os'
-import { dirname } from 'node:path'
 import { describe, it, expect, afterEach } from 'vitest'
 
 import {
@@ -134,4 +133,19 @@ describe('T-R2-1.0.5.3: Doctor repair restores tweak-planning.md', () => {
       .filter((f) => f.targetPath === 'docs/core/tweak-planning.md')
     expect(tweakPaths).toHaveLength(0)
   })
+})
+
+// T-R2-1.0.4.2: Live root agent files contain tweak routing row
+describe('T-R2-1.0.4.2: live root agent files contain tweak routing row', () => {
+  const ROOT_DIR = resolve(__dirname, '..', '..', '..')
+  const liveAgentFiles = ['AGENTS.md', 'GEMINI.md', 'QWEN.md', 'CLAUDE.md']
+
+  for (const agentFile of liveAgentFiles) {
+    it(`${agentFile} at project root contains tweak-planning.md reference`, async () => {
+      const filePath = join(ROOT_DIR, agentFile)
+      const content = await readFile(filePath, 'utf-8')
+      expect(content).toContain('tweak-planning.md')
+      expect(content).toContain('tweak')
+    })
+  }
 })

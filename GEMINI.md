@@ -79,6 +79,9 @@
   │ Change existing behavior│ docs/core/revision-planning.md       │
   │ (revision)              │                                      │
   ├─────────────────────────┼──────────────────────────────────────┤
+  │ Correct completed tasks │ docs/core/tweak-planning.md          │
+  │ in current phase (tweak)│                                      │
+  ├─────────────────────────┼──────────────────────────────────────┤
   │ Commit / git operations │ docs/core/git-execution-workflow.md  │
   │                         │ or docs/core/git-review-workflow.md  │
   ├─────────────────────────┼──────────────────────────────────────┤
