@@ -231,6 +231,17 @@ alignment, and grows as the project gains clarity.
       - Add shared Data Schema notes only when the source material
         explicitly supports them
 
+  This module defines SRS representation and SRS update rules.
+  It does not define how milestone planning, phase planning, bug
+  handling, or tweak handling work. Those workflows belong to their
+  own modules.
+</SRSProcess>
+
+---
+
+<SRSModificationRules>
+  PURPOSE: Define how an existing SRS changes after it has been created.
+
   ELABORATING AN EXISTING REQUIREMENT:
     IF new information deepens an existing requirement without changing
     its meaning:
@@ -302,12 +313,7 @@ alignment, and grows as the project gains clarity.
       without changing meaning:
         -> Keep the same requirement ID
         -> Update in place after approval
-
-  This module defines SRS representation and SRS update rules.
-  It does not define how milestone planning, phase planning, bug
-  handling, or tweak handling work. Those workflows belong to their
-  own modules.
-</SRSProcess>
+</SRSModificationRules>
 
 ---
 
@@ -329,3 +335,96 @@ alignment, and grows as the project gains clarity.
       modifying, route through docs/core/scope-change.md or
       docs/core/revision-planning.md before editing the SRS.
 </SRSRules>
+
+---
+
+<SRSExample>
+  The following is an example of a minimal SRS.
+
+  # MealBoard - Software Requirements Specification
+
+  ## Purpose
+
+  This SRS captures the current shared understanding of MealBoard's
+  product requirements between the PRD and later planning documents.
+
+  ## Requirement Index
+
+  | ID | Title | Priority | Status | Assigned Milestone |
+  |----|-------|----------|--------|--------------------|
+  | SRS-001 | Personal recipe library | Must | active | M1 - Recipe Collection |
+  | SRS-002 | Weekly meal planning | Should | active | M2 - Meal Planning & Shopping |
+
+  ## Requirement Metadata
+
+  ### SRS-001
+
+  - Title: Personal recipe library
+  - Priority: Must
+  - Status: active
+  - Assigned milestone: M1 - Recipe Collection
+  - Source: Knowledge base summary
+  - Introduced by: Alignment
+  - Supersedes: None
+  - Superseded by: None
+
+  Change log:
+  - 2026-03-26 - Created from knowledge-base recipe collection notes
+
+  ### SRS-002
+
+  - Title: Weekly meal planning
+  - Priority: Should
+  - Status: active
+  - Assigned milestone: M2 - Meal Planning & Shopping
+  - Source: Product planning conversation
+  - Introduced by: Alignment
+  - Supersedes: None
+  - Superseded by: None
+
+  Change log:
+  - 2026-03-26 - Created from product planning conversation
+
+  ## Requirements
+
+  ### Must Have
+
+  #### SRS-001 - Personal recipe library
+
+  Users can save, organize, and browse their recipes in one place
+  instead of relying on scattered notes and bookmarks.
+
+  ### Should Have
+
+  #### SRS-002 - Weekly meal planning
+
+  Users can assemble recipes into a week-based meal plan so they can
+  decide what to cook ahead of time.
+
+  ### Could Have
+
+  _None yet._
+
+  ### Won't Have
+
+  _None yet._
+
+  ## Data Schema
+
+  ### Recipe
+
+  - Related requirements: SRS-001
+  - Notes: Core saved cooking entry owned by the user
+  - Fields:
+    - title: Human-readable recipe name
+    - ingredients: Ingredient list for planning and cooking
+    - steps: Ordered preparation instructions
+
+  ### Meal Plan Entry
+
+  - Related requirements: SRS-002
+  - Notes: A scheduled recipe placed onto a calendar period
+  - Fields:
+    - recipeId: Linked recipe reference
+    - date: Planned cooking date
+</SRSExample>
