@@ -26,6 +26,7 @@ export const CANONICAL_CORE_FILES: string[] = [
   'docs/core/revision-planning.md',
   'docs/core/scope-change.md',
   'docs/core/test-planning.md',
+  'docs/core/tweak-planning.md',
 ]
 
 export const REQUIRED_BLUEPRINT_DIRECTORIES: string[] = ['docs', 'docs/core']

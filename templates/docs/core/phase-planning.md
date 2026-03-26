@@ -216,6 +216,17 @@ and parallel streams of tasks.
 
   ---
 
+  ## Tweaks
+
+  > Corrections to completed tasks within this phase are tracked here.
+  > Each tweak has an ID (e.g., M2-4.TW1), lists affected tasks, and
+  > includes test impact. See docs/core/tweak-planning.md for the full
+  > tweak workflow.
+
+  _None._
+
+  ---
+
 </PhaseTemplate>
 
 ---
