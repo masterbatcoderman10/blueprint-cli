@@ -36,8 +36,9 @@ describe('T-A.4: SRS protocol surfaces are represented in the live and template 
 
       for (const content of [liveContent, templateContent]) {
         expect(content).toContain('docs/srs.md')
-        expect(content).toContain('legacy Blueprint projects missing `docs/srs.md`')
-        expect(content).toContain('repairable compatibility path')
+        expect(content).toContain('STOP with a compatibility-path message')
+        expect(content).toContain('predates SRS integration')
+        expect(content).toContain('repairing from templates/srs.md')
       }
     }
   })
@@ -52,6 +53,7 @@ describe('T-A.4: SRS protocol surfaces are represented in the live and template 
       for (const content of [liveContent, templateContent]) {
         expect(content).toContain('SRS between PRD and milestone planning')
         expect(content).toContain('docs/core/srs-planning.md')
+        expect(content).toContain('- SRS → docs/core/srs-planning.md')
       }
     }
   })

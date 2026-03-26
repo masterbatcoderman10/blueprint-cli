@@ -1,7 +1,7 @@
 # Planning
 
 This module defines how planning works in Blueprint. It is loaded before
-any planning activity — PRD, milestone, or phase — and stays in context
+any planning activity — PRD, SRS, milestone, or phase — and stays in context
 throughout the planning session.
 
 ---
@@ -52,7 +52,7 @@ throughout the planning session.
 
   STEP 1 — ASK BEFORE DRAFTING
     NEVER produce a planning document without first asking clarifying questions.
-    This applies to PRDs, milestones, and phases equally.
+    This applies to PRDs, SRS documents, milestones, and phases equally.
 
     Ask until you understand:
       - Scope — what is in, what is explicitly out
@@ -81,6 +81,7 @@ throughout the planning session.
   STEP 3 — DRAFT
     Load the appropriate planning module:
       - PRD → docs/core/prd-planning.md
+      - SRS → docs/core/srs-planning.md
       - Milestone → docs/core/milestone-planning.md
       - Phase → docs/core/phase-planning.md
     Follow that module's structure and conventions.

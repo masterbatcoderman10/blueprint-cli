@@ -13,17 +13,29 @@ It runs at the start of EVERY session before any other action.
   ───────────────────────────────────────────────────────────────
 
   Run a single listing of the project docs directory (e.g., ls -R docs/).
-  From the output, verify ALL of the following exist:
+  From the output, verify ALL of the following legacy-invariant items exist:
 
     - docs/project-progress.md
     - docs/prd.md
     - docs/conventions.md
-    - docs/srs.md
     - docs/core/ (directory)
     - docs/core/blueprint-structure.md
     - docs/core/srs-planning.md
 
-  IF any are missing → STOP.
+  CHECK — docs/srs.md
+    IF docs/srs.md exists:
+      → Continue.
+
+    IF docs/srs.md is missing but the legacy-invariant items above exist:
+      → STOP with a compatibility-path message, not a structural-invalid message.
+        Inform user: "This Blueprint project predates SRS integration.
+        Add docs/srs.md by repairing from templates/srs.md or rerunning
+        blueprint init before continuing with SRS-aware workflows."
+
+    IF docs/srs.md is missing AND other legacy-invariant items are missing:
+      → Continue to the general structural failure below.
+
+  IF any legacy-invariant items are missing → STOP.
     Inform user which items are missing.
     The project cannot proceed without a complete Blueprint structure.
 
@@ -48,11 +60,6 @@ It runs at the start of EVERY session before any other action.
       Attempt a read operation against the kanban project.
       FAIL → STOP. "Kanban MCP is unreachable. Task execution,
               review, and status changes cannot proceed."
-
-  IF legacy Blueprint projects missing `docs/srs.md`:
-    Treat this as a repairable compatibility path, not a silent gap.
-    The agent should scaffold docs/srs.md from templates/srs.md or
-    rerun blueprint init so the project regains the SRS root doc.
 
   ───────────────────────────────────────────────────────────────
 
