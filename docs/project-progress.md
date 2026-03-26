@@ -35,6 +35,7 @@
 - 2026-03-25: Identified Revision 2 — Tweak Contract to add a lightweight in-phase correction mechanism. Impact spans M1 Phases 2 and 3 (templates and Doctor); purely additive. Revision document created at `docs/milestones/revision-2-tweak-contract/`.
 - 2026-03-26: Revision 2 Phase 1 — Tweak Contract & Template Integration completed. All tasks done, DoD satisfied, full test suite green (425 tests, 61 files).
 - 2026-03-26: Revision 2 — Tweak Contract completed. All phases done.
+- 2026-03-26: Identified Revision 3 — SRS Integration to introduce a Software Requirements Specification document as a progressive source of truth bridging the PRD and phase plans. Impact spans M1 Phases 2, 3, and 4; 3 phases planned. Revision document created at `docs/milestones/revision-3-srs-integration/`.
 
 ---
 
@@ -65,6 +66,10 @@ R1 — CLI Discoverability & Help
 └── Phase 3 — Documentation & Regression Coverage Alignment ✓
 R2 — Tweak Contract
 └── Phase 1 — Tweak Contract & Template Integration ✓
+R3 — SRS Integration
+├── Phase 1 — SRS Module & Structural Registration ○
+├── Phase 2 — Alignment & PRD Flow Rework ○
+└── Phase 3 — Planning Module Integration ○
 M2 — Cross-Project Context (Optional Post-MVP)
 └── Phase 1 — TBD ○
 M3 — Workflow Visibility Enhancements (Optional Future)
@@ -91,3 +96,10 @@ M3 — Workflow Visibility Enhancements (Optional Future)
   - **Scope:** Add a lightweight in-phase correction contract (tweak) — new core module, phase template update, routing, Doctor registration.
   - **Impact:** M1 Phases 2 and 3
   - **Document:** `docs/milestones/revision-2-tweak-contract/revision-2-tweak-contract.md`
+
+- **Revision 3 — SRS Integration**
+  - **Status:** Planned (3 phases)
+  - **Priority:** Next
+  - **Scope:** Introduce SRS document as a progressive source of truth bridging PRD and phase plans. New core module, new template, reworked alignment flow, planning module integration.
+  - **Impact:** M1 Phases 2, 3, and 4
+  - **Document:** `docs/milestones/revision-3-srs-integration/revision-3-srs-integration.md`
