@@ -167,7 +167,7 @@ export async function copyEditableShells(
   options: InitOptions,
 ): Promise<void> {
   const docsDir = join(resolve(rootDir), 'docs')
-  const shellFiles = ['project-progress.md', 'prd.md', 'conventions.md']
+  const shellFiles = ['project-progress.md', 'prd.md', 'conventions.md', 'srs.md']
 
   for (const fileName of shellFiles) {
     const templatePath = join(TEMPLATES_DIR, fileName)

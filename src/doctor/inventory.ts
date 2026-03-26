@@ -8,10 +8,14 @@
  */
 
 import { readFile } from 'node:fs/promises'
-import { join } from 'node:path'
+import { basename, join } from 'node:path'
 
 import { type ManifestState, validateManifest, MANIFEST_RELATIVE_PATH } from './manifest'
-import { CANONICAL_CORE_FILES, SUPPORTED_AGENT_FILES } from './structure'
+import {
+  CANONICAL_CORE_FILES,
+  EDITABLE_PROJECT_DOCS,
+  SUPPORTED_AGENT_FILES,
+} from './structure'
 
 const TEMPLATES_DIR = join(__dirname, '../../templates')
 
@@ -24,6 +28,10 @@ const TEMPLATES_DIR = join(__dirname, '../../templates')
  *   resolveTemplatePath('CLAUDE.md')                → <templates>/CLAUDE.md
  */
 export function resolveTemplatePath(relativePath: string): string {
+  if (EDITABLE_PROJECT_DOCS.includes(relativePath)) {
+    return join(TEMPLATES_DIR, basename(relativePath))
+  }
+
   return join(TEMPLATES_DIR, relativePath)
 }
 

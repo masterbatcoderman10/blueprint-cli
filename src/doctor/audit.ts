@@ -33,11 +33,18 @@ async function pathExists(path: string): Promise<boolean> {
 
 export async function runDoctorAudit(projectDir: string): Promise<DoctorAuditResult> {
   const findings: DoctorFinding[] = []
+  const repairableEditableSrsPath = 'docs/srs.md'
 
   for (const relativePath of REQUIRED_BLUEPRINT_DIRECTORIES) {
     if (!(await pathExists(join(projectDir, relativePath)))) {
       findings.push(createMissingStructureFinding(relativePath, 'directory'))
     }
+  }
+
+  // Legacy Blueprint projects may predate SRS integration. Missing docs/srs.md
+  // is repairable, but once it exists its content remains user-owned.
+  if (!(await pathExists(join(projectDir, repairableEditableSrsPath)))) {
+    findings.push(createMissingStructureFinding(repairableEditableSrsPath, 'file'))
   }
 
   for (const { relativePath, absolutePath } of resolveAllCoreTemplatePaths()) {
