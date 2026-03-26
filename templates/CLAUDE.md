@@ -79,6 +79,9 @@
   │ Change existing behavior│ docs/core/revision-planning.md       │
   │ (revision)              │                                      │
   ├─────────────────────────┼──────────────────────────────────────┤
+  │ SRS discussion/planning │ docs/core/srs-planning.md            │
+  │                         │                                      │
+  ├─────────────────────────┼──────────────────────────────────────┤
   │ Correct completed tasks │ docs/core/tweak-planning.md          │
   │ in current phase (tweak)│                                      │
   ├─────────────────────────┼──────────────────────────────────────┤
