@@ -17,7 +17,7 @@ describe('T-3.0.2.1: canonical structure inventory completeness', () => {
     expect(paths).toContain('docs/.blueprint/manifest.json')
   })
 
-  it('includes all 18 required docs/core/** files', () => {
+  it('includes all 19 required docs/core/** files', () => {
     const paths = getCanonicalStructurePaths()
     const expectedCoreFiles = [
       'docs/core/alignment.md',
@@ -36,13 +36,14 @@ describe('T-3.0.2.1: canonical structure inventory completeness', () => {
       'docs/core/review.md',
       'docs/core/revision-planning.md',
       'docs/core/scope-change.md',
+      'docs/core/srs-planning.md',
       'docs/core/test-planning.md',
       'docs/core/tweak-planning.md',
     ]
     for (const file of expectedCoreFiles) {
       expect(paths).toContain(file)
     }
-    expect(CANONICAL_CORE_FILES).toHaveLength(18)
+    expect(CANONICAL_CORE_FILES).toHaveLength(19)
   })
 
   it('returns managed agent paths for files in manifest selection', () => {
@@ -78,6 +79,10 @@ describe('T-3.0.2.2: editable project docs are excluded from exact content enfor
     expect(isEditableProjectDoc('docs/conventions.md')).toBe(true)
   })
 
+  it('marks docs/srs.md as a user-owned editable doc', () => {
+    expect(isEditableProjectDoc('docs/srs.md')).toBe(true)
+  })
+
   it('does not mark docs/core files as editable', () => {
     expect(isEditableProjectDoc('docs/core/execution.md')).toBe(false)
     expect(isEditableProjectDoc('docs/core/health-check.md')).toBe(false)
@@ -88,10 +93,11 @@ describe('T-3.0.2.2: editable project docs are excluded from exact content enfor
     expect(isEditableProjectDoc('AGENTS.md')).toBe(false)
   })
 
-  it('EDITABLE_PROJECT_DOCS contains exactly the three user-owned docs', () => {
+  it('EDITABLE_PROJECT_DOCS contains exactly the four user-owned docs', () => {
     expect(EDITABLE_PROJECT_DOCS).toContain('docs/prd.md')
     expect(EDITABLE_PROJECT_DOCS).toContain('docs/project-progress.md')
     expect(EDITABLE_PROJECT_DOCS).toContain('docs/conventions.md')
-    expect(EDITABLE_PROJECT_DOCS).toHaveLength(3)
+    expect(EDITABLE_PROJECT_DOCS).toContain('docs/srs.md')
+    expect(EDITABLE_PROJECT_DOCS).toHaveLength(4)
   })
 })
