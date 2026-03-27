@@ -13,6 +13,7 @@ docs/
 ├── project-progress.md                      # Project state: milestone, phase, kanban name
 ├── prd.md                                   # Full product requirements document
 ├── conventions.md                           # Tech stack, coding standards, project conventions
+├── srs.md                                   # Software Requirements Specification
 ├── core/                                    # Protocol and reference modules (read-only during execution)
 │   ├── blueprint-structure.md               # This file — defines the layout
 │   ├── health-check.md                      # Session startup validation
@@ -21,6 +22,7 @@ docs/
 │   ├── planning.md                          # Planning philosophy and orchestration
 │   ├── milestone-planning.md                # How to plan a milestone (includes template)
 │   ├── phase-planning.md                    # How to plan a phase (includes template and task conventions)
+│   ├── srs-planning.md                      # How to define and evolve the SRS
 │   ├── execution.md                         # Task creation, execution, and review note handling
 │   ├── hierarchy.md                         # Five-level hierarchy reference
 │   ├── review.md                            # Code review protocol
@@ -52,8 +54,8 @@ docs/
 
 ### docs/ Root
 
-- ONLY three files live at docs/ root: `project-progress.md`, `prd.md`, and `conventions.md`.
-- All three are REQUIRED. A Blueprint project is not valid without them.
+- ONLY four files live at docs/ root: `project-progress.md`, `prd.md`, `conventions.md`, and `srs.md`.
+- All four are REQUIRED. A Blueprint project is not valid without them.
 - No other files may be placed at docs/ root.
 
 ### AGENTS.md
@@ -67,6 +69,7 @@ docs/
 - Files in core/ are NOT modified during normal project work.
 - Modules are loaded on demand per AGENTS.md routing rules.
 - New modules may only be added to core/ as part of a Blueprint system update.
+- `docs/core/srs-planning.md` is the canonical module for the SRS layer.
 
 ### docs/milestones/
 
@@ -127,8 +130,10 @@ A valid Blueprint project has ALL of the following:
 - [ ] `docs/project-progress.md` exists and contains a kanban project name
 - [ ] `docs/prd.md` exists
 - [ ] `docs/conventions.md` exists
+- [ ] `docs/srs.md` exists
 - [ ] `docs/core/` exists and contains `blueprint-structure.md` at minimum
-- [ ] No files at docs/ root other than `project-progress.md`, `prd.md`, and `conventions.md`
+- [ ] `docs/core/srs-planning.md` exists
+- [ ] No files at docs/ root other than `project-progress.md`, `prd.md`, `conventions.md`, and `srs.md`
 - [ ] Every phase doc is inside a milestone subfolder under `docs/milestones/`
 
 health-check.md uses this checklist to verify project integrity.

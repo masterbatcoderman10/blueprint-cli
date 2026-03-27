@@ -8,6 +8,7 @@ const TEMPLATE_FILES = [
   'project-progress.md',
   'prd.md',
   'conventions.md',
+  'srs.md',
 ] as const
 
 const AGENT_TEMPLATE_FILES = [

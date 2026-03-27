@@ -1,7 +1,8 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises'
-import { dirname, join } from 'node:path'
+import { basename, dirname, join } from 'node:path'
 import type { RepairAction } from './repair'
 import { writeManifest } from './manifest'
+import { isEditableProjectDoc } from './structure'
 
 export interface RepairResult {
   success: boolean
@@ -37,6 +38,14 @@ export async function executeRepairs(actions: RepairAction[], projectDir: string
   }
 }
 
+function renderTemplateForRepair(templateContent: string, targetPath: string, projectDir: string): string {
+  if (!isEditableProjectDoc(targetPath)) {
+    return templateContent
+  }
+
+  return templateContent.replace(/\{\{project-name\}\}/g, basename(projectDir))
+}
+
 async function executeRepairAction(action: RepairAction, projectDir: string): Promise<void> {
   const targetPath = join(projectDir, action.targetPath)
 
@@ -48,9 +57,10 @@ async function executeRepairAction(action: RepairAction, projectDir: string): Pr
       } else if (action.templatePath) {
         // This is a file copy from template
         const templateContent = await readFile(action.templatePath, 'utf-8')
+        const renderedContent = renderTemplateForRepair(templateContent, action.targetPath, projectDir)
         const targetDir = dirname(targetPath)
         await mkdir(targetDir, { recursive: true })
-        await writeFile(targetPath, templateContent, 'utf-8')
+        await writeFile(targetPath, renderedContent, 'utf-8')
       } else {
         throw new Error('create-from-template action missing templatePath for file')
       }
@@ -62,7 +72,8 @@ async function executeRepairAction(action: RepairAction, projectDir: string): Pr
         throw new Error('replace-in-place action missing templatePath')
       }
       const templateContent = await readFile(action.templatePath, 'utf-8')
-      await writeFile(targetPath, templateContent, 'utf-8')
+      const renderedContent = renderTemplateForRepair(templateContent, action.targetPath, projectDir)
+      await writeFile(targetPath, renderedContent, 'utf-8')
       break
     }
 
