@@ -30,7 +30,11 @@ been done yet.
 
     IF no knowledge-base/ AND no codebase:
       → STATE = EMPTY
-      → Skip to <KanbanSetup>, then dispatch to prd-planning.md.
+      → Skip to <KanbanSetup>, then proceed to <DocumentProduction>.
+        EMPTY projects follow the same 5+1 document sequence as
+        existing projects. There are no SRS population leads from
+        analysis — the SRS Q&A probes features from the user
+        independently. Do NOT dispatch directly to full prd-planning.md.
 
   STEP 2 — ANALYZE (only for EXISTING_WITH_DOCS and EXISTING_NO_DOCS)
 
@@ -86,6 +90,36 @@ been done yet.
       - If no knowledge-base docs exist, derive the feature list from
         what the codebase already does
 
+    SRS POPULATION LEADS:
+      After completing the analysis above, extract and structure a list
+      of named feature leads from all sources. These are the starting
+      context for SRS Q&A — they are NOT requirements themselves.
+
+      FOR EACH FEATURE identified from any source (knowledge base,
+      codebase, git history, or feature status cross-reference):
+        - Assign a short descriptive name (e.g., "Manual recipe saving",
+          "URL recipe import", "Recipe search")
+        - Write a one-sentence description of what the feature does
+          from the user's perspective
+        - Note the source: knowledge base, codebase, git history,
+          or user input
+        - Note the observed status: implemented, partially implemented,
+          planned but not built, or inferred from code
+
+      STRUCTURE:
+        Feature leads should be presented as a flat list:
+          - **{{Feature Name}}** — {{One-sentence description}}
+            Source: {{where discovered}}  Status: {{observed status}}
+
+      PURPOSE:
+        These leads seed the SRS questioning cycle in srs-planning.md.
+        The SRS process uses them as conversation starters — probing
+        the user for requirements that may not be visible in the code
+        or docs. The leads are NOT copied verbatim into the SRS.
+        The SRS Q&A may discover additional requirements beyond what
+        the leads suggest, and may refine or discard leads that do
+        not represent real requirements.
+
   STEP 3 — CONFIRM WITH USER
     Present findings to the user in a structured summary:
 
@@ -100,6 +134,9 @@ been done yet.
       - Conventions from agent instruction files (if found)
       - Development timeline derived from git history (if present):
         major phases of work identified from commits
+      - SRS population leads: the named feature leads extracted
+        during analysis, presented so the user can confirm, correct,
+        or add missing features before SRS Q&A begins
 
     Then ASK — do not just wait for a nod. Actively question:
       - "Are there features or capabilities I missed?"
@@ -153,7 +190,7 @@ been done yet.
 ---
 
 <DocumentProduction>
-  Alignment produces three documents and populates a fourth.
+  Alignment produces five documents and populates a sixth.
   Each document is created using its respective planning module.
 
   CRITICAL RULE — ONE DOCUMENT AT A TIME
@@ -249,15 +286,40 @@ been done yet.
            progress. Existing code gets tested only when it is
            modified as part of new work, bug fixes, or revisions.
 
-  2. docs/prd.md
-     - Load docs/core/prd-planning.md. Follow its process.
-     - IF features were identified during analysis, use them as input
-       to the PRD conversation — but still confirm and refine with user
+  2. docs/prd.md — Stage 1 (body only)
+     - Load docs/core/prd-planning.md. Follow its Stage 1 process.
+     - Stage 1 produces ONLY the PRD body: Overview, Target Users,
+       and Platform & Experience. No milestones are written yet.
+     - IF features were identified during analysis, use them as
+       context for the PRD conversation — but still confirm and
+       refine with the user
      - IF STATE = EMPTY, start from scratch with the user
-     - Implemented features and planned features should be organized
-       into milestones per prd-planning.md conventions
+     - Do NOT proceed to milestones. The PRD body must be confirmed
+       before SRS creation begins.
 
-  3. First milestone document
+  3. docs/srs.md
+     - Load docs/core/srs-planning.md. Follow its process.
+     - The SRS has its own questioning cycle. It does NOT distill
+       requirements from the PRD body. The PRD body provides product
+       context, but requirements are probed from the user directly.
+     - Use the SRS population leads from STEP 2 as conversation
+       starters. These are the named features extracted during
+       analysis — they seed the Q&A but do not define the SRS.
+     - The Q&A may discover requirements beyond the leads and may
+       refine or discard leads that do not represent real requirements.
+     - The SRS must contain at least one requirement with a stable ID
+       before proceeding to the next step.
+
+  4. docs/prd.md — Stage 2 (add milestones)
+     - Load docs/core/prd-planning.md. Follow its Stage 2 process.
+     - Stage 2 adds the Milestones section to the existing PRD body.
+     - Group SRS requirements into milestones. Each milestone title
+       is followed by a "Relevant requirements:" line listing the
+       SRS IDs that the milestone addresses.
+     - Implemented features and planned features should be organized
+       into milestones per prd-planning.md conventions.
+
+  5. First milestone document
      - Load docs/core/planning.md, then docs/core/milestone-planning.md.
        Follow their process.
      - IF git history analysis produced a development timeline:
@@ -275,7 +337,7 @@ been done yet.
        priorities. The git history tells you where the project has
        been; the user tells you where it is going.
 
-  4. docs/project-progress.md
+  6. docs/project-progress.md
      - Populate using the following template:
 
        # Project Progress
