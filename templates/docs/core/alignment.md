@@ -91,34 +91,12 @@ been done yet.
         what the codebase already does
 
     SRS POPULATION LEADS:
-      After completing the analysis above, extract and structure a list
-      of named feature leads from all sources. These are the starting
-      context for SRS Q&A — they are NOT requirements themselves.
-
-      FOR EACH FEATURE identified from any source (knowledge base,
-      codebase, git history, or feature status cross-reference):
-        - Assign a short descriptive name (e.g., "Manual recipe saving",
-          "URL recipe import", "Recipe search")
-        - Write a one-sentence description of what the feature does
-          from the user's perspective
-        - Note the source: knowledge base, codebase, git history,
-          or user input
-        - Note the observed status: implemented, partially implemented,
-          planned but not built, or inferred from code
-
-      STRUCTURE:
-        Feature leads should be presented as a flat list:
-          - **{{Feature Name}}** — {{One-sentence description}}
-            Source: {{where discovered}}  Status: {{observed status}}
-
-      PURPOSE:
-        These leads seed the SRS questioning cycle in srs-planning.md.
-        The SRS process uses them as conversation starters — probing
-        the user for requirements that may not be visible in the code
-        or docs. The leads are NOT copied verbatim into the SRS.
-        The SRS Q&A may discover additional requirements beyond what
-        the leads suggest, and may refine or discard leads that do
-        not represent real requirements.
+      After completing the analysis above, collect the named features
+      discovered from all sources into a list of SRS population leads.
+      These are presented to the user in STEP 3 alongside the rest of
+      the analysis summary. They are NOT requirements — they are
+      conversation starters that seed the SRS Q&A cycle later in
+      <DocumentProduction> step 3.
 
   STEP 3 — CONFIRM WITH USER
     Present findings to the user in a structured summary:
