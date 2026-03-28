@@ -382,6 +382,10 @@ alignment, and grows as the project gains clarity.
   | SRS-004 | Recipe search | Should | active | M1 - Recipe Collection |
   | SRS-005 | Recipe collections | Should | active | M1 - Recipe Collection |
   | SRS-006 | Weekly meal planning | Should | active | M2 - Meal Planning & Shopping |
+  | SRS-007 | Household member invitation | Could | active | M3 - Household Sharing |
+  | SRS-008 | Shared shopping list | Could | active | M3 - Household Sharing |
+  | SRS-009 | Step-by-step cooking view | Could | active | M4 - Cooking Experience |
+  | SRS-010 | Cooking history | Could | active | M4 - Cooking Experience |
 
   ## Requirements
 
@@ -419,7 +423,21 @@ alignment, and grows as the project gains clarity.
 
   ### Could Have
 
-  _None yet._
+  #### SRS-007 - Household member invitation
+
+  The system could allow users to invite household members to a shared recipe library.
+
+  #### SRS-008 - Shared shopping list
+
+  The system could allow household members to share a shopping list with real-time sync.
+
+  #### SRS-009 - Step-by-step cooking view
+
+  The system could provide a step-by-step cooking view with large text and timers.
+
+  #### SRS-010 - Cooking history
+
+  The system could allow users to mark recipes as cooked to build a cooking history.
 
   ### Won't Have
 
@@ -443,6 +461,22 @@ alignment, and grows as the project gains clarity.
   - Fields:
     - recipeId: Linked recipe reference
     - date: Planned cooking date
+
+  ### Household
+
+  - Related requirements: SRS-007, SRS-008
+  - Notes: Shared group of users contributing to meal planning
+  - Fields:
+    - members: List of household participants
+    - sharedLibrary: Recipes visible to all members
+
+  ### Cooking Session
+
+  - Related requirements: SRS-009, SRS-010
+  - Notes: Active cooking interaction with a recipe
+  - Fields:
+    - recipeId: Linked recipe reference
+    - completedAt: When the recipe was cooked
 
   ## Requirement Metadata
 
@@ -522,6 +556,62 @@ alignment, and grows as the project gains clarity.
   - Priority: Should
   - Status: active
   - Assigned milestone: M2 - Meal Planning & Shopping
+  - Source: Product planning conversation
+  - Introduced by: Alignment
+  - Supersedes: None
+  - Superseded by: None
+
+  Change log:
+  - 2026-03-26 - Created from product planning conversation
+
+  ### SRS-007
+
+  - Title: Household member invitation
+  - Priority: Could
+  - Status: active
+  - Assigned milestone: M3 - Household Sharing
+  - Source: Product planning conversation
+  - Introduced by: Alignment
+  - Supersedes: None
+  - Superseded by: None
+
+  Change log:
+  - 2026-03-26 - Created from product planning conversation
+
+  ### SRS-008
+
+  - Title: Shared shopping list
+  - Priority: Could
+  - Status: active
+  - Assigned milestone: M3 - Household Sharing
+  - Source: Product planning conversation
+  - Introduced by: Alignment
+  - Supersedes: None
+  - Superseded by: None
+
+  Change log:
+  - 2026-03-26 - Created from product planning conversation
+
+  ### SRS-009
+
+  - Title: Step-by-step cooking view
+  - Priority: Could
+  - Status: active
+  - Assigned milestone: M4 - Cooking Experience
+  - Source: Product planning conversation
+  - Introduced by: Alignment
+  - Supersedes: None
+  - Superseded by: None
+
+  Change log:
+  - 2026-03-26 - Created from product planning conversation
+
+  ### SRS-010
+
+  - Title: Cooking history
+  - Priority: Could
+  - Status: active
+  - Assigned milestone: M4 - Cooking Experience
   - Source: Product planning conversation
   - Introduced by: Alignment
   - Supersedes: None

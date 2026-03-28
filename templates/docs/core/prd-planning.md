@@ -249,6 +249,7 @@ by milestones. It is non-technical.
 
   ### M3 — Household Sharing
   > Multiple household members can contribute to planning and shopping.
+  Relevant requirements: SRS-007, SRS-008
   - Invite household members to a shared recipe library
   - Collaborative meal calendar with visibility into who planned what
   - Shared shopping list with real-time sync
@@ -256,6 +257,7 @@ by milestones. It is non-technical.
 
   ### M4 — Cooking Experience
   > A guided cooking mode that makes the app useful during meal preparation.
+  Relevant requirements: SRS-009, SRS-010
   - Step-by-step cooking view with large text and timers
   - Voice-controlled navigation between recipe steps
   - Scale recipe ingredients for different serving counts
