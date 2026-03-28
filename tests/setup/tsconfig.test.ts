@@ -30,6 +30,14 @@ describe('T-1.0.2: Strict TypeScript configuration', () => {
     expect(opts?.rootDir).toBeTruthy()
   })
 
+  it('tsconfig.json constrains ambient types to Node for the CLI runtime', () => {
+    const raw = readFileSync(resolve(root, 'tsconfig.json'), 'utf-8')
+    const tsconfig = JSON.parse(raw)
+    const opts = tsconfig.compilerOptions
+
+    expect(opts?.types).toEqual(['node'])
+  })
+
   it('tsc --noEmit passes on baseline source tree', () => {
     expect(() => {
       execSync('npx tsc --noEmit', { cwd: root, stdio: 'pipe' })
