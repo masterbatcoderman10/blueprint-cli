@@ -47,7 +47,7 @@ describe('T-R3-1.B.2.1: Doctor structure marks docs/srs.md as a user-owned edita
 describe('T-R3-1.B.2.2: Doctor audit on a legacy project missing docs/srs.md returns a repairable finding', () => {
   it('reports docs/srs.md as a missing repairable file', async () => {
     const projectDir = await makeTempDir()
-    await writeCanonicalProject(projectDir)
+    await writeCanonicalProject(projectDir, { includeSrsDoc: false })
 
     const result = await runDoctorAudit(projectDir)
 
@@ -78,7 +78,7 @@ describe('T-R3-1.B.2.3: Doctor does not emit drift findings for customized docs/
 describe('T-R3-1.B.2.4: Doctor repair restores docs/srs.md from the bundled template', () => {
   it('creates docs/srs.md with project-name interpolation and clears the missing-file finding on re-audit', async () => {
     const projectDir = await makeTempDir('legacy-srs-project')
-    await writeCanonicalProject(projectDir)
+    await writeCanonicalProject(projectDir, { includeSrsDoc: false })
 
     const firstAudit = await runDoctorAudit(projectDir)
     const repairPlan = await createRepairPlan(firstAudit.findings, projectDir)
@@ -107,6 +107,7 @@ describe('T-R3-1.B.3.1: Legacy project upgrade path remains stable through audit
   it('reaches a clean post-repair state without affecting other editable docs and interpolates the repaired SRS shell', async () => {
     const projectDir = await makeTempDir('compat-upgrade-project')
     await writeCanonicalProject(projectDir, {
+      includeSrsDoc: false,
       editableDocs: {
         'docs/prd.md': '# Custom PRD\n',
         'docs/project-progress.md': '# Custom Progress\n',

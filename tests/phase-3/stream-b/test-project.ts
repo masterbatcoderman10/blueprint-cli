@@ -7,7 +7,10 @@ import { MANIFEST_RELATIVE_PATH, TEMPLATE_VERSION } from '../../../src/doctor/ma
 export interface CanonicalProjectOptions {
   includeManifest?: boolean
   managedFiles?: string[]
-  editableDocs?: Partial<Record<'docs/prd.md' | 'docs/project-progress.md' | 'docs/conventions.md', string>>
+  includeSrsDoc?: boolean
+  editableDocs?: Partial<
+    Record<'docs/prd.md' | 'docs/project-progress.md' | 'docs/conventions.md' | 'docs/srs.md', string>
+  >
 }
 
 export async function writeCanonicalProject(
@@ -17,6 +20,7 @@ export async function writeCanonicalProject(
   const {
     includeManifest = true,
     managedFiles = ['CLAUDE.md'],
+    includeSrsDoc = true,
     editableDocs = {},
   } = options
 
@@ -36,6 +40,7 @@ export async function writeCanonicalProject(
     'docs/prd.md': '# Custom PRD\n',
     'docs/project-progress.md': '# Custom Progress\n',
     'docs/conventions.md': '# Custom Conventions\n',
+    ...(includeSrsDoc ? { 'docs/srs.md': '# Custom SRS\n' } : {}),
     ...editableDocs,
   }
 
