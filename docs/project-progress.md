@@ -3,8 +3,8 @@
 **Project**: blueprint-cli
 **Kanban**: blueprint-cli
 **Current Milestone**: Revision 3 — SRS Integration (In Progress)
-**Current Phase**: TBD — pending phase planning
-**Status**: MVP Complete; Revision 3 — SRS Integration in progress (Phases 1–2 complete; Phase 3 pending planning)
+**Current Phase**: Revision 3 Phase 3 — Planning Module Integration (Planned)
+**Status**: MVP Complete; Revision 3 — SRS Integration in progress (Phases 1–2 complete; Phase 3 planned)
 
 ---
 
@@ -38,6 +38,7 @@
 - 2026-03-26: Identified Revision 3 — SRS Integration to introduce a Software Requirements Specification document as a progressive source of truth bridging the PRD and phase plans. Impact spans M1 Phases 2, 3, and 4; 3 phases planned. Revision document created at `docs/milestones/revision-3-srs-integration/`.
 - 2026-03-28: Revision 3 Phase 1 — SRS Module & Structural Registration completed. All tasks done, DoD satisfied, full test suite green (453 tests, 67 files).
 - 2026-03-29: Revision 3 Phase 2 — Alignment & PRD Flow Rework completed. All tasks done, DoD satisfied, full test suite green (453 tests, 67 files).
+- 2026-03-29: Revision 3 Phase 3 — Planning Module Integration was planned. Phase document committed and ready for execution.
 
 ---
 
@@ -100,7 +101,7 @@ M3 — Workflow Visibility Enhancements (Optional Future)
   - **Document:** `docs/milestones/revision-2-tweak-contract/revision-2-tweak-contract.md`
 
 - **Revision 3 — SRS Integration**
-  - **Status:** In Progress (Phases 1–2 complete; Phase 3 pending planning)
+  - **Status:** In Progress (Phases 1–2 complete; Phase 3 planned)
   - **Priority:** Next
   - **Scope:** Introduce SRS document as a progressive source of truth bridging PRD and phase plans. New core module, new template, reworked alignment flow, planning module integration.
   - **Impact:** M1 Phases 2, 3, and 4
