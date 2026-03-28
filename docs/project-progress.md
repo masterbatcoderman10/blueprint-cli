@@ -2,9 +2,9 @@
 
 **Project**: blueprint-cli
 **Kanban**: blueprint-cli
-**Current Milestone**: None active
-**Current Phase**: None active
-**Status**: MVP Complete; Revision 2 — Tweak Contract complete (1 phase done)
+**Current Milestone**: Revision 3 — SRS Integration (In Progress)
+**Current Phase**: TBD — pending phase planning
+**Status**: MVP Complete; Revision 3 — SRS Integration in progress (Phase 1 complete, 2 phases remaining)
 
 ---
 
@@ -36,6 +36,7 @@
 - 2026-03-26: Revision 2 Phase 1 — Tweak Contract & Template Integration completed. All tasks done, DoD satisfied, full test suite green (425 tests, 61 files).
 - 2026-03-26: Revision 2 — Tweak Contract completed. All phases done.
 - 2026-03-26: Identified Revision 3 — SRS Integration to introduce a Software Requirements Specification document as a progressive source of truth bridging the PRD and phase plans. Impact spans M1 Phases 2, 3, and 4; 3 phases planned. Revision document created at `docs/milestones/revision-3-srs-integration/`.
+- 2026-03-28: Revision 3 Phase 1 — SRS Module & Structural Registration completed. All tasks done, DoD satisfied, full test suite green (453 tests, 67 files).
 
 ---
 
@@ -67,7 +68,7 @@ R1 — CLI Discoverability & Help
 R2 — Tweak Contract
 └── Phase 1 — Tweak Contract & Template Integration ✓
 R3 — SRS Integration
-├── Phase 1 — SRS Module & Structural Registration ○
+├── Phase 1 — SRS Module & Structural Registration ✓
 ├── Phase 2 — Alignment & PRD Flow Rework ○
 └── Phase 3 — Planning Module Integration ○
 M2 — Cross-Project Context (Optional Post-MVP)
@@ -98,7 +99,7 @@ M3 — Workflow Visibility Enhancements (Optional Future)
   - **Document:** `docs/milestones/revision-2-tweak-contract/revision-2-tweak-contract.md`
 
 - **Revision 3 — SRS Integration**
-  - **Status:** Planned (3 phases)
+  - **Status:** In Progress (Phase 1 complete; 2 phases remaining)
   - **Priority:** Next
   - **Scope:** Introduce SRS document as a progressive source of truth bridging PRD and phase plans. New core module, new template, reworked alignment flow, planning module integration.
   - **Impact:** M1 Phases 2, 3, and 4
