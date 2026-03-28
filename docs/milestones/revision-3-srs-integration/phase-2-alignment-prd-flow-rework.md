@@ -65,35 +65,12 @@
 
 ---
 
-## Stream B — Regression Coverage
-
-> Verify template content contains expected markers for the new two-stage PRD and alignment flow.
-> **Depends on:** Gate (prd-planning.md changes) and Stream A (alignment.md changes).
-
-| Task ID | Task | Duration | Dependencies | Type |
-|---------|------|----------|--------------|------|
-| R3-2.B.1 | Add regression tests verifying `prd-planning.md` template contains two-stage process markers (Stage 1, Stage 2), the STOP instruction, and "Relevant requirements" SRS reference syntax in the template section. | 0.75 | R3-2.0.3 | Dependent |
-| R3-2.B.2 | Add regression tests verifying `alignment.md` template contains the updated document production sequence with SRS as the third document, feature extraction leads in the analysis step, and EMPTY state routing through the full sequence. | 0.75 | R3-2.A.3 | Dependent |
-
-### Stream B Acceptance Criteria
-
-- [ ] Tests verify `prd-planning.md` template contains two-stage process and SRS reference syntax
-- [ ] Tests verify `alignment.md` template contains the 5+1 document production sequence
-- [ ] All tests pass against the updated templates
-
----
-
 ## Parallelization Map
 
 ```text
 Gate R3-2.0 (Two-Stage PRD Contract) ──────────────────────────────┐
                                                                     │
-                 ┌─────────────────────────────────────────────────┤
-                 │                                                  │
 Stream A (Alignment Flow Rework) ─────────────────────────────────► │
-                 │                                                  │
-                 └── Stream B (Regression Coverage)                 │
-                     depends on Gate + A ──────────────────────────►│
                                                                     │
                                                                     ▼
                                                           Phase 2 complete
@@ -105,14 +82,43 @@ Stream A (Alignment Flow Rework) ───────────────�
 
 - [ ] Gate R3-2.0 acceptance criteria pass
 - [ ] Stream A acceptance criteria pass
-- [ ] Stream B acceptance criteria pass
 - [ ] `prd-planning.md` defines a strict two-stage creation workflow with SRS traceability
 - [ ] `alignment.md` produces the SRS as a first-class document with its own Q&A cycle
 - [ ] PRD milestones show "Relevant requirements:" SRS ID references below milestone titles
 - [ ] Greenfield and existing projects follow the same document production sequence
 - [ ] Live `docs/core/` and `templates/docs/core/` copies match for all modified files
-- [ ] No lint or typecheck errors in files touched by this phase
-- [ ] All tests pass
+
+---
+
+## Test Plan
+
+> Generated from task analysis. All tasks in this phase are protocol
+> documentation changes (markdown rewrites) with no runtime behavior.
+> Verification is manual via the Test Scenarios below.
+
+### Gate R3-2.0 Tests
+
+| Test ID | Task | Type | Description | Expected Result |
+|---------|------|------|-------------|-----------------|
+| — | R3-2.0.1 | — | Not testable: protocol documentation rewrite, no runtime behavior | — |
+| — | R3-2.0.2 | — | Not testable: template content update, no runtime behavior | — |
+| — | R3-2.0.3 | — | Not testable: example content update, no runtime behavior | — |
+
+### Stream A Tests
+
+| Test ID | Task | Type | Description | Expected Result |
+|---------|------|------|-------------|-----------------|
+| — | R3-2.A.1 | — | Not testable: protocol documentation rewrite, no runtime behavior | — |
+| — | R3-2.A.2 | — | Not testable: protocol documentation rewrite, no runtime behavior | — |
+| — | R3-2.A.3 | — | Not testable: protocol documentation rewrite, no runtime behavior | — |
+
+### Test Summary
+
+| Component | Total Tasks | Testable | Not Testable |
+|-----------|-------------|----------|--------------|
+| Gate R3-2.0 | 3 | 0 | 3 |
+| Stream A | 3 | 0 | 3 |
+| **Total** | **6** | **0** | **6** |
 
 ---
 
