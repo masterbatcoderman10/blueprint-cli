@@ -36,11 +36,22 @@ related phases that together deliver a meaningful product increment.
   DURING QUESTIONS:
     - Understand what this milestone delivers as a whole
     - Clarify which PRD milestone this maps to
+    - Refer to docs/core/srs-planning.md for the milestone-level
+      requirement-elaboration baseline before probing the SRS slice
     - Read the milestone's referenced SRS requirement slice before
       asking new milestone-planning questions
     - Identify the major feature areas that need to be built
     - Use concise, under-specified, or overly broad SRS requirements
       as explicit prompts for clarification
+    - If the user already knows the intended requirement shape,
+      let them describe it directly first
+    - If the user is not yet clear, do not ask what they want to
+      elaborate; instead probe with short acceptance scenarios and
+      concrete idea prompts so the user can react, accept, reject,
+      or adjust the proposed behavior
+    - After the user gives a clear preferred behavior, ask whether
+      they want to hear a few more ideas before finalizing the
+      milestone-level requirement wording
     - Ask how the user sees these grouping into phases
     - Ask about dependencies — which phases must complete before
       others can start
