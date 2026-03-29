@@ -30,17 +30,76 @@ related phases that together deliver a meaningful product increment.
 <MilestoneProcess>
   PRECONDITIONS:
   - docs/prd.md is loaded (milestones are derived from the PRD)
+  - docs/srs.md is loaded (milestone requirement slices are traced
+    through the SRS)
+
+  MILESTONE-PLANNING BASELINE:
+    Milestone planning owns requirement-meaning elaboration for the
+    milestone slice selected by the PRD.
+
+    WHEN a requirement is concise or under-specified:
+      - Ask what the requirement actually means at milestone level
+      - Broaden the readable requirement text once clarified
+      - Record the change in docs/srs.md during the same planning cycle
+
+    WHEN a requirement is too broad to assign cleanly to phases:
+      - Split it into atomic sub-requirements
+      - Assign new IDs to the new atomic requirements
+      - Record the split in docs/srs.md before finalizing phase grouping
+
+    PHASE-ASSIGNMENT RULE:
+      - When a milestone contains multiple in-scope requirements,
+        assign each requirement to a specific phase
+      - When a milestone begins with only one in-scope requirement
+        but the work spans multiple phases, broaden or split that
+        requirement into phase-ownable slices before assigning them
+        across phases
+
+    REFERENCE RULE:
+      - Keep this local baseline aligned with docs/core/srs-planning.md
+      - Still read docs/core/srs-planning.md for the canonical schema
+        and requirement-spec guidance
 
   DURING QUESTIONS:
     - Understand what this milestone delivers as a whole
     - Clarify which PRD milestone this maps to
+    - Refer to docs/core/srs-planning.md for the milestone-level
+      requirement-elaboration baseline before probing the SRS slice
+    - Read the milestone's referenced SRS requirement slice before
+      asking new milestone-planning questions
     - Identify the major feature areas that need to be built
+    - Use concise, under-specified, or overly broad SRS requirements
+      as explicit prompts for clarification
+    - If the user already knows the intended requirement shape,
+      let them describe it directly first
+    - If the user is not yet clear, do not ask what they want to
+      elaborate; instead probe with short acceptance scenarios and
+      concrete idea prompts so the user can react, accept, reject,
+      or adjust the proposed behavior
+    - After the user gives a clear preferred behavior, ask whether
+      they want to hear a few more ideas before finalizing the
+      milestone-level requirement wording
     - Ask how the user sees these grouping into phases
     - Ask about dependencies — which phases must complete before
       others can start
     - Do not drill into task-level detail — that is phase planning
 
   DURING DRAFTING:
+    - Once a concise SRS requirement is understood, broaden the
+      readable requirement text in docs/srs.md during the same
+      planning cycle
+    - If a broad SRS requirement cannot be assigned cleanly across
+      the milestone's planned phases, split it into atomic
+      sub-requirements before finalizing phase grouping
+    - Assign each in-scope SRS requirement to a specific planned
+      phase
+    - If the milestone starts with only one in-scope SRS requirement
+      but the work spans multiple phases, broaden or split that
+      requirement into phase-ownable slices before assigning them
+      across phases
+    - Update the shared SRS Data Schema at the entity/domain level
+      when milestone planning clarifies product structure, while
+      keeping the milestone document itself at milestone granularity
     - Each phase gets a name and a one-sentence objective
     - Phase names describe capabilities, not implementations
       (e.g., "Auth & Accounts" not "Add auth data models and migrations")
