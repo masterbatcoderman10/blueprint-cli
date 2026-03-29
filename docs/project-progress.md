@@ -2,9 +2,9 @@
 
 **Project**: blueprint-cli
 **Kanban**: blueprint-cli
-**Current Milestone**: Revision 3 — SRS Integration (In Progress)
-**Current Phase**: Revision 3 Phase 3 — Planning Module Integration (Planned)
-**Status**: MVP Complete; Revision 3 — SRS Integration in progress (Phases 1–2 complete; Phase 3 planned)
+**Current Milestone**: Revision 3 — SRS Integration (Complete)
+**Current Phase**: Revision 3 Phase 3 — Planning Module Integration (Complete)
+**Status**: MVP Complete; Revision 3 — SRS Integration complete (all 3 phases done; full test suite green)
 
 ---
 
@@ -39,6 +39,8 @@
 - 2026-03-28: Revision 3 Phase 1 — SRS Module & Structural Registration completed. All tasks done, DoD satisfied, full test suite green (453 tests, 67 files).
 - 2026-03-29: Revision 3 Phase 2 — Alignment & PRD Flow Rework completed. All tasks done, DoD satisfied, full test suite green (453 tests, 67 files).
 - 2026-03-29: Revision 3 Phase 3 — Planning Module Integration was planned. Phase document committed and ready for execution.
+- 2026-03-29: Revision 3 Phase 3 — Planning Module Integration completed. All tasks done, DoD satisfied, full test suite green (453 tests, 67 files).
+- 2026-03-29: Revision 3 — SRS Integration completed. All phases done.
 
 ---
 
@@ -72,7 +74,7 @@ R2 — Tweak Contract
 R3 — SRS Integration
 ├── Phase 1 — SRS Module & Structural Registration ✓
 ├── Phase 2 — Alignment & PRD Flow Rework ✓
-└── Phase 3 — Planning Module Integration ○
+└── Phase 3 — Planning Module Integration ✓
 M2 — Cross-Project Context (Optional Post-MVP)
 └── Phase 1 — TBD ○
 M3 — Workflow Visibility Enhancements (Optional Future)
@@ -101,8 +103,8 @@ M3 — Workflow Visibility Enhancements (Optional Future)
   - **Document:** `docs/milestones/revision-2-tweak-contract/revision-2-tweak-contract.md`
 
 - **Revision 3 — SRS Integration**
-  - **Status:** In Progress (Phases 1–2 complete; Phase 3 planned)
-  - **Priority:** Next
+  - **Status:** Complete (all 3 phases done)
+  - **Priority:** Done
   - **Scope:** Introduce SRS document as a progressive source of truth bridging PRD and phase plans. New core module, new template, reworked alignment flow, planning module integration.
   - **Impact:** M1 Phases 2, 3, and 4
   - **Document:** `docs/milestones/revision-3-srs-integration/revision-3-srs-integration.md`
