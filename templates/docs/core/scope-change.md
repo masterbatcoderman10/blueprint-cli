@@ -127,37 +127,13 @@ the current plan, this module classifies it and either places it
   This step runs after the feature has been placed at a level (A–D)
   and before the change is recorded in project-progress.md.
 
-  STEP 1 — DETERMINE NEW OR EXISTING REQUIREMENT
-    Ask:
-      - Does an existing SRS requirement already cover this capability?
-      - Or is this a genuinely new capability?
+  STEP 1 — UPDATE THE SRS
+    Load docs/core/srs-planning.md. Follow its rules for additive
+    requirement insertion (SRSModificationRules) to create or update
+    the corresponding SRS requirement entry.
+    Use "Scope Change" as the introduction path.
 
-    IF it deepens an existing requirement:
-      → Keep the same SRS ID
-      → Update the readable requirement text in the correct MoSCoW
-        section
-      → Add a change-log entry in the Requirement Metadata section
-
-    IF it is a new capability:
-      → Create a new requirement entry with the next available SRS ID
-      → Add a readable requirement entry in the correct MoSCoW section
-      → Add a row to the Requirement Index
-      → Create full metadata in the Requirement Metadata section
-
-  STEP 2 — POPULATE REQUIREMENT METADATA
-    Every SRS entry created or updated through scope placement must
-    include:
-      - Priority: Must | Should | Could | Won't
-      - Status: active (or approved-pending-implementation if the
-        capability is approved but not yet built)
-      - Assigned milestone: the milestone determined by the placement
-        level
-      - Source: user input, planning conversation, or whatever surfaced
-        the feature
-      - Introduced by: Scope Change
-      - Change log: dated entry recording the addition or update
-
-  STEP 3 — CONFIRM PLACEMENT CONSISTENCY
+  STEP 2 — CONFIRM PLACEMENT CONSISTENCY
     Verify that the SRS requirement's milestone assignment matches the
     placement level:
       - Level A or B → current milestone
@@ -210,21 +186,15 @@ the current plan, this module classifies it and either places it
     capability breaks traceability.
 
   STEP 2 — UPDATE THE SRS
-    Create a new SRS requirement entry for the discovered capability:
-      - Assign the next available SRS ID
-      - Write a readable requirement entry in the correct MoSCoW section
-      - Add a row to the Requirement Index
-      - Create full metadata with:
-        - Source: the planning conversation or broad requirement that
-          revealed it
-        - Introduced by: Milestone Planning or Phase Planning
-          (whichever discovered it)
-        - Assigned milestone: the milestone being planned
-      - Add a change-log entry noting the discovery context
+    Load docs/core/srs-planning.md. Follow its rules for additive
+    requirement insertion (SRSModificationRules) to create the new
+    SRS requirement entry.
+    Use "Milestone Planning" or "Phase Planning" as the introduction
+    path, whichever discovered the capability.
 
     IF the discovered capability was split from an existing broad
     requirement, also update the parent requirement's change log to
-    note the split.
+    note the split per srs-planning.md audit trace rules.
 
   STEP 3 — RESUME PLANNING
     Once the SRS contains the new requirement, downstream planning
