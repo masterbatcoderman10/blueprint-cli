@@ -35,6 +35,10 @@ and parallel streams of tasks.
   - The milestone document for the target milestone is loaded
     (the phase must map to a milestone's feature area)
   - docs/conventions.md is loaded (tech stack informs task design)
+  - docs/srs.md is loaded — specifically the requirement slice
+    assigned to this phase by milestone planning. The milestone
+    document identifies which SRS requirements map to this phase.
+    Phase planning works from that assigned slice, not the full SRS.
 
   DURING QUESTIONS:
     - Identify what data models or schemas this phase introduces or modifies
@@ -43,6 +47,21 @@ and parallel streams of tasks.
     - Ask about new configuration — environment variables, secrets, settings
     - Identify the endpoints, routes, or surfaces this phase exposes
     - Determine what can be parallelized vs what must be sequential
+
+    SRS-TARGETED CLARIFICATION:
+    - Read the SRS requirements assigned to this phase by the
+      milestone document. Use them as the starting point for
+      technical clarification.
+    - If an assigned requirement is concise or technically
+      under-specified, ask what it means at implementation level:
+      what schema fields, what API surface, what data flows.
+    - If an assigned requirement is broad enough to span multiple
+      streams, ask whether it should be split into sub-requirements
+      before stream grouping proceeds.
+    - Phase planning does not re-own requirement meaning. Meaning
+      was established at milestone level. Phase questions focus on
+      technical depth: schema detail, migration shape, architecture
+      choices, and integration points.
 
   DURING DRAFTING:
     - Start with the gate — what foundational work unlocks the streams?
@@ -56,6 +75,20 @@ and parallel streams of tasks.
       five independent feature areas, create five streams. Do not
       collapse independent work into fewer streams just for simplicity
       — parallelism is a primary advantage of the gate/stream model.
+
+    SRS-TO-STREAM TRACEABILITY:
+      When the phase's SRS slice contains distinct sub-requirements,
+      assign them to streams so the stream structure stays traceable
+      to the SRS.
+      - If a sub-requirement maps cleanly to one stream, note that
+        mapping in the stream description or acceptance criteria.
+      - If a sub-requirement spans multiple streams, document which
+        stream owns the primary implementation and which streams
+        contribute supporting work.
+      - Stream grouping is still driven by parallelism and dependency
+        structure. SRS traceability is a documentation concern — it
+        should not force unnatural stream boundaries.
+
     - Break streams into tasks — each task should be completable
       in a single focused session (≤ 2 duration units)
     - Write acceptance criteria for each gate and stream
@@ -63,6 +96,38 @@ and parallel streams of tasks.
       with inter-stream dependencies clearly marked
     - Include a definition of done that aggregates critical criteria
     - List test scenarios — happy path and edge cases
+
+  PHASE-LEVEL SRS UPDATES:
+    Phase planning may update docs/srs.md when technical clarification
+    deepens understanding without changing requirement meaning.
+
+    PERMITTED UPDATES (same meaning, same SRS ID):
+      - Shared data-schema detail: new fields, field types, or
+        entity relationships discovered during phase questioning
+      - Migration implications: schema versioning or data-migration
+        notes tied to the phase's requirement slice
+      - Data-structure detail: storage shapes, index strategies, or
+        serialization formats that the requirement implies
+      - Architecture notes: integration points, service boundaries,
+        or protocol choices tied to the requirement slice
+
+    These updates keep the existing requirement ID. They add a
+    change-log entry in the SRS requirement metadata noting that
+    phase planning deepened the technical detail.
+
+    BOUNDARY — MATERIALLY CHANGED MEANING:
+      If phase questioning reveals that the intended behavior is
+      materially different from what the SRS currently says:
+        - Do NOT silently rewrite the existing SRS entry
+        - STOP and flag the discrepancy to the user
+        - Route through docs/core/scope-change.md (if additive)
+          or docs/core/revision-planning.md (if modifying)
+        - Resume phase planning only after the SRS reflects the
+          approved requirement state
+
+    Phase planning should never produce a phase document that
+    assumes a requirement means something different from what the
+    SRS records. If meaning has drifted, fix the SRS first.
 
   WHEN UPDATING AN EXISTING PHASE:
     - New tasks may be added to a stream — update the stream's
