@@ -47,6 +47,15 @@ alignment, and grows as the project gains clarity.
     - An entire milestone
     - Multiple phases within one milestone
 
+  TRACEABILITY RULE:
+    Planning layers must keep requirement ownership visible:
+      - PRD selects the milestone slice
+      - Milestone planning assigns in-scope requirements to phases
+      - Phase planning may assign sub-requirements to streams
+
+    Each lower planning layer should work from the requirement slice
+    assigned by the layer above rather than inventing a fresh slice.
+
   ATOMICITY RULE:
     A requirement should describe one meaningful capability.
 
@@ -261,6 +270,68 @@ alignment, and grows as the project gains clarity.
 
 ---
 
+<PlanningBaseline>
+  PURPOSE: Define the SRS rules that downstream planning modules use.
+
+  MILESTONE-PLANNING BASELINE:
+    Milestone planning owns requirement-meaning elaboration for the
+    milestone slice selected by the PRD.
+
+    WHEN a requirement is concise or under-specified:
+      - Ask what the requirement actually means at milestone level
+      - Broaden the readable requirement text once clarified
+      - Record the change in the change log
+
+    WHEN a requirement is too broad to assign cleanly to phases:
+      - Split it into atomic sub-requirements
+      - Assign new IDs to the new atomic requirements
+      - Record the split in the change log
+
+    PHASE-ASSIGNMENT RULE:
+      - When a milestone contains multiple in-scope requirements,
+        assign each requirement to a specific phase
+      - When a milestone begins with only one in-scope requirement
+        but the work spans multiple phases, broaden or split that
+        requirement into phase-ownable slices before assigning them
+        across phases
+
+  PHASE-PLANNING BASELINE:
+    Phase planning does not re-own requirement meaning. It works
+    from the milestone-assigned requirement slice.
+
+    STREAM-ASSIGNMENT RULE:
+      - If the phase slice contains distinct sub-requirements,
+        phase planning may assign them to streams
+      - Stream assignment should stay traceable to the phase-owned
+        SRS slice
+
+    PHASE-LEVEL SRS UPDATE RULE:
+      When requirement meaning stays the same, phase planning may
+      update the SRS with:
+        - Shared data-schema detail
+        - Migration implications
+        - Data-structure detail
+        - Architecture notes tied to the requirement slice
+
+      These updates deepen technical understanding in the SRS, but
+      do not rewrite the requirement into a task list.
+
+  SCOPE-CHANGE BASELINE:
+    If planning reveals an additive capability missing from the SRS:
+      - Add or place the capability through scope-change handling
+      - Update the SRS before downstream phase or stream planning
+        continues
+
+  REVISION BASELINE:
+    If planning reveals materially changed requirement meaning:
+      - Do not silently rewrite the existing requirement
+      - Route through revision planning
+      - Keep the old requirement visible and use supersession links
+        if a new requirement replaces it
+</PlanningBaseline>
+
+---
+
 <SRSModificationRules>
   PURPOSE: Define how an existing SRS changes after it has been created.
 
@@ -271,6 +342,12 @@ alignment, and grows as the project gains clarity.
       - Update the readable requirement text
       - Update metadata if milestone assignment or status changed
       - Add a change-log entry
+
+    This rule covers:
+      - Milestone-level broadening of concise requirement text
+      - Reassignment to a different milestone or phase-owned slice
+      - Phase-level schema, migration, data-structure, and architecture
+        notes that preserve the same requirement meaning
 
   ADDITIVE REQUIREMENT INSERTION:
     When docs/core/scope-change.md classifies a request as additive,
@@ -311,6 +388,16 @@ alignment, and grows as the project gains clarity.
         create a new requirement ID. The same meaning remains the same
         requirement. Record the reassignment in the change log.
 
+    PLANNING-DISCOVERED SPLIT RULE:
+      When milestone planning determines that one broad requirement
+      actually contains multiple atomic capabilities:
+        - Keep the original requirement only if it still represents a
+          meaningful atomic capability after clarification
+        - Otherwise create new requirement IDs for the atomic
+          sub-requirements
+        - Update milestone assignment and change-log entries so the
+          phase-planning layer receives a clean requirement slice
+
   REVISION HANDOFF:
     When the user wants an existing requirement to mean something
     different, do not silently rewrite the current requirement.
@@ -322,19 +409,21 @@ alignment, and grows as the project gains clarity.
       The revision analysis should name which SRS requirement IDs are
       affected.
 
-    STEP 3 - APPLY THE REQUIREMENT ID RULE
+    STEP 3 - APPLY THE ID DECISION RULE
+      IF the revision only clarifies an under-specified requirement
+      without changing meaning:
+        -> Keep the same SRS ID
+        -> Update the requirement text, metadata, and change log
+
       IF the revision confirms the requirement means something
       materially different:
         -> Create a new requirement ID for the approved target state
         -> Add metadata for the new requirement
+        -> Mark the prior requirement as superseded
         -> Mark the new requirement as approved-pending-implementation
         -> Link old and new requirement IDs in both directions
+        -> Record the change in both change logs
         -> Preserve the prior requirement for audit trace
-
-      IF the revision only clarifies an under-specified requirement
-      without changing meaning:
-        -> Keep the same requirement ID
-        -> Update in place after approval
 </SRSModificationRules>
 
 ---
