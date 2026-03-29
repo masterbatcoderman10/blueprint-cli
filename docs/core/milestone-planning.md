@@ -33,6 +33,33 @@ related phases that together deliver a meaningful product increment.
   - docs/srs.md is loaded (milestone requirement slices are traced
     through the SRS)
 
+  MILESTONE-PLANNING BASELINE:
+    Milestone planning owns requirement-meaning elaboration for the
+    milestone slice selected by the PRD.
+
+    WHEN a requirement is concise or under-specified:
+      - Ask what the requirement actually means at milestone level
+      - Broaden the readable requirement text once clarified
+      - Record the change in docs/srs.md during the same planning cycle
+
+    WHEN a requirement is too broad to assign cleanly to phases:
+      - Split it into atomic sub-requirements
+      - Assign new IDs to the new atomic requirements
+      - Record the split in docs/srs.md before finalizing phase grouping
+
+    PHASE-ASSIGNMENT RULE:
+      - When a milestone contains multiple in-scope requirements,
+        assign each requirement to a specific phase
+      - When a milestone begins with only one in-scope requirement
+        but the work spans multiple phases, broaden or split that
+        requirement into phase-ownable slices before assigning them
+        across phases
+
+    REFERENCE RULE:
+      - Keep this local baseline aligned with docs/core/srs-planning.md
+      - Still read docs/core/srs-planning.md for the canonical schema
+        and requirement-spec guidance
+
   DURING QUESTIONS:
     - Understand what this milestone delivers as a whole
     - Clarify which PRD milestone this maps to
