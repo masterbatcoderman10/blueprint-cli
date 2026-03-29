@@ -30,17 +30,38 @@ related phases that together deliver a meaningful product increment.
 <MilestoneProcess>
   PRECONDITIONS:
   - docs/prd.md is loaded (milestones are derived from the PRD)
+  - docs/srs.md is loaded (milestone requirement slices are traced
+    through the SRS)
 
   DURING QUESTIONS:
     - Understand what this milestone delivers as a whole
     - Clarify which PRD milestone this maps to
+    - Read the milestone's referenced SRS requirement slice before
+      asking new milestone-planning questions
     - Identify the major feature areas that need to be built
+    - Use concise, under-specified, or overly broad SRS requirements
+      as explicit prompts for clarification
     - Ask how the user sees these grouping into phases
     - Ask about dependencies — which phases must complete before
       others can start
     - Do not drill into task-level detail — that is phase planning
 
   DURING DRAFTING:
+    - Once a concise SRS requirement is understood, broaden the
+      readable requirement text in docs/srs.md during the same
+      planning cycle
+    - If a broad SRS requirement cannot be assigned cleanly across
+      the milestone's planned phases, split it into atomic
+      sub-requirements before finalizing phase grouping
+    - Assign each in-scope SRS requirement to a specific planned
+      phase
+    - If the milestone starts with only one in-scope SRS requirement
+      but the work spans multiple phases, broaden or split that
+      requirement into phase-ownable slices before assigning them
+      across phases
+    - Update the shared SRS Data Schema at the entity/domain level
+      when milestone planning clarifies product structure, while
+      keeping the milestone document itself at milestone granularity
     - Each phase gets a name and a one-sentence objective
     - Phase names describe capabilities, not implementations
       (e.g., "Auth & Accounts" not "Add auth data models and migrations")
