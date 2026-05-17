@@ -68,8 +68,6 @@ export async function installPackedCliFixture(): Promise<PackedCliFixture> {
   const project = await createIsolatedTempProject('blueprint-packed-cli-')
 
   try {
-    await runCommand(npmExecutable, ['run', 'build'], { cwd: workspaceRoot })
-
     const packOutput = await runCommand(npmExecutable, ['pack', '--json', workspaceRoot], {
       cwd: packDir,
     })

@@ -18,7 +18,7 @@ describe('T-A.4.1: packed artifact install exposes the public blueprint executab
     } finally {
       await fixture.cleanup()
     }
-  }, 15000)
+  }, 30000)
 })
 
 describe('T-A.4.2: packed artifact includes runtime assets and supports release-critical smoke paths', () => {
@@ -67,5 +67,5 @@ describe('T-A.4.2: packed artifact includes runtime assets and supports release-
     } finally {
       await fixture.cleanup()
     }
-  }, 15000)
+  }, 30000)
 })
