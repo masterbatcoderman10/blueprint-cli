@@ -63,6 +63,9 @@
   │ Execute tasks           │ docs/core/execution.md               │
   │ (start gate/stream)     │                                      │
   ├─────────────────────────┼──────────────────────────────────────┤
+  │ Orchestrate phase /     │ docs/core/orchestrate.md             │
+  │ stream execution        │                                      │
+  ├─────────────────────────┼──────────────────────────────────────┤
   │ Review gate/stream      │ docs/core/review.md                  │
   ├─────────────────────────┼──────────────────────────────────────┤
   │ Address review notes    │ docs/core/execution.md               │

@@ -9,10 +9,10 @@ import { CANONICAL_CORE_FILES, EDITABLE_PROJECT_DOCS } from '../../../src/doctor
 const ROOT_DIR = resolve(__dirname, '..', '..', '..')
 const TEMPLATES_CORE_DIR = join(ROOT_DIR, 'templates', 'docs', 'core')
 
-describe('T-R3-1.C.2.1: canonical core template inventory includes srs-planning.md as the nineteenth module', () => {
+describe('T-R3-1.C.2.1: canonical core template inventory includes srs-planning.md', () => {
   it('tracks docs/core/srs-planning.md in both structure and resolved core template inventory', () => {
     expect(CANONICAL_CORE_FILES).toContain('docs/core/srs-planning.md')
-    expect(CANONICAL_CORE_FILES).toHaveLength(19)
+    expect(CANONICAL_CORE_FILES).toHaveLength(20)
 
     const srsPlanningEntry = resolveAllCoreTemplatePaths().find(
       (entry) => entry.relativePath === 'docs/core/srs-planning.md',
@@ -24,14 +24,14 @@ describe('T-R3-1.C.2.1: canonical core template inventory includes srs-planning.
   })
 })
 
-describe('T-R3-1.C.2.2: templates/docs/core contains exactly 19 Markdown protocol files including srs-planning.md', () => {
+describe('T-R3-1.C.2.2: templates/docs/core contains exactly 20 Markdown protocol files including srs-planning.md', () => {
   it('matches the canonical inventory and count', async () => {
     const mdFiles = (await readdir(TEMPLATES_CORE_DIR))
       .filter((entry) => entry.endsWith('.md'))
       .sort()
 
     expect(mdFiles).toEqual(CANONICAL_CORE_FILES.map((relativePath) => basename(relativePath)).sort())
-    expect(mdFiles).toHaveLength(19)
+    expect(mdFiles).toHaveLength(20)
     expect(mdFiles).toContain('srs-planning.md')
   })
 })

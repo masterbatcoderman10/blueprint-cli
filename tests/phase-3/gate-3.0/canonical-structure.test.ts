@@ -17,7 +17,7 @@ describe('T-3.0.2.1: canonical structure inventory completeness', () => {
     expect(paths).toContain('docs/.blueprint/manifest.json')
   })
 
-  it('includes all 19 required docs/core/** files', () => {
+  it('includes all 20 required docs/core/** files', () => {
     const paths = getCanonicalStructurePaths()
     const expectedCoreFiles = [
       'docs/core/alignment.md',
@@ -29,6 +29,7 @@ describe('T-3.0.2.1: canonical structure inventory completeness', () => {
       'docs/core/health-check.md',
       'docs/core/hierarchy.md',
       'docs/core/milestone-planning.md',
+      'docs/core/orchestrate.md',
       'docs/core/phase-completion.md',
       'docs/core/phase-planning.md',
       'docs/core/planning.md',
@@ -43,7 +44,7 @@ describe('T-3.0.2.1: canonical structure inventory completeness', () => {
     for (const file of expectedCoreFiles) {
       expect(paths).toContain(file)
     }
-    expect(CANONICAL_CORE_FILES).toHaveLength(19)
+    expect(CANONICAL_CORE_FILES).toHaveLength(20)
   })
 
   it('returns managed agent paths for files in manifest selection', () => {
