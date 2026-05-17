@@ -157,7 +157,7 @@ export function updateTask(db: TrackerDatabase, input: UpdateTaskInput): TaskRes
     return invalidState(input.state)
   }
 
-  const updatedAt = input.now ?? Date.now()
+  const updatedAt = Math.max(input.now ?? Date.now(), existing.updated_at + 1)
   db.prepare(
     `UPDATE tasks
       SET title = ?,

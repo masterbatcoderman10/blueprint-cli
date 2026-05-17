@@ -172,6 +172,32 @@ describe('Stream A — task CRUD route functions', () => {
     expect(result.ok && result.data.updated_at).toBeGreaterThan(created.data.updated_at)
   })
 
+  it('T-A.1.8: updateTask advances updated_at when the clock has not advanced', () => {
+    const database = openMemoryDb()
+    const created = createSampleTask(database)
+    if (!created.ok) throw new Error('setup failed')
+
+    const result = updateTask(database, {
+      id: 'R6-1.A.1',
+      title: 'Same millisecond update',
+      now: created.data.updated_at,
+    })
+
+    expect(result).toMatchObject({
+      ok: true,
+      data: {
+        id: 'R6-1.A.1',
+        title: 'Same millisecond update',
+      },
+    })
+    expect(result.ok && result.data.updated_at).toBeGreaterThan(created.data.updated_at)
+
+    const row = database.prepare('SELECT updated_at FROM tasks WHERE id = ?').get('R6-1.A.1') as {
+      updated_at: number
+    }
+    expect(row.updated_at).toBeGreaterThan(created.data.updated_at)
+  })
+
   it('T-A.1.9: updateTask returns task_not_found for missing IDs', () => {
     const database = openMemoryDb()
 
