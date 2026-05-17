@@ -3,8 +3,8 @@
 **Project**: blueprint-cli
 **Kanban**: blueprint-cli
 **Current Milestone**: Revision 6 — Built-in Task Tracker
-**Current Phase**: Phase 1 — Tracker Core (Schema + CRUD Server)
-**Status**: MVP Complete; Revision 5 — Orchestration Protocol complete; Revision 6 Phase 1 complete
+**Current Phase**: Phase 2 — Board SPA + blueprint board Command
+**Status**: MVP Complete; Revision 6 Phase 1 complete; Phase 2 active
 
 ---
 
@@ -97,7 +97,7 @@ R5 — Orchestration Protocol
 └── Phase 1 — Orchestration Module & Routing Integration ✓
 R6 — Built-in Task Tracker
 ├── Phase 1 — Tracker Core (Schema + CRUD Server) ✓
-├── Phase 2 — Board SPA + blueprint board Command ○
+├── Phase 2 — Board SPA + blueprint board Command ●
 ├── Phase 3 — Protocol Rewrite ○
 ├── Phase 4 — Migration & Doctor Integration ○
 └── Phase 5 — Verification & Cleanup ○
