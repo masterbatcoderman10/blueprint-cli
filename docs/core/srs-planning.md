@@ -709,3 +709,36 @@ alignment, and grows as the project gains clarity.
   Change log:
   - 2026-03-26 - Created from product planning conversation
 </SRSExample>
+
+---
+
+## Anti-Patterns
+
+```xml
+<AntiPatterns>
+  <AntiPattern name="Flat Requirement Lists">
+    <BadExample>The agent takes one MealBoard capability and explodes it into several top-level requirements that are really just parts of the same job.</BadExample>
+    <BadRequirementExample>SRS-101 - Recipe title capture - The system must allow users to enter a title when manually saving a recipe.</BadRequirementExample>
+    <BadRequirementExample>SRS-102 - Ingredient list capture - The system must allow users to enter ingredients when manually saving a recipe.</BadRequirementExample>
+    <BadRequirementExample>SRS-103 - Preparation step capture - The system must allow users to enter ordered steps when manually saving a recipe.</BadRequirementExample>
+    <BadRequirementExample>SRS-104 - Manual recipe record creation - The system must allow users to save the completed recipe as a new record.</BadRequirementExample>
+    <GoodRequirementExample>SRS-001 - Manual recipe saving - The system must allow users to save recipes manually.</GoodRequirementExample>
+    <GoodSubRequirementExample>- The system must capture a recipe title.</GoodSubRequirementExample>
+    <GoodSubRequirementExample>- The system must capture an ingredient list.</GoodSubRequirementExample>
+    <GoodSubRequirementExample>- The system must capture ordered preparation steps.</GoodSubRequirementExample>
+    <Why>The bad split spends four top-level requirement IDs to describe one MealBoard capability. The good version names the capability once, then keeps the title, ingredients, and steps as sub-requirements where they belong.</Why>
+  </AntiPattern>
+  <AntiPattern name="Checklist-Style SRS Execution">
+    <BadExample>The agent turns the MealBoard manual-recipe flow into an implementation checklist and mistakes build steps for requirement meaning.</BadExample>
+    <BadRequirementExample>SRS-201 - Recipe title input field - Build a title input for manual recipe creation.</BadRequirementExample>
+    <BadRequirementExample>SRS-202 - Ingredient repeater - Build ingredient rows for manual recipe creation.</BadRequirementExample>
+    <BadRequirementExample>SRS-203 - Preparation step list - Build ordered step inputs for manual recipe creation.</BadRequirementExample>
+    <BadRequirementExample>SRS-204 - Manual recipe save action - Persist the completed recipe when the user presses save.</BadRequirementExample>
+    <GoodRequirementExample>SRS-001 - Manual recipe saving - The system must allow users to save recipes manually.</GoodRequirementExample>
+    <GoodSubRequirementExample>- The system must capture a recipe title.</GoodSubRequirementExample>
+    <GoodSubRequirementExample>- The system must capture an ingredient list.</GoodSubRequirementExample>
+    <GoodSubRequirementExample>- The system must capture ordered preparation steps.</GoodSubRequirementExample>
+    <Why>A checklist writer describes what to build next and in what order. Progressive clarification describes enduring product truth first, then lets later planning layers decide implementation steps.</Why>
+  </AntiPattern>
+</AntiPatterns>
+```

@@ -4,9 +4,7 @@
 
 ## Purpose
 
-_Describe why this SRS exists for blueprint-cli and how it should be
-used as the persistent requirement layer between the PRD and later
-planning documents._
+This SRS exists for blueprint-cli to act as the persistent requirement layer between the PRD and later planning documents. It codifies the structural rules, process constraints, and system behaviors.
 
 ---
 
@@ -14,7 +12,11 @@ planning documents._
 
 | ID | Title | Priority | Status | Assigned Milestone |
 |----|-------|----------|--------|--------------------|
-| SRS-001 | _Requirement title_ | Must | _active_ | _TBD_ |
+| MAS-177 | Flat Requirement Lists in SRS | Must | superseded | M1 |
+| MAS-178 | Checklist-style SRS execution | Must | superseded | M1 |
+| MAS-200 | Git Execution Workflow Core Module | Must | active | Revision 4 |
+| MAS-201 | Hierarchical Requirement Structuring | Must | active | Revision 4 |
+| MAS-202 | Progressive Clarification vs Checklist | Must | active | Revision 4 |
 
 ---
 
@@ -22,14 +24,24 @@ planning documents._
 
 ### Must Have
 
-#### SRS-001 - _Requirement title_
+#### MAS-200 - Git Execution Workflow Core Module
 
-_Use strict requirement language such as "The system must...". Keep
-each requirement atomic. Split independent capabilities into separate
-requirement IDs._
+The system must formalize `git-execution-workflow.md` as a core module and enforce constraints against "Stale Status" and "Unupdated Review Notes" anti-patterns.
 
-- _Detail 1_
-- _Detail 2_
+- The git workflow must be integrated into the core documentation set.
+- Agents must adhere to the defined workflow during execution.
+
+#### MAS-201 - Hierarchical Requirement Structuring
+
+The system must ensure that the SRS module (`srs-planning.md`) structurally prevents "Flat Requirement Lists".
+
+- Requirements must be grouped and structured logically rather than listed without hierarchy.
+
+#### MAS-202 - Progressive Clarification vs Checklist
+
+The system must enforce that the SRS is used for progressive clarification rather than as a simplistic task checklist.
+
+- The SRS planning module must constrain agents from treating requirement gathering as a pure checklist exercise without understanding scope and depth.
 
 ### Should Have
 
@@ -47,27 +59,67 @@ _None yet._
 
 ## Requirement Metadata
 
-### SRS-001
-
-- Title: _Requirement title_
+### MAS-177
+- Title: Flat Requirement Lists in SRS
 - Priority: Must
-- Status: _active_
-- Assigned milestone: _TBD_
-- Source: _TBD_
-- Introduced by: _Alignment | Scope Change | Milestone Planning | Phase Planning | Revision_
+- Status: superseded
+- Assigned milestone: M1
+- Source: Revision 3
+- Introduced by: Phase Planning
+- Supersedes: None
+- Superseded by: MAS-201
+
+### MAS-178
+- Title: Checklist-style SRS execution
+- Priority: Must
+- Status: superseded
+- Assigned milestone: M1
+- Source: Revision 3
+- Introduced by: Phase Planning
+- Supersedes: None
+- Superseded by: MAS-202
+
+### MAS-200
+- Title: Git Execution Workflow Core Module
+- Priority: Must
+- Status: active
+- Assigned milestone: Revision 4
+- Source: Revision 4 Anti-Patterns
+- Introduced by: Revision 4
 - Supersedes: None
 - Superseded by: None
 
 Change log:
-- YYYY-MM-DD - Created from _source_
+- 2026-04-08 - Created from Revision 4
+
+### MAS-201
+- Title: Hierarchical Requirement Structuring
+- Priority: Must
+- Status: active
+- Assigned milestone: Revision 4
+- Source: Revision 4 Anti-Patterns
+- Introduced by: Revision 4
+- Supersedes: MAS-177
+- Superseded by: None
+
+Change log:
+- 2026-04-08 - Created from Revision 4
+
+### MAS-202
+- Title: Progressive Clarification vs Checklist
+- Priority: Must
+- Status: active
+- Assigned milestone: Revision 4
+- Source: Revision 4 Anti-Patterns
+- Introduced by: Revision 4
+- Supersedes: MAS-178
+- Superseded by: None
+
+Change log:
+- 2026-04-08 - Created from Revision 4
 
 ---
 
 ## Data Schema
 
-### _Entity or Domain Area_
-
-- Related requirements: _SRS IDs or TBD_
-- Notes: _High-level meaning or TBD_
-- Fields:
-  - _field-name_: _meaning or TBD_
+### None

@@ -278,6 +278,26 @@ phases, just as a milestone does.
     revision's phases, not deferred.
   - Revision planning never silently rewrites an existing SRS
     requirement's meaning. If the meaning changes, the prior
-    requirement is preserved and a new superseding requirement
-    is created per RevisionSRSImpact rules.
+    requirement is preserved and a new superseding requirement is created per RevisionSRSImpact rules.
 </RevisionRules>
+
+---
+
+## Anti-Patterns
+
+```xml
+<AntiPatterns>
+  <AntiPattern name="Incomplete Impact Analysis">
+    <BadExample>Drafting revision phases or executing modification work after checking phase documents but omitting tests, SRS requirement changes, or downstream PRD dependencies.</BadExample>
+    <Why>Omitting analysis domains leads to silent regressions, stale tests, or inconsistent SRS identity tracking. Revisions require comprehensive top-down impact investigation across every layer (PRD, milestone, phase, test, and SRS) before any work begins.</Why>
+  </AntiPattern>
+  <AntiPattern name="Execution Before Impact Confirmation">
+    <BadExample>Creating a new revision document and drafting execution phases based on a partial impact investigation without first presenting the comprehensive analysis and receiving explicit user confirmation to proceed.</BadExample>
+    <Why>Revisions carry high regression risk to completed functionality. Planning or drafting work before the user confirms the full scoped impact often hides unintended consequences. The agent must present the full top-down analysis, explicitly wait for user confirmation, and only then proceed to drafting and execution.</Why>
+  </AntiPattern>
+  <AntiPattern name="Phase-Level Task Breakdown in Revision Plan">
+    <BadExample>Writing the revision document with detailed gate, stream, or task-level implementation breakdowns for each phase instead of outlining the phases needed to execute the revision safely.</BadExample>
+    <Why>The revision document defines the revision's scope, impact, phases, dependencies, and success criteria. Phase-level task breakdown belongs in the individual phase plan after the revision is confirmed. Avoid including detailed gate, stream, or task-level implementation breakdowns inside the revision document; doing so duplicates phase planning too early and makes later planning harder to correct.</Why>
+  </AntiPattern>
+</AntiPatterns>
+```

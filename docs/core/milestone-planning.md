@@ -117,6 +117,27 @@ related phases that together deliver a meaningful product increment.
 
 ---
 
+## Anti-Patterns
+
+```xml
+<AntiPatterns>
+  <AntiPattern name="Undivided Requirement Assignment">
+    <BadExample>During milestone planning, the draft names multiple phases but does not associate any of them with specific SRS requirement IDs or sub-requirement IDs.</BadExample>
+    <BadExample>As milestone planning unfolds, assigned requirements and split sub-requirements stay pooled at milestone level instead of being assorted into phase-owned slices while the plan is being written.</BadExample>
+    <BadExample>The milestone plan looks structurally complete, but the phase list still says the requirement IDs will be sorted out later, so no phase actually owns a concrete SRS slice yet.</BadExample>
+    <Why>If milestone planning does not assign SRS requirement IDs to phases during planning, phase planning loses its boundary, downstream ownership gets blurry, and requirement traceability breaks. Milestone planning should perform that assortment while the milestone is being drafted so each phase leaves planning with a clear owned requirement slice.</Why>
+  </AntiPattern>
+  <AntiPattern name="Unexpanded Existing Requirements">
+    <BadExample>A requirement is concise but not dense, and milestone planning leaves the original thin wording untouched even after the user has clarified what it should mean.</BadExample>
+    <BadExample>The milestone builds phase structure around an existing requirement without broadening that requirement text in docs/srs.md to reflect the clarified milestone-level understanding.</BadExample>
+    <BadExample>Milestone planning treats a terse existing requirement as finished just because it is not multi-capability, so later phases inherit wording that never captured the clarified behavior.</BadExample>
+    <Why>When an existing requirement is not dense but still under-specified, milestone planning should expand the same requirement instead of leaving it thin or forcing an unnecessary replacement. That preserves the stable requirement ID while recording the clearer product meaning learned during milestone planning.</Why>
+  </AntiPattern>
+</AntiPatterns>
+```
+
+---
+
 <MilestoneTemplate>
 
   # Milestone {{N}} — {{Milestone Name}}

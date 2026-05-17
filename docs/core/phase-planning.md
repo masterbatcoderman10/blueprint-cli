@@ -152,6 +152,31 @@ and parallel streams of tasks.
 
 ---
 
+## Anti-Patterns
+
+```xml
+<AntiPatterns>
+  <AntiPattern name="Skipping Schema Ideation">
+    <BadExample>A phase introduces new data concepts but moves straight to API or UI tasks without defining the underlying schema or data model.</BadExample>
+    <Why>Implementation agents guess at data shapes, leading to inconsistent models across streams and broken integrations. Explicitly ideate and document the required schema changes before breaking work down into tasks.</Why>
+  </AntiPattern>
+  <AntiPattern name="Unconfirmed Schema Relationships">
+    <BadExample>New or changed schema is planned without confirming how it relates to existing tables, entities, or data models.</BadExample>
+    <Why>Orphaned data, broken queries, or impossible migrations occur when the new schema fails to connect to the existing system. Identify and explicitly confirm the relationships (e.g., foreign keys, ownership, cardinality) between the new schema and the existing data model before finalizing the gate tasks.</Why>
+  </AntiPattern>
+  <AntiPattern name="Backward Stream Dependencies">
+    <BadExample>An earlier stream (or a specific task within it) is planned with dependencies on a later stream or task (e.g., Stream A depends on Stream C, or task A.3 depends on task C.1).</BadExample>
+    <Why>This creates a chronological contradiction during execution. Streams run in alphabetic sequence or parallel; an earlier letter stream (or any task within it) must never depend on a later letter stream.</Why>
+  </AntiPattern>
+  <AntiPattern name="Non-Sequential Stream Naming">
+    <BadExample>Stream alphabetic order skips letters or is not in sequence (e.g., Stream B and Stream D running in parallel, but Stream C is scheduled after them).</BadExample>
+    <Why>Skipping letters breaks the sequential processing convention. Always name streams in strict alphabetic sequence based on their execution order (e.g., rename Stream D to Stream C and ensure sequential processing).</Why>
+  </AntiPattern>
+</AntiPatterns>
+```
+
+---
+
 <PhaseTemplate>
 
   # Phase {{N}} — {{Phase Name}} Plan
@@ -278,6 +303,17 @@ and parallel streams of tasks.
   ### Edge Cases
   - [ ] {{Failure or boundary condition}}
   - [ ] {{Validation / error state}}
+
+  ---
+
+  ## Tweaks
+
+  > Corrections to completed tasks within this phase are tracked here.
+  > Each tweak has an ID (e.g., {{N}}.TW1), lists affected tasks, and
+  > includes test impact. See docs/core/tweak-planning.md for the full
+  > tweak workflow.
+
+  _None._
 
   ---
 
@@ -484,6 +520,17 @@ and parallel streams of tasks.
   - [ ] Owner revokes access → document disappears from shared-with-me
   - [ ] Non-existent email in share request → appropriate error
   - [ ] Activity log is empty for a document that has never been shared
+
+  ---
+
+  ## Tweaks
+
+  > Corrections to completed tasks within this phase are tracked here.
+  > Each tweak has an ID (e.g., 4.TW1), lists affected tasks, and
+  > includes test impact. See docs/core/tweak-planning.md for the full
+  > tweak workflow.
+
+  _None._
 
   ---
 

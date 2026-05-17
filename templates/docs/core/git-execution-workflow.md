@@ -114,3 +114,24 @@ referenced again at completion for commit.
   - Commit messages must identify the gate, stream, or bug task
     so the reviewer and git history are traceable.
 </CommitOnCompletion>
+
+---
+
+## Anti-Patterns
+
+```xml
+<AntiPatterns>
+  <AntiPattern name="Editing Outside a Worktree">
+    <BadExample>Running code edits, test executions, or lint passes in the main working directory instead of inside the gate or stream's dedicated worktree directory.</BadExample>
+    <Why>The main working directory tracks the primary branch. Editing there during gate or stream execution mixes unreviewed changes with committed history, making rollback impossible and causing merge conflicts across parallel streams. Every file modification, test run, and lint pass must happen inside the worktree — no exceptions.</Why>
+  </AntiPattern>
+  <AntiPattern name="Execution Before Status Update">
+    <BadExample>Beginning substantive implementation work on a task before moving that task to In Progress on the kanban board.</BadExample>
+    <Why>Moving the task to In Progress before starting work signals active ownership to the reviewer and any parallel agents. Skipping this step creates phantom progress — code changes appear without a corresponding kanban state, making it impossible to track what is in flight and who owns it. Always update status first, then execute.</Why>
+  </AntiPattern>
+  <AntiPattern name="Overwriting Review Notes">
+    <BadExample>Replacing the reviewer's original feedback with the agent's responses during note application, or discarding earlier review rounds when preparing for re-review.</BadExample>
+    <Why>Review notes are a durable record of quality assurance. They document what was caught, why it mattered, and how it was resolved. Overwriting them destroys the audit trail and hides quality signals from future reviewers. When addressing notes, append responses directly below each reviewer comment. When entering a new review round, preserve all prior rounds intact.</Why>
+  </AntiPattern>
+</AntiPatterns>
+```
