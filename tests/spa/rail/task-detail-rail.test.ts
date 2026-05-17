@@ -96,7 +96,7 @@ describe('R6-2.B.1: TaskDetailRail', () => {
     mockFetch.mockResolvedValueOnce({
       ok: true,
       status: 200,
-      json: async () => ({ data: { id: 'task-1', description: 'Updated desc' } }),
+      json: async () => ({ ok: true, data: { id: 'task-1', description: 'Updated desc' } }),
     })
 
     const selection = createMockSelectionStore('task-1')

@@ -57,7 +57,7 @@ describe('R6-2.B.5 / R6-2.B.6: Integration', () => {
     mockFetch.mockResolvedValueOnce({
       ok: true,
       status: 200,
-      json: async () => ({ data: { id: 'task-1', description: 'Updated' } }),
+      json: async () => ({ ok: true, data: { id: 'task-1', description: 'Updated' } }),
     })
 
     const selection = createMockSelectionStore('task-1')
@@ -101,12 +101,13 @@ describe('R6-2.B.5 / R6-2.B.6: Integration', () => {
       .mockResolvedValueOnce({
         ok: true,
         status: 201,
-        json: async () => ({ data: { id: 'reply-1' } }),
+        json: async () => ({ ok: true, data: { id: 'reply-1' } }),
       })
       .mockResolvedValueOnce({
         ok: true,
         status: 200,
         json: async () => ({
+          ok: true,
           data: [
             {
               id: 'c1',

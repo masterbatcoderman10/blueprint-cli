@@ -31,7 +31,7 @@ describe('R6-2.B.2: CommentComposer', () => {
     mockFetch.mockResolvedValueOnce({
       ok: true,
       status: 201,
-      json: async () => ({ data: { id: 'c1' } }),
+      json: async () => ({ ok: true, data: { id: 'c1' } }),
     })
 
     const onSubmitted = vi.fn()
@@ -69,7 +69,7 @@ describe('R6-2.B.2: CommentComposer', () => {
     mockFetch.mockResolvedValueOnce({
       ok: true,
       status: 201,
-      json: async () => ({ data: { id: 'c2' } }),
+      json: async () => ({ ok: true, data: { id: 'c2' } }),
     })
 
     render(CommentComposer, {
@@ -90,7 +90,7 @@ describe('R6-2.B.2: CommentComposer', () => {
     mockFetch.mockResolvedValueOnce({
       ok: false,
       status: 400,
-      json: async () => ({ error: { code: 'invalid_severity', message: 'Bad severity' } }),
+      json: async () => ({ ok: false, error: { code: 'invalid_severity', message: 'Bad severity' } }),
     })
 
     render(CommentComposer, { props: { taskId: 't1', severity: 'MAJOR' } })
@@ -109,7 +109,7 @@ describe('R6-2.B.2: CommentComposer', () => {
     mockFetch.mockResolvedValueOnce({
       ok: false,
       status: 400,
-      json: async () => ({ error: { code: 'invalid_parent', message: 'Bad parent' } }),
+      json: async () => ({ ok: false, error: { code: 'invalid_parent', message: 'Bad parent' } }),
     })
 
     render(CommentComposer, {

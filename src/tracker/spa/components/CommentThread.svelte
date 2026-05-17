@@ -20,7 +20,7 @@
     allComments.filter((c) => !c.parent_id)
   )
 
-  const repliesByParent = $derived(() => {
+  const repliesByParent = $derived.by(() => {
     const map = new Map<string, CommentData[]>()
     for (const c of allComments) {
       if (c.parent_id) {
@@ -32,7 +32,7 @@
     return map
   })
 
-  const orderedTopLevel = $derived(() => {
+  const orderedTopLevel = $derived.by(() => {
     const majors = topLevel.filter((c) => c.severity === 'MAJOR')
     const minors = topLevel.filter((c) => c.severity === 'MINOR')
     const sortAsc = (a: CommentData, b: CommentData) =>
@@ -71,11 +71,11 @@
   {/if}
 
   <div class="comments-list" data-testid="comments-list">
-    {#each orderedTopLevel() as comment (comment.id)}
+    {#each orderedTopLevel as comment (comment.id)}
       <CommentItem
         {comment}
         {taskId}
-        replies={repliesByParent().get(comment.id ?? '') ?? []}
+        replies={repliesByParent.get(comment.id ?? '') ?? []}
         onReplySubmitted={() => comments.loadForTask(taskId)}
       />
     {:else}
