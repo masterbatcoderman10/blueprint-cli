@@ -1,5 +1,5 @@
 import { open } from 'node:fs/promises'
-import { extname, join, resolve } from 'node:path'
+import { extname, join, resolve, sep } from 'node:path'
 import type { IncomingMessage, ServerResponse } from 'node:http'
 
 const MIME_TYPES: Record<string, string> = {
@@ -47,7 +47,7 @@ export async function serveStatic(
   const safeRoot = resolve(options.spaDir)
   const targetPath = resolve(join(safeRoot, pathname))
 
-  if (!targetPath.startsWith(safeRoot + '/') && targetPath !== safeRoot) {
+  if (!targetPath.startsWith(safeRoot + sep) && targetPath !== safeRoot) {
     return false
   }
 

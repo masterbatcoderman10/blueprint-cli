@@ -32,7 +32,7 @@ describe('R6-2.C.2 — browser-open', () => {
 
     await openUrl('http://127.0.0.1:7300')
 
-    expect(spawnMock).toHaveBeenCalledWith('start', ['""', 'http://127.0.0.1:7300'], { detached: true })
+    expect(spawnMock).toHaveBeenCalledWith('cmd', ['/c', 'start', '""', 'http://127.0.0.1:7300'], { detached: true, windowsHide: true })
   })
 
   it('T-C.2.3: spawn failure is non-fatal; resolves without throwing and logs once', async () => {

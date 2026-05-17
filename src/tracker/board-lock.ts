@@ -54,12 +54,17 @@ export async function isLockAlive(lock: LockData): Promise<boolean> {
     const controller = new AbortController()
     const timeout = setTimeout(() => controller.abort(), 250)
 
-    const response = await fetch(`http://127.0.0.1:${lock.port}/project`, {
-      signal: controller.signal,
-    })
+    try {
+      const response = await fetch(`http://127.0.0.1:${lock.port}/project`, {
+        signal: controller.signal,
+      })
 
-    clearTimeout(timeout)
-    return response.status === 200
+      return response.status === 200
+    } catch {
+      return false
+    } finally {
+      clearTimeout(timeout)
+    }
   } catch {
     return false
   }
