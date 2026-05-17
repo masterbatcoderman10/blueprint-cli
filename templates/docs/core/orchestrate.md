@@ -44,8 +44,13 @@ their declared dependencies and scopes.
       task execution to execution agents per `execution.md`.
     - The orchestrator does NOT review code. It delegates review to
       review agents per `review.md`.
-    - The orchestrator does NOT merge branches. Merge is the reviewer's
-      responsibility per `docs/core/git-review-workflow.md`.
+    - The orchestrator does NOT directly merge branches. The review
+      subagent carries out the merge and worktree cleanup as part of
+      its final clean review / rereview pass per
+      `docs/core/git-review-workflow.md`.
+    - The orchestrator does NOT run phase completion itself. It
+      delegates phase completion to an independent phase-completion
+      subagent per `docs/core/phase-completion.md`.
 </OrchestratorInvocation>
 
 ---
@@ -120,9 +125,11 @@ their declared dependencies and scopes.
 
     5. CLOSEOUT
        - When all tasks are DONE, the stream is ready for merge.
-       - The orchestrator reports completion.
-       - The reviewer (not the orchestrator) merges the branch per
-         `docs/core/git-review-workflow.md`.
+       - The review subagent merges the branch and cleans up the
+         worktree as part of its final clean review / rereview
+         pass per `docs/core/git-review-workflow.md`.
+       - The orchestrator reports that the stream is fully closed out
+         (merged and cleaned up).
 
   INDEPENDENCE RULE:
     - One stream finishing its loop must trigger its own review
@@ -227,6 +234,64 @@ their declared dependencies and scopes.
 
 ---
 
+<PhaseCompletionLoop>
+  PURPOSE: Define the loop that runs after all streams are closed out
+  to verify the phase as a whole, handle any regressions, and update
+  project state.
+
+  The phase completion loop is the final stage of phase-level
+  orchestration. It runs only after all gates and streams in the
+  phase have been fully closed out (merged and cleaned up).
+
+  LOOP STEPS:
+
+    1. RUN PHASE COMPLETION
+       - Delegate to an independent phase-completion subagent per
+         `docs/core/phase-completion.md`.
+       - The subagent verifies all kanban tasks are DONE, checks the
+         Definition of Done, runs the full project test suite, and
+         either confirms completion or reports regressions.
+
+    2. EVALUATE RESULT
+       IF phase completion passes (full suite green, DoD satisfied):
+         → `project-progress.md` is updated by the phase-completion
+           subagent. The orchestrator reports that the phase is
+           fully complete.
+         → Loop ends.
+
+       IF phase completion is blocked by test failures / regressions:
+         → The phase-completion subagent creates [BUG] tasks on the
+           kanban board per `docs/core/phase-completion.md`.
+         → Proceed to step 3.
+
+    3. BUG RESOLUTION STREAM
+       - Treat the created bug tasks as a stream that runs after the
+         phase completion failure.
+       - Delegate task execution to an execution agent per
+         `docs/core/execution.md` and `docs/core/bug-resolution.md`.
+       - Delegate review to a review agent per `docs/core/review.md`.
+       - Run the full execute → review → address → rereview lifecycle
+         until all bug tasks are DONE and merged.
+       - The review subagent merges the bug-fix branch and cleans up
+         the worktree per `docs/core/git-review-workflow.md`.
+
+    4. RE-RUN PHASE COMPLETION
+       - Return to step 1 and re-run the phase-completion subagent.
+       - The loop repeats until phase completion passes or the user
+         explicitly stops the loop.
+
+  LOOP RULES:
+    - The orchestrator does not diagnose regressions or write fixes.
+      It delegates to execution and review subagents.
+    - Each iteration of the loop may create a new bug-resolution stream.
+      Multiple loops may occur if regressions are interdependent or
+      if fixes introduce new failures.
+    - The user may stop the loop at any time. If stopped, the phase
+      remains incomplete and `project-progress.md` is not updated.
+</PhaseCompletionLoop>
+
+---
+
 <PhaseLevelInvocation>
   PURPOSE: Define orchestration scope when the user names a full phase.
 
@@ -241,6 +306,10 @@ their declared dependencies and scopes.
     5. Spawns eligible dependent streams.
     6. Repeats until all streams in the phase are closed out or
        explicitly blocked.
+    7. Runs the `<PhaseCompletionLoop>` to verify the phase,
+       handle any regressions through bug-resolution streams, and
+       update `project-progress.md`. This is the final stage of
+       phase-level orchestration.
 
   STREAM-LEVEL INVOCATION
     When the user says "orchestrate stream X", the orchestrator:
@@ -248,6 +317,8 @@ their declared dependencies and scopes.
     - Does not manage other streams.
     - Still respects dependencies: if Stream X has prerequisites that
       are not closed out, report the blocker and wait.
+    - Does NOT run phase completion. Phase completion is only for
+      full phase orchestration.
 </PhaseLevelInvocation>
 
 ---
@@ -268,6 +339,8 @@ their declared dependencies and scopes.
     - `review.md` for review criteria, review note format, and re-review
     - `git-execution-workflow.md` for worktree creation and commit discipline
     - `git-review-workflow.md` for branch merge and worktree cleanup
+    - `phase-completion.md` for phase verification, regression handling, and project state updates
+    - `bug-resolution.md` for diagnostic process on bug tasks created by phase completion
     - `phase-planning.md` for parallelization map semantics
 
   RULE:
