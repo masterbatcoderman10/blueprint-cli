@@ -81,12 +81,23 @@ async function killProc(proc: ReturnType<typeof spawn>): Promise<number> {
   })
 }
 
-afterEach(() => {
-  for (const proc of spawnedProcs.splice(0)) {
-    if (!proc.killed && proc.exitCode === null) {
-      proc.kill('SIGINT')
+afterEach(async () => {
+  const procs = spawnedProcs.splice(0)
+  await Promise.all(procs.map(proc => new Promise<void>((resolve) => {
+    if (proc.killed || proc.exitCode !== null) {
+      resolve()
+      return
     }
-  }
+    proc.kill('SIGINT')
+    const timer = setTimeout(() => {
+      proc.kill('SIGKILL')
+      resolve()
+    }, 2000)
+    proc.on('exit', () => {
+      clearTimeout(timer)
+      resolve()
+    })
+  })))
 
   for (const dir of tempDirs.splice(0)) {
     rmSync(dir, { recursive: true, force: true })

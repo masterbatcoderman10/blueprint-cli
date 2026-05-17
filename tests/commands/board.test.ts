@@ -91,7 +91,7 @@ async function killProc(proc: ReturnType<typeof spawn>): Promise<number> {
   })
 }
 
-afterEach(() => {
+afterEach(async () => {
   vi.restoreAllMocks()
   for (const listener of process.listeners('SIGINT')) {
     if (!initialSigintListeners.has(listener)) {
@@ -99,11 +99,22 @@ afterEach(() => {
     }
   }
 
-  for (const proc of spawnedProcs.splice(0)) {
-    if (!proc.killed && proc.exitCode === null) {
-      proc.kill('SIGINT')
+  const procs = spawnedProcs.splice(0)
+  await Promise.all(procs.map(proc => new Promise<void>((resolve) => {
+    if (proc.killed || proc.exitCode !== null) {
+      resolve()
+      return
     }
-  }
+    proc.kill('SIGINT')
+    const timer = setTimeout(() => {
+      proc.kill('SIGKILL')
+      resolve()
+    }, 2000)
+    proc.on('exit', () => {
+      clearTimeout(timer)
+      resolve()
+    })
+  })))
 
   for (const server of occupiedServers.splice(0)) {
     server.close()

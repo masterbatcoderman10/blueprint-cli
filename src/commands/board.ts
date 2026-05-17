@@ -4,7 +4,7 @@ import { resolve } from 'node:path'
 
 import type { CommandDefinition } from '../runtime'
 import { clearLock, isLockAlive, readLock, writeLock } from '../tracker/board-lock'
-import { findFreePort } from '../tracker/board-port'
+import { BOARD_PORTS, findFreePort } from '../tracker/board-port'
 import { openUrl } from '../tracker/browser-open'
 import { openDb, type TrackerDbHandle } from '../tracker/db'
 import { findProjectRoot } from '../tracker/project-root'
@@ -35,6 +35,47 @@ function isNoFreePortError(error: unknown): boolean {
   )
 }
 
+async function tryListen(
+  server: ReturnType<typeof createHttpServer>,
+  port: number,
+): Promise<boolean> {
+  return new Promise((resolve) => {
+    const onError = (err: Error) => {
+      const code = (err as NodeJS.ErrnoException).code
+      if (code === 'EADDRINUSE') {
+        resolve(false)
+      } else {
+        server.off('error', onError)
+        resolve(false)
+      }
+    }
+    server.once('error', onError)
+    server.listen({ host: '127.0.0.1', port }, () => {
+      server.off('error', onError)
+      resolve(true)
+    })
+  })
+}
+
+async function bindServer(
+  server: ReturnType<typeof createHttpServer>,
+): Promise<number> {
+  // Use findFreePort as a first guess, then try atomically binding each port.
+  const firstGuess = await findFreePort('127.0.0.1').catch(() => null)
+  const orderedPorts = firstGuess !== null
+    ? [firstGuess, ...BOARD_PORTS.filter((p) => p !== firstGuess)]
+    : [...BOARD_PORTS]
+
+  for (const port of orderedPorts) {
+    const bound = await tryListen(server, port)
+    if (bound) {
+      return port
+    }
+  }
+
+  throw { code: 'no_free_port', tried: BOARD_PORTS }
+}
+
 async function runBoard({ headless }: { headless: boolean }): Promise<{ exitCode: number }> {
   let trackerDb: TrackerDbHandle | undefined
   let server: ReturnType<typeof createHttpServer> | undefined
@@ -61,7 +102,6 @@ async function runBoard({ headless }: { headless: boolean }): Promise<{ exitCode
     }
 
     trackerDb = openDb(projectRoot)
-    const port = await findFreePort('127.0.0.1')
 
     const apiServer = createServer({ db: trackerDb.db })
     const spaDir = resolve(__dirname, '../../dist/spa')
@@ -79,10 +119,7 @@ async function runBoard({ headless }: { headless: boolean }): Promise<{ exitCode
       }
     })
 
-    await new Promise<void>((resolve, reject) => {
-      server!.once('error', reject)
-      server!.listen({ host: '127.0.0.1', port }, resolve)
-    })
+    const port = await bindServer(server)
 
     const address = server.address() as AddressInfo
     const url = `http://${address.address}:${address.port}`
@@ -98,23 +135,8 @@ async function runBoard({ headless }: { headless: boolean }): Promise<{ exitCode
 
     await waitForSigint()
 
-    if (server?.listening) {
-      await closeServer(server)
-    }
-    trackerDb.close()
-    await clearLock(projectRoot)
-
     return { exitCode: 0 }
   } catch (error) {
-    if (server?.listening) {
-      await closeServer(server)
-    }
-    trackerDb?.close()
-
-    if (lockWritten && projectRoot) {
-      await clearLock(projectRoot)
-    }
-
     if (isNoFreePortError(error)) {
       console.error('No free port available for the board server.')
       return { exitCode: 1 }
@@ -122,6 +144,28 @@ async function runBoard({ headless }: { headless: boolean }): Promise<{ exitCode
 
     console.error(error instanceof Error ? error.message : String(error))
     return { exitCode: 1 }
+  } finally {
+    if (server?.listening) {
+      try {
+        await closeServer(server)
+      } catch {
+        // Ignore close errors during cleanup
+      }
+    }
+    if (trackerDb) {
+      try {
+        trackerDb.close()
+      } catch {
+        // Ignore close errors during cleanup
+      }
+    }
+    if (lockWritten && projectRoot) {
+      try {
+        await clearLock(projectRoot)
+      } catch {
+        // Ignore lock-clear errors during cleanup
+      }
+    }
   }
 }
 
