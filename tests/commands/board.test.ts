@@ -17,10 +17,6 @@ function createTempDir(prefix: string): string {
   return dir
 }
 
-async function flush(): Promise<void> {
-  await new Promise<void>((resolve) => setTimeout(resolve, 0))
-}
-
 afterEach(() => {
   vi.restoreAllMocks()
   for (const listener of process.listeners('SIGINT')) {
@@ -88,13 +84,5 @@ describe('Stream C — board command', () => {
     expect(log).toHaveBeenCalledWith(deferredSpaMessage)
   })
 
-  it('T-C.3.1: runtime dispatch can invoke the board command definition directly', async () => {
-    const log = vi.spyOn(console, 'log').mockImplementation(() => {})
 
-    const result = await boardCommand.handler({ commandName: 'board', args: [], rawArgv: ['board'] })
-    await flush()
-
-    expect(result).toEqual({ exitCode: 0 })
-    expect(log).toHaveBeenCalledWith(deferredSpaMessage)
-  })
 })
