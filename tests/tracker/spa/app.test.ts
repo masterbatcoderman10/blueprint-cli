@@ -49,9 +49,9 @@ describe('T-2.0.4.1: App.svelte renders 5-column board + closed rail', () => {
     expect(appSource).toMatch(/data-rail\b/)
   })
 
-  it('rail data-open is driven by railOpen which defaults to false', () => {
-    // railOpen is initialized to $state(false)
-    expect(appSource).toContain('let railOpen = $state(false)')
+  it('rail data-open is driven by railOpen derived from selection store', () => {
+    // railOpen is derived from selectionStore.selectedId
+    expect(appSource).toContain('let railOpen = $derived(selectionStore.selectedId !== null)')
     // data-open is bound to String(railOpen)
     expect(appSource).toMatch(/data-open=\{String\(railOpen\)\}/)
   })

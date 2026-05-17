@@ -8,6 +8,9 @@
    * Column order matches P1 kanban statuses: To Do | In Progress | In Review | Rework | Done
    */
 
+  import { selectionStore } from './stores/index.js'
+  import TaskDetailRail from './components/TaskDetailRail.svelte'
+
   const COLUMNS = [
     { id: 'todo',        label: 'To Do',       dot: '#6B6560' },
     { id: 'in-progress', label: 'In Progress', dot: '#F97316' },
@@ -16,7 +19,19 @@
     { id: 'done',        label: 'Done',        dot: '#22C55E' },
   ] as const
 
-  let railOpen = $state(false)
+  let railOpen = $derived(selectionStore.selectedId !== null)
+
+  $effect(() => {
+    if (!railOpen) return
+    const handler = (e: MouseEvent) => {
+      const rail = document.querySelector('[data-rail]')
+      if (rail && !rail.contains(e.target as Node)) {
+        selectionStore.clear()
+      }
+    }
+    document.addEventListener('click', handler)
+    return () => document.removeEventListener('click', handler)
+  })
 </script>
 
 <!--
@@ -226,7 +241,6 @@
       padding: {railOpen ? '20px' : '0'};
     "
   >
-    <!-- Rail content populated by TaskDetailRail component in Stream B -->
-    <div style="flex: 1 1 auto;"></div>
+    <TaskDetailRail />
   </div>
 </div>

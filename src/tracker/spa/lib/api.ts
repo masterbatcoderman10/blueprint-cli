@@ -21,20 +21,29 @@ export interface TaskData {
   id?: string
   title?: string
   status?: string
+  state?: string
   phase?: string
-  stream?: string
+  stream?: string | null
   gate?: string
   description?: string
+  author?: string | null
+  implementation_notes?: string | null
+  created_at?: number
+  updated_at?: number
   [key: string]: unknown
 }
 
 export interface CommentData {
   id?: string
+  task_id?: string
   taskId?: string
-  body?: string
+  parent_id?: string | null
   severity?: string
-  line?: number | null
-  author?: string
+  line?: string | null
+  body?: string
+  author?: string | null
+  created_at?: number
+  updated_at?: number
   [key: string]: unknown
 }
 
@@ -99,22 +108,39 @@ async function request<T>(
       }
     }
 
-    // Server uses { ok: true, data: ... } | { ok: false, error: { code, message } } envelope
-    if (
-      payload !== null &&
-      typeof payload === 'object' &&
-      'ok' in (payload as object)
-    ) {
-      const envelope = payload as { ok: boolean; data?: T; error?: ApiError }
-      if (envelope.ok) {
-        return { ok: true, data: envelope.data as T }
+    // Server uses { data: ... } | { error: { code, message } }
+    // Some test fixtures use { ok: true, data: ... } | { ok: false, error: ... }
+    if (payload !== null && typeof payload === 'object') {
+      const p = payload as Record<string, unknown>
+
+      // Error envelope
+      if (
+        'error' in p &&
+        p.error !== null &&
+        typeof p.error === 'object' &&
+        'code' in (p.error as object)
+      ) {
+        return { ok: false, error: p.error as ApiError }
       }
-      return {
-        ok: false,
-        error: envelope.error ?? {
-          code: String(res.status),
-          message: 'Unknown error',
-        },
+
+      // Success envelope without ok flag (server native)
+      if ('data' in p && !('ok' in p)) {
+        return { ok: true, data: p.data as T }
+      }
+
+      // Legacy/test envelope with ok flag
+      if ('ok' in p) {
+        const envelope = p as { ok: boolean; data?: T; error?: ApiError }
+        if (envelope.ok) {
+          return { ok: true, data: envelope.data as T }
+        }
+        return {
+          ok: false,
+          error: envelope.error ?? {
+            code: String(res.status),
+            message: 'Unknown error',
+          },
+        }
       }
     }
 
