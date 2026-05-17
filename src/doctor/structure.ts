@@ -18,6 +18,7 @@ export const CANONICAL_CORE_FILES: string[] = [
   'docs/core/health-check.md',
   'docs/core/hierarchy.md',
   'docs/core/milestone-planning.md',
+  'docs/core/orchestrate.md',
   'docs/core/phase-completion.md',
   'docs/core/phase-planning.md',
   'docs/core/planning.md',
