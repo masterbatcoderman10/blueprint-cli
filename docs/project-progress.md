@@ -3,8 +3,8 @@
 **Project**: blueprint-cli
 **Kanban**: blueprint-cli
 **Current Milestone**: Revision 6 — Built-in Task Tracker
-**Current Phase**: Phase 2 — Board SPA + blueprint board Command
-**Status**: MVP Complete; Revision 6 Phase 1 complete; Phase 2 active
+**Current Phase**: Phase 3 — Protocol Rewrite
+**Status**: Revision 6 Phase 2 complete; Phase 3 active
 
 ---
 
@@ -54,6 +54,7 @@
 - 2026-05-17: Revision 5 — Orchestration Protocol completed. All phases done.
 - 2026-05-17: Identified Revision 6 — Built-in Task Tracker to replace the external `vibe-kanban` MCP dependency with a built-in per-project task tracker (SQLite backend + local Svelte SPA) provisioned by the CLI. Impact: hybrid additive + modifying — new tracker backend / SPA / `blueprint board` command plus protocol rewrites, tracker field renaming, and REWORK-state adoption. SRS requirements MAS-204 and MAS-205 created (status: approved-pending-implementation). Revision document at `docs/milestones/revision-6-built-in-tracker/revision-6-built-in-tracker.md`.
 - 2026-05-18: Revision 6 Phase 1 — Tracker Core (Schema + CRUD Server) completed. All tasks done (including tweak R6-1.TW1 replacing `node:sqlite` with `better-sqlite3` for broader Node.js compatibility), DoD satisfied, full test suite green (531 tests, 87 files).
+- 2026-05-18: Phase 2 — Board SPA + blueprint board Command completed. All tasks done, DoD satisfied, full test suite green (688 tests, 110 files).
 
 ---
 
@@ -97,8 +98,8 @@ R5 — Orchestration Protocol
 └── Phase 1 — Orchestration Module & Routing Integration ✓
 R6 — Built-in Task Tracker
 ├── Phase 1 — Tracker Core (Schema + CRUD Server) ✓
-├── Phase 2 — Board SPA + blueprint board Command ●
-├── Phase 3 — Protocol Rewrite ○
+├── Phase 2 — Board SPA + blueprint board Command ✓
+├── Phase 3 — Protocol Rewrite ●
 ├── Phase 4 — Migration & Doctor Integration ○
 └── Phase 5 — Verification & Cleanup ○
 M2 — Cross-Project Context (Optional Post-MVP)
@@ -115,7 +116,7 @@ M3 — Workflow Visibility Enhancements (Optional Future)
 > The agent should surface these at session start.
 
 - **Revision 6 — Built-in Task Tracker**
-  - **Status:** In Progress (Phase 1 complete)
+  - **Status:** In Progress (Phase 2 complete)
   - **Priority:** Current
   - **Scope:** Replace the external `vibe-kanban` MCP dependency with a built-in per-project task tracker (SQLite backend + local Svelte SPA) provisioned by the CLI, including protocol rewrites and REWORK-state adoption.
   - **Impact:** Hybrid additive + modifying — tracker backend, local board UI, task-state expansion, and cross-doc/template replacement of kanban MCP references. SRS: MAS-204 and MAS-205 created.
