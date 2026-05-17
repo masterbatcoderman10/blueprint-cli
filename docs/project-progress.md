@@ -3,8 +3,8 @@
 **Project**: blueprint-cli
 **Kanban**: blueprint-cli
 **Current Milestone**: Revision 4 — Anti-Patterns
-**Current Phase**: Revision 4 Phase 4 — Verification & Cleanup
-**Status**: MVP Complete; Revision 4 — Anti-Patterns in progress, Phase 3 complete, Phase 4 ready for execution
+**Current Phase**: TBD — pending phase planning
+**Status**: MVP Complete; Revision 4 — Anti-Patterns complete
 
 ---
 
@@ -46,6 +46,8 @@
 - 2026-04-09: Revision 4 Phase 2 — Document Updates (Alignment, SRS, Milestone) completed. All tasks done, DoD satisfied, full test suite green (461 tests, 70 files).
 - 2026-04-10: Revision 4 Phase 3 — Document Updates (Phase, Revision, Git Workflow) was planned and test-planned. Phase document committed and ready for execution.
 - 2026-05-13: Revision 4 Phase 3 — Document Updates (Phase, Revision, Git Workflow) completed. All tasks done, DoD satisfied, full test suite green (467 tests, 72 files).
+- 2026-05-17: Revision 4 Phase 4 — Verification & Cleanup completed. All tasks done, DoD satisfied, full test suite green (472 tests, 75 files).
+- 2026-05-17: Revision 4 — Anti-Patterns completed. All phases done.
 
 ---
 
@@ -84,7 +86,7 @@ R4 — Anti-Patterns
 ├── Phase 1 — Structural & SRS Foundation ✓
 ├── Phase 2 — Document Updates (Alignment, SRS, Milestone) ✓
 ├── Phase 3 — Document Updates (Phase, Revision, Git Workflow) ✓
-└── Phase 4 — Verification & Cleanup ○
+└── Phase 4 — Verification & Cleanup ✓
 M2 — Cross-Project Context (Optional Post-MVP)
 └── Phase 1 — TBD ○
 M3 — Workflow Visibility Enhancements (Optional Future)
@@ -120,8 +122,8 @@ M3 — Workflow Visibility Enhancements (Optional Future)
   - **Document:** `docs/milestones/revision-3-srs-integration/revision-3-srs-integration.md`
 
 - **Revision 4 — Anti-Patterns**
-  - **Status:** In Progress (Phase 1, Phase 2, and Phase 3 complete; Phase 4 ready for execution)
-  - **Priority:** Medium
+  - **Status:** Complete (all 4 phases done)
+  - **Priority:** Done
   - **Scope:** Add "Anti-Patterns" sections to core documentation to prevent recurring process errors.
   - **Impact:** Alignment, SRS, Milestone Planning, Phase Planning, Revision Planning, Git Workflow.
   - **Document:** `docs/milestones/revision-4-anti-patterns/revision-4-anti-patterns.md`
