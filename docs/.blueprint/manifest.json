@@ -1,0 +1,10 @@
+{
+  "templateVersion": "1.0.0",
+  "cliVersion": "0.1.5",
+  "managedFiles": [
+    "CLAUDE.md",
+    "AGENTS.md",
+    "GEMINI.md",
+    "QWEN.md"
+  ]
+}
