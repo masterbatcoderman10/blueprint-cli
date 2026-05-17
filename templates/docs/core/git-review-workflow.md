@@ -133,3 +133,16 @@ Loaded by review.md at the start of ReviewProcess.
   - The merge is part of the review completion step — it is not
     a separate workflow triggered by the user.
 </GitReviewRules>
+
+---
+
+## Anti-Patterns
+
+```xml
+<AntiPatterns>
+  <AntiPattern name="Not Cleaning Up Worktrees After Review">
+    <BadExample>Completing a review, moving all tasks to DONE, and merging the branch to main — but leaving the worktree directory and branch in place indefinitely.</BadExample>
+    <Why>Worktrees and branches left after a completed review accumulate over time, cluttering git worktree list with stale entries and making it impossible to tell what is actively in-flight versus already merged. The cleanup step in WorktreeCleanup is automatic and non-optional — it runs immediately after a successful merge, not as a separate follow-up. Skipping it is not a time-saving shortcut; it creates confusion for every agent that checks worktree state afterward.</Why>
+  </AntiPattern>
+</AntiPatterns>
+```
