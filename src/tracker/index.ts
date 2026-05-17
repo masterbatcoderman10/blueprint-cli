@@ -1,5 +1,6 @@
 export * from './db'
 export * from './project-root'
 export * from './routes/comments'
+export * from './routes/tasks'
 export * from './schema'
 export * from './types'
