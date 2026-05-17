@@ -2,9 +2,9 @@
 
 **Project**: blueprint-cli
 **Kanban**: blueprint-cli
-**Current Milestone**: Revision 4 — Anti-Patterns
-**Current Phase**: TBD — pending phase planning
-**Status**: MVP Complete; Revision 4 — Anti-Patterns complete
+**Current Milestone**: Revision 6 — Built-in Task Tracker
+**Current Phase**: Phase 1 — TBD
+**Status**: MVP Complete; Revision 5 — Orchestration Protocol complete; Revision 6 — Built-in Task Tracker planned next
 
 ---
 
@@ -48,6 +48,11 @@
 - 2026-05-13: Revision 4 Phase 3 — Document Updates (Phase, Revision, Git Workflow) completed. All tasks done, DoD satisfied, full test suite green (467 tests, 72 files).
 - 2026-05-17: Revision 4 Phase 4 — Verification & Cleanup completed. All tasks done, DoD satisfied, full test suite green (472 tests, 75 files).
 - 2026-05-17: Revision 4 — Anti-Patterns completed. All phases done.
+- 2026-05-17: Identified Revision 5 — Orchestration Protocol to introduce `docs/core/orchestrate.md` as a new core module that turns an agent into a phase/stream orchestrator with parallel-subagent dispatch per the parallelization map and independent per-stream execute→review→address→rereview loops. Impact: additive — new core module, routing rows in all 4 agent entry points + project `CLAUDE.md`, template propagation via `templates/docs/core/orchestrate.md`, Doctor / template-integrity canonical-core-file list expansion. SRS requirement MAS-203 created (status: approved-pending-implementation). Revision document at `docs/milestones/revision-5-orchestration/revision-5-orchestration.md`.
+- 2026-05-17: Revision 5 Phase 1 — Orchestration Module & Routing Integration was planned. Phase document committed and ready for execution.
+- 2026-05-17: Revision 5 Phase 1 — Orchestration Module & Routing Integration completed. All tasks done, DoD satisfied, full test suite green (485 tests, 79 files).
+- 2026-05-17: Revision 5 — Orchestration Protocol completed. All phases done.
+- 2026-05-17: Identified Revision 6 — Built-in Task Tracker to replace the external `vibe-kanban` MCP dependency with a built-in per-project task tracker (SQLite backend + local Svelte SPA) provisioned by the CLI. Impact: hybrid additive + modifying — new tracker backend / SPA / `blueprint board` command plus protocol rewrites, tracker field renaming, and REWORK-state adoption. SRS requirements MAS-204 and MAS-205 created (status: approved-pending-implementation). Revision document at `docs/milestones/revision-6-built-in-tracker/revision-6-built-in-tracker.md`.
 
 ---
 
@@ -87,6 +92,10 @@ R4 — Anti-Patterns
 ├── Phase 2 — Document Updates (Alignment, SRS, Milestone) ✓
 ├── Phase 3 — Document Updates (Phase, Revision, Git Workflow) ✓
 └── Phase 4 — Verification & Cleanup ✓
+R5 — Orchestration Protocol
+└── Phase 1 — Orchestration Module & Routing Integration ✓
+R6 — Built-in Task Tracker
+└── Phase 1 — TBD ○
 M2 — Cross-Project Context (Optional Post-MVP)
 └── Phase 1 — TBD ○
 M3 — Workflow Visibility Enhancements (Optional Future)
@@ -100,30 +109,16 @@ M3 — Workflow Visibility Enhancements (Optional Future)
 > Track revisions that have been identified but not yet executed.
 > The agent should surface these at session start.
 
-- **Revision 1 — CLI Discoverability & Help**
-  - **Status:** Complete (all 3 phases done)
-  - **Priority:** Done
-  - **Scope:** Revise root CLI discoverability so `blueprint`, root help flags, and incorrect or unrecognized commands produce actionable usage guidance.
-  - **Impact:** M1 Phases 1, 3, and 4
-  - **Document:** `docs/milestones/revision-1-cli-discoverability/revision-1-cli-discoverability.md`
+- **Revision 5 — Orchestration Protocol**
+  - **Status:** Complete
+  - **Priority:** Immediate
+  - **Scope:** Add `docs/core/orchestrate.md` as a new core module defining the orchestrator role — parallelization-map-faithful subagent dispatch and independent per-stream execute→review→address→rereview loops; routing + template propagation included.
+  - **Impact:** Additive — new core module + routing rows in all 4 agent entry points + project `CLAUDE.md` + template scaffolding (Doctor canonical-core-file list expansion). SRS: MAS-203 created.
+  - **Document:** `docs/milestones/revision-5-orchestration/revision-5-orchestration.md`
 
-- **Revision 2 — Tweak Contract**
-  - **Status:** Complete (1 phase done)
-  - **Priority:** Done
-  - **Scope:** Add a lightweight in-phase correction contract (tweak) — new core module, phase template update, routing, Doctor registration.
-  - **Impact:** M1 Phases 2 and 3
-  - **Document:** `docs/milestones/revision-2-tweak-contract/revision-2-tweak-contract.md`
-
-- **Revision 3 — SRS Integration**
-  - **Status:** Complete (all 3 phases done)
-  - **Priority:** Done
-  - **Scope:** Introduce SRS document as a progressive source of truth bridging PRD and phase plans. New core module, new template, reworked alignment flow, planning module integration.
-  - **Impact:** M1 Phases 2, 3, and 4
-  - **Document:** `docs/milestones/revision-3-srs-integration/revision-3-srs-integration.md`
-
-- **Revision 4 — Anti-Patterns**
-  - **Status:** Complete (all 4 phases done)
-  - **Priority:** Done
-  - **Scope:** Add "Anti-Patterns" sections to core documentation to prevent recurring process errors.
-  - **Impact:** Alignment, SRS, Milestone Planning, Phase Planning, Revision Planning, Git Workflow.
-  - **Document:** `docs/milestones/revision-4-anti-patterns/revision-4-anti-patterns.md`
+- **Revision 6 — Built-in Task Tracker**
+  - **Status:** Planned
+  - **Priority:** Next
+  - **Scope:** Replace the external `vibe-kanban` MCP dependency with a built-in per-project task tracker (SQLite backend + local Svelte SPA) provisioned by the CLI, including protocol rewrites and REWORK-state adoption.
+  - **Impact:** Hybrid additive + modifying — tracker backend, local board UI, task-state expansion, and cross-doc/template replacement of kanban MCP references. SRS: MAS-204 and MAS-205 created.
+  - **Document:** `docs/milestones/revision-6-built-in-tracker/revision-6-built-in-tracker.md`

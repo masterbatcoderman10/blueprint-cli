@@ -21,6 +21,12 @@ module writes to these fields.
     - "Complete the phase"
     - "Run phase completion"
 
+  Triggered automatically by phase orchestration:
+    - When `docs/core/orchestrate.md` `<PhaseLevelInvocation>` reaches
+      step 7 (all streams closed out), the orchestrator invokes phase
+      completion as its final sub-step. No separate user command is
+      required in this path.
+
   PRECONDITIONS:
   - docs/project-progress.md is loaded
   - docs/conventions.md is loaded (testing framework, test commands)
@@ -179,15 +185,21 @@ module writes to these fields.
     Do NOT update project-progress.md phase status.
     The phase stays in its current state.
 
-    Inform the user:
-    "Phase completion blocked by {{N}} test failure(s).
-    Bug tasks have been created on the kanban board.
-    After bugs are resolved, run phase completion again."
+    IF invoked by the orchestrator (via `docs/core/orchestrate.md`):
+      → The orchestrator automatically spawns a bug-resolution
+        stream and re-runs phase completion when that stream
+        closes out. No manual re-trigger is needed.
 
-    The user then addresses the bugs through the normal
-    execution and review cycle. When all bugs are resolved,
-    the user triggers phase completion again. The loop
-    repeats until the full test suite is green.
+    IF invoked directly by the user:
+      Inform the user:
+      "Phase completion blocked by {{N}} test failure(s).
+      Bug tasks have been created on the kanban board.
+      After bugs are resolved, run phase completion again."
+
+      The user then addresses the bugs through the normal
+      execution and review cycle. When all bugs are resolved,
+      the user triggers phase completion again. The loop
+      repeats until the full test suite is green.
 </RegressionHandling>
 
 ---
