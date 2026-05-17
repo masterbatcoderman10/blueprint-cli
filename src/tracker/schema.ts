@@ -1,4 +1,6 @@
-export type TrackerDatabase = import('node:sqlite').DatabaseSync
+import BetterSqlite3 from 'better-sqlite3'
+
+export type TrackerDatabase = InstanceType<typeof BetterSqlite3>
 
 export const TRACKER_SCHEMA_VERSION = 1
 
@@ -45,6 +47,7 @@ export function applySchema(db: TrackerDatabase): void {
     CREATE INDEX IF NOT EXISTS idx_tasks_phase_stream ON tasks(phase, stream);
     CREATE INDEX IF NOT EXISTS idx_review_comments_task_id ON review_comments(task_id);
     CREATE INDEX IF NOT EXISTS idx_review_comments_parent_id ON review_comments(parent_id);
-    PRAGMA user_version = ${TRACKER_SCHEMA_VERSION};
   `)
+
+  db.pragma(`user_version = ${TRACKER_SCHEMA_VERSION}`)
 }

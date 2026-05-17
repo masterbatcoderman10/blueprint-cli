@@ -27,7 +27,7 @@ function isAtLeast(version: [number, number, number], minimum: [number, number, 
 }
 
 describe('Gate R6-1.0 — runtime foundation', () => {
-  it('T-1.0.1: package engines.node includes Node 22.5.0 and newer', async () => {
+  it('T-1.0.1: package engines.node includes Node 18.0.0 and newer', async () => {
     const packageJson = JSON.parse(await readFile(resolve('package.json'), 'utf-8')) as {
       engines?: { node?: string }
     }
@@ -35,8 +35,8 @@ describe('Gate R6-1.0 — runtime foundation', () => {
     expect(packageJson.engines?.node).toBeDefined()
     const minimum = parseMinimumNodeVersion(packageJson.engines?.node ?? '')
 
-    expect(isAtLeast([22, 5, 0], minimum)).toBe(true)
-    expect(isAtLeast([24, 13, 0], minimum)).toBe(true)
-    expect(isAtLeast([22, 4, 0], minimum)).toBe(false)
+    expect(isAtLeast([18, 0, 0], minimum)).toBe(true)
+    expect(isAtLeast([20, 0, 0], minimum)).toBe(true)
+    expect(isAtLeast([17, 99, 0], minimum)).toBe(false)
   })
 })

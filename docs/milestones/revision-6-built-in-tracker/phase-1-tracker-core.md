@@ -1,6 +1,6 @@
 # Phase 1 — Tracker Core (Schema + CRUD Server) Plan
 
-**Status**: Planning
+**Status**: Complete
 **Milestone**: Revision 6 — Built-in Task Tracker
 **Sequencing**: Do not start execution until Revision 5 — Orchestration Protocol completes (R6 Phase 3 will rewrite `orchestrate.md` shipped by R5).
 
@@ -301,4 +301,16 @@ Stream A and Stream B execute fully in parallel — no inter-stream dependency. 
 
 > Corrections to completed tasks within this phase are tracked here. Each tweak has an ID (e.g., R6-1.TW1), lists affected tasks, and includes test impact. See `docs/core/tweak-planning.md` for the full tweak workflow.
 
-_None._
+### R6-1.TW1 — Replace node:sqlite with better-sqlite3 for broader Node.js compatibility
+
+- **Corrects:** R6-1.0.1, R6-1.0.2, R6-1.0.3, R6-1.0.5, R6-1.A.1, R6-1.A.2, R6-1.A.3, R6-1.B.1, R6-1.B.2, R6-1.B.3, R6-1.C.1, R6-1.C.4, R6-1.C.5
+- **Reason:** `node:sqlite` requires Node ≥22.5.0, which is not available in the current dev/CI environment (Node 20.x). The Phase 1 engines bump to `>=22.5.0` breaks the full test suite on the current runtime. Replacing with `better-sqlite3` (synchronous SQLite3 binding, zero async overhead, works on Node ≥18) restores compatibility without changing the CRUD contract or behavior.
+- **Source of truth:** `conventions.md` — "no runtime deps for simple file I/O" rule; practical runtime environment constraint.
+- **Changes:**
+  - `src/tracker/schema.ts`: Replace `import('node:sqlite').DatabaseSync` type with `better-sqlite3` `Database` type. Update `PRAGMA user_version` from `db.exec()` to `db.pragma()`.
+  - `src/tracker/db.ts`: Replace `require('node:sqlite')` with `require('better-sqlite3')`. Constructor changes from `new DatabaseSync(path)` to `new Database(path)`.
+  - All 6 test files importing `node:sqlite`: Replace `DatabaseSync` with `better-sqlite3` `Database`.
+  - `package.json`: Add `better-sqlite3` as runtime dependency, `@types/better-sqlite3` as dev dependency. Revert `engines.node` to `>=18.0.0`.
+  - `docs/conventions.md`: Update Runtime section to reference `better-sqlite3` instead of `node:sqlite`; remove Node ≥22.5 requirement.
+- **Test impact:** Modified — all tracker tests (Gate, Stream A, Stream B, Stream C) update their DB import. All existing test assertions remain identical; only the DB constructor changes.
+- **Status:** done

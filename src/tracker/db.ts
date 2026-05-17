@@ -1,11 +1,9 @@
 import { mkdirSync } from 'node:fs'
-import { createRequire } from 'node:module'
 import { join, resolve } from 'node:path'
 
-import { applySchema, type TrackerDatabase } from './schema'
+import BetterSqlite3 from 'better-sqlite3'
 
-const nodeRequire = createRequire(__filename)
-const { DatabaseSync } = nodeRequire('node:sqlite') as typeof import('node:sqlite')
+import { applySchema, type TrackerDatabase } from './schema'
 
 export interface TrackerDbHandle {
   db: TrackerDatabase
@@ -21,8 +19,8 @@ export function openDb(projectRoot: string): TrackerDbHandle {
   const dbPath = trackerDbPath(projectRoot)
   mkdirSync(join(resolve(projectRoot), 'docs', '.blueprint'), { recursive: true })
 
-  const db = new DatabaseSync(dbPath)
-  db.exec('PRAGMA foreign_keys = ON')
+  const db = new BetterSqlite3(dbPath)
+  db.pragma('foreign_keys = ON')
   applySchema(db)
 
   return {

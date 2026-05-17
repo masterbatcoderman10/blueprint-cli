@@ -28,7 +28,7 @@
     "templates"
   ],
   "engines": {
-    "node": ">=22.5.0"
+    "node": ">=18.0.0"
   },
   "scripts": {
     "dev": "tsx src/index.ts",
@@ -43,12 +43,14 @@
     "release:version-check": "tsx src/release/run-version-check.ts"
   },
   "devDependencies": {
+    "@types/better-sqlite3": "^7.6.13",
     "@types/node": "^25.3.3",
     "tsx": "^4.0.0",
     "typescript": "^5.0.0",
     "vitest": "^2.0.0"
   },
   "dependencies": {
-    "@clack/prompts": "^1.1.0"
+    "@clack/prompts": "^1.1.0",
+    "better-sqlite3": "^12.10.0"
   }
 }

@@ -6,7 +6,7 @@
 
 ## Tech Stack
 
-- **Runtime:** Node.js >=22.5.0 (required for the built-in `node:sqlite` tracker storage backend)
+- **Runtime:** Node.js >=18.0.0 (required for the `better-sqlite3` tracker storage backend)
 - **Package manager:** npm
 - **Language:** TypeScript
 - **Distribution:** npm global install (`npm install -g @splitwireml/blueprint`)

@@ -1,4 +1,3 @@
-import { createRequire } from 'node:module'
 import type { AddressInfo } from 'node:net'
 import { mkdtempSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
@@ -6,26 +5,25 @@ import { join } from 'node:path'
 
 import { afterEach, describe, expect, it } from 'vitest'
 
+import BetterSqlite3 from 'better-sqlite3'
+
 import { openDb } from '../../src/tracker/db'
 import { createServer } from '../../src/tracker/server'
 import { applySchema, type TrackerDatabase } from '../../src/tracker/schema'
 
-type DatabaseSync = import('node:sqlite').DatabaseSync
-
-const require = createRequire(import.meta.url)
-const { DatabaseSync } = require('node:sqlite') as typeof import('node:sqlite')
+type TestDatabase = import('better-sqlite3').Database
 
 interface RunningServer {
-  db: DatabaseSync
+  db: TestDatabase
   origin: string
   close(): Promise<void>
 }
 
 let activeServer: RunningServer | undefined
 
-function openMemoryDb(): DatabaseSync {
-  const db = new DatabaseSync(':memory:')
-  db.exec('PRAGMA foreign_keys = ON')
+function openMemoryDb(): TestDatabase {
+  const db = new BetterSqlite3(':memory:')
+  db.pragma('foreign_keys = ON')
   applySchema(db)
   db.prepare(
     `INSERT INTO project_meta

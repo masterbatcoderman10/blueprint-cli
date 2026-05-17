@@ -1,17 +1,15 @@
 import { access, mkdir, mkdtemp, rm } from 'node:fs/promises'
-import { createRequire } from 'node:module'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
+import BetterSqlite3 from 'better-sqlite3'
+
 import { initCommand } from '../../../src/commands/init'
 import { clackPromptApi } from '../../../src/init/prompts'
 
-type DatabaseSync = import('node:sqlite').DatabaseSync
-
-const require = createRequire(import.meta.url)
-const { DatabaseSync } = require('node:sqlite') as typeof import('node:sqlite')
+type TestDatabase = import('better-sqlite3').Database
 
 const tempRoots: string[] = []
 
@@ -64,7 +62,7 @@ describe('Gate R6-1.0 — init tracker database', () => {
     const dbPath = await runInitWithTrackerInputs(root)
 
     await expect(access(dbPath)).resolves.toBeUndefined()
-    const db: DatabaseSync = new DatabaseSync(dbPath)
+    const db: TestDatabase = new BetterSqlite3(dbPath)
     try {
       const userVersion = db.prepare('PRAGMA user_version').get() as { user_version: number }
       expect(userVersion.user_version).toBe(1)
@@ -83,7 +81,7 @@ describe('Gate R6-1.0 — init tracker database', () => {
     const root = await makeRoot()
     const dbPath = await runInitWithTrackerInputs(root)
 
-    const db: DatabaseSync = new DatabaseSync(dbPath)
+    const db: TestDatabase = new BetterSqlite3(dbPath)
     try {
       const metaRows = db.prepare('SELECT name, tagline FROM project_meta').all() as Array<{
         name: string

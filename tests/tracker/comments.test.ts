@@ -1,6 +1,6 @@
-import { createRequire } from 'node:module'
-
 import { afterEach, describe, expect, it } from 'vitest'
+
+import BetterSqlite3 from 'better-sqlite3'
 
 import {
   createComment,
@@ -10,16 +10,13 @@ import {
 } from '../../src/tracker/routes/comments'
 import { applySchema } from '../../src/tracker/schema'
 
-type DatabaseSync = import('node:sqlite').DatabaseSync
+type TestDatabase = import('better-sqlite3').Database
 
-const require = createRequire(import.meta.url)
-const { DatabaseSync } = require('node:sqlite') as typeof import('node:sqlite')
+let db: TestDatabase | undefined
 
-let db: DatabaseSync | undefined
-
-function openMemoryDb(): DatabaseSync {
-  db = new DatabaseSync(':memory:')
-  db.exec('PRAGMA foreign_keys = ON')
+function openMemoryDb(): TestDatabase {
+  db = new BetterSqlite3(':memory:')
+  db.pragma('foreign_keys = ON')
   applySchema(db)
   return db
 }
