@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+import { boardCommand } from './commands/board'
 import { placeholderCommands } from './commands'
 import { parseCommandHelpInvocation, writeCommandHelp } from './help/command'
 import { writeUnknownCommandRecovery } from './help/recovery'
@@ -41,6 +42,7 @@ export async function runCli(argv: string[]): Promise<number> {
   for (const command of placeholderCommands) {
     runtime.register(command)
   }
+  runtime.register(boardCommand)
 
   const commandHelpRequest = parseCommandHelpInvocation(argv)
   if (commandHelpRequest) {
