@@ -65,6 +65,7 @@ These were resolved during phase planning and must not be re-litigated during ex
 | R6-2.0.4 | Author `src/tracker/spa/main.ts` (Svelte 5 mount) + `src/tracker/spa/App.svelte` (root layout: `<Board />` slot + collapsible `<TaskDetailRail />` slot driven by selection store). | 0.5 | R6-2.0.2 | Dependent |
 | R6-2.0.5 | Author `src/tracker/spa/lib/api.ts` — typed fetch wrappers: `listTasks(filter)`, `getTask`, `createTask`, `updateTask`, `deleteTask`, `listComments(taskId)`, `createComment`, `updateComment`, `deleteComment`, `getProject`. Returns `Result<T, ApiError>` mirroring P1 envelope `{ error: { code, message } }`. Base URL = `window.location.origin`. | 0.75 | R6-2.0.1 | Independent |
 | R6-2.0.6 | Author skeleton stores (Svelte 5 runes, `.svelte.ts`): `stores/tasks.svelte.ts` (task list state + polling driver — interval configurable, default 2s, pauses on tab hidden via `document.visibilityState`), `stores/selection.svelte.ts` (selected task ID ↔ URL hash sync), `stores/comments.svelte.ts` (per-task comment cache, invalidated on selection change). | 1.0 | R6-2.0.5 | Dependent |
+| R6-2.0.7 | Fetch the `2YY-0` (`Kanban — Board First with Task Detail`) artboard from Paper MCP and persist a read-only design reference under `src/design/`. Required artifacts: `src/design/2YY-0.jsx` (full artboard JSX via `get_jsx`), `src/design/2YY-0.png` (reference screenshot via `get_screenshot`), `src/design/computed-styles.json` (sub-node `get_computed_styles` for column widths, chip colors, status-dot colors, rail dimensions, comment chip palettes — keyed by node ID), `src/design/font-family-info.json` (output of `get_font_family_info` for typography tokens). Add a top-of-file banner comment in each file noting "DESIGN REFERENCE — DO NOT EDIT BY HAND; regenerate via the Paper MCP fetch script if the artboard changes." Streams A and B components are authored against these files; they are not imported at runtime. | 0.75 | None | Independent |
 
 ### Gate Acceptance Criteria
 
@@ -75,6 +76,7 @@ These were resolved during phase planning and must not be re-litigated during ex
 - [ ] `api.ts` exposes the listed wrappers, returns `Result` unions; tests cover at least the happy path of one wrapper + one error mapping (mocked `fetch`).
 - [ ] Polling driver invokes `listTasks` at the configured interval, stops on `visibilitychange → hidden`, resumes on `visibilitychange → visible` (covered by a Vitest test with faked timers + visibility).
 - [ ] Selection store writes `window.location.hash` on change and re-reads on `hashchange`.
+- [ ] `src/design/2YY-0.jsx`, `src/design/2YY-0.png`, `src/design/computed-styles.json`, and `src/design/font-family-info.json` exist. JSX file parses; JSON files parse; PNG has non-zero size. Each text file carries the "DESIGN REFERENCE — DO NOT EDIT BY HAND" banner.
 
 ---
 
@@ -233,6 +235,9 @@ Streams A, B, C are fully independent. A and B share only the Gate's `api.ts` + 
 | T-2.0.6.2 | R6-2.0.6 | unit | Tasks store polling pauses on `visibilitychange → hidden`, resumes on `visible`. | No calls while hidden; resumes after visible event. |
 | T-2.0.6.3 | R6-2.0.6 | unit | Selection store writes `window.location.hash` on change; reads on `hashchange`. | Hash mirrors `#task=<id>`; selection updates on hash event. |
 | T-2.0.6.4 | R6-2.0.6 | unit | Comments store invalidates cache on selection change. | New `listComments` fired; previous data not retained. |
+| T-2.0.7.1 | R6-2.0.7 | unit | All four design-reference files exist under `src/design/`: `2YY-0.jsx`, `2YY-0.png`, `computed-styles.json`, `font-family-info.json`. PNG is non-zero bytes. | Files present; sizes > 0. |
+| T-2.0.7.2 | R6-2.0.7 | unit | `2YY-0.jsx` parses as valid JSX/TSX (e.g., via `@babel/parser` in jsx mode); `computed-styles.json` and `font-family-info.json` are valid JSON. | Parsers complete without error. |
+| T-2.0.7.3 | R6-2.0.7 | unit | Each text design file's first line contains the banner `DESIGN REFERENCE — DO NOT EDIT BY HAND`. | Regex match passes for all three text files. |
 
 ### Stream A Tests
 
@@ -313,12 +318,12 @@ Streams A, B, C are fully independent. A and B share only the Gate's `api.ts` + 
 
 | Component | Total Tasks | Testable | Not Testable | Tests Defined |
 |-----------|-------------|----------|--------------|---------------|
-| Gate R6-2.0 | 6 | 6 | 0 | 13 |
+| Gate R6-2.0 | 7 | 7 | 0 | 16 |
 | Stream A | 6 | 5 | 1 | 10 |
 | Stream B | 6 | 5 | 1 | 16 |
 | Stream C | 5 | 4 | 1 | 15 |
 | Stream D | 3 | 1 | 2 | 11 |
-| **Total** | **26** | **21** | **5** | **65** |
+| **Total** | **27** | **22** | **5** | **68** |
 
 ---
 
@@ -329,7 +334,7 @@ Streams A, B, C are fully independent. A and B share only the Gate's `api.ts` + 
 - [ ] Stream B acceptance criteria pass.
 - [ ] Stream C acceptance criteria pass.
 - [ ] Stream D acceptance criteria pass.
-- [ ] All 65 tests in the Test Plan pass.
+- [ ] All 68 tests in the Test Plan pass.
 - [ ] `npm run build` produces a working `dist/spa/` with fingerprinted assets.
 - [ ] `npm pack` includes `dist/`, `dist/spa/`, `templates/`. Smoke install + `blueprint board` boots a working board on `127.0.0.1:7300` (or the first free port in range).
 - [ ] `blueprint board` opens the SPA in the default browser on at least one of darwin / linux / win32 (CI matrix or documented manual verification).
