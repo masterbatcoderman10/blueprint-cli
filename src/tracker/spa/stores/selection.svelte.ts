@@ -44,7 +44,7 @@ function writeHash(id: string | null): void {
 }
 
 export function createSelectionStore(): SelectionStore {
-  let selectedId: string | null = readHashTaskId()
+  let selectedId = $state<string | null>(readHashTaskId())
 
   // Listen for browser back/forward navigation changing the hash
   if (typeof window !== 'undefined') {

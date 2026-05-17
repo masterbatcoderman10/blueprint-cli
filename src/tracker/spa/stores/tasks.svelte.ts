@@ -40,15 +40,14 @@ export function createTasksStore(options: TasksStoreOptions = {}): TasksStore {
   const intervalMs = options.intervalMs ?? 2000
   let filter: TaskFilter = options.filter ?? {}
 
-  // State variables — in Svelte component context (.svelte files importing this
-  // module) these would use $state runes for reactivity. For now they are plain
-  // mutable variables; reactivity is wired up by the consuming Svelte component.
-  let tasks: TaskData[] = []
-  let loading: boolean = false
-  let error: string | null = null
+  // State variables — Svelte 5 runes for reactivity in .svelte.ts files
+  let tasks = $state<TaskData[]>([])
+  let loading = $state(false)
+  let error = $state<string | null>(null)
 
   let timerId: ReturnType<typeof setInterval> | null = null
   let paused = false
+  let visibilityListener: (() => void) | null = null
 
   async function fetchOnce(): Promise<void> {
     loading = true
@@ -98,15 +97,20 @@ export function createTasksStore(options: TasksStoreOptions = {}): TasksStore {
       startInterval()
 
       // Wire up real visibilitychange events when document is available
-      if (typeof document !== 'undefined') {
-        document.addEventListener('visibilitychange', () => {
+      if (typeof document !== 'undefined' && visibilityListener === null) {
+        visibilityListener = () => {
           handleVisibilityChange(document.visibilityState)
-        })
+        }
+        document.addEventListener('visibilitychange', visibilityListener)
       }
     },
 
     stop() {
       stopInterval()
+      if (typeof document !== 'undefined' && visibilityListener !== null) {
+        document.removeEventListener('visibilitychange', visibilityListener)
+        visibilityListener = null
+      }
     },
 
     setFilter(newFilter: TaskFilter) {

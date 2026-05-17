@@ -23,9 +23,9 @@ export interface CommentsStore {
 }
 
 export function createCommentsStore(): CommentsStore {
-  let comments: CommentData[] = []
-  let loading: boolean = false
-  let error: string | null = null
+  let comments = $state<CommentData[]>([])
+  let loading = $state(false)
+  let error = $state<string | null>(null)
 
   // Cache: last fetched task ID and its comments
   let cachedTaskId: string | null = null

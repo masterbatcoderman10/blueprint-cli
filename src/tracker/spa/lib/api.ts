@@ -79,7 +79,7 @@ async function request<T>(
   options?: RequestInit
 ): Promise<Result<T>> {
   try {
-    const url = `${baseUrl()}/api${path}`
+    const url = `${baseUrl()}${path}`
     const res = await fetch(url, {
       headers: { 'Content-Type': 'application/json' },
       ...options,
