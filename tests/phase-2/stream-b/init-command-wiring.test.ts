@@ -52,7 +52,7 @@ describe('Phase 2 Stream B — Init Command Wiring', () => {
 
       expect(result).toEqual({ exitCode: 0 })
       expect(introMock).toHaveBeenCalledTimes(1)
-      expect(textMock).toHaveBeenCalledTimes(1)
+      expect(textMock).toHaveBeenCalledTimes(2)
       expect(selectMock).toHaveBeenCalledTimes(2)
       expect(multiselectMock).toHaveBeenCalledTimes(1)
       expect(confirmMock).toHaveBeenCalledTimes(4)

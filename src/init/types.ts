@@ -6,6 +6,7 @@ export const defaultArchiveDirectoryName = 'docs-archived'
 
 export interface InitOptions {
   projectName: string
+  projectTagline: string
   git: {
     hasExistingRepository: boolean
     shouldInitialize: boolean

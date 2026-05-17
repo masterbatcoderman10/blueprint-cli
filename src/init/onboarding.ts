@@ -12,6 +12,7 @@ import {
 
 export const onboardingIntroMessage = 'Blueprint init'
 export const projectNamePromptMessage = 'Project name'
+export const projectTaglinePromptMessage = 'Project tagline'
 export const missingGitRepositoryWarning = 'No .git directory found. Blueprint can initialize git and set the main branch.'
 export const gitInitializationPromptMessage = 'Initialize git repository and set branch to main?'
 export const existingDocsWarningPrefix = 'Existing docs/ directory detected and will be replaced during scaffold.'
@@ -44,6 +45,19 @@ export async function promptForProjectName(): Promise<string> {
 
   if (typeof response !== 'string') {
     throw new Error('Initialization cancelled before project name was provided.')
+  }
+
+  return response.trim()
+}
+
+export async function promptForProjectTagline(): Promise<string> {
+  const response = await clackPromptApi.text({
+    message: projectTaglinePromptMessage,
+    placeholder: 'A short description for the project board',
+  })
+
+  if (typeof response !== 'string') {
+    throw new Error('Initialization cancelled before project tagline was provided.')
   }
 
   return response.trim()
@@ -396,6 +410,7 @@ export async function promptConfirmation(options: InitOptions): Promise<boolean>
 
 export async function runInitOnboardingFlow(rootDir: string): Promise<InitOnboardingFlowResult> {
   const projectName = await promptForProjectName()
+  const projectTagline = await promptForProjectTagline()
   const gitChoice = await promptGitInitializationChoice(rootDir)
   const docsChoice = await promptDocsArchiveChoice(rootDir)
   const markdownChoice = await promptMarkdownMigrationChoice(rootDir)
@@ -403,6 +418,7 @@ export async function runInitOnboardingFlow(rootDir: string): Promise<InitOnboar
 
   const options: InitOptions = {
     projectName,
+    projectTagline,
     git: {
       hasExistingRepository: gitChoice.hasExistingRepository,
       shouldInitialize: gitChoice.shouldInitialize,
