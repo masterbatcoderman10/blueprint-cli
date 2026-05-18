@@ -1,14 +1,7 @@
 # Project Progress
 
 **Project**: {{project-name}}
-
----
-
-## Tracker
-
-| Board         | Link / Reference |
-|---------------|------------------|
-| Project Board | _link pending_   |
+**Tracker**: {{project-name}}
 
 ---
 

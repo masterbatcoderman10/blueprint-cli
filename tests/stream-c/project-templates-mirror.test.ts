@@ -51,10 +51,10 @@ describe('R6-3.C: Project + Templates Mirror', () => {
       expect(content).not.toContain('**Kanban**: blueprint-cli')
     })
 
-    it('templates/project-progress.md has ## Tracker section', async () => {
+    it('templates/project-progress.md has **Tracker**: {{project-name}}', async () => {
       const content = await readFile(join(TEMPLATES_DIR, 'project-progress.md'), 'utf-8')
-      expect(content).toContain('## Tracker')
-      expect(content).not.toContain('## Kanban')
+      expect(content).toContain('**Tracker**: {{project-name}}')
+      expect(content).not.toContain('## Tracker')
     })
   })
 
