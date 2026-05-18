@@ -87,6 +87,7 @@ Streams A and B share no files. Within a stream, tasks run sequentially per thei
 | R6-5.A.3 | Extend `importSnapshot` in `src/tracker/export.ts` so that a snapshot row missing `milestone` is filled via `parseMilestoneFromId(row.id)` before insertion. If both the snapshot field is missing AND the ID does not match the prefix pattern, surface the row id in a single aggregated error (do not silently drop). Also extend the snapshot writer to include `milestone` in the JSON shape. | 0.75 | Gate | Dependent |
 | R6-5.A.4 | Add `tests/tracker/routes-tasks-milestone.test.ts` covering: `GET /tasks?milestone=R6` returns only R6 tasks; combined `?milestone=R6&phase=R6-3` AND-narrows correctly; empty `milestone=` rejected; `POST /tasks` without milestone auto-derives from ID; `POST /tasks` with explicit milestone wins over derivation; `POST /tasks` rejected when no milestone supplied and ID does not match prefix; `PATCH /tasks/:id` accepts milestone update. | 1.0 | R6-5.A.2 | Dependent |
 | R6-5.A.5 | Add `tests/tracker/export-milestone.test.ts` covering: pre-P5 snapshot (no milestone field on rows) imports with milestone derived from IDs; snapshot with malformed IDs surfaces aggregated error and leaves the DB untouched; round-trip (export → import) preserves milestone on every row. | 1.0 | R6-5.A.3 | Dependent |
+| R6-5.A.6 | Add `tests/tracker/export-milestone-atomicity.test.ts` — explicit partial-failure atomicity test. Construct a snapshot with 50 well-formed rows followed by 1 row with a malformed ID (`'orphan-task'`). Invoke `importSnapshot()` and assert: (a) transaction rolls back completely — DB row count is exactly 0 (no partial writes), (b) error message names the offending row's ID, (c) attempting the import again with a corrected snapshot succeeds (verifies DB is clean, not corrupted). | 1.25 | R6-5.A.3, R6-5.A.5 | Dependent |
 
 ### Stream A Acceptance Criteria
 
@@ -97,6 +98,7 @@ Streams A and B share no files. Within a stream, tasks run sequentially per thei
 - [ ] `PATCH /tasks/:id` accepts a `milestone` update with the same non-empty validation.
 - [ ] `importSnapshot` accepts a pre-P5 snapshot and backfills `milestone` via ID parsing.
 - [ ] Snapshot writer includes `milestone` on every row; export → import round-trip preserves the field.
+- [ ] **Snapshot import is atomic: when 1 of 51 rows has a malformed ID, all 51 rows are NOT inserted (complete rollback) and error names the offending row.**
 - [ ] All new tests pass; existing server tests remain green.
 
 ---
@@ -113,6 +115,7 @@ Streams A and B share no files. Within a stream, tasks run sequentially per thei
 | R6-5.B.4 | Update `src/tracker/spa/components/Header.svelte`: replace the defensive cast at lines 44–46 with `const milestoneCount = $derived(new Set(tasks.map((t) => t.milestone).filter(Boolean)).size)`. Keep `data-testid="milestone-count"`. The `|| 1` fallback goes away. | 0.5 | R6-5.B.1 | Dependent |
 | R6-5.B.5 | Extend `tests/spa/Filters.test.ts` to assert the Milestone dropdown renders, lists unique milestones from the task set sorted alphabetically, and emits `{ milestone, phase, stream }` on change. | 0.75 | R6-5.B.3 | Dependent |
 | R6-5.B.6 | Extend `tests/spa/Header.test.ts` to assert `[data-testid="milestone-count"]` renders the real count (e.g., 1 when all tasks are `R6`, 2 when mixed `M1` + `R6`). Drop the test (if any) that pinned the count to `1`. | 0.5 | R6-5.B.4 | Dependent |
+| R6-5.B.7 | Add end-to-end test `tests/e2e/doctor-snapshot-import.test.ts` — Doctor integration validation. Create a temporary project, generate a pre-P5 `tasks.export.json` snapshot (manually or via fixture), invoke Doctor's repair plan (which calls `importSnapshot`), verify the DB has all tasks with milestone backfilled, then start `blueprint board --headless` and fetch `GET /tasks?milestone=R6`, assert response is `{ ok: true, data: [...] }` with all tasks carrying `milestone` field. Confirms Doctor → snapshot import → board rendering integration. | 1.5 | R6-5.A.6, R6-5.B.6 | Dependent |
 
 ### Stream B Acceptance Criteria
 
@@ -121,6 +124,7 @@ Streams A and B share no files. Within a stream, tasks run sequentially per thei
 - [ ] Clearing the Milestone selection (empty option) restores the unfiltered view.
 - [ ] Header milestone-count badge reflects the unique-milestone count of the current task set (no `|| 1` fallback).
 - [ ] No SPA file touched by Stream B is also touched by Stream A (verified by the Parallel-Safety Contract).
+- [ ] **Doctor → snapshot import → board rendering integration works end-to-end: pre-P5 snapshot imports with milestone backfilled; board renders filtered by milestone; HTTP responses are correct envelope.**
 - [ ] All new and existing SPA tests pass.
 
 ---
@@ -137,12 +141,14 @@ Streams A and B share no files. Within a stream, tasks run sequentially per thei
 | R6-5.C.3 | Transition `docs/srs.md`: MAS-204 status `approved-pending-implementation` → `active`; MAS-205 status `approved-pending-implementation` → `active`. Add change-log entries on both referencing Phase 5 completion. | 0.5 | R6-5.C.2 | Dependent |
 | R6-5.C.4 | Run release-readiness check per `docs/conventions.md` release flow: `npm run release:check`. Confirm CI and Publish workflows would succeed (do not actually publish in this phase). | 0.5 | R6-5.C.3 | Dependent |
 | R6-5.C.5 | Amend `docs/milestones/revision-6-built-in-tracker/revision-6-built-in-tracker.md` Phase 5 row to reflect the expanded scope (milestone integration + verification). Update Success Criteria to include the milestone field, filter, and snapshot back-compat. Add a Deferred Items entry noting any items moved out (none expected). | 0.5 | R6-5.C.1 | Dependent |
+| R6-5.C.6 | Add `tests/tracker/schema-integrity.test.ts` — post-migration schema validation. On the live project DB (`docs/.blueprint/tasks.db`), after opening via `openDb()`, execute: (a) `PRAGMA integrity_check` — must return `'ok'`, (b) `PRAGMA foreign_key_check` — must return zero rows (no orphans), (c) verify `TRACKER_SCHEMA_VERSION === 2`, (d) verify every row in `tasks` table has `milestone IS NOT NULL`, (e) verify indexes `idx_tasks_milestone` and `idx_tasks_milestone_phase` exist and are properly formed. | 0.75 | R6-5.C.2 | Dependent |
 
 ### Stream C Acceptance Criteria
 
 - [ ] `rg -i 'vibe-kanban\|kanban mcp' docs/ templates/ src/ tests/` returns zero hits outside the revision-history allow-list.
 - [ ] `npm test` is green; test totals recorded.
 - [ ] MAS-204 and MAS-205 are `active` in `docs/srs.md` with Phase 5 change-log entries.
+- [ ] **Live project DB (`docs/.blueprint/tasks.db`) passes integrity check: `PRAGMA integrity_check` returns `'ok'`, no foreign-key orphans, `TRACKER_SCHEMA_VERSION === 2`, every row has `milestone IS NOT NULL`, indexes are present and valid.**
 - [ ] `npm run release:check` exits clean.
 - [ ] Revision 6 document's Phase 5 row matches what was actually built.
 - [ ] `docs/prd.md` is untouched (verified by `git diff docs/prd.md` → empty).
@@ -222,6 +228,9 @@ Gate R6-5.0 (Milestone Schema Foundation) ──┐
 | T-R6-5.A.3.2 | R6-5.A.3 | integration | `importSnapshot` aborts atomically on a malformed-ID row and surfaces an aggregated error. | DB row count unchanged; error message names the offending ID(s). |
 | T-R6-5.A.3.3 | R6-5.A.3 | integration | Snapshot writer includes `milestone`; export → import round-trip preserves the field. | Re-imported rows match original rows exactly. |
 | **T-R6-5.A.3.HTTP** | **R6-5.A.3** | **integration** | **HTTP envelope contract: snapshot export JSON has `{ tasks: [...], comments: [...], meta: {...} }` shape (no `ok` field on snapshots, as they are internal)**. | **Snapshot JSON parses correctly and round-trip import produces identical task data**. |
+| **T-R6-5.A.6.1** | **R6-5.A.6** | **integration** | **Snapshot import atomicity: 51-row snapshot with row 51 malformed → all 51 rows rejected, DB row count = 0.** | **Zero rows inserted; transaction rolled back completely; no partial write.** |
+| **T-R6-5.A.6.2** | **R6-5.A.6** | **integration** | **Snapshot import error message names the offending row ID.** | **Error message names row 51's malformed ID (e.g., `'orphan-task'`); user can correct and retry.** |
+| **T-R6-5.A.6.3** | **R6-5.A.6** | **integration** | **After failed import, DB is clean and can accept a corrected snapshot.** | **Corrected 50-row snapshot imports successfully; verifies DB not corrupted by failed attempt.** |
 | — | R6-5.A.4 | — | Not testable: this task authors the server filter + validation tests. | — |
 | — | R6-5.A.5 | — | Not testable: this task authors the snapshot back-compat tests. | — |
 
@@ -237,6 +246,7 @@ Gate R6-5.0 (Milestone Schema Foundation) ──┐
 | T-R6-5.B.3.3 | R6-5.B.3 | integration | Milestone change emits `{ milestone, phase, stream }` to `onFilterChange`. | Callback receives the full filter triple. |
 | T-R6-5.B.4.1 | R6-5.B.4 | integration | `Header.svelte` `[data-testid="milestone-count"]` renders the real unique-milestone count. | All-`R6` set renders `1`. |
 | T-R6-5.B.4.2 | R6-5.B.4 | integration | Mixed-milestone task set produces the correct count. | Set with `M1` + `R6` tasks renders `2`. |
+| **T-R6-5.B.7** | **R6-5.B.7** | **e2e** | **Doctor → snapshot import → board rendering integration: pre-P5 snapshot imports with milestone backfilled; board starts successfully; `GET /tasks?milestone=R6` returns `{ ok: true, data: [...] }` with all tasks carrying `milestone` field.** | **End-to-end flow works; no HTTP envelope errors; board renders correctly after Doctor import.** |
 | — | R6-5.B.5 | — | Not testable: this task authors the Filters.svelte tests. | — |
 | — | R6-5.B.6 | — | Not testable: this task authors the Header.svelte tests. | — |
 
@@ -247,6 +257,9 @@ Gate R6-5.0 (Milestone Schema Foundation) ──┐
 | T-R6-5.C.1 | R6-5.C.1 | integration | Suite-level meta-test runs `rg -i 'vibe-kanban\|kanban mcp' docs/ templates/ src/ tests/` and asserts zero hits outside the allow-list. | Allow-list = `docs/milestones/revision-6-built-in-tracker/**` + `docs/project-progress.md` Decisions log. Test fails on any other hit. |
 | — | R6-5.C.2 | — | Not testable: this task is the act of running the test suite. | — |
 | T-R6-5.C.3 | R6-5.C.3 | unit | Doc-assertion test asserts MAS-204 and MAS-205 status lines read `active` in `docs/srs.md`. | Both requirement blocks contain `status: active`. |
+| **T-R6-5.C.6.1** | **R6-5.C.6** | **integration** | **Live project DB schema integrity: `PRAGMA integrity_check` returns `'ok'` and `PRAGMA foreign_key_check` returns zero rows.** | **DB has no corruption and no orphaned foreign keys.** |
+| **T-R6-5.C.6.2** | **R6-5.C.6** | **integration** | **Post-migration schema version and constraints: `TRACKER_SCHEMA_VERSION === 2`, every row in `tasks` has `milestone IS NOT NULL`.** | **Schema version is correct; no null milestones exist.** |
+| **T-R6-5.C.6.3** | **R6-5.C.6** | **integration** | **Post-migration indexes exist and are valid: `idx_tasks_milestone` and `idx_tasks_milestone_phase` are present and properly formed.** | **Indexes exist on correct columns with correct types (TEXT, TEXT).** |
 | — | R6-5.C.4 | — | Not testable: `npm run release:check` is an external release-readiness command, not part of the standard suite. | — |
 | — | R6-5.C.5 | — | Not testable: revision document amendment is a documentation edit. | — |
 
@@ -255,12 +268,12 @@ Gate R6-5.0 (Milestone Schema Foundation) ──┐
 | Component | Total Tasks | Testable | Not Testable |
 |-----------|-------------|----------|--------------|
 | Gate R6-5.0 | 7 | 5 | 2 |
-| Stream A | 5 | 3 | 2 |
-| Stream B | 6 | 4 | 2 |
-| Stream C | 5 | 2 | 3 |
-| **Total** | **23** | **14** | **9** |
+| Stream A | **6** | **4** | **2** |
+| Stream B | **7** | **5** | **2** |
+| Stream C | **6** | **4** | **2** |
+| **Total** | **26** | **18** | **8** |
 
-Total tests: **31** (Gate 12 + Stream A 10 + Stream B 7 + Stream C 2 — the 2-test count for C reflects that only R6-5.C.1 and R6-5.C.3 produce in-suite tests; the remaining C tasks are not-testable per the table above).
+Total tests: **40** (Gate 12 + Stream A 13 [includes 3 atomicity tests from R6-5.A.6] + Stream B 8 [includes 1 E2E test from R6-5.B.7] + Stream C 7 [includes 3 schema integrity tests from R6-5.C.6]). The atomicity and schema-integrity tests are critical for data integrity and correctness validation post-migration.
 
 ---
 
