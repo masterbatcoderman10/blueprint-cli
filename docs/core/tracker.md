@@ -165,6 +165,7 @@ blueprint board --headless &
 ```
 
 After spawning, the agent should poll `GET /project` until it succeeds before issuing further tracker requests.
+Any browser-open side-effect from running `blueprint board` is benign and does not interfere with agent operation.
 
 ### Shutdown
 
