@@ -271,6 +271,56 @@ describe('Revision 6 Phase 4 Stream A — tracker export hook', () => {
     expectSnapshotMatchesDb(running.projectRoot, running.db)
   })
 
+  // Supplemental coverage: required by the task contract for the comment PATCH
+  // endpoint, but intentionally left without a Phase 4 plan ID so the approved
+  // Stream A test matrix remains unchanged.
+  it('supplemental coverage: rewrites tasks.export.json after PATCH /tasks/:id/comments/:cid', async () => {
+    const running = await listen()
+    await requestJson(running.origin, '/tasks', {
+      method: 'POST',
+      body: JSON.stringify({
+        id: 'R6-4.A.update-comment',
+        title: 'Update comment',
+        description: 'Task for comment update',
+        state: 'TO-DO',
+        phase: 'Phase 4',
+      }),
+    })
+    const created = await requestJson(running.origin, '/tasks/R6-4.A.update-comment/comments', {
+      method: 'POST',
+      body: JSON.stringify({
+        severity: 'MINOR',
+        body: 'Before update',
+      }),
+    })
+
+    const patched = await requestJson(
+      running.origin,
+      `/tasks/R6-4.A.update-comment/comments/${created.body.data.id}`,
+      {
+        method: 'PATCH',
+        body: JSON.stringify({
+          severity: 'MAJOR',
+          body: 'After update',
+          line: 'src/tracker/server.ts:1',
+        }),
+      },
+    )
+
+    expect(patched.status).toBe(200)
+    expect(readSnapshotJson(running.projectRoot).comments).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: created.body.data.id,
+          severity: 'MAJOR',
+          body: 'After update',
+          line: 'src/tracker/server.ts:1',
+        }),
+      ]),
+    )
+    expectSnapshotMatchesDb(running.projectRoot, running.db)
+  })
+
   it('T-R6-4.A.1.5: rewrites tasks.export.json after DELETE /tasks/:id/comments/:cid and reflects reply cascade', async () => {
     const running = await listen()
     await requestJson(running.origin, '/tasks', {
