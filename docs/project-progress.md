@@ -4,7 +4,7 @@
 **Kanban**: blueprint-cli
 **Current Milestone**: Revision 6 — Built-in Task Tracker
 **Current Phase**: Phase 3 — Protocol Rewrite
-**Status**: Revision 6 Phase 2 complete; Phase 3 active
+**Status**: Revision 6 Phase 3 planned + test-planned, ready for execution
 
 ---
 
@@ -55,6 +55,8 @@
 - 2026-05-17: Identified Revision 6 — Built-in Task Tracker to replace the external `vibe-kanban` MCP dependency with a built-in per-project task tracker (SQLite backend + local Svelte SPA) provisioned by the CLI. Impact: hybrid additive + modifying — new tracker backend / SPA / `blueprint board` command plus protocol rewrites, tracker field renaming, and REWORK-state adoption. SRS requirements MAS-204 and MAS-205 created (status: approved-pending-implementation). Revision document at `docs/milestones/revision-6-built-in-tracker/revision-6-built-in-tracker.md`.
 - 2026-05-18: Revision 6 Phase 1 — Tracker Core (Schema + CRUD Server) completed. All tasks done (including tweak R6-1.TW1 replacing `node:sqlite` with `better-sqlite3` for broader Node.js compatibility), DoD satisfied, full test suite green (531 tests, 87 files).
 - 2026-05-18: Phase 2 — Board SPA + blueprint board Command completed. All tasks done, DoD satisfied, full test suite green (688 tests, 110 files).
+- 2026-05-18: SRS repair — added MAS-204 (Built-in Task Tracker) and MAS-205 (Local Project Board UI) to `docs/srs.md` (status `approved-pending-implementation`, assigned milestone Revision 6). Revision 6 document had referenced both requirements as created but they were missing from the SRS index; pre-phase repair commit unblocks R6 Phase 3 execution per `phase-planning.md` preconditions. Both transition to `active` in R6 Phase 5.
+- 2026-05-18: Revision 6 Phase 3 — Protocol Rewrite was planned and test-planned. Phase document committed at `docs/milestones/revision-6-built-in-tracker/phase-3-protocol-rewrite.md` with Gate R6-3.0 (Tracker Contract Canon) + Stream A (execution-side docs) + Stream B (planning-side docs, featuring the `health-check.md` rewrite for agent-initiated background board boot) + Stream C (project-level + templates mirror, depends on A + B). 26 tasks, 31 tests. Ready for execution.
 
 ---
 
