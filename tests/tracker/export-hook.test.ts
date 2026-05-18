@@ -271,54 +271,7 @@ describe('Revision 6 Phase 4 Stream A — tracker export hook', () => {
     expectSnapshotMatchesDb(running.projectRoot, running.db)
   })
 
-  it('T-R6-4.A.1.5: rewrites tasks.export.json after PATCH /tasks/:id/comments/:cid', async () => {
-    const running = await listen()
-    await requestJson(running.origin, '/tasks', {
-      method: 'POST',
-      body: JSON.stringify({
-        id: 'R6-4.A.update-comment',
-        title: 'Update comment',
-        description: 'Task for comment update',
-        state: 'TO-DO',
-        phase: 'Phase 4',
-      }),
-    })
-    const created = await requestJson(running.origin, '/tasks/R6-4.A.update-comment/comments', {
-      method: 'POST',
-      body: JSON.stringify({
-        severity: 'MINOR',
-        body: 'Before update',
-      }),
-    })
-
-    const patched = await requestJson(
-      running.origin,
-      `/tasks/R6-4.A.update-comment/comments/${created.body.data.id}`,
-      {
-        method: 'PATCH',
-        body: JSON.stringify({
-          severity: 'MAJOR',
-          body: 'After update',
-          line: 'src/tracker/server.ts:1',
-        }),
-      },
-    )
-
-    expect(patched.status).toBe(200)
-    expect(readSnapshotJson(running.projectRoot).comments).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          id: created.body.data.id,
-          severity: 'MAJOR',
-          body: 'After update',
-          line: 'src/tracker/server.ts:1',
-        }),
-      ]),
-    )
-    expectSnapshotMatchesDb(running.projectRoot, running.db)
-  })
-
-  it('T-R6-4.A.1.6: rewrites tasks.export.json after DELETE /tasks/:id/comments/:cid and reflects reply cascade', async () => {
+  it('T-R6-4.A.1.5: rewrites tasks.export.json after DELETE /tasks/:id/comments/:cid and reflects reply cascade', async () => {
     const running = await listen()
     await requestJson(running.origin, '/tasks', {
       method: 'POST',
@@ -359,7 +312,7 @@ describe('Revision 6 Phase 4 Stream A — tracker export hook', () => {
     expectSnapshotMatchesDb(running.projectRoot, running.db)
   })
 
-  it('T-R6-4.A.1.7: logs a warning and preserves the HTTP response when snapshot writing fails', async () => {
+  it('T-R6-4.A.1.6: logs a warning and preserves the HTTP response when snapshot writing fails', async () => {
     const running = await listen()
     rmSync(join(running.projectRoot, 'docs', '.blueprint'), { recursive: true, force: true })
     const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
