@@ -78,7 +78,7 @@ describe('T-R3-1.B.2.3: Doctor does not emit drift findings for customized docs/
 describe('T-R3-1.B.2.4: Doctor repair restores docs/srs.md from the bundled template', () => {
   it('creates docs/srs.md with project-name interpolation and clears the missing-file finding on re-audit', async () => {
     const projectDir = await makeTempDir('legacy-srs-project')
-    await writeCanonicalProject(projectDir, { includeSrsDoc: false })
+    await writeCanonicalProject(projectDir, { includeSrsDoc: false, includeTracker: true })
 
     const firstAudit = await runDoctorAudit(projectDir)
     const repairPlan = await createRepairPlan(firstAudit.findings, projectDir)
@@ -108,6 +108,7 @@ describe('T-R3-1.B.3.1: Legacy project upgrade path remains stable through audit
     const projectDir = await makeTempDir('compat-upgrade-project')
     await writeCanonicalProject(projectDir, {
       includeSrsDoc: false,
+      includeTracker: true,
       editableDocs: {
         'docs/prd.md': '# Custom PRD\n',
         'docs/project-progress.md': '# Custom Progress\n',

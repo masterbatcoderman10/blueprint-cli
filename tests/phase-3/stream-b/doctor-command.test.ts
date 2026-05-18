@@ -38,7 +38,7 @@ describe('T-B.1.1: Doctor is registered in the CLI runtime', () => {
 describe('T-B.1.2: CLI dispatch invokes doctor through runCli([\'doctor\'])', () => {
   it('returns exitCode 0 for a valid Blueprint project', async () => {
     const projectDir = await makeTempDir()
-    await writeCanonicalProject(projectDir)
+    await writeCanonicalProject(projectDir, { includeTracker: true })
 
     const originalCwd = process.cwd()
     process.chdir(projectDir)

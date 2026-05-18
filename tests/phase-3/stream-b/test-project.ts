@@ -3,11 +3,14 @@ import { dirname, join } from 'node:path'
 
 import { resolveAllCoreTemplatePaths, resolveTemplatePath } from '../../../src/doctor/inventory'
 import { MANIFEST_RELATIVE_PATH, TEMPLATE_VERSION } from '../../../src/doctor/manifest'
+import { openDb } from '../../../src/tracker/db'
 
 export interface CanonicalProjectOptions {
   includeManifest?: boolean
   managedFiles?: string[]
   includeSrsDoc?: boolean
+  /** Write a minimal tracker DB with seeded project metadata so Doctor audit returns clean. */
+  includeTracker?: boolean
   editableDocs?: Partial<
     Record<'docs/prd.md' | 'docs/project-progress.md' | 'docs/conventions.md' | 'docs/srs.md', string>
   >
@@ -52,6 +55,13 @@ export async function writeCanonicalProject(
 
   if (!includeManifest) {
     return
+  }
+
+  if (options.includeTracker) {
+    const handle = openDb(dir)
+    const now = Date.now()
+    handle.db.prepare('INSERT OR REPLACE INTO project_meta (id, name, tagline, created_at, updated_at) VALUES (1, ?, ?, ?, ?)').run('test-project', 'Test project', now, now)
+    handle.db.close()
   }
 
   const manifestPath = join(dir, MANIFEST_RELATIVE_PATH)

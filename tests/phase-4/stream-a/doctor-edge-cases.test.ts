@@ -59,7 +59,7 @@ describe('T-A.3.1: doctor reports malformed metadata with actionable validation 
 describe('T-A.3.2: doctor repairs mixed missing and drifted canonical files together', () => {
   it('detects both classes of issues and repairs them in one cycle', async () => {
     const projectDir = await mkdtempJoinTmpdir('blueprint-phase4-doctor-')
-    await writeCanonicalProject(projectDir)
+    await writeCanonicalProject(projectDir, { includeTracker: true })
 
     const missingPath = join(projectDir, 'docs', 'core', 'review.md')
     const driftedPath = join(projectDir, 'docs', 'core', 'execution.md')
@@ -82,7 +82,7 @@ describe('T-A.3.2: doctor repairs mixed missing and drifted canonical files toge
 describe('T-A.3.3: doctor decline and post-repair revalidation flow', () => {
   it('leaves the project unchanged when repair is declined, then reaches a stable clean state after acceptance', async () => {
     const projectDir = await mkdtempJoinTmpdir('blueprint-phase4-doctor-')
-    await writeCanonicalProject(projectDir)
+    await writeCanonicalProject(projectDir, { includeTracker: true })
 
     const driftedPath = join(projectDir, 'docs', 'core', 'execution.md')
     await writeFile(driftedPath, '# Drifted Content\n', 'utf-8')

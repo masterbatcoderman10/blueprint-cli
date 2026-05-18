@@ -71,7 +71,7 @@ describe('T-B.3.3: Doctor ignores non-managed root agent files', () => {
 describe('T-B.3.4: Doctor reports a clean result when all canonical files match', () => {
   it('returns no integrity findings for a fully aligned Blueprint project', async () => {
     const projectDir = await makeTempDir()
-    await writeCanonicalProject(projectDir, { managedFiles: ['CLAUDE.md', 'AGENTS.md'] })
+    await writeCanonicalProject(projectDir, { managedFiles: ['CLAUDE.md', 'AGENTS.md'], includeTracker: true })
 
     const result = await runDoctorAudit(projectDir)
 
