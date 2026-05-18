@@ -13,10 +13,28 @@ export interface MissingManifestFinding {
   message: string
 }
 
+export interface MissingTrackerDbFinding {
+  kind: 'missing-tracker-db'
+  targetPath: string
+  repairable: true
+  message: string
+}
+
 export interface DriftedFileFinding {
   kind: 'drifted-file'
   targetPath: string
   repairable: true
+  message: string
+}
+
+export interface TrackerDbDriftFinding {
+  kind: 'tracker-db-drift'
+  targetPath: string
+  cause: 'schema-stale' | 'integrity-fail'
+  repairable: boolean
+  observedVersion?: number
+  expectedVersion?: number
+  issues?: string[]
   message: string
 }
 
@@ -40,7 +58,9 @@ export interface ManifestValidationErrorFinding {
 export type DoctorFinding =
   | MissingStructureFinding
   | MissingManifestFinding
+  | MissingTrackerDbFinding
   | DriftedFileFinding
+  | TrackerDbDriftFinding
   | TemplateVersionMismatchFinding
   | ManifestValidationErrorFinding
 
@@ -72,12 +92,57 @@ export function createMissingManifestFinding(targetPath: string): MissingManifes
   }
 }
 
+export function createMissingTrackerDbFinding(targetPath: string): MissingTrackerDbFinding {
+  return {
+    kind: 'missing-tracker-db',
+    targetPath,
+    repairable: true,
+    message: `Tracker database is missing: ${targetPath}`,
+  }
+}
+
 export function createDriftedFileFinding(targetPath: string): DriftedFileFinding {
   return {
     kind: 'drifted-file',
     targetPath,
     repairable: true,
     message: `Canonical file content differs from the bundled template: ${targetPath}`,
+  }
+}
+
+export function createTrackerDbDriftFinding(
+  input:
+    | {
+        targetPath: string
+        cause: 'schema-stale'
+        observedVersion: number
+        expectedVersion: number
+      }
+    | {
+        targetPath: string
+        cause: 'integrity-fail'
+        issues: string[]
+      },
+): TrackerDbDriftFinding {
+  if (input.cause === 'schema-stale') {
+    return {
+      kind: 'tracker-db-drift',
+      targetPath: input.targetPath,
+      cause: 'schema-stale',
+      repairable: true,
+      observedVersion: input.observedVersion,
+      expectedVersion: input.expectedVersion,
+      message: `Tracker database schema is stale at ${input.targetPath}: found user_version ${input.observedVersion}, expected ${input.expectedVersion}.`,
+    }
+  }
+
+  return {
+    kind: 'tracker-db-drift',
+    targetPath: input.targetPath,
+    cause: 'integrity-fail',
+    repairable: false,
+    issues: input.issues,
+    message: `Tracker database integrity check failed at ${input.targetPath}: ${input.issues.join('; ')}`,
   }
 }
 

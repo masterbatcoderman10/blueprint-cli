@@ -3,6 +3,7 @@ import { runInitOnboardingFlow } from '../init/onboarding'
 import { executeScaffold } from '../init/archive-engine'
 import { clackPromptApi } from '../init/prompts'
 import { openDb } from '../tracker/db'
+import { seedProjectMeta } from '../tracker/project-meta'
 
 export const initCommand: CommandDefinition = {
   name: 'init',
@@ -15,16 +16,12 @@ export const initCommand: CommandDefinition = {
 
     const result = await executeScaffold(process.cwd(), options)
     const trackerDb = openDb(process.cwd())
-    const now = Date.now()
 
     try {
-      trackerDb.db
-        .prepare(
-          `INSERT OR REPLACE INTO project_meta
-            (id, name, tagline, phase_count, stream_count, created_at, updated_at)
-            VALUES (1, ?, ?, NULL, NULL, COALESCE((SELECT created_at FROM project_meta WHERE id = 1), ?), ?)`,
-        )
-        .run(options.projectName, options.projectTagline, now, now)
+      seedProjectMeta(trackerDb.db, {
+        name: options.projectName,
+        tagline: options.projectTagline,
+      })
     } finally {
       trackerDb.close()
     }

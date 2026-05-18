@@ -5,13 +5,17 @@ import {
   type ManifestValidationErrorFinding,
   type MissingManifestFinding,
   type MissingStructureFinding,
+  type MissingTrackerDbFinding,
   type TemplateVersionMismatchFinding,
+  type TrackerDbDriftFinding,
 } from './findings'
 
 export interface DoctorFindingGroups {
   missingStructure: MissingStructureFinding[]
   driftedFiles: DriftedFileFinding[]
   missingManifest: MissingManifestFinding[]
+  missingTrackerDb: MissingTrackerDbFinding[]
+  trackerDbDrift: TrackerDbDriftFinding[]
   versionMismatch: TemplateVersionMismatchFinding[]
   validationErrors: ManifestValidationErrorFinding[]
 }
@@ -21,6 +25,12 @@ export function groupDoctorFindings(findings: DoctorFinding[]): DoctorFindingGro
     missingStructure: findings.filter((finding): finding is MissingStructureFinding => finding.kind === 'missing-structure'),
     driftedFiles: findings.filter((finding): finding is DriftedFileFinding => finding.kind === 'drifted-file'),
     missingManifest: findings.filter((finding): finding is MissingManifestFinding => finding.kind === 'missing-manifest'),
+    missingTrackerDb: findings.filter(
+      (finding): finding is MissingTrackerDbFinding => finding.kind === 'missing-tracker-db',
+    ),
+    trackerDbDrift: findings.filter(
+      (finding): finding is TrackerDbDriftFinding => finding.kind === 'tracker-db-drift',
+    ),
     versionMismatch: findings.filter(
       (finding): finding is TemplateVersionMismatchFinding => finding.kind === 'template-version-mismatch',
     ),
@@ -56,6 +66,20 @@ export function renderDoctorReport(result: DoctorAuditResult): string {
     lines.push('Legacy manifest bootstrap required:')
     for (const finding of groups.missingManifest) {
       lines.push(`- ${finding.targetPath}`)
+    }
+  }
+
+  if (groups.missingTrackerDb.length > 0) {
+    lines.push('Tracker database migration required:')
+    for (const finding of groups.missingTrackerDb) {
+      lines.push(`- ${finding.message}`)
+    }
+  }
+
+  if (groups.trackerDbDrift.length > 0) {
+    lines.push('Tracker database drift detected:')
+    for (const finding of groups.trackerDbDrift) {
+      lines.push(`- ${finding.message}`)
     }
   }
 
