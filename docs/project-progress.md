@@ -3,8 +3,8 @@
 **Project**: blueprint-cli
 **Tracker**: blueprint-cli
 **Current Milestone**: Revision 6 — Built-in Task Tracker
-**Current Phase**: Phase 3 — Protocol Rewrite
-**Status**: Revision 6 Phase 3 planned + test-planned, ready for execution
+**Current Phase**: Phase 4 — Migration & Doctor Integration
+**Status**: Revision 6 in progress — Phase 4 not started
 
 ---
 
@@ -57,6 +57,7 @@
 - 2026-05-18: Phase 2 — Board SPA + blueprint board Command completed. All tasks done, DoD satisfied, full test suite green (688 tests, 110 files).
 - 2026-05-18: SRS repair — added MAS-204 (Built-in Task Tracker) and MAS-205 (Local Project Board UI) to `docs/srs.md` (status `approved-pending-implementation`, assigned milestone Revision 6). Revision 6 document had referenced both requirements as created but they were missing from the SRS index; pre-phase repair commit unblocks R6 Phase 3 execution per `phase-planning.md` preconditions. Both transition to `active` in R6 Phase 5.
 - 2026-05-18: Revision 6 Phase 3 — Protocol Rewrite was planned and test-planned. Phase document committed at `docs/milestones/revision-6-built-in-tracker/phase-3-protocol-rewrite.md` with Gate R6-3.0 (Tracker Contract Canon) + Stream A (execution-side docs) + Stream B (planning-side docs, featuring the `health-check.md` rewrite for agent-initiated background board boot) + Stream C (project-level + templates mirror, depends on A + B). 26 tasks, 31 tests. Ready for execution.
+- 2026-05-18: Revision 6 Phase 3 — Protocol Rewrite completed. All tasks done, DoD satisfied, full test suite green (757 tests, 114 test files).
 
 ---
 
@@ -101,7 +102,7 @@ R5 — Orchestration Protocol
 R6 — Built-in Task Tracker
 ├── Phase 1 — Tracker Core (Schema + CRUD Server) ✓
 ├── Phase 2 — Board SPA + blueprint board Command ✓
-├── Phase 3 — Protocol Rewrite ●
+├── Phase 3 — Protocol Rewrite ✓
 ├── Phase 4 — Migration & Doctor Integration ○
 └── Phase 5 — Verification & Cleanup ○
 M2 — Cross-Project Context (Optional Post-MVP)
@@ -118,7 +119,7 @@ M3 — Workflow Visibility Enhancements (Optional Future)
 > The agent should surface these at session start.
 
 - **Revision 6 — Built-in Task Tracker**
-  - **Status:** In Progress (Phase 2 complete)
+  - **Status:** In Progress (Phase 3 complete)
   - **Priority:** Current
   - **Scope:** Replace the external `vibe-kanban` MCP dependency with a built-in per-project task tracker (SQLite backend + local Svelte SPA) provisioned by the CLI, including protocol rewrites and REWORK-state adoption.
   - **Impact:** Hybrid additive + modifying — tracker backend, local board UI, task-state expansion, and cross-doc/template replacement of kanban MCP references. SRS: MAS-204 and MAS-205 created.
