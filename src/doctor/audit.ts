@@ -9,6 +9,7 @@ import {
   createManifestValidationErrorFinding,
   createMissingManifestFinding,
   createMissingStructureFinding,
+  createMissingTrackerDbFinding,
   createTemplateVersionMismatchFinding,
 } from './findings'
 import { loadManifestState, ManifestParseError, resolveAllCoreTemplatePaths, resolveTemplatePath } from './inventory'
@@ -31,6 +32,15 @@ async function pathExists(path: string): Promise<boolean> {
   }
 }
 
+export async function auditTrackerDb(projectDir: string): Promise<DoctorFinding[]> {
+  const trackerDbRelativePath = 'docs/.blueprint/tasks.db'
+  if (await pathExists(join(projectDir, trackerDbRelativePath))) {
+    return []
+  }
+
+  return [createMissingTrackerDbFinding(trackerDbRelativePath)]
+}
+
 export async function runDoctorAudit(projectDir: string): Promise<DoctorAuditResult> {
   const findings: DoctorFinding[] = []
   const repairableEditableSrsPath = 'docs/srs.md'
@@ -46,6 +56,8 @@ export async function runDoctorAudit(projectDir: string): Promise<DoctorAuditRes
   if (!(await pathExists(join(projectDir, repairableEditableSrsPath)))) {
     findings.push(createMissingStructureFinding(repairableEditableSrsPath, 'file'))
   }
+
+  findings.push(...(await auditTrackerDb(projectDir)))
 
   for (const { relativePath, absolutePath } of resolveAllCoreTemplatePaths()) {
     const templateContent = await readFile(absolutePath, 'utf-8')
