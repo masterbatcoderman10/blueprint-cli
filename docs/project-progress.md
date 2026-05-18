@@ -4,7 +4,7 @@
 **Tracker**: blueprint-cli
 **Current Milestone**: Revision 6 — Built-in Task Tracker
 **Current Phase**: Phase 4 — Migration & Doctor Integration
-**Status**: Revision 6 in progress — Phase 4 planned + test-planned, ready for execution
+**Status**: Revision 6 in progress — Phase 4 complete, Phase 5 pending
 
 ---
 
@@ -61,6 +61,7 @@
 - 2026-05-18: Revision 6 Phase 4 — Migration & Doctor Integration was planned. Phase document committed at `docs/milestones/revision-6-built-in-tracker/phase-4-migration-doctor-integration.md` with Gate R6-4.0 (Migration Foundation) + Stream A (server-side JSON export hook) + Stream B (pre-R6 migration via composite Doctor repair: create+migrate DB, import from `tasks.export.json` if present, seed `project_meta`, inject `.gitignore` line) + Stream C (schema-currency + DB-integrity audit via read-only DB open) + Stream D (verification, traceability, repo-wide `vibe-kanban` audit). 20 tasks, ~16.75 duration units. Reuses existing `TRACKER_SCHEMA_VERSION` from Phase 1; no new schema-version constant. JSON snapshot contract: bidirectional, atomically written by the server on every mutation, flat `{ tasks, comments, meta }` shape, consumed by Doctor on missing DB. Ready for test planning.
 - 2026-05-18: Revision 6 Phase 4 — Migration & Doctor Integration test plan committed. 46 tests across Gate (18) + Stream A (7) + Stream B (8) + Stream C (8) + Stream D (5). 17 of 20 tasks testable; the 3 not-testable tasks are the test-file-authoring tasks (R6-4.A.3, R6-4.B.4, R6-4.C.3) whose coverage is delivered by their sibling implementation tests. Phase document ready for execution.
 - 2026-05-18: JSON snapshot contract decided — bidirectional, atomically written by the tracker server on every successful mutation (`POST/PATCH/DELETE` on tasks and comments), consumed by Doctor on missing DB. Shape is flat `{ tasks, comments, meta }` serialized from every table row. Write uses temp-file + atomic rename at `docs/.blueprint/tasks.export.json`. Failures are caught, logged as `[tracker] snapshot write failed`, and never block the HTTP response. Doctor reads the snapshot via `readSnapshot`, validates shape via `assertSnapshot`, and imports via `importSnapshot` under a single transaction (clear + insert).
+- 2026-05-18: Revision 6 Phase 4 — Migration & Doctor Integration completed. All tasks done, DoD satisfied, full test suite green (805 tests, 120 files). 4 regression bugs found during phase completion (pre-existing test fixtures lacked tracker DB), all fixed by adding `includeTracker` option to shared test helper.
 
 ---
 
@@ -106,7 +107,7 @@ R6 — Built-in Task Tracker
 ├── Phase 1 — Tracker Core (Schema + CRUD Server) ✓
 ├── Phase 2 — Board SPA + blueprint board Command ✓
 ├── Phase 3 — Protocol Rewrite ✓
-├── Phase 4 — Migration & Doctor Integration ○
+├── Phase 4 — Migration & Doctor Integration ✓
 └── Phase 5 — Verification & Cleanup ○
 M2 — Cross-Project Context (Optional Post-MVP)
 └── Phase 1 — TBD ○
