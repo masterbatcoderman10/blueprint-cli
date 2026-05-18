@@ -201,6 +201,7 @@ Gate R6-5.0 (Milestone Schema Foundation) ──┐
 | T-R6-5.0.4.3 | R6-5.0.4 | integration | Migration is idempotent on a v2 DB. | Second `applySchema` call is a no-op; `user_version` stays at `2`; no row mutation. |
 | T-R6-5.0.4.4 | R6-5.0.4 | integration | Migration aborts atomically when a row's ID cannot be parsed. | Transaction rolls back; `user_version` stays at `1`; error names the offending ID(s). |
 | T-R6-5.0.5 | R6-5.0.5 | integration | `GET /tasks` payload includes the `milestone` field on every row. | Every task row in the response has a non-empty `milestone`. |
+| **T-R6-5.0.5.HTTP** | **R6-5.0.5** | **integration** | **HTTP envelope contract: `GET /tasks` returns `{ ok: true, data: [...] }`**. | **Response body has `ok: true` and `data` is an array; no bare `{ data }` shape**. |
 | — | R6-5.0.6 | — | Not testable: this task authors the migration tests covering R6-5.0.3 and R6-5.0.4. | — |
 | — | R6-5.0.7 | — | Not testable: this task updates the schema tests covering R6-5.0.2. | — |
 
@@ -211,13 +212,16 @@ Gate R6-5.0 (Milestone Schema Foundation) ──┐
 | T-R6-5.A.1.1 | R6-5.A.1 | integration | `GET /tasks?milestone=R6` returns only `R6` tasks. | Response contains zero non-`R6` rows. |
 | T-R6-5.A.1.2 | R6-5.A.1 | integration | `GET /tasks?milestone=R6&phase=R6-3&stream=A` AND-combines all three filters. | Response contains only `R6-3.A.*` tasks. |
 | T-R6-5.A.1.3 | R6-5.A.1 | integration | `GET /tasks?milestone=` (empty value) returns 400. | Status `400`; error body names the bad param. |
+| **T-R6-5.A.1.HTTP** | **R6-5.A.1** | **integration** | **HTTP envelope contract: `GET /tasks?milestone=R6` returns `{ ok: true, data: [...] }` and error at `?milestone=` returns `{ ok: false, error: { code, message } }`**. | **Success response has `ok: true` field; error response has `ok: false` field. No bare envelope shape**. |
 | T-R6-5.A.2.1 | R6-5.A.2 | integration | `POST /tasks` body without `milestone` auto-derives from a well-formed ID. | `'R6-5.A.1'` body → row stored with `milestone='R6'`. |
 | T-R6-5.A.2.2 | R6-5.A.2 | integration | Explicit `milestone` in `POST /tasks` body wins over ID-derived value. | Body `{ id: 'R6-5.A.1', milestone: 'M1' }` → row stored with `milestone='M1'`. |
 | T-R6-5.A.2.3 | R6-5.A.2 | integration | `POST /tasks` rejected when `milestone` absent AND ID unparseable. | Status `400`; row not created. |
+| **T-R6-5.A.2.HTTP** | **R6-5.A.2** | **integration** | **HTTP envelope contract: `POST /tasks` success returns `{ ok: true, data: Task }` and validation error returns `{ ok: false, error: { code, message } }`**. | **Success response wraps new task in `ok: true, data` envelope; error response has `ok: false` with error details**. |
 | T-R6-5.A.2.4 | R6-5.A.2 | integration | `PATCH /tasks/:id` accepts a `milestone` update. | Subsequent `GET` shows the new value; empty string still rejected. |
 | T-R6-5.A.3.1 | R6-5.A.3 | integration | `importSnapshot` derives `milestone` from ID when missing on the row. | Pre-P5 snapshot imports cleanly; every row has `milestone` set. |
 | T-R6-5.A.3.2 | R6-5.A.3 | integration | `importSnapshot` aborts atomically on a malformed-ID row and surfaces an aggregated error. | DB row count unchanged; error message names the offending ID(s). |
 | T-R6-5.A.3.3 | R6-5.A.3 | integration | Snapshot writer includes `milestone`; export → import round-trip preserves the field. | Re-imported rows match original rows exactly. |
+| **T-R6-5.A.3.HTTP** | **R6-5.A.3** | **integration** | **HTTP envelope contract: snapshot export JSON has `{ tasks: [...], comments: [...], meta: {...} }` shape (no `ok` field on snapshots, as they are internal)**. | **Snapshot JSON parses correctly and round-trip import produces identical task data**. |
 | — | R6-5.A.4 | — | Not testable: this task authors the server filter + validation tests. | — |
 | — | R6-5.A.5 | — | Not testable: this task authors the snapshot back-compat tests. | — |
 
@@ -226,6 +230,7 @@ Gate R6-5.0 (Milestone Schema Foundation) ──┐
 | Test ID | Task | Type | Description | Expected Result |
 |---------|------|------|-------------|-----------------|
 | T-R6-5.B.1 | R6-5.B.1 | unit | `fetchTasks` appends `?milestone=` to URL when filter supplied. | Captured fetch URL includes `milestone=R6` and `phase=` / `stream=` when set. |
+| **T-R6-5.B.1.HTTP** | **R6-5.B.1** | **unit** | **Client-side HTTP envelope handling: `fetchTasks` response `{ ok: true, data: [...] }` is extracted correctly; `{ ok: false, error }` is rejected**. | **`listTasks` returns `Result` type; client correctly uses `response.ok` and `response.data` fields**. |
 | T-R6-5.B.2 | R6-5.B.2 | unit | Store filter state holds `milestone` alongside `phase` and `stream` and passes it through. | Setting `milestone` triggers a `fetchTasks` call with the new value. |
 | T-R6-5.B.3.1 | R6-5.B.3 | integration | `Filters.svelte` renders a Milestone dropdown positioned left of the Phase dropdown. | DOM order: Milestone, Phase, Stream. |
 | T-R6-5.B.3.2 | R6-5.B.3 | integration | Milestone dropdown lists unique milestones from the task set, alphabetically sorted. | Options match `[...new Set(tasks.map(t => t.milestone))].sort()`. |
@@ -276,23 +281,103 @@ Total tests: **31** (Gate 12 + Stream A 10 + Stream B 7 + Stream C 2 — the 2-t
 
 ---
 
+## HTTP Response Envelope Contract
+
+**CRITICAL: This section defines the exact shape of all HTTP responses. Violations cause client-side failures (e.g., `.map() is not a function` when the client receives `{ data: [...] }` instead of `{ ok: true, data: [...] }`). Every handler must validate this contract.**
+
+### Success Response Format
+
+All successful HTTP responses (`2xx` status) MUST use the envelope:
+
+```json
+{
+  "ok": true,
+  "data": <T>
+}
+```
+
+- **`ok: true`** — Boolean literal, always present on success.
+- **`data: <T>`** — The typed response payload (Task, Task[], ProjectMeta, etc.). Type varies by endpoint.
+
+Examples:
+- `GET /tasks` → `{ ok: true, data: [ { id: 'R6-5.A.1', milestone: 'R6', ... }, ... ] }`
+- `POST /tasks` → `{ ok: true, data: { id: 'R6-5.A.1', milestone: 'R6', ... } }`
+- `GET /project` → `{ ok: true, data: { name: '...', phaseCount: null, ... } }`
+
+### Error Response Format
+
+All error HTTP responses (`4xx` / `5xx` status) MUST use the envelope:
+
+```json
+{
+  "ok": false,
+  "error": {
+    "code": "<error_code>",
+    "message": "<human_readable_message>"
+  }
+}
+```
+
+- **`ok: false`** — Boolean literal, always present on error.
+- **`error.code`** — Machine-readable error identifier (e.g., `'task_not_found'`, `'invalid_state'`, `'duplicate_id'`). Used for programmatic handling.
+- **`error.message`** — Human-readable message describing the error. May include context (e.g., field names, rejected values).
+
+Examples:
+- `GET /tasks?milestone=` → `{ ok: false, error: { code: 'invalid_milestone', message: 'Milestone filter cannot be empty.' } }`
+- `POST /tasks` (missing milestone + unparseable ID) → `{ ok: false, error: { code: 'invalid_milestone', message: 'Milestone required or auto-derivable from task ID. Received ID 'orphan-task' does not match ^[MR]\\d+-.' } }`
+- `GET /tasks/missing-id` → `{ ok: false, error: { code: 'task_not_found', message: 'Task 'missing-id' was not found.' } }`
+
+### Snapshot Export Format (Exception)
+
+Snapshots exported to `docs/.blueprint/tasks.export.json` are internal files and do NOT use the HTTP envelope. They use a flat shape:
+
+```json
+{
+  "tasks": [ { id, title, ... }, ... ],
+  "comments": [ { id, task_id, ... }, ... ],
+  "meta": { name, tagline, ... }
+}
+```
+
+The snapshot has no `ok` field because it is consumed directly by Doctor, not via HTTP.
+
+### Validation Rules for Implementers
+
+1. **Every HTTP handler MUST wrap its response via `dataResult(status, data)` (success) or `errorResult(code, message)` (error).**
+   - These functions ensure the envelope is applied consistently.
+   - Do NOT construct envelope objects manually; use the helper functions.
+
+2. **Every test MUST validate the full envelope, not just the `data` field.**
+   - ❌ BAD: `expect(response.body).toHaveProperty('data')`
+   - ✅ GOOD: `expect(response.body).toEqual({ ok: true, data: {...} })`
+   - ✅ GOOD: `expect(response.body).toMatchObject({ ok: true, data: {...} })`
+
+3. **Client-side code (`src/tracker/spa/lib/api.ts`) MUST check `response.ok` and handle both success and error cases.**
+   - Do NOT assume success or bare `{ data }` responses.
+   - Properly extract `response.data` on `response.ok === true` and `response.error` on `response.ok === false`.
+
+4. **E2E and integration tests MUST verify that responses match the expected envelope on both happy path and error cases.**
+   - Test at least one success endpoint (e.g., `GET /tasks`, `POST /tasks`) and one error case (e.g., empty filter, bad ID).
+
+---
+
 ## Test Scenarios
 
 ### Happy Path
 
-- [ ] Fresh `blueprint init` on a new project produces a v2 schema; first `POST /tasks` with ID `'M1-1.0.1'` auto-derives `milestone='M1'`.
+- [ ] Fresh `blueprint init` on a new project produces a v2 schema; first `POST /tasks` with ID `'M1-1.0.1'` auto-derives `milestone='M1'` and returns `{ ok: true, data: Task }`.
 - [ ] Existing project DB (v1) is opened by `blueprint board`; migration backfills milestone on every historical task; board renders the milestone count as `1` (all `R6`).
-- [ ] User opens the board, picks `R6` in Milestone ▾, then `R6-4` in Phase ▾, then `A` in Stream ▾ — board narrows to only `R6-4.A.*` tasks.
-- [ ] Doctor encounters a missing DB, finds a pre-P5 `tasks.export.json`, and imports it — milestone backfilled from IDs; project state restored.
+- [ ] User opens the board, picks `R6` in Milestone ▾, then `R6-4` in Phase ▾, then `A` in Stream ▾ — board narrows to only `R6-4.A.*` tasks; all HTTP responses use correct envelope.
+- [ ] Doctor encounters a missing DB, finds a pre-P5 `tasks.export.json`, and imports it — milestone backfilled from IDs; project state restored; final `GET /tasks` returns `{ ok: true, data: [...] }`.
 
 ### Edge Cases
 
-- [ ] Snapshot import with one row whose ID is malformed (e.g., `'orphan-task'`) aborts atomically with an aggregated error naming the offending ID; DB remains untouched.
-- [ ] `POST /tasks` body omits `milestone` and supplies an ID that does not match `^[MR]\d+-` → 400 with a clear message.
-- [ ] `GET /tasks?milestone=` (empty value) → 400 (no silent unfiltered fallback).
-- [ ] v1 → v2 migration encounters the legacy long-form phase row (`'Phase 4 — Migration & Doctor Integration'`) and normalizes it to `'R6-4'` while backfilling `milestone='R6'`.
-- [ ] Re-opening a v2 DB does not re-run the migration (idempotency).
-- [ ] SPA filter row: clearing the Milestone selection while Phase and Stream remain selected leaves the latter two active and broadens the milestone scope only.
+- [ ] Snapshot import with one row whose ID is malformed (e.g., `'orphan-task'`) aborts atomically with `{ ok: false, error: { code: '...', message: '...' } }` naming the offending ID; DB remains untouched.
+- [ ] `POST /tasks` body omits `milestone` and supplies an ID that does not match `^[MR]\d+-` → status 400, returns `{ ok: false, error: {...} }` with a clear message.
+- [ ] `GET /tasks?milestone=` (empty value) → status 400, returns `{ ok: false, error: {...} }` (no silent unfiltered fallback).
+- [ ] v1 → v2 migration encounters the legacy long-form phase row (`'Phase 4 — Migration & Doctor Integration'`) and normalizes it to `'R6-4'` while backfilling `milestone='R6'`; subsequent `GET /tasks` returns `{ ok: true, data: [...] }` with correct values.
+- [ ] Re-opening a v2 DB does not re-run the migration (idempotency); `GET /tasks` continues to return correct envelope.
+- [ ] SPA filter row: clearing the Milestone selection while Phase and Stream remain selected leaves the latter two active and broadens the milestone scope only; all intermediate fetches use correct envelope.
 
 ---
 
