@@ -37,8 +37,8 @@ describe('T-A.2: Core protocol template files', () => {
     const entries = await readdir(TEMPLATES_CORE_DIR)
     const mdFiles = entries.filter((f) => f.endsWith('.md')).sort()
 
-    expect(mdFiles).toEqual([...CANONICAL_CORE_FILES].sort())
-    expect(mdFiles).toHaveLength(20)
+    expect(mdFiles.filter((f) => f !== 'tracker.md')).toEqual([...CANONICAL_CORE_FILES].sort())
+    expect(mdFiles).toHaveLength(21)
   })
 
   it('T-A.2.2: core protocol template files are valid Markdown (non-empty, begin with heading)', async () => {

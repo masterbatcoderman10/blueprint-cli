@@ -15,7 +15,7 @@ specified.
   Bugs enter this module through two paths:
 
   PATH A — EXISTING BUG TASK
-    A bug task already exists on the kanban board, typically created
+    A bug task already exists on the tracker, typically created
     by the phase completion agent from a failing test. The task
     contains the symptom, test output, and which phase the test
     belongs to. Reproduction is already handled — the failing test
@@ -29,20 +29,22 @@ specified.
     → Start at STEP 1 (Clarify the Symptom).
 
   Triggered when:
-    - An agent picks up a [BUG] task from the kanban board (Path A)
+    - An agent picks up a [BUG] task from the tracker (Path A)
     - A user reports something is broken or not working correctly (Path B)
     - Unexpected behavior is observed during development or production (Path B)
 
   PRECONDITIONS:
   - docs/conventions.md is loaded (tech stack, available tools, patterns)
-  - Kanban MCP is reachable
+  - Local tracker server is reachable
   - Phase document for the current phase is loaded (if one is active)
+  - `docs/core/tracker.md` is referenced for tracker API recipes
 
   ENTRY POINT:
-    Check the kanban board for existing bug tasks related to the
-    reported issue.
+    Check the tracker for existing bug tasks related to the
+    reported issue. Use `GET /tasks` as documented in
+    `docs/core/tracker.md`.
 
-    IF a [BUG] task exists on the board for this issue:
+    IF a [BUG] task exists on the tracker for this issue:
       → PATH A. Read the task description for symptom and test
         output. Skip to STEP 3.
 
@@ -99,7 +101,7 @@ specified.
 
     IF the bug cannot be reproduced by either agent or user:
       → Inform the user. A bug that cannot be reproduced cannot
-        be reliably fixed. Record the report on the kanban board
+        be reliably fixed. Record the report on the tracker
         with status TO-DO and all known details. The user
         decides whether to investigate further or wait for
         recurrence.
@@ -118,7 +120,7 @@ specified.
     However, the agent SHOULD use available project context:
       - Phase documents describe what the code was intended to do
       - conventions.md defines the patterns the code should follow
-      - Implementation notes on kanban tasks (if accessible) record
+      - Implementation notes on tracker tasks (if accessible) record
         what decisions were made during development
 
     The diagnosis is complete when the agent can state:
@@ -145,7 +147,7 @@ specified.
       but is still a straightforward correction, not a design change.
       → Path A: Update the existing bug task and create additional
         tasks if the fix requires multiple logical units of work.
-      → Path B: Create multiple bug fix tasks on the kanban board,
+      → Path B: Create multiple bug fix tasks on the tracker,
         one per logical unit of work.
       → Execute using execution.md.
 
@@ -155,7 +157,7 @@ specified.
       taken to implement it is fundamentally flawed and needs rethinking.
       → This is no longer a bug fix. Load docs/core/revision-planning.md.
       → The revision process handles impact analysis and planning.
-      → Record the escalation in the kanban task notes and in the
+      → Record the escalation in the tracker task notes and in the
         Decisions section of project-progress.md.
 
     IF the agent is unsure about classification, present the options
@@ -165,9 +167,11 @@ specified.
 ---
 
 <BugTaskCreation>
-  Bug fix tasks are created on the kanban board with a distinct
+  Bug fix tasks are created on the tracker with a distinct
   format so they are identifiable as bug fixes rather than planned
   feature work.
+
+  Use `POST /tasks` as documented in `docs/core/tracker.md`.
 
   TITLE FORMAT:
     [BUG] Short description of the fix
@@ -190,7 +194,8 @@ specified.
     (empty — populated during review)
 
   RULES:
-  - Bug fix tasks go through the same TO-DO -> IN-PROGRESS -> IN-REVIEW -> DONE
+  - Bug fix tasks go through the same
+    TO-DO → IN-PROGRESS → IN-REVIEW → REWORK → DONE
     cycle as any other task.
   - The executing agent NEVER moves a bug fix task to DONE.
     Review is required, same as feature work.
@@ -211,7 +216,7 @@ specified.
 
   FOR EACH BUG TASK:
 
-  a. Move task to IN-PROGRESS.
+  a. Move task to IN-PROGRESS using `PATCH /tasks/:id`.
   b. Write agent identity as author on the task.
   c. Write a regression test that reproduces the bug (TDD).
      The test should FAIL before the fix and PASS after.
@@ -225,7 +230,7 @@ specified.
   g. Update task notes with files modified, test written,
      and what was changed.
   h. Commit per docs/core/git-execution-workflow.md CommitOnCompletion.
-  i. Move task to IN-REVIEW.
+  i. Move task to IN-REVIEW using `PATCH /tasks/:id`.
 
   After all bug tasks are in IN-REVIEW, the reviewer picks
   them up through the normal review process in review.md.
@@ -263,7 +268,7 @@ specified.
 
 <BugResolutionRules>
   RULES:
-  - Check the kanban board first. If a bug task already exists
+  - Check the tracker first. If a bug task already exists
     (e.g., from phase completion), start at diagnosis. If not,
     start at clarification.
   - For user-reported bugs (Path B): always clarify before

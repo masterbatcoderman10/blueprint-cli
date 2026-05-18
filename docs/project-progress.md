@@ -1,7 +1,7 @@
 # Project Progress
 
 **Project**: blueprint-cli
-**Kanban**: blueprint-cli
+**Tracker**: blueprint-cli
 **Current Milestone**: Revision 6 — Built-in Task Tracker
 **Current Phase**: Phase 3 — Protocol Rewrite
 **Status**: Revision 6 Phase 3 planned + test-planned, ready for execution

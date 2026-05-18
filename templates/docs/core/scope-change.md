@@ -63,7 +63,7 @@ the current plan, this module classifies it and either places it
         [stream/gate] of the current phase."
       → IF user confirms:
         - Update the phase document with the new task
-        - Create the kanban task per execution.md
+        - Create the tracker task per execution.md
       → GOTO <SRSPlacement>
 
   LEVEL B — NEW PHASE IN CURRENT MILESTONE

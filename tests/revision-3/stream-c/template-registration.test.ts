@@ -30,8 +30,8 @@ describe('T-R3-1.C.2.2: templates/docs/core contains exactly 20 Markdown protoco
       .filter((entry) => entry.endsWith('.md'))
       .sort()
 
-    expect(mdFiles).toEqual(CANONICAL_CORE_FILES.map((relativePath) => basename(relativePath)).sort())
-    expect(mdFiles).toHaveLength(20)
+    expect(mdFiles.filter((f) => f !== 'tracker.md')).toEqual(CANONICAL_CORE_FILES.map((relativePath) => basename(relativePath)).sort())
+    expect(mdFiles).toHaveLength(21)
     expect(mdFiles).toContain('srs-planning.md')
   })
 })

@@ -5,8 +5,8 @@
   five-level hierarchy: Project → Milestone → Phase → Gate/Stream → Task.
 
   Planning is progressive — milestones are planned loosely at the feature level, phases
-  are planned in full detail with tasks, and work is managed through a kanban board
-  (vibe-kanban MCP). All protocols, conventions, and workflows are defined in modular
+  are planned in full detail with tasks, and work is managed through the built-in
+  task tracker (SQLite backend + local Svelte SPA). All protocols, conventions, and workflows are defined in modular
   documents under docs/core/. This file is the entry point. It tells you what to assess,
   what to load, and what never to do.
 </Blueprint>

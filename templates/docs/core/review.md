@@ -2,7 +2,7 @@
 
 This module defines how code review is conducted on completed tasks.
 A review examines work that has been moved to the IN-REVIEW state on
-the kanban board and either approves it or leaves structured feedback.
+the tracker and either approves it or leaves structured feedback.
 
 ---
 
@@ -17,7 +17,8 @@ the kanban board and either approves it or leaves structured feedback.
   PRECONDITIONS:
   - Phase document is loaded (including its Test Plan section)
   - docs/conventions.md is loaded (tech stack, coding standards, patterns)
-  - Kanban MCP is reachable
+  - docs/core/tracker.md is loaded (state machine, API recipes)
+  - Local tracker server is reachable
   - User has specified which gate, stream, or agent's work to review
 
   CONTEXT INFERENCE:
@@ -33,6 +34,8 @@ the kanban board and either approves it or leaves structured feedback.
   STEP 1 -- IDENTIFY TASKS AND WORKTREE
     Retrieve all tasks for the specified gate or stream (or by the
     specified agent) that are in the IN-REVIEW state.
+    Use `GET /tasks?phase=<phase>&stream=<stream>` as documented
+    in `docs/core/tracker.md`.
 
     IF no tasks are in IN-REVIEW:
       Inform user: "No tasks found in review."
@@ -67,7 +70,12 @@ the kanban board and either approves it or leaves structured feedback.
        IF issues found:
          Write detailed review notes in the Review Notes section
          of the task description per <ReviewNoteFormat>.
-         Task stays in IN-REVIEW.
+         Move task to REWORK.
+         Include the canonical transition note:
+           "Task moved to REWORK. After corrections, the agent must
+            follow the canonical REWORK → IN-PROGRESS → IN-REVIEW
+            transition per docs/core/tracker.md before this task
+            can reach DONE."
 
     Repeat for the next task.
 
@@ -96,18 +104,18 @@ the kanban board and either approves it or leaves structured feedback.
 
     IF reviewing gate or stream tasks:
       IF every task in the gate or stream was moved to DONE
-      (no tasks remain in IN-REVIEW with notes):
+      (no tasks remain in IN-REVIEW or REWORK):
         Follow the MergeProcess in docs/core/git-review-workflow.md
         to merge the branch to main and clean up the worktree.
 
-      IF any tasks still have review notes (not all clean):
+      IF any tasks are in REWORK:
         Do NOT merge. The branch stays as-is until the
         re-review cycle completes all tasks to DONE.
 
   STEP 5 -- REPORT
     After all tasks have been reviewed, report to the user:
     - Which tasks were marked clean and moved to DONE
-    - Which tasks have review notes that need to be addressed
+    - Which tasks were moved to REWORK and need to be addressed
     - Whether all acceptance criteria for the gate/stream are met
     - Whether the branch was merged to main (or why not)
     - A brief summary of the most significant issues found
@@ -120,9 +128,11 @@ the kanban board and either approves it or leaves structured feedback.
   all issues. The cycle repeats until every task is clean:
 
   1. Reviewer examines tasks, leaves notes on tasks with issues,
-     moves clean tasks to DONE.
+     moves clean tasks to DONE. Tasks with issues are moved to REWORK.
   2. Executing agent addresses notes via ApplyReviewNotes in
-     execution.md. Tasks return to IN-REVIEW.
+     execution.md. Tasks in REWORK move to IN-PROGRESS, then back
+     to IN-REVIEW following the canonical transition
+     REWORK → IN-PROGRESS → IN-REVIEW.
   3. Reviewer RE-REVIEWS the same tasks:
      - For each task, read the agent's responses to each note.
      - Verify the fix actually resolves the issue -- do not take
@@ -133,7 +143,7 @@ the kanban board and either approves it or leaves structured feedback.
      - If all notes on a task are resolved: write "Clean" and
        move to DONE.
      - If any notes remain unresolved or new issues are found:
-       task stays in IN-REVIEW with updated notes.
+       move the task to REWORK.
   4. Repeat from step 2 until all tasks are in DONE.
 
   There is no limit to the number of review rounds. The cycle
@@ -213,7 +223,7 @@ the kanban board and either approves it or leaves structured feedback.
 
 <ReviewNoteFormat>
   Review notes are written in the Review Notes section of the
-  task description on the kanban board.
+  task description on the tracker.
 
   Each issue is a separate bullet point with:
     - Severity: MAJOR or MINOR
@@ -264,7 +274,7 @@ the kanban board and either approves it or leaves structured feedback.
   - The reviewer only reviews tasks belonging to the specified
     gate, stream, or agent -- not other streams.
   - The reviewer ONLY moves tasks to DONE when they are clean.
-    Tasks with any issues -- MAJOR or MINOR -- stay in IN-REVIEW.
+    Tasks with any issues -- MAJOR or MINOR -- are moved to REWORK.
   - The reviewer does not fix code. It identifies issues and
     documents them. The executing agent addresses them via
     the ApplyReviewNotes flow in execution.md.
