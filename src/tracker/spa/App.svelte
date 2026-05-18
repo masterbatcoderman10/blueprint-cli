@@ -10,7 +10,7 @@
 
   import Board from './components/Board.svelte'
   import TaskDetailRail from './components/TaskDetailRail.svelte'
-  import { selectionStore } from './stores/index.js'
+  import { selectionStore, tasksStore, commentsStore } from './stores/index.js'
 
   let railOpen = $derived(selectionStore.selectedId !== null)
 
@@ -48,7 +48,7 @@
   "
 >
   <!-- Board panel -->
-  <Board />
+  <Board {tasksStore} {selectionStore} />
 
   <!-- Task Detail Rail -->
   <div
@@ -67,6 +67,6 @@
       padding: {railOpen ? '20px' : '0'};
     "
   >
-    <TaskDetailRail />
+    <TaskDetailRail selection={selectionStore} tasks={tasksStore} comments={commentsStore} />
   </div>
 </div>
