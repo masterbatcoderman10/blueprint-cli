@@ -1,5 +1,7 @@
 import { createServer as createHttpServer, type IncomingMessage, type Server, type ServerResponse } from 'node:http'
+import { dirname, resolve } from 'node:path'
 
+import { serializeSnapshot, writeSnapshotAtomic } from './export'
 import { createComment, deleteComment, listComments, updateComment } from './routes/comments'
 import { createTask, deleteTask, getTask, listTasks, updateTask } from './routes/tasks'
 import type { TrackerDatabase } from './schema'
@@ -7,6 +9,7 @@ import type { CommentError, Result, TaskError, TrackerResult } from './types'
 
 interface ServerOptions {
   db: TrackerDatabase
+  projectRoot?: string
 }
 
 interface ProjectMetaRow {
@@ -120,6 +123,40 @@ function ensureTaskExists(db: TrackerDatabase, taskId: string): TaskError | unde
   return result.ok ? undefined : result.error
 }
 
+function inferProjectRoot(db: TrackerDatabase): string | undefined {
+  if (db.name === ':memory:') {
+    return undefined
+  }
+
+  return dirname(dirname(dirname(resolve(db.name))))
+}
+
+function isMutationRequest(request: IncomingMessage): boolean {
+  const method = request.method ?? 'GET'
+  return method === 'POST' || method === 'PATCH' || method === 'DELETE'
+}
+
+function isSuccessfulRouteResult(result: RouteResult): boolean {
+  return result.status >= 200 && result.status < 300 && 'data' in result.body
+}
+
+async function writeSnapshotForMutation(
+  request: IncomingMessage,
+  result: RouteResult,
+  db: TrackerDatabase,
+  projectRoot: string | undefined,
+): Promise<void> {
+  if (!projectRoot || !isMutationRequest(request) || !isSuccessfulRouteResult(result)) {
+    return
+  }
+
+  try {
+    await writeSnapshotAtomic(projectRoot, serializeSnapshot(db))
+  } catch (error) {
+    console.warn('[tracker] snapshot write failed', error)
+  }
+}
+
 function route(db: TrackerDatabase, request: IncomingMessage, body: JsonBody): RouteResult {
   const { pathname, parts, searchParams } = parsePath(request)
   const method = request.method ?? 'GET'
@@ -196,10 +233,17 @@ function route(db: TrackerDatabase, request: IncomingMessage, body: JsonBody): R
 }
 
 export function createServer(options: ServerOptions): Server {
+  const projectRoot = options.projectRoot ?? inferProjectRoot(options.db)
+
   return createHttpServer(async (request, response) => {
     try {
       const body = request.method === 'GET' || request.method === 'DELETE' ? undefined : await readJson(request)
       const result = route(options.db, request, body)
+
+      // Ordering contract: route() applies the DB mutation synchronously, then
+      // the server snapshots that committed state before flushing the HTTP response.
+      await writeSnapshotForMutation(request, result, options.db, projectRoot)
+
       sendJson(response, result.status, result.body)
     } catch (error) {
       if (error instanceof SyntaxError) {
