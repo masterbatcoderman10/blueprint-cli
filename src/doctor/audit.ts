@@ -11,7 +11,10 @@ import {
   createMissingStructureFinding,
   createMissingTrackerDbFinding,
   createTemplateVersionMismatchFinding,
+  createTrackerDbDriftFinding,
 } from './findings'
+import { getUserVersion, openDbReadOnly, runIntegrityCheck } from '../tracker/db'
+import { TRACKER_SCHEMA_VERSION } from '../tracker/schema'
 import { loadManifestState, ManifestParseError, resolveAllCoreTemplatePaths, resolveTemplatePath } from './inventory'
 import { MANIFEST_RELATIVE_PATH, TEMPLATE_VERSION } from './manifest'
 import {
@@ -41,6 +44,72 @@ export async function auditTrackerDb(projectDir: string): Promise<DoctorFinding[
   return [createMissingTrackerDbFinding(trackerDbRelativePath)]
 }
 
+export async function auditTrackerSchema(projectDir: string): Promise<DoctorFinding[]> {
+  const trackerDbRelativePath = 'docs/.blueprint/tasks.db'
+  const dbPath = join(projectDir, trackerDbRelativePath)
+
+  // Stream B handles the missing-DB case; skip when tasks.db is absent
+  if (!(await pathExists(dbPath))) {
+    return []
+  }
+
+  const findings: DoctorFinding[] = []
+  let handle: ReturnType<typeof openDbReadOnly> | null = null
+
+  try {
+    handle = openDbReadOnly(projectDir)
+  } catch {
+    // File exists but cannot be opened as a database — treat as integrity failure
+    findings.push(
+      createTrackerDbDriftFinding({
+        targetPath: trackerDbRelativePath,
+        cause: 'integrity-fail',
+        issues: ['file is not a database'],
+      }),
+    )
+    return findings
+  }
+
+  try {
+    const observedVersion = getUserVersion(handle.db)
+    if (observedVersion !== TRACKER_SCHEMA_VERSION) {
+      findings.push(
+        createTrackerDbDriftFinding({
+          targetPath: trackerDbRelativePath,
+          cause: 'schema-stale',
+          observedVersion,
+          expectedVersion: TRACKER_SCHEMA_VERSION,
+        }),
+      )
+    }
+
+    const integrityResult = runIntegrityCheck(handle.db)
+    if (integrityResult !== 'ok') {
+      findings.push(
+        createTrackerDbDriftFinding({
+          targetPath: trackerDbRelativePath,
+          cause: 'integrity-fail',
+          issues: integrityResult,
+        }),
+      )
+    }
+  } catch (error) {
+    // A query-time failure (e.g., corrupted DB where PRAGMAs fail) also means integrity failure
+    const message = error instanceof Error ? error.message : 'unknown database error'
+    findings.push(
+      createTrackerDbDriftFinding({
+        targetPath: trackerDbRelativePath,
+        cause: 'integrity-fail',
+        issues: [message],
+      }),
+    )
+  } finally {
+    handle.close()
+  }
+
+  return findings
+}
+
 export async function runDoctorAudit(projectDir: string): Promise<DoctorAuditResult> {
   const findings: DoctorFinding[] = []
   const repairableEditableSrsPath = 'docs/srs.md'
@@ -58,6 +127,7 @@ export async function runDoctorAudit(projectDir: string): Promise<DoctorAuditRes
   }
 
   findings.push(...(await auditTrackerDb(projectDir)))
+  findings.push(...(await auditTrackerSchema(projectDir)))
 
   for (const { relativePath, absolutePath } of resolveAllCoreTemplatePaths()) {
     const templateContent = await readFile(absolutePath, 'utf-8')
@@ -122,6 +192,10 @@ export async function runDoctorAudit(projectDir: string): Promise<DoctorAuditRes
   return {
     findings,
     isClean: findings.length === 0,
-    hasBlockingFindings: findings.some((finding) => finding.kind === 'manifest-validation-error'),
+    hasBlockingFindings: findings.some(
+      (finding) =>
+        finding.kind === 'manifest-validation-error' ||
+        (finding.kind === 'tracker-db-drift' && finding.cause === 'integrity-fail'),
+    ),
   }
 }

@@ -45,10 +45,23 @@ export interface TrackerDbMigrationRepairAction {
   steps: TrackerDbMigrationStep[]
 }
 
+export interface TrackerDbDriftRepairAction {
+  type: 'repair-tracker-db-drift'
+  targetPath: string
+  description: string
+  cause: 'schema-stale'
+  observedVersion: number
+  expectedVersion: number
+}
+
 /**
  * A repair action represents a concrete operation to fix an integrity issue.
  */
-export type RepairAction = TemplateRepairAction | BootstrapManifestRepairAction | TrackerDbMigrationRepairAction
+export type RepairAction =
+  | TemplateRepairAction
+  | BootstrapManifestRepairAction
+  | TrackerDbMigrationRepairAction
+  | TrackerDbDriftRepairAction
 
 export interface RepairPlan {
   actions: RepairAction[]
@@ -155,7 +168,24 @@ export async function createRepairPlan(findings: DoctorFinding[], projectDir: st
       continue
     }
 
-    if (finding.kind === 'template-version-mismatch' || finding.kind === 'tracker-db-drift') {
+    if (finding.kind === 'template-version-mismatch') {
+      continue
+    }
+
+    if (finding.kind === 'tracker-db-drift') {
+      if (finding.cause === 'schema-stale') {
+        actions.push({
+          type: 'repair-tracker-db-drift',
+          targetPath: finding.targetPath,
+          description: `Upgrade tracker database schema from version ${finding.observedVersion} to ${finding.expectedVersion}`,
+          cause: 'schema-stale',
+          observedVersion: finding.observedVersion!,
+          expectedVersion: finding.expectedVersion!,
+        })
+      } else if (finding.cause === 'integrity-fail') {
+        hasBlockingFindings = true
+        blockingReason = finding.issues!.join('\n')
+      }
       continue
     }
   }
@@ -189,6 +219,10 @@ export function renderRepairPlan(plan: RepairPlan): string {
       for (let j = 0; j < action.steps.length; j++) {
         lines.push(`     ${j + 1}. [will-run] ${action.steps[j].description}`)
       }
+    }
+
+    if (action.type === 'repair-tracker-db-drift') {
+      lines.push(`     Schema upgrade: version ${action.observedVersion} → ${action.expectedVersion}`)
     }
   }
 

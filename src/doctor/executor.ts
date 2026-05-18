@@ -224,6 +224,18 @@ async function executeRepairAction(action: RepairAction, projectDir: string): Pr
     case 'migrate-tracker-db':
       return executeTrackerDbMigration(action, projectDir)
 
+    case 'repair-tracker-db-drift': {
+      // Schema-stale repair: openDb calls applySchema which is the
+      // canonical idempotent migration path and re-stamps user_version.
+      const handle = openDb(projectDir)
+      handle.close()
+      return {
+        type: action.type,
+        targetPath: action.targetPath,
+        description: action.description,
+      }
+    }
+
     default: {
       const _exhaustive: never = action
       throw new Error(`Unknown repair action type: ${_exhaustive}`)
