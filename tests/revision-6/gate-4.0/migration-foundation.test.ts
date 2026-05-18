@@ -341,7 +341,28 @@ describe('Gate R6-4.0 — migration foundation', () => {
       expect(content).toContain('# Blueprint')
     })
 
-    it('T-R6-4.0.4.3: ensureTrackerDbIgnored is a no-op when the canonical line already exists', async () => {
+    it('T-R6-4.0.4.3: ensureTrackerDbIgnored ignores comment-only coincidences and still inserts the canonical rule', async () => {
+      const root = await makeProjectRoot('blueprint-gitignore-comment-coincidence-')
+      await writeFile(join(root, '.gitignore'), '# docs/.blueprint/tasks.db\n', 'utf-8')
+
+      await expect(ensureTrackerDbIgnored(root)).resolves.toBe(true)
+
+      const content = await readFile(join(root, '.gitignore'), 'utf-8')
+      expect(content).toContain('# docs/.blueprint/tasks.db')
+      expect(content.split('\n')).toContain('docs/.blueprint/tasks.db')
+    })
+
+    it('T-R6-4.0.4.4: ensureTrackerDbIgnored inserts the canonical rule inside an existing Blueprint section', async () => {
+      const root = await makeProjectRoot('blueprint-gitignore-section-placement-')
+      await writeFile(join(root, '.gitignore'), '# Other\ndist/\n\n# Blueprint\ncoverage/\n', 'utf-8')
+
+      await expect(ensureTrackerDbIgnored(root)).resolves.toBe(true)
+
+      const content = await readFile(join(root, '.gitignore'), 'utf-8')
+      expect(content).toBe('# Other\ndist/\n\n# Blueprint\ndocs/.blueprint/tasks.db\ncoverage/\n')
+    })
+
+    it('T-R6-4.0.4.5: ensureTrackerDbIgnored is a no-op when the canonical line already exists', async () => {
       const root = await makeProjectRoot('blueprint-gitignore-idempotent-')
       const original = '# Blueprint\ndocs/.blueprint/tasks.db\n'
       await writeFile(join(root, '.gitignore'), original, 'utf-8')

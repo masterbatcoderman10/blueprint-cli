@@ -8,6 +8,10 @@ function ensureTrailingNewline(value: string): string {
   return value.endsWith('\n') ? value : `${value}\n`
 }
 
+function splitLines(value: string): string[] {
+  return value.replace(/\n$/, '').split('\n')
+}
+
 export async function ensureTrackerDbIgnored(projectRoot: string): Promise<boolean> {
   const gitignorePath = join(projectRoot, '.gitignore')
 
@@ -21,20 +25,27 @@ export async function ensureTrackerDbIgnored(projectRoot: string): Promise<boole
     }
   }
 
-  if (content.includes(TRACKER_DB_LINE)) {
+  const normalized = ensureTrailingNewline(content)
+  if (normalized.trim().length === 0) {
+    await writeFile(gitignorePath, `${BLUEPRINT_HEADER}\n${TRACKER_DB_LINE}\n`, 'utf-8')
+    return true
+  }
+
+  const lines = splitLines(normalized)
+  if (lines.includes(TRACKER_DB_LINE)) {
     return false
   }
 
-  const normalized = ensureTrailingNewline(content)
-  let nextContent: string
-  if (normalized.trim().length === 0) {
-    nextContent = `${BLUEPRINT_HEADER}\n${TRACKER_DB_LINE}\n`
-  } else if (normalized.includes(BLUEPRINT_HEADER)) {
-    nextContent = `${normalized}${TRACKER_DB_LINE}\n`
+  const blueprintHeaderIndex = lines.findIndex((line) => line === BLUEPRINT_HEADER)
+  if (blueprintHeaderIndex >= 0) {
+    lines.splice(blueprintHeaderIndex + 1, 0, TRACKER_DB_LINE)
   } else {
-    nextContent = `${normalized}\n${BLUEPRINT_HEADER}\n${TRACKER_DB_LINE}\n`
+    if (lines[lines.length - 1] !== '') {
+      lines.push('')
+    }
+    lines.push(BLUEPRINT_HEADER, TRACKER_DB_LINE)
   }
 
-  await writeFile(gitignorePath, nextContent, 'utf-8')
+  await writeFile(gitignorePath, `${lines.join('\n')}\n`, 'utf-8')
   return true
 }
