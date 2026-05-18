@@ -168,12 +168,98 @@ Gate R6-3.0 (Tracker Contract Canon) ──────────┐
 
 ---
 
+## Test Plan
+
+> Generated from task analysis. Each testable task has one or more
+> tests mapped to it. Tests are written before implementation (TDD)
+> during task execution. Phase 3 is doc-only; tests are file-content
+> assertions (Vitest integration tests asserting strings, regex hits,
+> and file-mirror equality), plus three `npm test` green-gates after
+> the forward-only test-patch tasks (R6-3.A.7, R6-3.B.8, R6-3.C.9).
+> Convention precedent: `tests/stream-a/core-templates.test.ts`.
+
+### Gate R6-3.0 Tests
+
+| Test ID | Task | Type | Description | Expected Result |
+|---------|------|------|-------------|-----------------|
+| T-R6-3.0.1.1 | R6-3.0.1 | integration | `docs/core/tracker.md` contains all 6 required section headers (Storage, Schema reference, State machine, CRUD endpoints + curl recipes, Lock-file semantics, `blueprint board` lifecycle) | All 6 headers present |
+| T-R6-3.0.1.2 | R6-3.0.1 | integration | tracker.md state-machine section names all 5 states (TO-DO, IN-PROGRESS, IN-REVIEW, REWORK, DONE) and contains the canonical phrase `REWORK → IN-PROGRESS → IN-REVIEW` | All 5 states + canonical transition present |
+| T-R6-3.0.1.3 | R6-3.0.1 | integration | tracker.md contains curl recipes for `POST /tasks`, `PATCH /tasks/:id`, `GET /tasks?phase=&stream=`, `POST /tasks/:id/comments`, `GET /project` | All 5 curl recipes present |
+| T-R6-3.0.1.4 | R6-3.0.1 | integration | tracker.md lifecycle section documents agent-initiated background boot of `blueprint board` when server unreachable | Boot semantics phrase present |
+| T-R6-3.0.2 | R6-3.0.2 | integration | Terminology + curl-snippet canon table present in tracker.md (covers REWORK label, "tracker project id", endpoint paths, reusable snippets) | Table present with all canon terms |
+
+### Stream R6-3.A Tests
+
+| Test ID | Task | Type | Description | Expected Result |
+|---------|------|------|-------------|-----------------|
+| T-R6-3.A.1.1 | R6-3.A.1 | integration | `docs/core/execution.md` has zero hits for `vibe-kanban\|kanban MCP\|Kanban project` | 0 matches |
+| T-R6-3.A.1.2 | R6-3.A.1 | integration | execution.md ApplyReviewNotes section documents REWORK pickup with canonical transition | Section + transition present |
+| T-R6-3.A.2.1 | R6-3.A.2 | integration | `docs/core/review.md` has zero kanban hits | 0 matches |
+| T-R6-3.A.2.2 | R6-3.A.2 | integration | review.md rejection path explicitly moves task to REWORK | REWORK referenced in rejection path |
+| T-R6-3.A.3.1 | R6-3.A.3 | integration | `docs/core/git-execution-workflow.md` has zero kanban hits | 0 matches |
+| T-R6-3.A.3.2 | R6-3.A.3 | integration | git-execution-workflow.md uses "tracker" wording for state transitions and documents REWORK | "tracker" + REWORK present |
+| T-R6-3.A.4.1 | R6-3.A.4 | integration | `docs/core/phase-completion.md` has zero kanban hits | 0 matches |
+| T-R6-3.A.4.2 | R6-3.A.4 | integration | phase-completion.md references tracker.md curl recipes for task retrieval / bug-task creation | tracker.md reference + recipe usage present |
+| T-R6-3.A.5.1 | R6-3.A.5 | integration | `docs/core/bug-resolution.md` has zero kanban hits | 0 matches |
+| T-R6-3.A.5.2 | R6-3.A.5 | integration | bug-resolution.md PATH A and PATH B both use tracker recipes | Both paths reference tracker |
+| T-R6-3.A.6.1 | R6-3.A.6 | integration | `docs/core/orchestrate.md` has zero kanban hits | 0 matches |
+| T-R6-3.A.6.2 | R6-3.A.6 | integration | orchestrate.md per-stream loop documents 5-state machine + REWORK loop | All 5 states + REWORK loop present |
+| T-R6-3.A.7 | R6-3.A.7 | integration | `npm test` green after Stream A protocol-text test patches land | Exit code 0 |
+
+### Stream R6-3.B Tests
+
+| Test ID | Task | Type | Description | Expected Result |
+|---------|------|------|-------------|-----------------|
+| T-R6-3.B.1.1 | R6-3.B.1 | integration | `docs/core/health-check.md` has zero kanban hits | 0 matches |
+| T-R6-3.B.1.2 | R6-3.B.1 | integration | health-check.md documents DB-presence check (`tasks.db`) AND agent-initiated background boot of `blueprint board` | Both phrases present |
+| T-R6-3.B.1.3 | R6-3.B.1 | integration | health-check.md uses `tracker project id` field name (not `kanban project name`) | New field present, old absent |
+| T-R6-3.B.2.1 | R6-3.B.2 | integration | `docs/core/alignment.md` has zero kanban hits | 0 matches |
+| T-R6-3.B.2.2 | R6-3.B.2 | integration | alignment.md replaces `KanbanSetup` with `TrackerSetup` flow | TrackerSetup present, KanbanSetup absent |
+| T-R6-3.B.3 | R6-3.B.3 | integration | `docs/core/phase-planning.md` has zero kanban hits | 0 matches |
+| T-R6-3.B.4 | R6-3.B.4 | integration | `docs/core/tweak-planning.md` has zero kanban hits and uses "tracker note" wording | 0 kanban matches + "tracker note" present |
+| T-R6-3.B.5 | R6-3.B.5 | integration | `docs/core/scope-change.md` has zero kanban hits and uses tracker task-creation wording | 0 matches + tracker wording present |
+| T-R6-3.B.6 | R6-3.B.6 | integration | `docs/core/blueprint-structure.md` has zero kanban hits | 0 matches |
+| — | R6-3.B.7 | — | Not testable: outcome is an audit decision recorded in phase Tweaks section, not a behavior | — |
+| T-R6-3.B.8 | R6-3.B.8 | integration | `npm test` green after Stream B protocol-text test patches land | Exit code 0 |
+
+### Stream R6-3.C Tests
+
+| Test ID | Task | Type | Description | Expected Result |
+|---------|------|------|-------------|-----------------|
+| T-R6-3.C.1.1 | R6-3.C.1 | integration | `docs/conventions.md` has zero kanban hits | 0 matches |
+| T-R6-3.C.1.2 | R6-3.C.1 | integration | conventions.md mentions built-in tracker, `node:sqlite` (or `better-sqlite3`), and the Svelte dev-dep bullet | All 3 references present |
+| T-R6-3.C.1.3 | R6-3.C.1 | integration | conventions.md preserves "no runtime dependencies for simple file I/O tasks" anti-pattern verbatim | Phrase present unchanged |
+| T-R6-3.C.2 | R6-3.C.2 | integration | Project-root `CLAUDE.md` has zero kanban hits | 0 matches |
+| T-R6-3.C.3 | R6-3.C.3 | integration | `docs/project-progress.md` uses `**Tracker**:` field, not `**Kanban**:` | New field present, old absent |
+| T-R6-3.C.4 | R6-3.C.4 | integration | Each of 6 Stream A templates (`templates/docs/core/{execution,review,git-execution-workflow,phase-completion,bug-resolution,orchestrate}.md`) matches its source `docs/core/*.md` byte-for-byte | All 6 mirrors equal source |
+| T-R6-3.C.5 | R6-3.C.5 | integration | Each Stream B template under `templates/docs/core/` mirrors its source byte-for-byte (`alignment`, `health-check`, `phase-planning`, `tweak-planning`, `scope-change`, `blueprint-structure`; `srs-planning` if R6-3.B.7 applied changes) | All mirrors equal source |
+| T-R6-3.C.6 | R6-3.C.6 | integration | `templates/docs/core/tracker.md` matches `docs/core/tracker.md` byte-for-byte | Mirror equal source |
+| T-R6-3.C.7.1 | R6-3.C.7 | integration | `templates/docs/conventions.md` mirrors `docs/conventions.md` byte-for-byte | Mirror equal source |
+| T-R6-3.C.7.2 | R6-3.C.7 | integration | `templates/project-progress.md` uses `**Tracker**:` field | New field present |
+| T-R6-3.C.8 | R6-3.C.8 | integration | All 4 templated agent entry points (`templates/{CLAUDE,AGENTS,GEMINI,QWEN}.md`) have tracker wording on line 8 (no `vibe-kanban` MCP reference) | All 4 fixed |
+| T-R6-3.C.9 | R6-3.C.9 | integration | `npm test` green after Stream C protocol-text + template test patches land | Exit code 0 |
+
+### Test Summary
+
+| Component | Total Tasks | Testable | Not Testable |
+|-----------|-------------|----------|--------------|
+| Gate R6-3.0 | 2 | 2 | 0 |
+| Stream R6-3.A | 7 | 7 | 0 |
+| Stream R6-3.B | 8 | 7 | 1 |
+| Stream R6-3.C | 9 | 9 | 0 |
+| **Total** | **26** | **25** | **1** |
+
+Total test count: **31** (Gate 5, Stream A 12, Stream B 9, Stream C 12).
+
+---
+
 ## Definition of Done
 
 - [ ] Gate R6-3.0 acceptance criteria pass.
 - [ ] Stream R6-3.A acceptance criteria pass.
 - [ ] Stream R6-3.B acceptance criteria pass.
 - [ ] Stream R6-3.C acceptance criteria pass.
+- [ ] All tests in the Test Plan pass.
 - [ ] `docs/core/tracker.md` exists and is referenced by execution.md, review.md, phase-completion.md, bug-resolution.md, orchestrate.md, and health-check.md.
 - [ ] The 5-state machine + canonical REWORK transition is named consistently across every doc that mentions task states.
 - [ ] `health-check.md` documents the agent-initiated background boot of `blueprint board`.
