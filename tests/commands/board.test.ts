@@ -120,9 +120,6 @@ afterEach(async () => {
     server.close()
   }
 
-  // Allow OS to release ports before next test
-  await new Promise((r) => setTimeout(r, 500))
-
   for (const dir of tempDirs.splice(0)) {
     rmSync(dir, { recursive: true, force: true })
   }
@@ -252,21 +249,12 @@ describe('Stream D — board command', () => {
       try {
         for (const port of [7300, 7301, 7302, 7303, 7304, 7305, 7306, 7307, 7308, 7309]) {
           const server = createServer()
-          try {
-            await new Promise<void>((resolve, reject) => {
-              server.once('error', reject)
-              server.listen({ host: '127.0.0.1', port }, () => resolve())
-            })
-            servers.push(server)
-            occupiedServers.push(server)
-          } catch (err: any) {
-            if (err.code === 'EADDRINUSE') {
-              // Port already occupied by a leaked process from another test;
-              // the board should still see no free port.
-              continue
-            }
-            throw err
-          }
+          await new Promise<void>((resolve, reject) => {
+            server.once('error', reject)
+            server.listen({ host: '127.0.0.1', port }, () => resolve())
+          })
+          servers.push(server)
+          occupiedServers.push(server)
         }
 
         const proc = spawnBoard(projectRoot, ['--headless'])

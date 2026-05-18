@@ -333,14 +333,14 @@ and parallel streams of tasks.
     Stream tasks: M<milestone>-<phase>.<stream>.<seq>
                   →  M2-4.A.1, M2-4.A.2, M1-1.B.1
 
-    The full ID is used on the tracker, in test IDs, and
+    The full ID is used on the kanban board, in test IDs, and
     in any cross-phase or cross-milestone reference.
 
     Within a phase document, the M<milestone>-<phase> prefix is
     established in the document header. Task tables may use the
     short form (<gate>.<seq> or <stream>.<seq>) for readability,
     but the full ID must appear in the header and is what gets
-    created on the tracker.
+    created on the kanban board.
 
   DURATION UNITS:
     All durations use abstract units, not hours or days.

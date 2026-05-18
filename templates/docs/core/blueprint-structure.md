@@ -10,7 +10,7 @@ It is the source of truth for where files live, what is required, and what is pr
 ```
 AGENTS.md                                    # Repo root — entry point for all agents
 docs/
-├── project-progress.md                      # Project state: milestone, phase, tracker id
+├── project-progress.md                      # Project state: milestone, phase, kanban name
 ├── prd.md                                   # Full product requirements document
 ├── conventions.md                           # Tech stack, coding standards, project conventions
 ├── srs.md                                   # Software Requirements Specification
@@ -127,7 +127,7 @@ docs/
 A valid Blueprint project has ALL of the following:
 
 - [ ] `AGENTS.md` exists at repo root
-- [ ] `docs/project-progress.md` exists and contains a tracker project id
+- [ ] `docs/project-progress.md` exists and contains a kanban project name
 - [ ] `docs/prd.md` exists
 - [ ] `docs/conventions.md` exists
 - [ ] `docs/srs.md` exists

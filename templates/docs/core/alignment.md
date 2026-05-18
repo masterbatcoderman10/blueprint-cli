@@ -30,7 +30,7 @@ been done yet.
 
     IF no knowledge-base/ AND no codebase:
       → STATE = EMPTY
-      → Skip to <TrackerSetup>, then proceed to <DocumentProduction>.
+      → Skip to <KanbanSetup>, then proceed to <DocumentProduction>.
         EMPTY projects follow the same 5+1 document sequence as
         existing projects. There are no SRS population leads from
         analysis — the SRS Q&A probes features from the user
@@ -112,8 +112,8 @@ been done yet.
       - Conventions from agent instruction files (if found)
       - Development timeline derived from git history (if present):
         major phases of work identified from commits
-      - SRS population leads: the named features extracted during
-        analysis, presented so the user can confirm, correct,
+      - SRS population leads: the named feature leads extracted
+        during analysis, presented so the user can confirm, correct,
         or add missing features before SRS Q&A begins
 
     Then ASK — do not just wait for a nod. Actively question:
@@ -135,8 +135,8 @@ been done yet.
     Do NOT proceed to document creation until the user confirms
     the summary is accurate.
 
-  STEP 4 — TRACKER SETUP
-    → GOTO <TrackerSetup>
+  STEP 4 — KANBAN SETUP
+    → GOTO <KanbanSetup>
 
   STEP 5 — PRODUCE DOCUMENTS
     → GOTO <DocumentProduction>
@@ -144,25 +144,26 @@ been done yet.
 
 ---
 
-<TrackerSetup>
-  The Blueprint local task tracker is required for task management.
-  It is provisioned automatically by `blueprint init`.
+<KanbanSetup>
+  A vibe-kanban project is required for task management in Blueprint.
 
-  CHECK — Does docs/.blueprint/tasks.db exist?
+  CHECK — Does a vibe-kanban project exist for this project?
 
-  IF the database does not exist:
-    Inform user: "Blueprint uses a local SQLite tracker for task management.
-    Run `blueprint init` to provision the tracker database and project
-    scaffold. Task work will be blocked until the tracker is available."
+  IF the kanban MCP is not connected:
+    Inform user: "Blueprint uses vibe-kanban MCP for task management.
+    Please connect the vibe-kanban MCP tool before proceeding with
+    task execution. You can continue with planning without it, but
+    task work will be blocked until it is available."
 
-  IF the database exists:
-    Read the project identity from docs/project-progress.md.
-    The tracker project id is the value recorded in the
-    **Tracker** field (or the project directory name as fallback).
+  IF the kanban MCP is connected but no project exists:
+    Ask user for the kanban project name to create.
 
-  Record the tracker project id (or "TBD" if not yet set up)
+  IF the kanban MCP is connected and a project exists:
+    Confirm the project name with the user.
+
+  Record the kanban project name (or "TBD" if not yet set up)
   for inclusion in project-progress.md.
-</TrackerSetup>
+</KanbanSetup>
 
 ---
 
@@ -320,7 +321,7 @@ been done yet.
        # Project Progress
 
        **Project**: {{PROJECT_NAME}}
-       **Tracker**: {{TRACKER_PROJECT_ID or "TBD"}}
+       **Kanban**: {{KANBAN_PROJECT_NAME or "TBD"}}
        **Current Milestone**: {{MILESTONE_NUMBER}} — {{MILESTONE_NAME}}
        **Current Phase**: Phase {{PHASE_NUMBER}} — {{PHASE_NAME}}
        **Status**: {{Planning | In Progress | Complete}}
@@ -373,7 +374,7 @@ been done yet.
 
        (none)
 
-     - Fill in project name, tracker project id (or "TBD"),
+     - Fill in project name, kanban project name (or "TBD"),
        current milestone reference, and set current phase to
        "TBD — pending phase planning" unless a phase is obvious
      - This makes the project ACTIVE for future sessions

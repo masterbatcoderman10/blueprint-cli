@@ -106,8 +106,8 @@ warrant a full revision.
     e. Run the gate or stream's test suite — all must pass.
     f. Update the tweak status to done.
 
-  STEP 5 — UPDATE TRACKER
-    Add a tracker note to each affected task referencing
+  STEP 5 — UPDATE KANBAN
+    Add a note to each affected task on the kanban board referencing
     the tweak ID and what was changed. This preserves traceability
     between the task's original work and the correction.
 </TweakProcess>
@@ -190,8 +190,8 @@ warrant a full revision.
     Every tweak is recorded in the Tweaks section. No informal
     corrections. If it changes completed work, it gets a tweak entry.
 
-  RULE 6 — TRACKER TRACEABILITY
-    Affected tracker tasks must reference the tweak ID so the
+  RULE 6 — KANBAN TRACEABILITY
+    Affected kanban tasks must reference the tweak ID so the
     reviewer can trace what changed and why.
 </TweakRules>
 
