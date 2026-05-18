@@ -99,6 +99,9 @@ afterEach(async () => {
     })
   })))
 
+  // Allow OS to release ports before next test
+  await new Promise((r) => setTimeout(r, 500))
+
   for (const dir of tempDirs.splice(0)) {
     rmSync(dir, { recursive: true, force: true })
   }

@@ -81,7 +81,23 @@ export async function installPackedCliFixture(): Promise<PackedCliFixture> {
     const tarballPath = join(packDir, tarballName)
 
     await runCommand(npmExecutable, ['init', '-y'], { cwd: project.rootDir })
-    await runCommand(npmExecutable, ['install', tarballPath], { cwd: project.rootDir })
+    await runCommand(npmExecutable, ['install', tarballPath, '--ignore-scripts'], { cwd: project.rootDir })
+
+    // Copy prebuilt better-sqlite3 binary to avoid slow compilation in temp dirs
+    const prebuiltBinary = join(workspaceRoot, 'node_modules', 'better-sqlite3', 'build', 'Release', 'better_sqlite3.node')
+    const targetDirs = [
+      join(project.rootDir, 'node_modules', 'better-sqlite3', 'build', 'Release'),
+      join(project.rootDir, 'node_modules', '@splitwireml', 'blueprint', 'node_modules', 'better-sqlite3', 'build', 'Release'),
+    ]
+    if (await pathExists(prebuiltBinary)) {
+      for (const targetDir of targetDirs) {
+        const targetBinary = join(targetDir, 'better_sqlite3.node')
+        if (!(await pathExists(targetBinary))) {
+          await mkdir(targetDir, { recursive: true })
+          await writeFile(targetBinary, await readFile(prebuiltBinary))
+        }
+      }
+    }
 
     const binPath = join(project.rootDir, 'node_modules', '.bin', blueprintExecutable)
 
