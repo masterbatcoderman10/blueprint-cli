@@ -18,6 +18,8 @@ This SRS exists for blueprint-cli to act as the persistent requirement layer bet
 | MAS-201 | Hierarchical Requirement Structuring | Must | active | Revision 4 |
 | MAS-202 | Progressive Clarification vs Checklist | Must | active | Revision 4 |
 | MAS-203 | Agent Orchestration Protocol Module | Must | active | Revision 5 |
+| MAS-204 | Built-in Task Tracker | Must | approved-pending-implementation | Revision 6 |
+| MAS-205 | Local Project Board UI | Must | approved-pending-implementation | Revision 6 |
 
 ---
 
@@ -54,6 +56,27 @@ The system must provide an orchestration protocol module (`docs/core/orchestrate
 - The protocol must support both stream-level invocation (single parallel loop) and phase-level invocation (gate + all streams).
 - The protocol must reference, not duplicate, existing per-task and per-stream rules defined in `execution.md`, `review.md`, and `git-execution-workflow.md`.
 - The module must be scaffolded into new Blueprint projects via `templates/docs/core/orchestrate.md` and registered in Doctor / template-integrity surfaces as a required core file.
+
+#### MAS-204 - Built-in Task Tracker
+
+The system must provide a built-in per-project task tracker that replaces the external `vibe-kanban` MCP dependency, owned end-to-end by the CLI and shipped with the npm package.
+
+- Storage must be a SQLite database at `docs/.blueprint/tasks.db`, provisioned by `blueprint init` and migrated idempotently.
+- The schema must support the 5-state task machine (TO-DO, IN-PROGRESS, IN-REVIEW, REWORK, DONE) and a threaded review-comment surface (severity `MAJOR` | `MINOR`, single-level replies via self-referential `parent_id`).
+- A local HTTP CRUD service must expose task and comment operations (`POST/GET/PATCH/DELETE /tasks`, `POST/GET/PATCH/DELETE /tasks/:id/comments`) plus a `GET /project` meta endpoint.
+- The service must bind to `127.0.0.1` only on a dynamic port; no network exposure and no authentication is required.
+- The canonical forward transition out of REWORK must be `REWORK → IN-PROGRESS → IN-REVIEW`.
+- No external service or runtime dependency may be added beyond Node.js built-ins (`node:sqlite` / `better-sqlite3` as confirmed by R6 Phase 1) and the existing `@clack/prompts` runtime dep.
+
+#### MAS-205 - Local Project Board UI
+
+The system must provide a single-page browser UI for the built-in task tracker, served by the local CRUD service and launched via a new `blueprint board` command.
+
+- `blueprint board` must resolve the project root by walking up from cwd to find `docs/.blueprint/`, boot the CRUD server on `127.0.0.1` with a dynamic port, open the SPA in the default browser, and shut down cleanly on SIGINT.
+- The SPA contract must match the `blueprint-controls` Paper file artboard `2YY-0` ("Kanban — Board First with Task Detail"), scoped to a single project (no project switcher, no view toggle).
+- The board surface must render five columns (TO-DO / IN-PROGRESS / IN-REVIEW / REWORK / DONE) with live count badges, task cards (multi-line title + stream/gate tag chip + task ID), header filters for phase and stream, and the Done-column collapse for the long tail of completed tasks.
+- The Task Detail rail must open on task-card click, display the task's status, title, description, and a threaded review-comment thread with `MAJOR` / `MINOR` severity chips, single-level replies, and `+ MAJOR` / `+ MINOR` / `Reply` composer affordances.
+- Pre-built SPA assets must ship under `dist/spa/` inside the published npm tarball; consumers must not invoke any build step locally.
 
 ### Should Have
 
@@ -143,6 +166,32 @@ Change log:
 Change log:
 - 2026-05-17 - Created from Revision 5
 - 2026-05-17 - Activated in Revision 5 Phase 1 (Gate R5-1.0)
+
+### MAS-204
+- Title: Built-in Task Tracker
+- Priority: Must
+- Status: approved-pending-implementation
+- Assigned milestone: Revision 6
+- Source: Revision 6 Built-in Tracker
+- Introduced by: Revision 6
+- Supersedes: None
+- Superseded by: None
+
+Change log:
+- 2026-05-17 - Created from Revision 6 (recorded 2026-05-18 via R6 Phase 3 pre-phase SRS repair)
+
+### MAS-205
+- Title: Local Project Board UI
+- Priority: Must
+- Status: approved-pending-implementation
+- Assigned milestone: Revision 6
+- Source: Revision 6 Built-in Tracker
+- Introduced by: Revision 6
+- Supersedes: None
+- Superseded by: None
+
+Change log:
+- 2026-05-17 - Created from Revision 6 (recorded 2026-05-18 via R6 Phase 3 pre-phase SRS repair)
 
 ---
 
