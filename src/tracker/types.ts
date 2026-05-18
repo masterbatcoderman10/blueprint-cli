@@ -15,6 +15,7 @@ export interface Task {
   stream: string | null
   author: string | null
   implementation_notes: string | null
+  milestone: string
   created_at: number
   updated_at: number
 }
@@ -28,6 +29,7 @@ export interface CreateTaskInput {
   stream?: string | null
   author?: string | null
   implementation_notes?: string | null
+  milestone?: string
   now?: number
 }
 
@@ -40,12 +42,14 @@ export interface UpdateTaskInput {
   stream?: string | null
   author?: string | null
   implementation_notes?: string | null
+  milestone?: string
   now?: number
 }
 
 export interface TaskFilter {
   phase?: string
   stream?: string
+  milestone?: string
 }
 
 export type TaskError =

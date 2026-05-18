@@ -26,6 +26,7 @@ function createSampleTask(database: DatabaseSync, id = 'R6-1.A.1') {
     stream: 'A',
     author: 'Codex',
     implementation_notes: 'TDD',
+    milestone: 'R6',
   })
 }
 
@@ -127,6 +128,7 @@ describe('Stream A — task CRUD route functions', () => {
       state: 'TO-DO',
       phase: 'Phase 2',
       stream: 'A',
+      milestone: 'R6',
     })
     createTask(database, {
       id: 'R6-1.B.1',
@@ -135,6 +137,7 @@ describe('Stream A — task CRUD route functions', () => {
       state: 'TO-DO',
       phase: 'Phase 1',
       stream: 'B',
+      milestone: 'R6',
     })
 
     const result = listTasks(database, { phase: 'Phase 1', stream: 'A' })

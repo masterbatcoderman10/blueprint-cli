@@ -24,9 +24,9 @@ function openMemoryDb(): TestDatabase {
 function insertTask(database: DatabaseSync, id: string): void {
   database
     .prepare(
-      "INSERT INTO tasks (id, title, description, state, phase, stream, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+      "INSERT INTO tasks (id, title, description, state, phase, stream, milestone, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
     )
-    .run(id, `Task ${id}`, '', 'IN-PROGRESS', 'Phase 1', 'B', 1, 1)
+    .run(id, `Task ${id}`, '', 'IN-PROGRESS', 'Phase 1', 'B', 'R6', 1, 1)
 }
 
 function countComments(database: DatabaseSync, taskId: string): number {

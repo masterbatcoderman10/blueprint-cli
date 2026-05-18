@@ -9,6 +9,7 @@ import {
   type TaskState,
   type UpdateTaskInput,
 } from '../types'
+import { parseMilestoneFromId } from '../migrations'
 
 interface TaskRow {
   id: string
@@ -19,6 +20,7 @@ interface TaskRow {
   stream: string | null
   author: string | null
   implementation_notes: string | null
+  milestone: string
   created_at: number
   updated_at: number
 }
@@ -39,6 +41,7 @@ function taskFromRow(row: TaskRow): Task {
     stream: row.stream,
     author: row.author,
     implementation_notes: row.implementation_notes,
+    milestone: row.milestone,
     created_at: row.created_at,
     updated_at: row.updated_at,
   }
@@ -89,6 +92,7 @@ export function createTask(db: TrackerDatabase, input: CreateTaskInput): TaskRes
   }
 
   const now = input.now ?? Date.now()
+  const milestone = input.milestone ?? parseMilestoneFromId(input.id) ?? ''
   db.prepare(
     `INSERT INTO tasks (
       id,
@@ -99,9 +103,10 @@ export function createTask(db: TrackerDatabase, input: CreateTaskInput): TaskRes
       stream,
       author,
       implementation_notes,
+      milestone,
       created_at,
       updated_at
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
   ).run(
     input.id,
     input.title,
@@ -111,6 +116,7 @@ export function createTask(db: TrackerDatabase, input: CreateTaskInput): TaskRes
     input.stream ?? null,
     input.author ?? null,
     input.implementation_notes ?? null,
+    milestone,
     now,
     now,
   )
@@ -167,6 +173,7 @@ export function updateTask(db: TrackerDatabase, input: UpdateTaskInput): TaskRes
           stream = ?,
           author = ?,
           implementation_notes = ?,
+          milestone = ?,
           updated_at = ?
       WHERE id = ?`,
   ).run(
@@ -177,6 +184,7 @@ export function updateTask(db: TrackerDatabase, input: UpdateTaskInput): TaskRes
     input.stream === undefined ? existing.stream : input.stream,
     input.author === undefined ? existing.author : input.author,
     input.implementation_notes === undefined ? existing.implementation_notes : input.implementation_notes,
+    input.milestone ?? existing.milestone,
     updatedAt,
     input.id,
   )

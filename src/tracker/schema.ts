@@ -1,10 +1,15 @@
 import BetterSqlite3 from 'better-sqlite3'
 
+import { runV1ToV2Migration } from './migrations'
+
 export type TrackerDatabase = InstanceType<typeof BetterSqlite3>
 
-export const TRACKER_SCHEMA_VERSION = 1
+export const TRACKER_SCHEMA_VERSION = 2
 
 export function applySchema(db: TrackerDatabase): void {
+  // Run migrations before creating schema (idempotent on fresh/current-version DBs)
+  runV1ToV2Migration(db)
+
   db.exec(`
     CREATE TABLE IF NOT EXISTS tasks (
       id TEXT PRIMARY KEY NOT NULL,
@@ -15,6 +20,7 @@ export function applySchema(db: TrackerDatabase): void {
       stream TEXT,
       author TEXT,
       implementation_notes TEXT,
+      milestone TEXT NOT NULL,
       created_at INTEGER NOT NULL,
       updated_at INTEGER NOT NULL
     );
@@ -45,6 +51,8 @@ export function applySchema(db: TrackerDatabase): void {
 
     CREATE INDEX IF NOT EXISTS idx_tasks_state ON tasks(state);
     CREATE INDEX IF NOT EXISTS idx_tasks_phase_stream ON tasks(phase, stream);
+    CREATE INDEX IF NOT EXISTS idx_tasks_milestone ON tasks(milestone);
+    CREATE INDEX IF NOT EXISTS idx_tasks_milestone_phase ON tasks(milestone, phase);
     CREATE INDEX IF NOT EXISTS idx_review_comments_task_id ON review_comments(task_id);
     CREATE INDEX IF NOT EXISTS idx_review_comments_parent_id ON review_comments(parent_id);
   `)
