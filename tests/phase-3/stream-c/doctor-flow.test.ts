@@ -13,6 +13,7 @@ import { tmpdir } from 'node:os'
 import { invokeCli } from '../../helpers/cli'
 import { writeCanonicalProject } from '../stream-b/test-project'
 import { MANIFEST_RELATIVE_PATH, TEMPLATE_VERSION } from '../../../src/doctor/manifest'
+import { openDb } from '../../../src/tracker/db'
 
 vi.mock('@clack/prompts', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@clack/prompts')>()
@@ -41,6 +42,7 @@ describe('T-C.3: Doctor End-to-End Flow', () => {
     it('analyzes, repairs, reruns validation, and reports clean result', async () => {
       const projectDir = await mkdtempJoinTmpdir('blueprint-doctor-e2e-')
       await writeCanonicalProject(projectDir)
+      openDb(projectDir).close()
 
       const executionPath = join(projectDir, 'docs', 'core', 'execution.md')
       await writeFile(executionPath, '# Drifted Content\n')
@@ -75,6 +77,7 @@ describe('T-C.3: Doctor End-to-End Flow', () => {
     it('exits with 0 and reports no issues for a clean canonical project', async () => {
       const projectDir = await mkdtempJoinTmpdir('blueprint-doctor-clean-')
       await writeCanonicalProject(projectDir)
+      openDb(projectDir).close()
 
       const originalCwd = process.cwd()
       process.chdir(projectDir)

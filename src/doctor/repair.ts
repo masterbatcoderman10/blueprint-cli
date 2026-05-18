@@ -1,5 +1,6 @@
 import { stat } from 'node:fs/promises'
 import { join } from 'node:path'
+
 import type { DoctorFinding } from './findings'
 import { resolveAllCoreTemplatePaths, resolveTemplatePath } from './inventory'
 import { MANIFEST_RELATIVE_PATH, type ManifestData, TEMPLATE_VERSION, getCliVersion } from './manifest'
@@ -18,27 +19,61 @@ async function pathExists(path: string): Promise<boolean> {
   }
 }
 
+export interface TrackerDbMigrationStep {
+  key: 'create-db' | 'import-snapshot' | 'seed-meta' | 'ensure-gitignore'
+  description: string
+}
+
+export interface TemplateRepairAction {
+  type: 'create-from-template' | 'replace-in-place'
+  targetPath: string
+  templatePath?: string
+  description: string
+}
+
+export interface BootstrapManifestRepairAction {
+  type: 'bootstrap-manifest'
+  targetPath: string
+  manifestData?: ManifestData
+  description: string
+}
+
+export interface TrackerDbMigrationRepairAction {
+  type: 'migrate-tracker-db'
+  targetPath: string
+  description: string
+  steps: TrackerDbMigrationStep[]
+}
+
 /**
  * A repair action represents a concrete operation to fix an integrity issue.
  */
-export interface RepairAction {
-  /** The type of repair to perform */
-  type: 'create-from-template' | 'replace-in-place' | 'bootstrap-manifest'
-  /** The target path for the repair (relative to project root) */
-  targetPath: string
-  /** For template-based repairs, the source template path */
-  templatePath?: string
-  /** For manifest bootstrap, the managed files to record */
-  manifestData?: ManifestData
-  /** Human-readable description of what will be done */
-  description: string
-}
+export type RepairAction = TemplateRepairAction | BootstrapManifestRepairAction | TrackerDbMigrationRepairAction
 
 export interface RepairPlan {
   actions: RepairAction[]
   hasBlockingFindings: boolean
   blockingReason?: string
 }
+
+export const TRACKER_DB_MIGRATION_STEPS: TrackerDbMigrationStep[] = [
+  {
+    key: 'create-db',
+    description: 'Create tracker database and apply schema',
+  },
+  {
+    key: 'import-snapshot',
+    description: 'Import tasks.export.json snapshot if present',
+  },
+  {
+    key: 'seed-meta',
+    description: 'Seed project_meta from docs/project-progress.md if still empty',
+  },
+  {
+    key: 'ensure-gitignore',
+    description: 'Ensure .gitignore contains docs/.blueprint/tasks.db',
+  },
+]
 
 /**
  * Creates a repair plan from Doctor findings.
@@ -50,90 +85,78 @@ export async function createRepairPlan(findings: DoctorFinding[], projectDir: st
   let blockingReason: string | undefined
 
   for (const finding of findings) {
-    // Blocking findings cannot be repaired automatically
     if (finding.kind === 'manifest-validation-error') {
       hasBlockingFindings = true
       blockingReason = finding.message
       continue
     }
 
-    // Missing structure findings → create-from-template actions
     if (finding.kind === 'missing-structure') {
       if (finding.scope === 'directory') {
-        // Directories are created directly, not from templates
         actions.push({
           type: 'create-from-template',
           targetPath: finding.targetPath,
           description: `Create missing directory: ${finding.targetPath}`,
         })
       } else {
-        // Files are copied from bundled templates
-        const templatePath = resolveTemplatePath(finding.targetPath)
         actions.push({
           type: 'create-from-template',
           targetPath: finding.targetPath,
-          templatePath,
+          templatePath: resolveTemplatePath(finding.targetPath),
           description: `Create missing file from template: ${finding.targetPath}`,
         })
       }
+
+      continue
     }
 
-    // Drifted file findings → replace-in-place actions
     if (finding.kind === 'drifted-file') {
-      // Determine if this is a core file or a managed agent file
-      const coreTemplates = resolveAllCoreTemplatePaths()
-      const coreTemplate = coreTemplates.find((t) => t.relativePath === finding.targetPath)
-
-      if (coreTemplate) {
-        actions.push({
-          type: 'replace-in-place',
-          targetPath: finding.targetPath,
-          templatePath: coreTemplate.absolutePath,
-          description: `Replace drifted canonical file with bundled template: ${finding.targetPath}`,
-        })
-      } else {
-        // Must be a managed agent file
-        const templatePath = resolveTemplatePath(finding.targetPath)
-        actions.push({
-          type: 'replace-in-place',
-          targetPath: finding.targetPath,
-          templatePath,
-          description: `Replace drifted managed agent file with bundled template: ${finding.targetPath}`,
-        })
-      }
+      const coreTemplate = resolveAllCoreTemplatePaths().find((template) => template.relativePath === finding.targetPath)
+      actions.push({
+        type: 'replace-in-place',
+        targetPath: finding.targetPath,
+        templatePath: coreTemplate?.absolutePath ?? resolveTemplatePath(finding.targetPath),
+        description: coreTemplate
+          ? `Replace drifted canonical file with bundled template: ${finding.targetPath}`
+          : `Replace drifted managed agent file with bundled template: ${finding.targetPath}`,
+      })
+      continue
     }
 
-    // Missing manifest → bootstrap-manifest action
     if (finding.kind === 'missing-manifest') {
-      // For legacy projects, we need to detect which agent files exist
-      // and record them as managed files
       const existingManagedFiles: string[] = []
       for (const agentFile of SUPPORTED_AGENT_FILES) {
-        const agentPath = join(projectDir, agentFile)
-        if (await pathExists(agentPath)) {
+        if (await pathExists(join(projectDir, agentFile))) {
           existingManagedFiles.push(agentFile)
         }
-      }
-
-      const manifestData: ManifestData = {
-        templateVersion: TEMPLATE_VERSION,
-        cliVersion: await getCliVersion(),
-        managedFiles: existingManagedFiles,
       }
 
       actions.push({
         type: 'bootstrap-manifest',
         targetPath: MANIFEST_RELATIVE_PATH,
-        manifestData,
+        manifestData: {
+          templateVersion: TEMPLATE_VERSION,
+          cliVersion: await getCliVersion(),
+          managedFiles: existingManagedFiles,
+        },
         description: `Bootstrap manifest metadata for legacy Blueprint project: ${MANIFEST_RELATIVE_PATH}`,
       })
+      continue
     }
 
-    // Template version mismatch → we don't auto-repair in this phase
-    // The finding is informational only; user decides whether to update
-    if (finding.kind === 'template-version-mismatch') {
-      // In Phase 3, version mismatch is reported but not auto-repaired
-      // This is a recommendation-only finding
+    if (finding.kind === 'missing-tracker-db') {
+      actions.push({
+        type: 'migrate-tracker-db',
+        targetPath: finding.targetPath,
+        description:
+          'Create the tracker database, import tasks.export.json if available, seed project metadata, and update .gitignore.',
+        steps: TRACKER_DB_MIGRATION_STEPS,
+      })
+      continue
+    }
+
+    if (finding.kind === 'template-version-mismatch' || finding.kind === 'tracker-db-drift') {
+      continue
     }
   }
 
@@ -156,17 +179,20 @@ export function renderRepairPlan(plan: RepairPlan): string {
     return 'No repairs needed. Project integrity is clean.'
   }
 
-  const lines: string[] = []
-  lines.push('Proposed repairs:')
-  lines.push('')
+  const lines: string[] = ['Proposed repairs:', '']
 
   for (let i = 0; i < plan.actions.length; i++) {
     const action = plan.actions[i]
     lines.push(`  ${i + 1}. [${action.type}] ${action.description}`)
+
+    if (action.type === 'migrate-tracker-db') {
+      for (let j = 0; j < action.steps.length; j++) {
+        lines.push(`     ${j + 1}. [will-run] ${action.steps[j].description}`)
+      }
+    }
   }
 
   lines.push('')
   lines.push(`Total: ${plan.actions.length} repair(s) to apply.`)
-
   return lines.join('\n')
 }
