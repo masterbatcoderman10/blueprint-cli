@@ -33,7 +33,7 @@ alignment, and grows as the project gains clarity.
   The SRS does NOT contain:
     - Gate/stream/task breakdowns
     - Execution sequencing
-    - Kanban task state
+    - Tracker task state
     - Review notes
     - Implementation checklists
     - Code-level instructions

@@ -51,15 +51,40 @@ It runs at the start of EVERY session before any other action.
 
   IF it is populated:
 
-    CHECK — Kanban project name is present
-      project-progress.md must contain a non-empty kanban project name.
-      FAIL → STOP. "No kanban project name found. This must be set
-              before any work can begin."
+    CHECK — Tracker project id is present
+      project-progress.md must contain a non-empty tracker project id.
+      FAIL → STOP. "No tracker project id found. This must be set
+              before any work can begin. Run `blueprint init` if the
+              project has not been set up yet."
 
-    CHECK — vibe-kanban MCP is reachable
-      Attempt a read operation against the kanban project.
-      FAIL → STOP. "Kanban MCP is unreachable. Task execution,
-              review, and status changes cannot proceed."
+    CHECK — tasks.db exists
+      Verify docs/.blueprint/tasks.db exists on disk.
+      FAIL → STOP. "Tracker database not found at docs/.blueprint/tasks.db.
+              Run `blueprint init` to provision the tracker, or verify
+              the project was set up correctly."
+
+    CHECK — Tracker HTTP server is reachable
+      Attempt a read operation against the local tracker:
+        curl -s http://127.0.0.1:7300/project
+      If the server responds with project metadata, the check PASSES.
+
+      If the server is NOT reachable BUT tasks.db exists:
+        → Boot the board in the background:
+
+          ```bash
+          blueprint board &
+          ```
+
+          After spawning, poll `GET /project` until it succeeds
+          (retry every 500 ms for up to 10 seconds).
+
+          The browser-open side-effect is benign — it does not interfere
+          with agent operation.
+
+          Once the server responds, the check PASSES.
+
+      If the server is NOT reachable AND tasks.db does not exist:
+        → This case is already caught by the tasks.db check above.
 
   ───────────────────────────────────────────────────────────────
 

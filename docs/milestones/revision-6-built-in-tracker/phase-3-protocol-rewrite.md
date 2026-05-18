@@ -294,7 +294,7 @@ Total test count: **31** (Gate 5, Stream A 12, Stream B 9, Stream C 12).
 > includes test impact. See docs/core/tweak-planning.md for the full
 > tweak workflow.
 
-_None._
+- **R6-3.B.7** — Audit decision: `docs/core/srs-planning.md` contains zero kanban references in non-historical text (only in examples illustrating external tooling, which are acceptable). No rewrite applied.
 
 ---
 
