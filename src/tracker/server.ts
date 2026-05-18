@@ -21,7 +21,7 @@ interface ProjectMetaRow {
 
 type JsonObject = Record<string, unknown>
 type JsonBody = JsonObject | undefined
-type RouteResult = { status: number; body: TrackerResult<unknown, ErrorEnvelope> }
+type RouteResult = { status: number; body: Result<unknown, ErrorEnvelope> }
 
 interface ErrorEnvelope {
   code: string
@@ -63,12 +63,12 @@ async function readJson(request: IncomingMessage): Promise<JsonBody> {
 function errorResult(code: string, message: string): RouteResult {
   return {
     status: ERROR_STATUS[code] ?? 500,
-    body: { error: { code, message } },
+    body: { ok: false, error: { code, message } },
   }
 }
 
 function dataResult(status: number, data: unknown): RouteResult {
-  return { status, body: { data } }
+  return { status, body: { ok: true, data } }
 }
 
 function taskResult<TData>(status: number, result: Result<TData, TaskError>): RouteResult {

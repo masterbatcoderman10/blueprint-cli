@@ -172,7 +172,7 @@ describe('Stream C — tracker HTTP server', () => {
       method: 'DELETE',
     })
     expect(deletedTask.status).toBe(200)
-    expect(deletedTask.body).toEqual({ data: { id: 'R6-1.C.1' } })
+    expect(deletedTask.body).toEqual({ ok: true, data: { id: 'R6-1.C.1' } })
   })
 
   it('T-C.1.5: comment routes dispatch through to Stream B handlers', async () => {
@@ -230,7 +230,7 @@ describe('Stream C — tracker HTTP server', () => {
       method: 'DELETE',
     })
     expect(deletedComment.status).toBe(200)
-    expect(deletedComment.body).toEqual({ data: { deleted: true } })
+    expect(deletedComment.body).toEqual({ ok: true, data: { deleted: true } })
   })
 
   it('T-C.1.8: error envelopes carry correct HTTP status codes', async () => {
@@ -285,6 +285,7 @@ describe('Stream C — tracker HTTP server', () => {
 
     expect(response.status).toBe(200)
     expect(response.body).toEqual({
+      ok: true,
       data: {
         name: 'Blueprint CLI',
         tagline: 'Structured software development',
