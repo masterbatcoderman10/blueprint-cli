@@ -4,7 +4,7 @@
 **Tracker**: blueprint-cli
 **Current Milestone**: Revision 6 — Built-in Task Tracker
 **Current Phase**: Phase 4 — Migration & Doctor Integration
-**Status**: Revision 6 in progress — Phase 4 not started
+**Status**: Revision 6 in progress — Phase 4 planned + test-planned, ready for execution
 
 ---
 
