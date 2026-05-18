@@ -82,6 +82,16 @@ function selectTask(db: TrackerDatabase, id: string): Task | undefined {
   return row ? taskFromRow(row) : undefined
 }
 
+function invalidMilestone(id: string): TaskResult<never> {
+  return {
+    ok: false,
+    error: {
+      code: 'invalid_milestone',
+      message: `Milestone required or auto-derivable from task ID. Received ID '${id}' does not match expected patterns.`,
+    },
+  }
+}
+
 export function createTask(db: TrackerDatabase, input: CreateTaskInput): TaskResult<Task> {
   if (!isTaskState(input.state)) {
     return invalidState(input.state)
@@ -91,8 +101,19 @@ export function createTask(db: TrackerDatabase, input: CreateTaskInput): TaskRes
     return duplicateId(input.id)
   }
 
+  // Derive milestone: explicit value > auto-derive from ID > reject
+  let milestone: string
+  if (input.milestone !== undefined && input.milestone !== '') {
+    milestone = input.milestone
+  } else {
+    const derived = parseMilestoneFromId(input.id)
+    if (derived === null) {
+      return invalidMilestone(input.id)
+    }
+    milestone = derived
+  }
+
   const now = input.now ?? Date.now()
-  const milestone = input.milestone ?? parseMilestoneFromId(input.id) ?? ''
   db.prepare(
     `INSERT INTO tasks (
       id,

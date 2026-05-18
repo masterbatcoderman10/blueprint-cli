@@ -41,6 +41,23 @@ describe('parseMilestoneFromId', () => {
   it('returns null for bare number like 123', () => {
     expect(parseMilestoneFromId('123')).toBeNull()
   })
+
+  // BUG-* ID support
+  it('extracts R6 from BUG-R6-4-001', () => {
+    expect(parseMilestoneFromId('BUG-R6-4-001')).toBe('R6')
+  })
+
+  it('extracts R6 from BUG-R6-4-004', () => {
+    expect(parseMilestoneFromId('BUG-R6-4-004')).toBe('R6')
+  })
+
+  it('extracts M1 from BUG-M1-2-001', () => {
+    expect(parseMilestoneFromId('BUG-M1-2-001')).toBe('M1')
+  })
+
+  it('returns null for BUG- with wrong prefix', () => {
+    expect(parseMilestoneFromId('BUG-XY-1-001')).toBeNull()
+  })
 })
 
 describe('normalizePhase', () => {
@@ -59,6 +76,15 @@ describe('normalizePhase', () => {
 
   it('is identity on unknown long-form value', () => {
     expect(normalizePhase('Phase 99 — Unknown')).toBe('Phase 99 — Unknown')
+  })
+
+  // BUG-* ID context for normalizePhase
+  it('derives phase from BUG-R6-4-001 when phase is long-form containing R6', () => {
+    expect(normalizePhase('Phase 4 — Migration & Doctor Integration', 'BUG-R6-4-001')).toBe('R6-4')
+  })
+
+  it('is identity on BUG-R6-4-001 when phase is already short-form', () => {
+    expect(normalizePhase('R6-4', 'BUG-R6-4-001')).toBe('R6-4')
   })
 })
 
@@ -289,5 +315,116 @@ describe('v1 → v2 migration', () => {
     expect(row.state).toBe('IN-PROGRESS')
     expect(row.phase).toBe('R6-3')
     expect(row.milestone).toBe('R6')
+  })
+
+  it('review_comments survive migration (not cascade-deleted)', () => {
+    const database = createV1Database()
+    const now = Date.now()
+
+    // Insert a task
+    insertV1Task(database, { id: 'R6-3.A.1', phase: 'R6-3' })
+
+    // Insert a review comment on that task
+    database.prepare(
+      `INSERT INTO review_comments (id, task_id, parent_id, severity, body, author, line, created_at, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    ).run('comment-1', 'R6-3.A.1', null, 'MAJOR', 'This needs work', 'reviewer', null, now, now)
+
+    // Run migration
+    runV1ToV2Migration(database)
+
+    // Verify the comment survived
+    const comments = database.prepare('SELECT * FROM review_comments').all() as Array<Record<string, unknown>>
+    expect(comments).toHaveLength(1)
+    expect(comments[0].id).toBe('comment-1')
+    expect(comments[0].task_id).toBe('R6-3.A.1')
+    expect(comments[0].body).toBe('This needs work')
+
+    // Task should also be migrated correctly
+    const task = database.prepare('SELECT * FROM tasks WHERE id = ?').get('R6-3.A.1') as Record<string, unknown>
+    expect(task.milestone).toBe('R6')
+  })
+
+  it('review_comments survive migration with multiple tasks and comments', () => {
+    const database = createV1Database()
+    const now = Date.now()
+
+    insertV1Task(database, { id: 'R6-3.A.1', phase: 'R6-3' })
+    insertV1Task(database, { id: 'R6-4.0.1', phase: 'R6-4' })
+
+    // Insert comments on both tasks
+    database.prepare(
+      `INSERT INTO review_comments (id, task_id, parent_id, severity, body, author, line, created_at, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    ).run('comment-1', 'R6-3.A.1', null, 'MAJOR', 'Fix this', 'reviewer', null, now, now)
+
+    database.prepare(
+      `INSERT INTO review_comments (id, task_id, parent_id, severity, body, author, line, created_at, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    ).run('comment-2', 'R6-4.0.1', null, 'MINOR', 'Nits', 'reviewer', null, now, now)
+
+    runV1ToV2Migration(database)
+
+    // All comments survive
+    const comments = database.prepare('SELECT * FROM review_comments ORDER BY id').all() as Array<Record<string, unknown>>
+    expect(comments).toHaveLength(2)
+    expect(comments[0].id).toBe('comment-1')
+    expect(comments[1].id).toBe('comment-2')
+
+    // Tasks migrated correctly
+    const task1 = database.prepare('SELECT milestone FROM tasks WHERE id = ?').get('R6-3.A.1') as { milestone: string }
+    const task2 = database.prepare('SELECT milestone FROM tasks WHERE id = ?').get('R6-4.0.1') as { milestone: string }
+    expect(task1.milestone).toBe('R6')
+    expect(task2.milestone).toBe('R6')
+  })
+
+  it('migrates BUG-* task IDs with correct milestone extraction', () => {
+    const database = createV1Database()
+    const now = Date.now()
+
+    // Insert standard tasks
+    insertV1Task(database, { id: 'R6-3.A.1', phase: 'R6-3' })
+    insertV1Task(database, { id: 'R6-4.0.1', phase: 'R6-4' })
+
+    // Insert BUG-* tasks (as they exist in the live project DB)
+    for (const bugId of ['BUG-R6-4-001', 'BUG-R6-4-002', 'BUG-R6-4-003', 'BUG-R6-4-004']) {
+      database
+        .prepare(
+          `INSERT INTO tasks (id, title, description, state, phase, stream, author, implementation_notes, created_at, updated_at)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        )
+        .run(
+          bugId,
+          `Bug task ${bugId}`,
+          'Bug description',
+          'DONE',
+          'R6-4',
+          null,
+          null,
+          null,
+          now,
+          now,
+        )
+    }
+
+    runV1ToV2Migration(database)
+
+    // All tasks should be migrated
+    const count = database.prepare('SELECT COUNT(*) as cnt FROM tasks').get() as { cnt: number }
+    expect(count.cnt).toBe(6)
+
+    // No null milestones
+    const nullCount = database.prepare('SELECT COUNT(*) as cnt FROM tasks WHERE milestone IS NULL').get() as { cnt: number }
+    expect(nullCount.cnt).toBe(0)
+
+    // BUG-* tasks should have milestone = 'R6'
+    for (const bugId of ['BUG-R6-4-001', 'BUG-R6-4-002', 'BUG-R6-4-003', 'BUG-R6-4-004']) {
+      const row = database.prepare('SELECT milestone FROM tasks WHERE id = ?').get(bugId) as { milestone: string }
+      expect(row.milestone).toBe('R6')
+    }
+
+    // Standard tasks also have correct milestone
+    const r6Task = database.prepare('SELECT milestone FROM tasks WHERE id = ?').get('R6-3.A.1') as { milestone: string }
+    expect(r6Task.milestone).toBe('R6')
   })
 })

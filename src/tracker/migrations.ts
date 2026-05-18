@@ -3,9 +3,15 @@ import type { TrackerDatabase } from './schema'
 /**
  * Extracts the milestone prefix from a task ID.
  * Matches patterns like 'R6-3.A.1' → 'R6', 'M1-2.0.1' → 'M1'.
+ * Also handles bug-task IDs like 'BUG-R6-4-001' → 'R6'.
  * Returns null for IDs that don't match the expected pattern.
  */
 export function parseMilestoneFromId(id: string): string | null {
+  // Try BUG- prefixed IDs first: BUG-R6-4-001 → R6
+  const bugMatch = /^BUG-([MR]\d+)-/.exec(id)
+  if (bugMatch) return bugMatch[1]
+
+  // Standard prefix: R6-3.A.1 → R6, M1-2.0.1 → M1
   const match = /^([MR]\d+)-/.exec(id)
   return match ? match[1] : null
 }
@@ -22,11 +28,30 @@ const KNOWN_LONG_FORM_PHASES: Record<string, string> = {
  * Normalizes a phase value to its short form.
  * If the phase is already in short form (e.g., 'R6-4'), returns it unchanged.
  * If it matches a known long-form value, returns the corresponding short form.
+ *
+ * @param phase The phase value to normalize.
+ * @param id Optional task ID for context (used for BUG-* IDs that carry milestone info).
  */
-export function normalizePhase(phase: string): string {
+export function normalizePhase(phase: string, id?: string): string {
   if (KNOWN_LONG_FORM_PHASES[phase]) {
     return KNOWN_LONG_FORM_PHASES[phase]
   }
+
+  // For BUG-* IDs, try to derive short-form phase from the ID pattern.
+  // BUG-R6-4-001 → phase should be R6-4 if the stored phase is long-form or ambiguous.
+  if (id) {
+    const bugPhaseMatch = /^BUG-([MR]\d+-\d+)-/.exec(id)
+    if (bugPhaseMatch && phase !== bugPhaseMatch[1]) {
+      // If the current phase doesn't match the ID-derived short form and the
+      // stored phase is a long-form that contains the milestone prefix, normalize it.
+      const derivedPhase = bugPhaseMatch[1]
+      const milestone = parseMilestoneFromId(id)
+      if (milestone && phase.includes(milestone)) {
+        return derivedPhase
+      }
+    }
+  }
+
   return phase
 }
 
@@ -49,6 +74,11 @@ export function runV1ToV2Migration(db: TrackerDatabase): void {
     return
   }
 
+  // Disable foreign keys BEFORE the transaction to prevent CASCADE deletion
+  // of review_comments during the DROP TABLE tasks step. SQLite does not allow
+  // changing this pragma inside a transaction.
+  db.pragma('foreign_keys = OFF')
+
   const transaction = db.transaction(() => {
     // Step (a): Add milestone column without NOT NULL constraint
     db.exec('ALTER TABLE tasks ADD COLUMN milestone TEXT')
@@ -69,13 +99,13 @@ export function runV1ToV2Migration(db: TrackerDatabase): void {
         badIds.push(row.id)
         continue
       }
-      const normalizedPhase = normalizePhase(row.phase)
+      const normalizedPhase = normalizePhase(row.phase, row.id)
       updateStmt.run(milestone, normalizedPhase, row.id)
     }
 
     if (badIds.length > 0) {
       throw new Error(
-        `Cannot migrate: ${badIds.length} task(s) have IDs that don't match the ^[MR]\\d+- pattern. ` +
+        `Cannot migrate: ${badIds.length} task(s) have IDs that don't match the expected patterns. ` +
           `Manual fix required for: ${badIds.join(', ')}`,
       )
     }
@@ -124,5 +154,11 @@ export function runV1ToV2Migration(db: TrackerDatabase): void {
     db.pragma('user_version = 2')
   })
 
-  transaction()
+  try {
+    transaction()
+  } finally {
+    // Always re-enable foreign keys, even if the migration threw an error
+    // (rollback still happens, so the DB is consistent, but FK must be restored)
+    db.pragma('foreign_keys = ON')
+  }
 }

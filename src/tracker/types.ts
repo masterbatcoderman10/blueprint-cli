@@ -56,6 +56,7 @@ export type TaskError =
   | { code: 'invalid_state'; message: string }
   | { code: 'duplicate_id'; message: string }
   | { code: 'task_not_found'; message: string }
+  | { code: 'invalid_milestone'; message: string }
 
 export type CommentSeverity = 'MAJOR' | 'MINOR'
 
