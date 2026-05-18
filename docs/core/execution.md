@@ -1,17 +1,17 @@
 # Execution
 
 This module defines how agents interact with tasks during execution.
-It covers task creation on the kanban board, starting a gate or stream,
+It covers task creation on the local tracker, starting a gate or stream,
 and applying review notes after a review cycle.
 
 ---
 
 <TaskCreation>
-  PURPOSE: Define how tasks are created on the vibe-kanban board
+  PURPOSE: Define how tasks are created on the local tracker
   when they do not already exist.
 
   Tasks are created from the phase document. The agent copies
-  the relevant information into the kanban board using this structure:
+  the relevant information into the tracker using this structure:
 
   TITLE FORMAT:
     [Full Task ID] Task name
@@ -39,6 +39,8 @@ and applying review notes after a review cycle.
     one the user has requested.
   - Task content must match the phase document. Do not rename,
     split, or merge tasks without user confirmation.
+  - Use the tracker API recipes defined in `docs/core/tracker.md`
+    for task creation and updates.
 </TaskCreation>
 
 ---
@@ -50,7 +52,7 @@ and applying review notes after a review cycle.
   PRECONDITIONS:
   - Phase document is loaded and contains a Test Plan section
   - docs/conventions.md is loaded (tech stack, coding standards, patterns)
-  - Kanban MCP is reachable
+  - Local tracker server is reachable
   - User has specified which gate or stream to start
 
   CONTEXT INFERENCE:
@@ -68,8 +70,10 @@ and applying review notes after a review cycle.
 
   FLOW:
 
-  STEP 1 -- CHECK KANBAN
-    Look up the tasks for the specified gate or stream on the kanban board.
+  STEP 1 -- CHECK TRACKER
+    Look up the tasks for the specified gate or stream on the tracker.
+    Use `GET /tasks?phase=<phase>&stream=<stream>` as documented
+    in `docs/core/tracker.md`.
 
     IF tasks do not exist:
       Create them per <TaskCreation>.
@@ -109,7 +113,7 @@ and applying review notes after a review cycle.
 
     FOR EACH TASK:
 
-    a. Move task to IN-PROGRESS.
+    a. Move task to IN-PROGRESS using `PATCH /tasks/:id`.
     b. Write agent identity as author on the task.
        Use the name of the tool being used:
        Claude Code, Codex, OpenCode, Gemini CLI, or whichever agent is active.
@@ -123,7 +127,7 @@ and applying review notes after a review cycle.
            the right thing -- investigate and fix the test.
          - Implement the task.
          - Run the test(s) again. They should now PASS.
-         - If tests do not pass, continue implementation until they do.
+           If tests do not pass, continue implementation until they do.
        IF the task is marked as not testable:
          - Execute the task normally. No tests required.
        IF the task is marked as partially testable:
@@ -149,7 +153,7 @@ and applying review notes after a review cycle.
     f. Update task notes during implementation with relevant details
        (files modified, tests written, decisions made, anything the
        reviewer should know).
-    g. Move task to IN-REVIEW.
+    g. Move task to IN-REVIEW using `PATCH /tasks/:id`.
 
     Repeat until all tasks in the gate or stream are in IN-REVIEW.
 
@@ -190,24 +194,24 @@ and applying review notes after a review cycle.
   PRECONDITIONS:
   - Phase document is loaded
   - docs/conventions.md is loaded (tech stack, coding standards, patterns)
-  - Kanban MCP is reachable
+  - Local tracker server is reachable
   - The specified gate or stream has been through at least one
     review cycle
   - Clean tasks have already been moved to DONE by the reviewer
 
   CONTEXT INFERENCE:
-    Same as StartGateOrStream — infer the current milestone and
+    Same as StartGateOrStream -- infer the current milestone and
     phase from docs/project-progress.md. Do not ask the user
     unless project-progress.md is ambiguous.
 
   FLOW:
 
-  STEP 1 -- CHECK KANBAN AND WORKTREE
+  STEP 1 -- CHECK TRACKER AND WORKTREE
     Retrieve all tasks for the specified gate or stream that are
-    in the IN-REVIEW state.
+    in the IN-REVIEW or REWORK state.
 
-    IF no tasks are in IN-REVIEW:
-      Inform user: "No tasks found in review for this gate/stream."
+    IF no tasks are in IN-REVIEW or REWORK:
+      Inform user: "No tasks found in review or rework for this gate/stream."
       STOP.
 
     Navigate to the worktree for this gate or stream. The worktree
@@ -215,8 +219,8 @@ and applying review notes after a review cycle.
     IF it does not exist, STOP and flag to the user.
 
   STEP 2 -- READ REVIEW NOTES
-    For each task in the specified gate or stream that is in IN-REVIEW,
-    read the review notes from the task description.
+    For each task in the specified gate or stream that is in IN-REVIEW
+    or REWORK, read the review notes from the task description.
     Only inspect tasks belonging to the gate or stream the user
     specified -- do not read or act on tasks from other streams.
 
@@ -228,7 +232,9 @@ and applying review notes after a review cycle.
   STEP 3 -- ADDRESS NOTES (sequentially, one task at a time)
     For each task in the specified gate or stream that has review notes:
 
-    a. Move task to IN-PROGRESS.
+    a. If the task is in REWORK, move it to IN-PROGRESS.
+       If the task is in IN-REVIEW, move it to IN-PROGRESS.
+       Use `PATCH /tasks/:id` as documented in `docs/core/tracker.md`.
     b. Read each review note.
     c. Address the note -- make the required changes.
     d. Run linting on files modified. Fix any lint errors in those
@@ -241,7 +247,7 @@ and applying review notes after a review cycle.
          Review: "Error handling missing on share endpoint"
          Response: "Added try/catch with specific error types
          in share.controller.ts -- handles 404, 403, and 500."
-    g. Move task back to IN-REVIEW.
+    g. Move task to IN-REVIEW using `PATCH /tasks/:id`.
 
     Repeat for the next task.
 
@@ -256,6 +262,7 @@ and applying review notes after a review cycle.
   - The agent NEVER moves a task to DONE, even after addressing
     review notes. Only the reviewer does.
   - Tasks move IN-PROGRESS to IN-REVIEW, never IN-PROGRESS to DONE.
+  - Tasks in REWORK move REWORK → IN-PROGRESS → IN-REVIEW.
   - The agent responds to every review note. No note is silently
     skipped or ignored.
   - If a review note is unclear, ask the user for clarification
@@ -264,31 +271,34 @@ and applying review notes after a review cycle.
 
 ---
 
-<KanbanStates>
-  The kanban board uses these states:
+<TrackerStates>
+  The tracker uses these five states:
 
   TO-DO        -- Task exists but is not yet being worked on
   IN-PROGRESS  -- Task is actively being worked on by an agent
   IN-REVIEW    -- Task is complete and awaiting review
+  REWORK       -- Task was rejected during review and needs correction
   DONE         -- Task has passed review (moved by reviewer only)
 
   STATE TRANSITIONS:
 
   During execution (StartGateOrStream):
-    TO-DO to IN-PROGRESS to IN-REVIEW
+    TO-DO → IN-PROGRESS → IN-REVIEW
 
   During review note application (ApplyReviewNotes):
-    IN-REVIEW to IN-PROGRESS to IN-REVIEW
+    IN-REVIEW → IN-PROGRESS → IN-REVIEW
+    REWORK → IN-PROGRESS → IN-REVIEW
 
   During review (handled by review.md):
-    IN-REVIEW to DONE (if clean)
-    IN-REVIEW stays in IN-REVIEW with notes (if changes needed)
+    IN-REVIEW → DONE (if clean)
+    IN-REVIEW → REWORK (if changes needed)
 
   FORBIDDEN TRANSITIONS:
   - Execution agent NEVER moves to DONE
   - No task skips IN-REVIEW
   - No task moves backward from DONE
-</KanbanStates>
+  - No direct REWORK → DONE transition
+</TrackerStates>
 
 ---
 

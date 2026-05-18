@@ -96,8 +96,18 @@ their declared dependencies and scopes.
   that each stream runs.
 
   Each stream is a parallel execution path with its own worktree, branch,
-  and kanban tasks. Streams do not wait for each other during execution
+  and tracker tasks. Streams do not wait for each other during execution
   or review unless the parallelization map declares a dependency.
+
+  The tracker state machine for every stream follows the five canonical
+  states:
+
+  ```
+  TO-DO → IN-PROGRESS → IN-REVIEW → REWORK → DONE
+  ```
+
+  Canonical forward transition after review rejection:
+  REWORK → IN-PROGRESS → IN-REVIEW
 
   LOOP STEPS:
 
@@ -109,16 +119,19 @@ their declared dependencies and scopes.
     2. REVIEW
        - Delegate to `review.md` ReviewProcess.
        - The review agent examines the stream's worktree.
-       - Clean tasks move to DONE; tasks with notes stay IN-REVIEW.
+       - Clean tasks move to DONE; tasks with issues move to REWORK.
 
     3. ADDRESS (conditional)
        - If review found issues, delegate to `execution.md` ApplyReviewNotes.
-       - The execution agent addresses notes and returns tasks to IN-REVIEW.
+       - The execution agent picks up tasks in REWORK, addresses
+         notes, and returns tasks to IN-REVIEW.
        - If all tasks were clean, skip this step.
 
     4. REREVIEW (conditional)
        - If notes were addressed, delegate to `review.md` ReReview.
        - The review agent verifies fixes.
+       - Clean tasks move to DONE; tasks with remaining issues
+         move to REWORK.
        - This loop repeats until all tasks are clean and in DONE.
        - Rereview is conditional: it only occurs when the prior review
          found unresolved issues.
@@ -134,8 +147,8 @@ their declared dependencies and scopes.
   INDEPENDENCE RULE:
     - One stream finishing its loop must trigger its own review
       immediately, without waiting for slower streams in the same phase.
-    - A stream blocked by review notes does NOT block unrelated streams
-      that are already clean.
+    - A stream blocked by review notes (tasks in REWORK) does NOT
+      block unrelated streams that are already clean.
 </StreamLifecycle>
 
 ---
@@ -148,8 +161,8 @@ their declared dependencies and scopes.
     Definition: The subagent (execution or review) cannot complete its
     work because of missing information, unavailable tooling, or an
     external dependency failure that is outside the subagent's control.
-    Examples: MCP unreachable, missing environment variable, network
-    outage during test run, ambiguous phase document.
+    Examples: tracker server unreachable, missing environment variable,
+    network outage during test run, ambiguous phase document.
 
     Response: Report-and-stop for that subagent path.
     - The orchestrator records the failure.
@@ -186,7 +199,7 @@ their declared dependencies and scopes.
     When the harness does NOT support effort levels:
     - Report the constraint: "Harness does not support effort escalation.
       Proceeding with default review configuration."
-    - Continue with the best default configuration available.
+      Continue with the best default configuration available.
 
   MODEL ESCALATION
     When the harness supports model or agent switching:
@@ -248,7 +261,7 @@ their declared dependencies and scopes.
     1. RUN PHASE COMPLETION
        - Delegate to an independent phase-completion subagent per
          `docs/core/phase-completion.md`.
-       - The subagent verifies all kanban tasks are DONE, checks the
+       - The subagent verifies all tracker tasks are DONE, checks the
          Definition of Done, runs the full project test suite, and
          either confirms completion or reports regressions.
 
@@ -261,7 +274,7 @@ their declared dependencies and scopes.
 
        IF phase completion is blocked by test failures / regressions:
          → The phase-completion subagent creates [BUG] tasks on the
-           kanban board per `docs/core/phase-completion.md`.
+           tracker per `docs/core/phase-completion.md`.
          → Proceed to step 3.
 
     3. BUG RESOLUTION STREAM
@@ -344,7 +357,7 @@ their declared dependencies and scopes.
     - `phase-planning.md` for parallelization map semantics
 
   RULE:
-    The orchestrator must not redefine per-task rules, kanban state
+    The orchestrator must not redefine per-task rules, tracker state
     transitions, or git operations that are already specified in the
     modules above. It consumes those modules as subroutines.
 </ModuleBoundaries>
@@ -363,7 +376,7 @@ their declared dependencies and scopes.
   </AntiPattern>
 
   <AntiPattern name="Cross-Stream Blockage">
-    <BadExample>Stream B is held in review because Stream A has review notes, even though the parallelization map shows no dependency between them.</BadExample>
+    <BadExample>Stream B is held in review because Stream A has tasks in REWORK, even though the parallelization map shows no dependency between them.</BadExample>
     <Why>Streams are independent execution paths. One stream's review cycle must not gate another stream's progress unless there is an explicit dependency. This preserves parallelism and prevents slower streams from starving faster ones.</Why>
   </AntiPattern>
 

@@ -46,9 +46,11 @@ referenced again at completion for commit.
 
   STEP 2 — VERIFY DEPENDENCIES (dependent streams only)
     IF the gate or stream has dependencies on other streams:
-      a. Check the kanban board — all dependency streams' tasks
+      a. Check the tracker — all dependency streams' tasks
          must be in DONE. This confirms review passed and the
          reviewer merged the branch.
+         Use `GET /tasks?phase=<phase>&stream=<stream>` as
+         documented in `docs/core/tracker.md`.
       b. Run: git log main --oneline
          Confirm the dependency branch's commits are present
          on main.
@@ -101,6 +103,10 @@ referenced again at completion for commit.
     git add .
     git commit -m "<gate/stream ID>: review notes addressed, ready for re-review"
 
+  WHEN REWORK IS ADDRESSED (tasks were in REWORK and returned to IN-REVIEW):
+    git add .
+    git commit -m "<gate/stream ID>: rework addressed, ready for re-review"
+
   FOR BUG FIX TASKS (on main, no worktree):
     git add .
     git commit -m "[BUG] <task title>: fix complete, ready for review"
@@ -110,7 +116,7 @@ referenced again at completion for commit.
     IN-REVIEW. This is not optional.
   - One commit per handoff. Do not commit per-task during
     execution — commit once when the full gate or stream is
-    ready for review, or when all review notes are addressed.
+    ready for review, or when all review notes or rework are addressed.
   - Commit messages must identify the gate, stream, or bug task
     so the reviewer and git history are traceable.
 </CommitOnCompletion>
@@ -126,8 +132,8 @@ referenced again at completion for commit.
     <Why>The main working directory tracks the primary branch. Editing there during gate or stream execution mixes unreviewed changes with committed history, making rollback impossible and causing merge conflicts across parallel streams. Every file modification, test run, and lint pass must happen inside the worktree — no exceptions.</Why>
   </AntiPattern>
   <AntiPattern name="Execution Before Status Update">
-    <BadExample>Beginning substantive implementation work on a task before moving that task to In Progress on the kanban board.</BadExample>
-    <Why>Moving the task to In Progress before starting work signals active ownership to the reviewer and any parallel agents. Skipping this step creates phantom progress — code changes appear without a corresponding kanban state, making it impossible to track what is in flight and who owns it. Always update status first, then execute.</Why>
+    <BadExample>Beginning substantive implementation work on a task before moving that task to IN-PROGRESS on the tracker.</BadExample>
+    <Why>Moving the task to IN-PROGRESS before starting work signals active ownership to the reviewer and any parallel agents. Skipping this step creates phantom progress — code changes appear without a corresponding tracker state, making it impossible to track what is in flight and who owns it. Always update status first (using `PATCH /tasks/:id` per docs/core/tracker.md), then execute.</Why>
   </AntiPattern>
   <AntiPattern name="Overwriting Review Notes">
     <BadExample>Replacing the reviewer's original feedback with the agent's responses during note application, or discarding earlier review rounds when preparing for re-review.</BadExample>

@@ -247,14 +247,25 @@ describe('Stream D — board command', () => {
       const servers: ReturnType<typeof createServer>[] = []
 
       try {
+        let externallyOccupied = 0
         for (const port of [7300, 7301, 7302, 7303, 7304, 7305, 7306, 7307, 7308, 7309]) {
           const server = createServer()
-          await new Promise<void>((resolve, reject) => {
-            server.once('error', reject)
-            server.listen({ host: '127.0.0.1', port }, () => resolve())
+          const bound = await new Promise<boolean>((resolve) => {
+            server.once('error', () => resolve(false))
+            server.listen({ host: '127.0.0.1', port }, () => resolve(true))
           })
-          servers.push(server)
-          occupiedServers.push(server)
+          if (bound) {
+            servers.push(server)
+            occupiedServers.push(server)
+          } else {
+            externallyOccupied++
+          }
+        }
+
+        // Skip if any port is already occupied externally (e.g. dev tracker)
+        if (externallyOccupied > 0) {
+          console.log(`Skipping D.5: ${externallyOccupied} port(s) already occupied externally`)
+          return
         }
 
         const proc = spawnBoard(projectRoot, ['--headless'])
