@@ -28,6 +28,7 @@ export const CANONICAL_CORE_FILES: string[] = [
   'docs/core/scope-change.md',
   'docs/core/srs-planning.md',
   'docs/core/test-planning.md',
+  'docs/core/tracker.md',
   'docs/core/tweak-planning.md',
 ]
 

@@ -1,11 +1,8 @@
-import { mkdir, mkdtemp, rm, writeFile, readFile } from 'node:fs/promises'
+import { mkdir, mkdtemp, rm, writeFile, readFile, access } from 'node:fs/promises'
 import { join } from 'node:path'
 import { tmpdir } from 'node:os'
 
 import { describe, expect, it, beforeEach, afterEach } from 'vitest'
-import { mkdir, mkdtemp, rm, writeFile, readFile, access } from 'node:fs/promises'
-import { join } from 'node:path'
-import { tmpdir } from 'node:os'
 
 import {
   scaffoldBlueprintDirectory,
@@ -100,6 +97,14 @@ describe('Stream A — Scaffold Engine & Doctor Repair', () => {
       const restoredContent = await readFile(join(projectDir, 'docs', 'tweaks', 'README.md'), 'utf-8')
       const templateContent = await readFile(resolveTemplatePath('docs/tweaks/README.md'), 'utf-8')
       expect(restoredContent).toBe(templateContent)
+
+      // Verify missing canonical core files were restored byte-for-byte
+      const missingCoreFiles = ['docs/core/orchestrate.md', 'docs/core/tracker.md', 'docs/core/tweak-planning.md']
+      for (const coreFile of missingCoreFiles) {
+        const restored = await readFile(join(projectDir, coreFile), 'utf-8')
+        const expected = await readFile(resolveTemplatePath(coreFile), 'utf-8')
+        expect(restored, `${coreFile} should match template byte-for-byte`).toBe(expected)
+      }
 
       await rm(projectDir, { recursive: true, force: true })
     })
