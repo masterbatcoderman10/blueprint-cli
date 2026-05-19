@@ -20,6 +20,7 @@ This SRS exists for blueprint-cli to act as the persistent requirement layer bet
 | MAS-203 | Agent Orchestration Protocol Module | Must | active | Revision 5 |
 | MAS-204 | Built-in Task Tracker | Must | active | Revision 6 |
 | MAS-205 | Local Project Board UI | Must | active | Revision 6 |
+| MAS-206 | Standalone Tweak Workflow | Must | approved-pending-implementation | Revision 7 |
 
 ---
 
@@ -77,6 +78,19 @@ The system must provide a single-page browser UI for the built-in task tracker, 
 - The board surface must render five columns (TO-DO / IN-PROGRESS / IN-REVIEW / REWORK / DONE) with live count badges, task cards (multi-line title + stream/gate tag chip + task ID), header filters for phase and stream, and the Done-column collapse for the long tail of completed tasks.
 - The Task Detail rail must open on task-card click, display the task's status, title, description, and a threaded review-comment thread with `MAJOR` / `MINOR` severity chips, single-level replies, and `+ MAJOR` / `+ MINOR` / `Reply` composer affordances.
 - Pre-built SPA assets must ship under `dist/spa/` inside the published npm tarball; consumers must not invoke any build step locally.
+
+#### MAS-206 - Standalone Tweak Workflow
+
+The system must provide a standalone top-level tweak workflow for small, contained changes that should move faster than revisions while preserving Blueprint planning, tracker, review, and verification guards.
+
+- `docs/tweaks/` must be a required Blueprint directory scaffolded into every project.
+- Each tweak must be planned as a standalone Markdown document under `docs/tweaks/`, not as a section inside a phase document.
+- Tweak documents must use a lightweight phase-plan-shaped structure with goals, dependencies, small task tables, acceptance criteria, verification notes, Definition of Done, and completion state.
+- Tweak documents must not include their own formal Test Plan section.
+- Small additions or modifications may be tweaks when the work is contained and does not create a new feature.
+- New features, major edits, regressive changes, cross-cutting contract changes, work needing a formal test plan, or work needing multiple phases must route to revision or milestone planning instead.
+- Phase and revision phase templates must not include a `## Tweaks` section.
+- Tweak tasks must use the built-in tracker and the normal execution, review, address-notes, rereview, and verification lifecycle.
 
 ### Should Have
 
@@ -196,6 +210,19 @@ Change log:
 Change log:
 - 2026-05-17 - Created from Revision 6 (recorded 2026-05-18 via R6 Phase 3 pre-phase SRS repair)
 - 2026-05-19 - Transitioned to active. Phase 5 complete: local board SPA with milestone filter dropdown and real milestone count rendering implemented and verified.
+
+### MAS-206
+- Title: Standalone Tweak Workflow
+- Priority: Must
+- Status: approved-pending-implementation
+- Assigned milestone: Revision 7
+- Source: Revision 7 Standalone Tweak Workflow
+- Introduced by: Revision 7
+- Supersedes: None
+- Superseded by: None
+
+Change log:
+- 2026-05-19 - Created from Revision 7 planning.
 
 ---
 
