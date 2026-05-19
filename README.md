@@ -2,7 +2,7 @@
 
 **Software engineering discipline for AI-aided development.** Blueprint structures planning and execution so you stay in control: phases decompose into testable tasks, agents run in parallel without conflict, and scope changes don't break your plan. Write tests first. Review code before shipping. Track progress in your repo.
 
-[![npm version](https://img.shields.io/npm/v/@splitwireml/blueprint)](https://www.npmjs.com/package/@splitwireml/blueprint) [![Node.js >= 20.0.0](https://img.shields.io/badge/Node.js-%3E%3D20.0.0-brightgreen)](https://nodejs.org/) [![MIT License](https://img.shields.io/badge/License-MIT-blue)](#license) [![GitHub stars](https://img.shields.io/github/stars/splitwireml/blueprint)](https://github.com/splitwireml/blueprint)
+[![npm version](https://img.shields.io/npm/v/@splitwireml/blueprint)](https://www.npmjs.com/package/@splitwireml/blueprint) [![Node.js >= 20.0.0](https://img.shields.io/badge/Node.js-%3E%3D20.0.0-brightgreen)](https://nodejs.org/) [![MIT License](https://img.shields.io/badge/License-MIT-blue)](#license)
 
 ## Get Started
 
@@ -10,14 +10,6 @@
 npm install -g @splitwireml/blueprint
 blueprint init
 ```
-
----
-
-## The Task Tracker
-
-![Blueprint Task Tracker — macOS app showing Kanban board with TO-DO, IN-PROGRESS, IN-REVIEW, and DONE columns.](docs/images/task-tracker.png)
-
-Built-in task tracker gives you visual control over phases and streams. Manage tasks, track state, filter by milestone and assignee.
 
 ---
 
@@ -39,7 +31,7 @@ Blueprint solves this through five mechanisms:
 
 1. **Bounded tasks** — Each task is one deliverable with acceptance criteria and tests. Small scope means full context fits in an agent's budget.
 
-2. **The tracker as external memory** — Task state, progress, blockers, and implementation notes live in the built-in board. Agents don't need to hold project state in context.
+2. **External memory** — Task state, progress, blockers, and implementation notes live in a visual UI-based tracker. Agents don't need to hold project state in context.
 
 3. **Test contracts** — Every task ships with a test. Tests become specs: future agents know exactly what "DONE" means without re-reading docs.
 
@@ -98,7 +90,6 @@ npm install -g @splitwireml/blueprint
 |---------|---------|
 | `blueprint init` | Scaffold a Blueprint project with full docs and templates |
 | `blueprint doctor` | Audit and repair project structure |
-| `blueprint board` | Open built-in task tracker board in browser |
 | `blueprint link` | Cross-project linking *(coming soon)* |
 | `blueprint context` | Cross-project context surfacing *(coming soon)* |
 
