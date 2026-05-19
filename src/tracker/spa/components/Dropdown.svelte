@@ -35,6 +35,8 @@
 <div bind:this={containerEl} style="position: relative;">
   <button
     type="button"
+    aria-label={label}
+    aria-expanded={open}
     onclick={toggle}
     style="
       display: flex; align-items: center; gap: 8px;

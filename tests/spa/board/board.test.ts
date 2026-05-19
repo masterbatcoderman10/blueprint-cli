@@ -12,14 +12,14 @@ describe('R6-2.A.5: Board', () => {
   let mockSelectionStore: SelectionStore
 
   const allStatesTasks: TaskData[] = [
-    { id: 't1', title: 'Todo 1', status: 'todo', phase: 'P2', stream: 'A', gate: '1' },
-    { id: 't2', title: 'Todo 2', status: 'todo', phase: 'P2', stream: 'A', gate: '2' },
-    { id: 't3', title: 'In Progress 1', status: 'in-progress', phase: 'P2', stream: 'B', gate: '1' },
-    { id: 't4', title: 'In Review 1', status: 'in-review', phase: 'P2', stream: 'C', gate: '1' },
-    { id: 't5', title: 'Rework 1', status: 'rework', phase: 'P2', stream: 'D', gate: '1' },
-    { id: 't6', title: 'Done 1', status: 'done', phase: 'P2', stream: 'A', gate: '1' },
-    { id: 't7', title: 'Done 2', status: 'done', phase: 'P2', stream: 'B', gate: '2' },
-    { id: 't8', title: 'Done 3', status: 'done', phase: 'P2', stream: 'C', gate: '3' },
+    { id: 't1', title: 'Todo 1', state: 'TO-DO', phase: 'P2', stream: 'A', gate: '1' },
+    { id: 't2', title: 'Todo 2', state: 'TO-DO', phase: 'P2', stream: 'A', gate: '2' },
+    { id: 't3', title: 'In Progress 1', state: 'IN-PROGRESS', phase: 'P2', stream: 'B', gate: '1' },
+    { id: 't4', title: 'In Review 1', state: 'IN-REVIEW', phase: 'P2', stream: 'C', gate: '1' },
+    { id: 't5', title: 'Rework 1', state: 'REWORK', phase: 'P2', stream: 'D', gate: '1' },
+    { id: 't6', title: 'Done 1', state: 'DONE', phase: 'P2', stream: 'A', gate: '1' },
+    { id: 't7', title: 'Done 2', state: 'DONE', phase: 'P2', stream: 'B', gate: '2' },
+    { id: 't8', title: 'Done 3', state: 'DONE', phase: 'P2', stream: 'C', gate: '3' },
   ]
 
   beforeEach(() => {
@@ -67,9 +67,9 @@ describe('R6-2.A.5: Board', () => {
     render(Board, {
       props: { tasksStore: mockTasksStore, selectionStore: mockSelectionStore },
     })
-    const phaseSelect = screen.getByLabelText('Phase')
-    await fireEvent.change(phaseSelect, { target: { value: 'P2' } })
-    expect(mockTasksStore.setFilter).toHaveBeenCalledWith({ phase: 'P2', stream: undefined })
+    await fireEvent.click(screen.getByLabelText('Phase'))
+    await fireEvent.click(screen.getByRole('button', { name: 'P2' }))
+    expect(mockTasksStore.setFilter).toHaveBeenCalledWith({ milestone: undefined, phase: 'P2', stream: undefined })
   })
 
   it('calls selectionStore.select when a task card is clicked', async () => {

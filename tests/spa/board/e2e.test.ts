@@ -11,14 +11,14 @@ describe('R6-2.A.6: Board end-to-end', () => {
   let mockSelectionStore: SelectionStore
 
   const seededTasks: TaskData[] = [
-    { id: 't1', title: 'Todo One', status: 'todo', phase: 'P2', stream: 'A', gate: '1', milestone: 'M1' },
-    { id: 't2', title: 'Todo Two', status: 'todo', phase: 'P2', stream: 'A', gate: '2', milestone: 'M1' },
-    { id: 't3', title: 'In Progress One', status: 'in-progress', phase: 'P2', stream: 'B', gate: '1', milestone: 'M1' },
-    { id: 't4', title: 'In Review One', status: 'in-review', phase: 'P2', stream: 'C', gate: '1', milestone: 'M1' },
-    { id: 't5', title: 'Rework One', status: 'rework', phase: 'P2', stream: 'D', gate: '1', milestone: 'M1' },
-    { id: 't6', title: 'Done One', status: 'done', phase: 'P2', stream: 'A', gate: '1', milestone: 'M1' },
-    { id: 't7', title: 'Done Two', status: 'done', phase: 'P2', stream: 'B', gate: '2', milestone: 'M1' },
-    { id: 't8', title: 'Done Three', status: 'done', phase: 'P2', stream: 'C', gate: '3', milestone: 'M1' },
+    { id: 't1', title: 'Todo One', state: 'TO-DO', phase: 'P2', stream: 'A', gate: '1', milestone: 'M1' },
+    { id: 't2', title: 'Todo Two', state: 'TO-DO', phase: 'P2', stream: 'A', gate: '2', milestone: 'M1' },
+    { id: 't3', title: 'In Progress One', state: 'IN-PROGRESS', phase: 'P2', stream: 'B', gate: '1', milestone: 'M1' },
+    { id: 't4', title: 'In Review One', state: 'IN-REVIEW', phase: 'P2', stream: 'C', gate: '1', milestone: 'M1' },
+    { id: 't5', title: 'Rework One', state: 'REWORK', phase: 'P2', stream: 'D', gate: '1', milestone: 'M1' },
+    { id: 't6', title: 'Done One', state: 'DONE', phase: 'P2', stream: 'A', gate: '1', milestone: 'M1' },
+    { id: 't7', title: 'Done Two', state: 'DONE', phase: 'P2', stream: 'B', gate: '2', milestone: 'M1' },
+    { id: 't8', title: 'Done Three', state: 'DONE', phase: 'P2', stream: 'C', gate: '3', milestone: 'M1' },
   ]
 
   beforeEach(() => {
@@ -62,8 +62,8 @@ describe('R6-2.A.6: Board end-to-end', () => {
         selectionStore: mockSelectionStore,
       },
     })
-    const streamSelect = screen.getByLabelText('Stream')
-    await fireEvent.change(streamSelect, { target: { value: 'A' } })
+    await fireEvent.click(screen.getByLabelText('Stream'))
+    await fireEvent.click(screen.getByRole('button', { name: 'A' }))
     expect(mockTasksStore.setFilter).toHaveBeenCalledWith({ milestone: undefined, phase: undefined, stream: 'A' })
   })
 
@@ -88,7 +88,6 @@ describe('R6-2.A.6: Board end-to-end', () => {
         selectionStore: mockSelectionStore,
       },
     })
-    // Verify counts via hidden data-testid spans
     expect(screen.getByTestId('column-count-todo')).toHaveTextContent('2')
     expect(screen.getByTestId('column-count-in-progress')).toHaveTextContent('1')
     expect(screen.getByTestId('column-count-in-review')).toHaveTextContent('1')
@@ -104,7 +103,6 @@ describe('R6-2.A.6: Board end-to-end', () => {
         selectionStore: mockSelectionStore,
       },
     })
-    // Done column should initially show 2 cards + toggle
     const doneColumn = screen.getByTestId('column-done')
     const cardsInDone = doneColumn.querySelectorAll('[data-testid="task-card"]')
     expect(cardsInDone.length).toBe(2)
@@ -118,14 +116,22 @@ describe('R6-2.A.6: Board end-to-end', () => {
   })
 
   it('Board fetches project on mount when no project props provided', async () => {
-    const mockFetch = vi.fn().mockResolvedValueOnce({
-      ok: true,
-      status: 200,
-      json: async () => ({
+    const mockFetch = vi.fn()
+      // First call: listTasks({}) for allTasks
+      .mockResolvedValueOnce({
         ok: true,
-        data: { name: 'Auto Project', description: 'Auto Tagline' },
-      }),
-    })
+        status: 200,
+        json: async () => ({ ok: true, data: [] }),
+      })
+      // Second call: getProject()
+      .mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: async () => ({
+          ok: true,
+          data: { name: 'Auto Project', description: 'Auto Tagline' },
+        }),
+      })
     vi.stubGlobal('fetch', mockFetch)
 
     const { default: DynamicBoard } = await import(
