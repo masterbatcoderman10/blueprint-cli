@@ -167,9 +167,13 @@ Stream B (Core Docs + R2 Test) ────────────────�
 
 > Generated from task analysis. Each testable task has one or more tests
 > mapped to it. Tests are written before implementation (TDD) during
-> task execution. Test-authoring tasks (R7-1.A.4, R7-1.B.7, R7-1.C.6,
+> task execution. Pure test-authoring tasks (R7-1.A.4, R7-1.C.6,
 > R7-1.D.1–D.4) are marked not testable; their coverage is delivered by
-> sibling implementation tests (R6 Phase 4 pattern).
+> sibling implementation tests (R6 Phase 4 pattern). R7-1.B.7 (the R2
+> contract test supersession) is testable: its rewritten R2 contract test
+> carries behavioral assertions for the two new `execution.md` gates,
+> the standalone-contract structural rules, and a repo-wide guard against
+> reintroducing `## Tweaks` headings — see T-R7-1.B.7.1–4.
 
 ### Gate R7-1.0 Tests
 
@@ -192,8 +196,9 @@ Stream B (Core Docs + R2 Test) ────────────────�
 | T-R7-1.A.1.1 | R7-1.A.1 | integration | `blueprint init` scaffold produces `docs/tweaks/README.md` matching the template | File exists with template content |
 | T-R7-1.A.1.2 | R7-1.A.1 | integration | `blueprint init` summary report lists `docs/tweaks/` in created directories | Output contains the path |
 | T-R7-1.A.2 | R7-1.A.2 | unit | `src/doctor/structure.ts` required-structure set includes `docs/tweaks/` and `docs/tweaks/README.md` | Both entries present |
-| T-R7-1.A.3.1 | R7-1.A.3 | unit | Doctor repair is driven by the canonical-structure list (generic) — adding a new required entry causes repair to attempt restoration without per-file branches | Inspection of repair routine shows list-driven behavior |
-| T-R7-1.A.3.2 | R7-1.A.3 | integration | Doctor repair never overwrites an existing required file regardless of content | Existing file bytes unchanged after repair pass |
+| T-R7-1.A.3.1 | R7-1.A.3 | integration | Doctor repair, given a fixture project missing a parameterized set of canonical entries — at minimum `docs/tweaks/`, `docs/tweaks/README.md`, `docs/core/orchestrate.md`, `docs/core/tracker.md`, and a synthetic probe entry injected into the required-set — restores every missing entry byte-for-byte from its template. Parameterization is enforced by injecting the probe entry at test time so silently dropping a required file from the loop fails the test. | Every missing entry restored; bytes match template; probe entry restored proves generic dispatch |
+| T-R7-1.A.3.2 | R7-1.A.3 | integration | Doctor repair never overwrites an existing required file regardless of content drift. Fixture has each required file present with arbitrary user content; after repair, every file's bytes are unchanged. | Bytes unchanged for every pre-existing required file |
+| T-R7-1.A.3.3 | R7-1.A.3 | integration | Doctor repair restores a single missing file inside an otherwise-present required directory (e.g. `docs/tweaks/` exists but `README.md` is missing) — the partial-present scenario, not just the all-missing scenario. | The single missing file is restored from template; no other file is touched |
 | — | R7-1.A.4 | — | Not testable: this task **is** the scaffold-archive test update; coverage delivered by T-R7-1.A.1.x | — |
 
 ### Stream B Tests
@@ -211,7 +216,10 @@ Stream B (Core Docs + R2 Test) ────────────────�
 | T-R7-1.B.4.5 | R7-1.B.4 | unit | `phase-completion.md` disclaims ownership of standalone tweak completion | Clause present |
 | T-R7-1.B.5 | R7-1.B.5 | unit | `test-planning.md` states tweaks do not get a formal test plan and that needing one is an escalation signal | Clause present |
 | T-R7-1.B.6 | R7-1.B.6 | unit | `orchestrate.md` describes how orchestration consumes a tweak's gate/stream map when present | Clause present |
-| — | R7-1.B.7 | — | Not testable: this task **is** the R2 inline-tweak-contract test supersession; coverage delivered by the rewritten R2 contract test itself | — |
+| T-R7-1.B.7.1 | R7-1.B.7 | integration | Rewritten R2 contract test asserts the **tweak-start gate behaviorally**: a tweak task cannot transition TO-DO → IN-PROGRESS via the tracker unless the user has explicitly confirmed the tweak plan. Attempting the transition without confirmation is rejected. | Transition blocked when unconfirmed; allowed only after explicit confirmation |
+| T-R7-1.B.7.2 | R7-1.B.7 | integration | Rewritten R2 contract test asserts the **tweak-completion gate behaviorally**: the terminal tweak task cannot transition to DONE unless `npm test` exits 0 against the project. Simulated failing suite blocks DONE; passing suite permits it. | DONE blocked on failing suite; permitted on green suite |
+| T-R7-1.B.7.3 | R7-1.B.7 | unit | Rewritten R2 contract test asserts the **standalone-contract structural rules**: `docs/tweaks/` is the canonical tweak location; phase docs cannot own `## Tweaks` sections; `<TweakIntentClassification>` and `<TweakReviewGate>` blocks exist in `tweak-planning.md` with their key obligations (proactive classification regardless of user wording; mandatory user confirmation before any task leaves TO-DO). | All four structural assertions pass |
+| T-R7-1.B.7.4 | R7-1.B.7 | unit | Rewritten R2 contract test runs a repo-wide grep guard: no file under `docs/milestones/**` created after R7 (or under `templates/**`) reintroduces a `## Tweaks` heading. Historical pre-R7 phase docs are explicitly allowlisted. | Grep returns zero non-allowlisted hits |
 
 ### Stream C Tests
 
@@ -230,22 +238,22 @@ Stream B (Core Docs + R2 Test) ────────────────�
 | Test ID | Task | Type | Description | Expected Result |
 |---------|------|------|-------------|-----------------|
 | — | R7-1.D.1 | — | Not testable: this task **is** the canonical-structure test update; coverage delivered by T-R7-1.A.2 | — |
-| — | R7-1.D.2 | — | Not testable: this task **is** the broad parameterized Doctor repair test (covers `docs/tweaks/`, `orchestrate.md`, `tracker.md`, plus any future entries); coverage delivered by T-R7-1.A.3.1 and T-R7-1.A.3.2 | — |
-| — | R7-1.D.3 | — | Not testable: this task **is** the missing-README repair test; coverage delivered by T-R7-1.A.3.2 | — |
-| — | R7-1.D.4 | — | Not testable: this task **is** the drifted-README-left-alone test; coverage delivered by T-R7-1.A.3.2 | — |
+| — | R7-1.D.2 | — | Not testable: this task **is** the broad parameterized Doctor repair test (covers `docs/tweaks/`, `orchestrate.md`, `tracker.md`, plus any future entries via the probe-entry mechanism); coverage delivered by T-R7-1.A.3.1 | — |
+| — | R7-1.D.3 | — | Not testable: this task **is** the partial-present missing-file repair test; coverage delivered by T-R7-1.A.3.3 | — |
+| — | R7-1.D.4 | — | Not testable: this task **is** the drifted-file-left-alone test; coverage delivered by T-R7-1.A.3.2 | — |
 
 ### Test Summary
 
-| Component | Total Tasks | Testable | Not Testable |
-|-----------|-------------|----------|--------------|
-| Gate R7-1.0 | 4 | 4 | 0 |
-| Stream A | 4 | 3 | 1 |
-| Stream B | 7 | 6 | 1 |
-| Stream C | 6 | 5 | 1 |
-| Stream D | 4 | 0 | 4 |
-| **Total** | **25** | **18** | **7** |
+| Component | Total Tasks | Testable | Not Testable | Tests |
+|-----------|-------------|----------|--------------|-------|
+| Gate R7-1.0 | 4 | 4 | 0 | 9 |
+| Stream A | 4 | 3 | 1 | 6 |
+| Stream B | 7 | 7 | 0 | 15 |
+| Stream C | 6 | 5 | 1 | 6 |
+| Stream D | 4 | 0 | 4 | 0 |
+| **Total** | **25** | **19** | **6** | **36** |
 
-32 tests total mapped across 18 testable tasks. The 7 not-testable tasks are all test-authoring tasks whose coverage is delivered by sibling implementation tests.
+36 tests total mapped across 19 testable tasks. The 6 not-testable tasks are all test-authoring or test-rewrite tasks whose coverage is delivered by sibling implementation tests (R6 Phase 4 pattern).
 
 ---
 
