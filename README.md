@@ -90,6 +90,7 @@ npm install -g @splitwireml/blueprint
 |---------|---------|
 | `blueprint init` | Scaffold a Blueprint project with full docs and templates |
 | `blueprint doctor` | Audit and repair project structure |
+| `blueprint board` | Open the task tracker in your browser |
 | `blueprint link` | Cross-project linking *(coming soon)* |
 | `blueprint context` | Cross-project context surfacing *(coming soon)* |
 
