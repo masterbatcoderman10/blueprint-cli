@@ -40,6 +40,20 @@ describe('R6-2.B.1: TaskDetailRail', () => {
     expect(screen.getByTestId('task-detail-rail')).toBeTruthy()
   })
 
+  it('renders the reference section scaffold for description and comments', () => {
+    const selection = createMockSelectionStore('task-1')
+    const tasks = createMockTasksStore([
+      { id: 'task-1', title: 'Test Task', state: 'IN-PROGRESS', description: 'Desc' },
+    ])
+    const comments = createMockCommentsStore([])
+
+    render(TaskDetailRail, { props: { selection, tasks, comments } })
+
+    expect(screen.getByText('Description')).toBeTruthy()
+    expect(screen.getByText('Review Comments')).toBeTruthy()
+    expect(screen.getAllByTestId('rail-divider')).toHaveLength(2)
+  })
+
   it('shows status dot color for IN-PROGRESS (orange)', () => {
     const selection = createMockSelectionStore('task-1')
     const tasks = createMockTasksStore([
@@ -90,6 +104,25 @@ describe('R6-2.B.1: TaskDetailRail', () => {
     expect(screen.queryByTestId('desc-text')).toBeNull()
     const textarea = screen.getByTestId('desc-textarea')
     expect((textarea as HTMLTextAreaElement).value).toBe('Original desc')
+  })
+
+  it('shows a view-more toggle for long descriptions and expands on click', async () => {
+    const selection = createMockSelectionStore('task-1')
+    const tasks = createMockTasksStore([
+      {
+        id: 'task-1',
+        title: 'T',
+        state: 'TO-DO',
+        description: 'Long description '.repeat(40),
+      },
+    ])
+    const comments = createMockCommentsStore([])
+
+    render(TaskDetailRail, { props: { selection, tasks, comments } })
+
+    expect(screen.getByTestId('desc-toggle').textContent).toBe('View more')
+    await fireEvent.click(screen.getByTestId('desc-toggle'))
+    expect(screen.getByTestId('desc-toggle').textContent).toBe('View less')
   })
 
   it('saves description on Cmd+Enter with PATCH', async () => {

@@ -55,8 +55,8 @@
   <div class="thread-header">
     <span class="thread-label">Review Comments</span>
     <div class="thread-actions">
-      <button class="action-btn" onclick={() => openComposer('MAJOR')} data-testid="add-major">+ MAJOR</button>
-      <button class="action-btn" onclick={() => openComposer('MINOR')} data-testid="add-minor">+ MINOR</button>
+      <button class="action-btn action-btn-major" onclick={() => openComposer('MAJOR')} data-testid="add-major">+ MAJOR</button>
+      <button class="action-btn action-btn-minor" onclick={() => openComposer('MINOR')} data-testid="add-minor">+ MINOR</button>
     </div>
   </div>
 
@@ -88,31 +88,47 @@
   .comment-thread {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 16px;
+    min-height: 0;
   }
   .thread-header {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
   }
   .thread-label {
-    font-family: 'Space Grotesk', system-ui, sans-serif;
-    font-size: 13px;
-    font-weight: 600;
-    color: #EDE9E3;
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 16px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: #A8A29E;
   }
   .thread-actions {
     display: flex;
     gap: 6px;
   }
   .action-btn {
-    padding: 4px 10px;
-    border: 1px solid #333130;
+    height: 24px;
+    padding: 0 8px;
+    border: 1px solid transparent;
     border-radius: 4px;
-    background-color: #282624;
-    color: #EDE9E3;
-    font-size: 11px;
+    background-color: transparent;
+    font-size: 10px;
+    font-weight: 600;
+    line-height: 12px;
     cursor: pointer;
+  }
+  .action-btn-major {
+    background-color: rgba(220, 38, 38, 0.15);
+    border-color: rgba(220, 38, 38, 0.3);
+    color: #EF4444;
+  }
+  .action-btn-minor {
+    background-color: rgba(245, 158, 11, 0.15);
+    border-color: rgba(245, 158, 11, 0.3);
+    color: #F59E0B;
   }
   .top-composer {
     margin-bottom: 8px;
@@ -120,10 +136,12 @@
   .comments-list {
     display: flex;
     flex-direction: column;
+    gap: 16px;
   }
   .empty {
     font-size: 12px;
+    line-height: 16px;
     color: #6B6560;
-    padding: 12px 0;
+    padding: 4px 0 0;
   }
 </style>

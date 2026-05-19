@@ -19,21 +19,19 @@
 
 <div class="comment-item" data-testid="comment-item" data-severity={comment.severity}>
   <div class="comment-header">
-    <span
-      class="severity-chip"
-      style="background-color: {severityColor};"
-      data-testid="comment-severity-chip"
-    >
+    <span class="severity-chip" data-testid="comment-severity-chip" data-severity={comment.severity}>
       {comment.severity}
     </span>
     {#if comment.line}
-      <span class="line-ref" data-testid="line-ref">L{comment.line}</span>
+      <span class="line-ref" data-testid="line-ref">Line {comment.line}</span>
     {/if}
   </div>
   <div class="comment-body" data-testid="comment-body">{comment.body}</div>
   <div class="comment-meta">
-    <span class="author" data-testid="comment-author">{comment.author ?? 'Unknown'}</span>
-    <span class="timestamp" data-testid="comment-timestamp">{comment.created_at ? timeAgo(comment.created_at) : ''}</span>
+    <div class="comment-meta-row">
+      <span class="author" data-testid="comment-author">{comment.author ?? 'Unknown'}</span>
+      <span class="timestamp" data-testid="comment-timestamp">{comment.created_at ? timeAgo(comment.created_at) : ''}</span>
+    </div>
     <button class="reply-link" onclick={() => showReply = !showReply} data-testid="reply-link">
       {showReply ? 'Cancel' : 'Reply'}
     </button>
@@ -54,19 +52,16 @@
     <div class="replies" data-testid="replies">
       {#each replies as reply (reply.id)}
         <div class="reply-item" data-testid="reply-item">
-          <div class="comment-header">
-            <span
-              class="severity-chip"
-              style="background-color: {reply.severity === 'MAJOR' ? '#EF4444' : '#F59E0B'};"
-            >
+          <div class="comment-header reply-header">
+            <span class="severity-chip" data-severity={reply.severity}>
               {reply.severity}
             </span>
             {#if reply.line}
-              <span class="line-ref">L{reply.line}</span>
+              <span class="line-ref">Line {reply.line}</span>
             {/if}
           </div>
           <div class="comment-body">{reply.body}</div>
-          <div class="comment-meta">
+          <div class="comment-meta-row">
             <span class="author">{reply.author ?? 'Unknown'}</span>
             <span class="timestamp">{reply.created_at ? timeAgo(reply.created_at) : ''}</span>
           </div>
@@ -80,9 +75,11 @@
   .comment-item {
     display: flex;
     flex-direction: column;
-    gap: 6px;
-    padding: 12px 0;
-    border-bottom: 1px solid #282624;
+    gap: 12px;
+    padding: 14px;
+    border: 1px solid #333130;
+    border-radius: 6px;
+    background-color: #1E1D1B;
   }
   .comment-header {
     display: flex;
@@ -90,40 +87,68 @@
     gap: 8px;
   }
   .severity-chip {
-    font-size: 10px;
-    font-weight: 600;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    font-weight: 700;
+    line-height: 12px;
+    letter-spacing: 0.03em;
     text-transform: uppercase;
-    padding: 2px 6px;
+    padding: 4px 8px;
     border-radius: 4px;
-    color: #111110;
+    border: 1px solid transparent;
     flex-shrink: 0;
   }
+  .severity-chip[data-severity='MAJOR'] {
+    background-color: rgba(220, 38, 38, 0.15);
+    border-color: rgba(220, 38, 38, 0.3);
+    color: #EF4444;
+  }
+  .severity-chip[data-severity='MINOR'] {
+    background-color: rgba(245, 158, 11, 0.15);
+    border-color: rgba(245, 158, 11, 0.3);
+    color: #F59E0B;
+  }
   .line-ref {
-    font-size: 11px;
-    color: #A39E96;
-    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    line-height: 16px;
+    color: #A8A29E;
   }
   .comment-body {
     font-size: 12px;
-    line-height: 16px;
-    color: #EDE9E3;
+    line-height: 18px;
+    color: #D7D3CD;
     white-space: pre-wrap;
   }
   .comment-meta {
     display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+  .comment-meta-row {
+    display: flex;
     align-items: center;
     gap: 8px;
+  }
+  .author {
     font-size: 11px;
-    color: #6B6560;
+    font-weight: 500;
+    line-height: 14px;
+    color: #EDE9E3;
+  }
+  .timestamp {
+    font-size: 9px;
+    line-height: 12px;
+    color: #A8A29E;
   }
   .reply-link {
     background: none;
     border: none;
     padding: 0;
-    color: #A78BFA;
-    font-size: 11px;
+    color: #A8A29E;
+    font-size: 10px;
+    line-height: 12px;
     cursor: pointer;
-    text-decoration: underline;
   }
   .reply-composer {
     margin-top: 8px;
@@ -131,15 +156,14 @@
   .replies {
     display: flex;
     flex-direction: column;
-    gap: 8px;
-    margin-top: 8px;
-    padding-left: 16px;
-    border-left: 2px solid #333130;
+    gap: 14px;
+    margin-top: 4px;
+    padding-left: 20px;
+    border-left: 1px solid #333130;
   }
   .reply-item {
     display: flex;
     flex-direction: column;
-    gap: 4px;
-    padding: 8px 0;
+    gap: 8px;
   }
 </style>

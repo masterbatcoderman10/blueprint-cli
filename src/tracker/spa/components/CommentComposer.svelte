@@ -51,7 +51,6 @@
     <span
       class="severity-chip"
       data-severity={severity}
-      style="background-color: {severity === 'MAJOR' ? '#EF4444' : '#F59E0B'};"
     >
       {severity}
     </span>
@@ -84,63 +83,100 @@
 
 <style>
   .composer {
+    box-sizing: border-box;
+    width: 100%;
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 10px;
     padding: 12px;
     border: 1px solid #333130;
     border-radius: 6px;
     background-color: #1a1918;
+    overflow: hidden;
   }
   .composer-header {
     display: flex;
     align-items: center;
     gap: 8px;
+    width: 100%;
+    min-width: 0;
   }
   .severity-chip {
-    font-size: 10px;
-    font-weight: 600;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    font-weight: 700;
+    line-height: 12px;
+    letter-spacing: 0.03em;
     text-transform: uppercase;
-    padding: 2px 6px;
+    padding: 4px 8px;
     border-radius: 4px;
-    color: #111110;
+    border: 1px solid transparent;
     flex-shrink: 0;
   }
+  .severity-chip[data-severity='MAJOR'] {
+    background-color: rgba(220, 38, 38, 0.15);
+    border-color: rgba(220, 38, 38, 0.3);
+    color: #EF4444;
+  }
+  .severity-chip[data-severity='MINOR'] {
+    background-color: rgba(245, 158, 11, 0.15);
+    border-color: rgba(245, 158, 11, 0.3);
+    color: #F59E0B;
+  }
   .line-input {
+    box-sizing: border-box;
     flex: 1 1 auto;
+    width: 100%;
+    min-width: 0;
     background: transparent;
     border: 1px solid #333130;
     border-radius: 4px;
-    padding: 4px 8px;
-    color: #EDE9E3;
-    font-size: 12px;
+    padding: 8px 10px;
+    color: #D7D3CD;
+    font-size: 13px;
+    line-height: 16px;
     font-family: 'JetBrains Mono', monospace;
   }
   .body-textarea {
+    box-sizing: border-box;
+    width: 100%;
     background: transparent;
     border: 1px solid #333130;
     border-radius: 4px;
-    padding: 8px;
-    color: #EDE9E3;
-    font-size: 12px;
-    line-height: 16px;
-    min-height: 60px;
+    padding: 12px;
+    color: #D7D3CD;
+    font-size: 13px;
+    line-height: 20px;
+    min-height: 120px;
     resize: vertical;
     font-family: 'DM Sans', system-ui, sans-serif;
   }
   .submit-btn {
     align-self: flex-start;
-    padding: 6px 14px;
+    min-width: 96px;
+    height: 40px;
+    padding: 0 16px;
     border: 1px solid #333130;
     border-radius: 6px;
     background-color: #282624;
     color: #EDE9E3;
     font-size: 12px;
+    line-height: 16px;
     cursor: pointer;
   }
   .submit-btn:disabled {
     opacity: 0.5;
     cursor: not-allowed;
+  }
+  .line-input::placeholder,
+  .body-textarea::placeholder {
+    color: #6B6560;
+  }
+  .line-input:focus-visible,
+  .body-textarea:focus-visible,
+  .submit-btn:focus-visible {
+    outline: 2px solid rgba(237, 233, 227, 0.85);
+    outline-offset: 2px;
   }
   .error {
     color: #EF4444;

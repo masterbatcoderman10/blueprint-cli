@@ -3,7 +3,7 @@
    * App.svelte — Root layout for the Blueprint Board SPA.
    * Design contract: 2YY-0 artboard (src/design/2YY-0.jsx).
    *
-   * Layout: [Board panel (flex-1)] [TaskDetailRail (280px, collapsible)]
+   * Layout: [Board panel (flex-1)] [TaskDetailRail (308px, collapsible)]
    * The rail is closed by default (data-open="false").
    * Column order matches P1 kanban statuses: To Do | In Progress | In Review | Rework | Done
    */
@@ -61,15 +61,11 @@
     data-open={String(railOpen)}
     style="
       flex-shrink: 0;
-      width: {railOpen ? '280px' : '0'};
-      overflow: hidden;
-      transition: width 200ms ease;
-      background-color: #151413;
-      border-left: {railOpen ? '1px solid #333130' : 'none'};
       display: flex;
       flex-direction: column;
-      gap: 20px;
-      padding: {railOpen ? '20px' : '0'};
+      width: {railOpen ? '308px' : '0'};
+      overflow: hidden;
+      transition: width 200ms ease;
     "
   >
     <TaskDetailRail selection={selectionStore} tasks={tasksStore} comments={commentsStore} />

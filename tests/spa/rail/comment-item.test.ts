@@ -25,7 +25,7 @@ describe('R6-2.B.3: CommentItem', () => {
     })
     const chip = screen.getByTestId('comment-severity-chip')
     expect(chip.textContent).toBe('MAJOR')
-    expect(chip.getAttribute('style')).toContain('background-color: rgb(239, 68, 68)')
+    expect(chip.getAttribute('data-severity')).toBe('MAJOR')
   })
 
   it('renders severity chip MINOR in amber', () => {
@@ -34,14 +34,14 @@ describe('R6-2.B.3: CommentItem', () => {
     })
     const chip = screen.getByTestId('comment-severity-chip')
     expect(chip.textContent).toBe('MINOR')
-    expect(chip.getAttribute('style')).toContain('background-color: rgb(245, 158, 11)')
+    expect(chip.getAttribute('data-severity')).toBe('MINOR')
   })
 
   it('renders optional line reference', () => {
     render(CommentItem, {
       props: { comment: baseComment, replies: [], taskId: 't1' },
     })
-    expect(screen.getByTestId('line-ref').textContent).toBe('L42')
+    expect(screen.getByTestId('line-ref').textContent).toBe('Line 42')
   })
 
   it('renders body, author and timestamp', () => {
