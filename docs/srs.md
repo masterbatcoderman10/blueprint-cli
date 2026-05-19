@@ -18,8 +18,8 @@ This SRS exists for blueprint-cli to act as the persistent requirement layer bet
 | MAS-201 | Hierarchical Requirement Structuring | Must | active | Revision 4 |
 | MAS-202 | Progressive Clarification vs Checklist | Must | active | Revision 4 |
 | MAS-203 | Agent Orchestration Protocol Module | Must | active | Revision 5 |
-| MAS-204 | Built-in Task Tracker | Must | approved-pending-implementation | Revision 6 |
-| MAS-205 | Local Project Board UI | Must | approved-pending-implementation | Revision 6 |
+| MAS-204 | Built-in Task Tracker | Must | active | Revision 6 |
+| MAS-205 | Local Project Board UI | Must | active | Revision 6 |
 
 ---
 
@@ -59,7 +59,7 @@ The system must provide an orchestration protocol module (`docs/core/orchestrate
 
 #### MAS-204 - Built-in Task Tracker
 
-The system must provide a built-in per-project task tracker that replaces the external `vibe-kanban` MCP dependency, owned end-to-end by the CLI and shipped with the npm package.
+The system must provide a built-in per-project task tracker, owned end-to-end by the CLI and shipped with the npm package.
 
 - Storage must be a SQLite database at `docs/.blueprint/tasks.db`, provisioned by `blueprint init` and migrated idempotently.
 - The schema must support the 5-state task machine (TO-DO, IN-PROGRESS, IN-REVIEW, REWORK, DONE) with a `milestone TEXT NOT NULL` column on the tasks table for grouping and filtering by milestone, and a threaded review-comment surface (severity `MAJOR` | `MINOR`, single-level replies via self-referential `parent_id`).
@@ -170,7 +170,7 @@ Change log:
 ### MAS-204
 - Title: Built-in Task Tracker
 - Priority: Must
-- Status: approved-pending-implementation
+- Status: active
 - Assigned milestone: Revision 6
 - Source: Revision 6 Built-in Tracker
 - Introduced by: Revision 6
@@ -181,11 +181,12 @@ Change log:
 - 2026-05-17 - Created from Revision 6 (recorded 2026-05-18 via R6 Phase 3 pre-phase SRS repair)
 - 2026-05-18 - Deepened by R6 Phase 4: bidirectional JSON snapshot sub-detail — server-side hook writes `tasks.export.json` atomically on every mutation; Doctor imports snapshot on missing DB. Meaning unchanged; ID unchanged.
 - 2026-05-18 - Deepened by R6 Phase 5: added `milestone TEXT NOT NULL` column to the tasks-table schema detail for multi-milestone grouping and filtering. Permitted schema-detail deepening per `phase-planning.md`; meaning unchanged; ID unchanged.
+- 2026-05-19 - Transitioned to active. Phase 5 complete: milestone field, filter, migration, and board rendering all implemented and verified.
 
 ### MAS-205
 - Title: Local Project Board UI
 - Priority: Must
-- Status: approved-pending-implementation
+- Status: active
 - Assigned milestone: Revision 6
 - Source: Revision 6 Built-in Tracker
 - Introduced by: Revision 6
@@ -194,6 +195,7 @@ Change log:
 
 Change log:
 - 2026-05-17 - Created from Revision 6 (recorded 2026-05-18 via R6 Phase 3 pre-phase SRS repair)
+- 2026-05-19 - Transitioned to active. Phase 5 complete: local board SPA with milestone filter dropdown and real milestone count rendering implemented and verified.
 
 ---
 

@@ -65,7 +65,7 @@ describe('Gate R6-1.0 — init tracker database', () => {
     const db: TestDatabase = new BetterSqlite3(dbPath)
     try {
       const userVersion = db.prepare('PRAGMA user_version').get() as { user_version: number }
-      expect(userVersion.user_version).toBe(1)
+      expect(userVersion.user_version).toBe(2)
 
       const tables = db
         .prepare("SELECT name FROM sqlite_master WHERE type = 'table' AND name IN ('tasks', 'review_comments', 'project_meta') ORDER BY name")

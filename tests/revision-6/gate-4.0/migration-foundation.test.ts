@@ -60,6 +60,7 @@ function sampleSnapshot(): TrackerSnapshot {
         stream: '0',
         author: 'Codex',
         implementation_notes: 'Round-trip coverage',
+        milestone: 'R6',
         created_at: 10,
         updated_at: 11,
       },
@@ -92,8 +93,8 @@ function sampleSnapshot(): TrackerSnapshot {
 function insertSampleRows(db: TestDatabase): void {
   db.prepare(
     `INSERT INTO tasks
-      (id, title, description, state, phase, stream, author, implementation_notes, created_at, updated_at)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      (id, title, description, state, phase, stream, author, implementation_notes, milestone, created_at, updated_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
   ).run(
     'R6-4.0.2',
     'Serialize snapshot',
@@ -103,6 +104,7 @@ function insertSampleRows(db: TestDatabase): void {
     '0',
     'Codex',
     'Round-trip coverage',
+    'R6',
     10,
     11,
   )

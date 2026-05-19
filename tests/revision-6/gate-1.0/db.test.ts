@@ -50,9 +50,9 @@ describe('Gate R6-1.0 — tracker database', () => {
     const first = openDb(projectRoot)
     first.db
       .prepare(
-        "INSERT INTO tasks (id, title, description, state, phase, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)",
+        "INSERT INTO tasks (id, title, description, state, phase, milestone, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
       )
-      .run('R6-1.0.3', 'DB task', 'Open database', 'IN-PROGRESS', 'Phase 1', 1, 1)
+      .run('R6-1.0.3', 'DB task', 'Open database', 'IN-PROGRESS', 'Phase 1', 'R6', 1, 1)
     first.close()
 
     const second = openDb(projectRoot)

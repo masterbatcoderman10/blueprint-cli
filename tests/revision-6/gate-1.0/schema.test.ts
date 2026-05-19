@@ -70,6 +70,7 @@ describe('Gate R6-1.0 — tracker schema', () => {
         ['stream', { type: 'TEXT', notnull: 0 }],
         ['author', { type: 'TEXT', notnull: 0 }],
         ['implementation_notes', { type: 'TEXT', notnull: 0 }],
+        ['milestone', { type: 'TEXT', notnull: 1 }],
         ['created_at', { type: 'INTEGER', notnull: 1 }],
         ['updated_at', { type: 'INTEGER', notnull: 1 }],
       ]),
@@ -112,9 +113,9 @@ describe('Gate R6-1.0 — tracker schema', () => {
     expect(() => {
       database
         .prepare(
-          "INSERT INTO tasks (id, title, description, state, phase, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)",
+          "INSERT INTO tasks (id, title, description, state, phase, milestone, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
         )
-        .run('R6-1.X.1', 'Invalid state', '', 'BOGUS', 'Phase 1', 1, 1)
+        .run('R6-1.X.1', 'Invalid state', '', 'BOGUS', 'Phase 1', 'R6', 1, 1)
     }).toThrow(/SQLITE_CONSTRAINT_CHECK|CHECK constraint failed/)
   })
 
@@ -134,9 +135,9 @@ describe('Gate R6-1.0 — tracker schema', () => {
     applySchema(database)
     database
       .prepare(
-        "INSERT INTO tasks (id, title, description, state, phase, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)",
+        "INSERT INTO tasks (id, title, description, state, phase, milestone, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
       )
-      .run('R6-1.0.2', 'Schema task', 'DDL', 'IN-PROGRESS', 'Phase 1', 1, 1)
+      .run('R6-1.0.2', 'Schema task', 'DDL', 'IN-PROGRESS', 'Phase 1', 'R6', 1, 1)
 
     expect(() => applySchema(database)).not.toThrow()
 

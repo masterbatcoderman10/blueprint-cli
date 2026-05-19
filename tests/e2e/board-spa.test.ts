@@ -142,6 +142,7 @@ describe('Stream D — board SPA E2E', () => {
       const tasksContentType = tasksResponse.headers.get('content-type')
       expect(tasksContentType).toContain('application/json')
       const tasksBody = await tasksResponse.json()
+      expect(tasksBody).toHaveProperty('ok', true)
       expect(tasksBody).toHaveProperty('data')
       expect(Array.isArray(tasksBody.data)).toBe(true)
 
@@ -152,6 +153,7 @@ describe('Stream D — board SPA E2E', () => {
       expect(projectContentType).toContain('application/json')
       const projectBody = await projectResponse.json()
       expect(projectBody).toEqual({
+        ok: true,
         data: {
           name: 'E2E Project',
           tagline: 'E2E tagline',

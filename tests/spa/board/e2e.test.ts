@@ -11,14 +11,14 @@ describe('R6-2.A.6: Board end-to-end', () => {
   let mockSelectionStore: SelectionStore
 
   const seededTasks: TaskData[] = [
-    { id: 't1', title: 'Todo One', status: 'todo', phase: 'P2', stream: 'A', gate: '1' },
-    { id: 't2', title: 'Todo Two', status: 'todo', phase: 'P2', stream: 'A', gate: '2' },
-    { id: 't3', title: 'In Progress One', status: 'in-progress', phase: 'P2', stream: 'B', gate: '1' },
-    { id: 't4', title: 'In Review One', status: 'in-review', phase: 'P2', stream: 'C', gate: '1' },
-    { id: 't5', title: 'Rework One', status: 'rework', phase: 'P2', stream: 'D', gate: '1' },
-    { id: 't6', title: 'Done One', status: 'done', phase: 'P2', stream: 'A', gate: '1' },
-    { id: 't7', title: 'Done Two', status: 'done', phase: 'P2', stream: 'B', gate: '2' },
-    { id: 't8', title: 'Done Three', status: 'done', phase: 'P2', stream: 'C', gate: '3' },
+    { id: 't1', title: 'Todo One', status: 'todo', phase: 'P2', stream: 'A', gate: '1', milestone: 'M1' },
+    { id: 't2', title: 'Todo Two', status: 'todo', phase: 'P2', stream: 'A', gate: '2', milestone: 'M1' },
+    { id: 't3', title: 'In Progress One', status: 'in-progress', phase: 'P2', stream: 'B', gate: '1', milestone: 'M1' },
+    { id: 't4', title: 'In Review One', status: 'in-review', phase: 'P2', stream: 'C', gate: '1', milestone: 'M1' },
+    { id: 't5', title: 'Rework One', status: 'rework', phase: 'P2', stream: 'D', gate: '1', milestone: 'M1' },
+    { id: 't6', title: 'Done One', status: 'done', phase: 'P2', stream: 'A', gate: '1', milestone: 'M1' },
+    { id: 't7', title: 'Done Two', status: 'done', phase: 'P2', stream: 'B', gate: '2', milestone: 'M1' },
+    { id: 't8', title: 'Done Three', status: 'done', phase: 'P2', stream: 'C', gate: '3', milestone: 'M1' },
   ]
 
   beforeEach(() => {
@@ -64,7 +64,7 @@ describe('R6-2.A.6: Board end-to-end', () => {
     })
     const streamSelect = screen.getByLabelText('Stream')
     await fireEvent.change(streamSelect, { target: { value: 'A' } })
-    expect(mockTasksStore.setFilter).toHaveBeenCalledWith({ phase: undefined, stream: 'A' })
+    expect(mockTasksStore.setFilter).toHaveBeenCalledWith({ milestone: undefined, phase: undefined, stream: 'A' })
   })
 
   it('TaskCard click writes to selection store', async () => {

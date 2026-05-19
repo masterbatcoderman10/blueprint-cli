@@ -299,7 +299,7 @@ This revision requires **five phases**. Phase-level breakdown (gate / stream / t
 | 2 | Board SPA + `blueprint board` Command | Svelte SPA matching `2YY-0` contract scoped to single project (no sidebar, no view toggle). Implements both the board surface and the Task Detail rail with threaded review comments. Vite build → `dist/spa/`. `src/commands/board.ts` resolves project root, boots server on `127.0.0.1` with dynamic port, opens browser, handles SIGINT. `prepack` script regenerates `dist/spa/` before publish. `files` whitelist updated. `browser-open.ts` cross-platform dispatch. |
 | 3 | Protocol Rewrite (`docs/core/` + `templates/docs/core/`) | Coordinated rewrite of all affected core docs (and templates mirror) — 11 modules plus `orchestrate.md` (R5-shipped). Introduce optional `docs/core/tracker.md` if user confirms during this phase's planning. Insert `curl` recipes for CRUD ops. Update state machine to include REWORK. Rename `project-progress.md` field. Update conventions.md, project-root CLAUDE.md, and all 4 templated agent entry points. |
 | 4 | Migration & Doctor Integration | `blueprint doctor` detects pre-R6 projects (presence of `**Kanban**:` field or absence of `docs/.blueprint/tasks.db`) and offers safe migration via existing audit / repair plan flow. Template-level project-progress scaffold updated. Doctor checks for schema currency and DB integrity. Agent-entry-point line 8 wording corrected across all 4 templates + project CLAUDE.md (in case any survived Phase 3). |
-| 5 | Verification & Cleanup | Full test suite green. `rg -i 'vibe-kanban\|kanban mcp' docs/ templates/ src/ tests/` returns zero non-historical hits (allowing only superseded-history mentions in revision docs / decisions log). SRS requirements MAS-204, MAS-205 transition `approved-pending-implementation` → `active`. PRD untouched. Release-readiness check passes. |
+| 5 | Milestone Integration, Verification & Cleanup | Full test suite green (865 tests, 124 files). `rg -i 'vibe-kanban\|kanban mcp' docs/ templates/ src/ tests/` returns zero non-historical hits (allowing only superseded-history mentions in revision docs / decisions log, plus verification tests). SRS requirements MAS-204, MAS-205 transitioned `approved-pending-implementation` → `active`. PRD untouched. Release-readiness check passes. Schema bumped to v2 with `milestone TEXT NOT NULL` column on tasks table, idempotent v1→v2 migration, `GET /tasks?milestone=` filter, SPA Milestone dropdown, real milestone count in header, pre-P5 snapshot import back-compat via Doctor. Post-migration schema integrity validated on live project DB. |
 
 ---
 
@@ -322,6 +322,8 @@ This revision requires **five phases**. Phase-level breakdown (gate / stream / t
 - [ ] `package.json` `engines.node` `>=22.5.0`; install + test pass on Node 22.5 LTS.
 - [ ] Full existing test suite remains green (post-R5 baseline + new tracker tests). Tests asserting the old 4-state machine or `Kanban:` field are updated as part of R6 scope (per `<RevisionRules>`: updating affected tests is part of revision scope, not regression).
 - [ ] SRS requirements MAS-204, MAS-205 transition from `approved-pending-implementation` → `active`.
+- [ ] `milestone TEXT NOT NULL` column on tasks table; `GET /tasks?milestone=` filter AND-combines with phase and stream; SPA Milestone dropdown renders; header milestone count reflects real data; pre-P5 snapshots import with milestone backfilled from task IDs; v1→v2 migration is idempotent.
+- [ ] Post-migration schema integrity: `PRAGMA integrity_check` returns `'ok'`; no foreign-key orphans; `TRACKER_SCHEMA_VERSION === 2`; every row has `milestone IS NOT NULL`; indexes `idx_tasks_milestone` and `idx_tasks_milestone_phase` present.
 - [ ] No regression in `blueprint init`, `blueprint doctor`, or template-integrity flows.
 
 ---
@@ -359,3 +361,9 @@ This revision requires **five phases**. Phase-level breakdown (gate / stream / t
 7. **Comment-thread depth.** Current scope = single level of replies (matches `2YY-0`). Whether to allow deeper nesting (replies to replies) is deferred; the schema's self-FK `parent_id` permits it without migration, but the SPA renders only one level.
 8. **`line` field semantics for review comments.** The Paper artboard shows `Line 42` and `Line 88` references on comments. Whether `line` is a free-form string anchor, an integer file-line pointer, or a `{ file, line }` tuple is deferred to Phase 1 schema-detail planning.
 9. **Task description edit UX in the rail.** Inline-edit vs click-to-edit vs dedicated edit mode. Deferred to Phase 2 planning.
+
+---
+
+## Deferred Items
+
+_No items deferred from Phase 5._ All planned scope was delivered: milestone schema field, filter, SPA dropdown, header count, migration, snapshot back-compat, SRS activation, rg sweep, full test suite, release check, revision-doc amendment, and schema-integrity validation.

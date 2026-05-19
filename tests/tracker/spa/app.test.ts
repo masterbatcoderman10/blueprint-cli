@@ -26,7 +26,7 @@ const boardSource = readFileSync(boardSveltePath, 'utf-8')
 describe('T-2.0.4.1: App.svelte root layout', () => {
   it('imports and renders Board component', () => {
     expect(appSource).toContain("import Board from './components/Board.svelte'")
-    expect(appSource).toContain('<Board />')
+    expect(appSource).toContain('<Board')
   })
 
   it('declares a data-rail attribute on the task detail rail element', () => {
