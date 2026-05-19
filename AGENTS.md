@@ -85,8 +85,9 @@
   │ SRS discussion/planning │ docs/core/srs-planning.md            │
   │                         │                                      │
   ├─────────────────────────┼──────────────────────────────────────┤
-  │ Correct completed tasks │ docs/core/tweak-planning.md          │
-  │ in current phase (tweak)│                                      │
+  │ Quick change / tweak    │ docs/core/tweak-planning.md          │
+  │ (small, contained,      │                                      │
+  │ single concern)         │                                      │
   ├─────────────────────────┼──────────────────────────────────────┤
   │ Commit / git operations │ docs/core/git-execution-workflow.md  │
   │                         │ or docs/core/git-review-workflow.md  │
@@ -97,6 +98,13 @@
   ├─────────────────────────┼──────────────────────────────────────┤
   │ Discuss / clarify       │ No module needed. Use loaded context.│
   └─────────────────────────┴──────────────────────────────────────┘
+
+  TWEAK INTENT CLASSIFICATION:
+    The agent must apply general intelligence to every incoming change
+    request — assessing scope, surface area, feature-ness, and test-plan
+    need — and proactively route to tweak planning when the request
+    qualifies, even when the user did not say "tweak". The agent must
+    surface the classification to the user before drafting.
 
   IF the user's request spans multiple intents (e.g., "finish this task and commit"):
     Load each required module before executing its corresponding workflow.

@@ -45,6 +45,9 @@ docs/
 │       ├── prd.md                           # Linked project's product requirements
 │       ├── project-progress.md              # Linked project's current state
 │       └── milestone-<n>-<name>.md          # Linked project's active milestone
+├── tweaks/                                  # Standalone tweak documents (top-level quick-change contract)
+│   ├── README.md                            # Directory purpose and naming convention
+│   └── tweak-<n>-<slug>.md                  # Individual tweak documents
 └── knowledge-base/                                 # Pre-Blueprint docs preserved for reference
 ```
 
@@ -95,6 +98,14 @@ docs/
 - Does NOT contain the project's main README or non-doc files.
 - Once stored in the knowledge base, files serve as reference only and are not modified by any active workflow.
 
+### docs/tweaks/
+
+- Contains standalone tweak documents: `tweak-<n>-<slug>.md`.
+- Tweaks are the smallest formal change contract in Blueprint — small, contained, non-feature corrections and adjustments.
+- Each tweak gets its own document, its own tracker milestone (`Tweak <n> — <name>`), and its own lightweight execution lifecycle.
+- Tweaks are NOT recorded inside phase or milestone documents.
+- New tweak documents are created per `docs/core/tweak-planning.md`.
+
 ### docs/external/
 
 - Created by `blueprint link`, not by default during setup.
@@ -119,6 +130,7 @@ docs/
 | Revision plans | `docs/milestones/` | scope-change.md |
 | Pre-Blueprint docs | `docs/knowledge-base/` | CLI |
 | Linked project context | `docs/external/<alias>/` | `blueprint link` CLI |
+| Tweak documents | `docs/tweaks/` | tweak-planning.md |
 
 ---
 
@@ -134,6 +146,7 @@ A valid Blueprint project has ALL of the following:
 - [ ] `docs/core/` exists and contains `blueprint-structure.md` at minimum
 - [ ] `docs/core/srs-planning.md` exists
 - [ ] No files at docs/ root other than `project-progress.md`, `prd.md`, `conventions.md`, and `srs.md`
+- [ ] `docs/tweaks/` exists and contains at minimum a `README.md`
 - [ ] Every phase doc is inside a milestone subfolder under `docs/milestones/`
 
 health-check.md uses this checklist to verify project integrity.

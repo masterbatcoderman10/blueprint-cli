@@ -55,6 +55,14 @@ and applying review notes after a review cycle.
   - Local tracker server is reachable
   - User has specified which gate or stream to start
 
+  NOTE ON TWEAK DOCUMENTS:
+    Tweak documents (`docs/tweaks/tweak-<n>-<slug>.md`) are valid
+    execution sources alongside phase documents. When executing a
+    tweak, the agent follows the same StartGateOrStream flow, with
+    the two additional gates defined in <TweakExecutionGates> below.
+    Tweak documents do not contain a formal Test Plan section; the
+    agent relies on the existing project test suite for verification.
+
   CONTEXT INFERENCE:
     The current milestone and phase are read from
     docs/project-progress.md. When the user says "start stream A"
@@ -183,6 +191,49 @@ and applying review notes after a review cycle.
     ignored during execution. Cross-stream regressions are the
     phase completion agent's responsibility.
 </StartGateOrStream>
+
+---
+
+<TweakExecutionGates>
+  PURPOSE: Define two explicit gates that apply when executing tweak
+  tasks. These gates block execution on failure.
+
+  GATE 1 — TWEAK-START GATE
+    No tweak task may transition from **TO-DO** to **IN-PROGRESS**
+    until the user has explicitly confirmed the drafted tweak plan.
+
+    This gate is enforced by the agent protocol, not by code. The
+    agent must:
+      - Present the drafted tweak document to the user in full.
+      - Wait for explicit confirmation ("yes", "proceed", "looks fine").
+      - Re-loop the draft on requested changes.
+      - Only after confirmation move the first task to IN-PROGRESS.
+
+    IF the user has not confirmed: STOP. Do not move any task out
+    of TO-DO. Re-present the draft and wait.
+
+  GATE 2 — TWEAK-COMPLETION GATE
+    The full project test suite (`npm test`) must pass before a
+    tweak's terminal task is marked **DONE**.
+
+    This gate is enforced at review time. The reviewer:
+      - Runs `npm test` before moving the terminal tweak task to DONE.
+      - If the suite fails: leaves the task in IN-REVIEW (or moves
+        it to REWORK with notes) until the suite is green.
+      - If the suite passes: may move the terminal task to DONE.
+
+    The executing agent also runs the full project test suite before
+    marking its final task complete, as a self-check.
+
+  HARD RULES:
+    - Both gates block execution on failure. There are no overrides.
+    - The tweak-start gate is mandatory for every tweak, regardless
+      of size or urgency.
+    - The tweak-completion gate is mandatory for every tweak. A green
+      test suite is non-negotiable.
+    - These gates apply ONLY to tweaks. Phase and milestone execution
+      follows the normal rules defined in <StartGateOrStream>.
+</TweakExecutionGates>
 
 ---
 

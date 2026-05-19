@@ -10,6 +10,15 @@ Revision planning is a deep process. It requires top-down impact
 analysis before any work begins, and produces its own document with
 phases, just as a milestone does.
 
+**Revision vs Tweak Boundary:**
+- New features, major edits, cross-cutting contract changes, formal
+  Test Plan needs, and multi-phase work route through **revision**
+  planning (or scope-change / milestone placement for additive work).
+- Small, contained, single-concern, non-feature corrections and
+  adjustments route to **tweak** planning (`docs/core/tweak-planning.md`).
+- When in doubt, default to the heavier process. It is safer to
+  over-scope to revision than to under-scope to tweak.
+
 ---
 
 <RevisionProcess>
@@ -279,6 +288,11 @@ phases, just as a milestone does.
   - Revision planning never silently rewrites an existing SRS
     requirement's meaning. If the meaning changes, the prior
     requirement is preserved and a new superseding requirement is created per RevisionSRSImpact rules.
+  - **Revision vs Tweak:** A change that is small, contained,
+    single-concern, non-feature, and needs no formal Test Plan
+    does not need a revision — route it to `docs/core/tweak-planning.md`.
+    Revisions are for multi-phase, cross-cutting, or contract-level
+    change. When in doubt, prefer revision.
 </RevisionRules>
 
 ---

@@ -68,6 +68,15 @@ For detailed session management patterns, see: `[Context Rot & Session Managemen
     - The orchestrator does NOT run phase completion itself. It
       delegates phase completion to an independent phase-completion
       subagent per `docs/core/phase-completion.md`.
+
+  TWEAK ORCHESTRATION:
+    When a tweak document contains a gate/stream map, the orchestrator
+    may run that map using the same per-stream execute → review →
+    address → rereview loop defined in <StreamLifecycle>. Tweak
+    orchestration follows the same spawn rules, dependency checks,
+    and lifecycle management as phase orchestration. The orchestrator
+    does not treat tweaks differently — it consumes the map faithfully
+    and delegates execution and review to the same subagents.
 </OrchestratorInvocation>
 
 ---

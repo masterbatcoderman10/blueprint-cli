@@ -21,6 +21,13 @@ the tracker and either approves it or leaves structured feedback.
   - Local tracker server is reachable
   - User has specified which gate, stream, or agent's work to review
 
+  NOTE ON TWEAK REVIEW:
+    Tweak documents (`docs/tweaks/tweak-<n>-<slug>.md`) are valid
+    review sources alongside phase documents. When reviewing a tweak,
+    the reviewer follows the same ReviewProcess flow, with the
+    tweak-completion gate in mind: the terminal tweak task may only
+    move to DONE when the full project test suite (`npm test`) is green.
+
   CONTEXT INFERENCE:
     The current milestone and phase are read from
     docs/project-progress.md. When the user says "review stream A"

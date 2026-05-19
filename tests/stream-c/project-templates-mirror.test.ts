@@ -74,6 +74,9 @@ describe('R6-3.C: Project + Templates Mirror', () => {
       { source: 'docs/core/tweak-planning.md', template: 'templates/docs/core/tweak-planning.md' },
       { source: 'docs/core/scope-change.md', template: 'templates/docs/core/scope-change.md' },
       { source: 'docs/core/blueprint-structure.md', template: 'templates/docs/core/blueprint-structure.md' },
+      { source: 'docs/core/hierarchy.md', template: 'templates/docs/core/hierarchy.md' },
+      { source: 'docs/core/revision-planning.md', template: 'templates/docs/core/revision-planning.md' },
+      { source: 'docs/core/test-planning.md', template: 'templates/docs/core/test-planning.md' },
       { source: 'docs/core/srs-planning.md', template: 'templates/docs/core/srs-planning.md' },
       // C.6
       { source: 'docs/core/tracker.md', template: 'templates/docs/core/tracker.md' },
@@ -104,6 +107,47 @@ describe('R6-3.C: Project + Templates Mirror', () => {
       const line8 = lines[7] ?? ''
       expect(line8).toContain('built-in')
       expect(line8).not.toContain('kanban board')
+    })
+  })
+
+  describe('C.4: Root agent routing tables route tweak intent to tweak-planning.md', () => {
+    const rootAgentFiles = ['AGENTS.md', 'CLAUDE.md', 'GEMINI.md', 'QWEN.md']
+
+    it.each(rootAgentFiles)('%s routes tweak intent to docs/core/tweak-planning.md', async (file) => {
+      const content = await readFile(join(ROOT_DIR, file), 'utf-8')
+      expect(content).toContain('docs/core/tweak-planning.md')
+      expect(content).not.toContain('Correct completed tasks')
+      expect(content).toContain('Quick change / tweak')
+    })
+
+    it.each(rootAgentFiles)('%s contains tweak intent classification clause', async (file) => {
+      const content = await readFile(join(ROOT_DIR, file), 'utf-8')
+      expect(content).toContain('TWEAK INTENT CLASSIFICATION')
+      expect(content).toContain('proactively route to tweak planning')
+    })
+  })
+
+  describe('C.5: Template agent files mirror root routing region byte-for-byte', () => {
+    const agentPairs = [
+      { root: 'AGENTS.md', template: 'templates/AGENTS.md' },
+      { root: 'CLAUDE.md', template: 'templates/CLAUDE.md' },
+      { root: 'GEMINI.md', template: 'templates/GEMINI.md' },
+      { root: 'QWEN.md', template: 'templates/QWEN.md' },
+    ]
+
+    function extractRoutingRegion(content: string): string {
+      const start = content.indexOf('<ModuleRouting>')
+      const end = content.indexOf('</ModuleRouting>') + '</ModuleRouting>'.length
+      if (start === -1 || end === -1) return ''
+      return content.slice(start, end)
+    }
+
+    it.each(agentPairs)('$root routing region ↔ $template routing region', ({ root, template }) => {
+      const rootContent = readFileSync(join(ROOT_DIR, root), 'utf-8')
+      const templateContent = readFileSync(join(ROOT_DIR, template), 'utf-8')
+      const rootRouting = extractRoutingRegion(rootContent)
+      const templateRouting = extractRoutingRegion(templateContent)
+      expect(templateRouting).toBe(rootRouting)
     })
   })
 })
