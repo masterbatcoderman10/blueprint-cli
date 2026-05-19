@@ -3,6 +3,8 @@ import { describe, it, expect } from 'vitest'
 import {
   CANONICAL_CORE_FILES,
   EDITABLE_PROJECT_DOCS,
+  REQUIRED_BLUEPRINT_DIRECTORIES,
+  REQUIRED_CANONICAL_FILES,
   SUPPORTED_AGENT_FILES,
   getCanonicalStructurePaths,
   getManagedAgentPaths,
@@ -65,6 +67,14 @@ describe('T-3.0.2.1: canonical structure inventory completeness', () => {
     expect(SUPPORTED_AGENT_FILES).toContain('AGENTS.md')
     expect(SUPPORTED_AGENT_FILES).toContain('GEMINI.md')
     expect(SUPPORTED_AGENT_FILES).toContain('QWEN.md')
+  })
+
+  it('includes docs/tweaks/ in required Blueprint directories', () => {
+    expect(REQUIRED_BLUEPRINT_DIRECTORIES).toContain('docs/tweaks')
+  })
+
+  it('includes docs/tweaks/README.md in required canonical files', () => {
+    expect(REQUIRED_CANONICAL_FILES).toContain('docs/tweaks/README.md')
   })
 })
 
