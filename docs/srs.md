@@ -83,14 +83,15 @@ The system must provide a single-page browser UI for the built-in task tracker, 
 
 The system must provide a standalone top-level tweak workflow for small, contained changes that should move faster than revisions while preserving Blueprint planning, tracker, review, and verification guards.
 
-- `docs/tweaks/` must be a required Blueprint directory scaffolded into every project.
-- Each tweak must be planned as a standalone Markdown document under `docs/tweaks/`, not as a section inside a phase document.
-- Tweak documents must use a lightweight phase-plan-shaped structure with goals, dependencies, small task tables, acceptance criteria, verification notes, Definition of Done, and completion state.
-- Tweak documents must not include their own formal Test Plan section.
+- `docs/tweaks/` must be a required Blueprint directory scaffolded into every project, and the **Doctor scaffold integration** must repair the directory and its placeholder `README.md` for older projects missing them, without overwriting any existing user content.
+- Each tweak must be planned as a standalone Markdown document under `docs/tweaks/`, named with the locked **naming convention** `tweak-<n>-<slug>.md` (kebab-case slug, monotonically increasing `<n>`).
+- Each tweak's tracker tasks must use the locked **tracker milestone value** `Tweak <n> — <name>` (em-dash, human-readable name) for grouping and filtering on the board.
+- Tweak documents must use a **lightweight** phase-plan-shaped structure containing exactly: Goals, Dependencies, small Task tables, Acceptance Criteria, Verification, Definition of Done, and Status. No additional formal sections are required.
+- Tweak documents must have **no formal test plan section** (this is the "no formal test plan" rule). Needing a formal test plan is an explicit escalation signal that the work belongs in revision or milestone planning, not in a tweak.
 - Small additions or modifications may be tweaks when the work is contained and does not create a new feature.
 - New features, major edits, regressive changes, cross-cutting contract changes, work needing a formal test plan, or work needing multiple phases must route to revision or milestone planning instead.
 - Phase and revision phase templates must not include a `## Tweaks` section.
-- Tweak tasks must use the built-in tracker and the normal execution, review, address-notes, rereview, and verification lifecycle.
+- Tweak tasks must use the built-in tracker and the normal execution, review, address-notes, rereview, and verification lifecycle. The terminal tweak task may only move to DONE when the full project test suite (`npm test`) is green.
 
 ### Should Have
 
@@ -223,6 +224,7 @@ Change log:
 
 Change log:
 - 2026-05-19 - Created from Revision 7 planning.
+- 2026-05-19 - Deepened by R7 Phase 1 Gate (R7-1.0): locked sub-detail bullets added — naming convention `tweak-<n>-<slug>.md`, tracker milestone value `Tweak <n> — <name>`, lightweight phase-shaped structure, no formal test plan, Doctor scaffold integration for older projects. Status remains `approved-pending-implementation` until phase completion. ID unchanged; meaning unchanged.
 
 ---
 
