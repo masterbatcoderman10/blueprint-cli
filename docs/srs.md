@@ -20,7 +20,7 @@ This SRS exists for blueprint-cli to act as the persistent requirement layer bet
 | MAS-203 | Agent Orchestration Protocol Module | Must | active | Revision 5 |
 | MAS-204 | Built-in Task Tracker | Must | active | Revision 6 |
 | MAS-205 | Local Project Board UI | Must | active | Revision 6 |
-| MAS-206 | Standalone Tweak Workflow | Must | approved-pending-implementation | Revision 7 |
+| MAS-206 | Standalone Tweak Workflow | Must | active | Revision 7 |
 
 ---
 
@@ -215,7 +215,7 @@ Change log:
 ### MAS-206
 - Title: Standalone Tweak Workflow
 - Priority: Must
-- Status: approved-pending-implementation
+- Status: active
 - Assigned milestone: Revision 7
 - Source: Revision 7 Standalone Tweak Workflow
 - Introduced by: Revision 7
@@ -225,6 +225,7 @@ Change log:
 Change log:
 - 2026-05-19 - Created from Revision 7 planning.
 - 2026-05-19 - Deepened by R7 Phase 1 Gate (R7-1.0): locked sub-detail bullets added — naming convention `tweak-<n>-<slug>.md`, tracker milestone value `Tweak <n> — <name>`, lightweight phase-shaped structure, no formal test plan, Doctor scaffold integration for older projects. Status remains `approved-pending-implementation` until phase completion. ID unchanged; meaning unchanged.
+- 2026-05-20 - Transitioned to active. Phase 1 complete: standalone tweak workflow implemented, `docs/tweaks/` scaffolded and repaired by Doctor, `tweak-planning.md` rewritten with intent classification and review gates, all core docs and templates updated, R2 inline tweak contract superseded, full test suite green.
 
 ---
 

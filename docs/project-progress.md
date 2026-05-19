@@ -2,9 +2,9 @@
 
 **Project**: blueprint-cli
 **Tracker**: blueprint-cli
-**Current Milestone**: Revision 7 — Standalone Tweak Workflow
-**Current Phase**: Phase 1 — Standalone Tweak Workflow & Scaffold Integration (planned and test-planned, ready for execution)
-**Status**: Revision 7 Phase 1 planned and test-planned; ready for execution
+**Current Milestone**: None active
+**Current Phase**: None active
+**Status**: Revision 7 Phase 1 complete; Revision 7 complete
 
 ---
 
@@ -69,6 +69,8 @@
 - 2026-05-19: Revision 7 Phase 1 — Standalone Tweak Workflow & Scaffold Integration was planned. Gate R7-1.0 rewrites `tweak-planning.md` (with prominent tweak definition, intent-classification block, and a worked example), removes the `## Tweaks` section from the phase-plan template, seeds `docs/tweaks/README.md`, and deepens MAS-206 with locked sub-detail (naming `tweak-<n>-<slug>.md`, tracker milestone `Tweak <n> — <name>`). Streams: A (scaffold + generic canonical-set Doctor repair that never overwrites existing files), B (other core docs + `execution.md` tweak-completion gate requiring `npm test` green + R2 inline tweak-contract test supersession), C (byte-for-byte template mirror + root agent routing with proactive tweak classification + mirror test), D (canonical-structure test + parameterized Doctor repair coverage across `docs/tweaks/`, `docs/core/orchestrate.md`, `docs/core/tracker.md`, and any other required-set entries). MAS-206 transitions to `active` on phase completion. Phase document at `docs/milestones/revision-7-standalone-tweak-workflow/phase-1-standalone-tweak-workflow-and-scaffold-integration.md`.
 - 2026-05-19: Revision 7 Phase 1 test plan committed. 32 tests across Gate (9) + Stream A (5) + Stream B (12) + Stream C (6) + Stream D (0). 18 of 25 tasks testable; the 7 not-testable tasks are all test-authoring tasks (R7-1.A.4, R7-1.B.7, R7-1.C.6, R7-1.D.1–D.4) whose coverage is delivered by sibling implementation tests. Phase document ready for execution.
 - 2026-05-19: Revision 7 Phase 1 test plan tightened after independent subagent audit. Three high-impact gaps closed: (1) T-R7-1.A.3.1 replaced from "inspection-of-source" with a real probe-entry parameterized fixture proving Doctor repair restores every canonical-set entry byte-for-byte (and added T-R7-1.A.3.3 for the partial-present missing-file scenario, re-pointing D.3's coverage); (2) R7-1.B.7 promoted from not-testable to testable with four explicit assertions (T-R7-1.B.7.1 tweak-start gate behavior, T-R7-1.B.7.2 tweak-completion gate behavior, T-R7-1.B.7.3 standalone-contract structural rules, T-R7-1.B.7.4 repo-wide grep guard against new `## Tweaks` headings); (3) added the grep-guard test as analogue to R6's `vibe-kanban` audit precedent. New totals: 36 tests, 19 testable tasks, 6 not-testable.
+- 2026-05-20: Revision 7 Phase 1 — Standalone Tweak Workflow & Scaffold Integration completed. All tasks done, DoD satisfied, full test suite green.
+- 2026-05-20: Revision 7 — Standalone Tweak Workflow completed. All phases done.
 
 ---
 
@@ -117,7 +119,7 @@ R6 — Built-in Task Tracker
 ├── Phase 4 — Migration & Doctor Integration ✓
 └── Phase 5 — Milestone Integration, Verification & Cleanup ✓
 R7 — Standalone Tweak Workflow
-└── Phase 1 — Standalone Tweak Workflow & Scaffold Integration ○
+└── Phase 1 — Standalone Tweak Workflow & Scaffold Integration ✓
 M2 — Cross-Project Context (Optional Post-MVP)
 └── Phase 1 — TBD ○
 M3 — Workflow Visibility Enhancements (Optional Future)
@@ -131,9 +133,4 @@ M3 — Workflow Visibility Enhancements (Optional Future)
 > Track revisions that have been identified but not yet executed.
 > The agent should surface these at session start.
 
-- **Revision 7 — Standalone Tweak Workflow**
-  - **Status:** Planned
-  - **Priority:** Next
-  - **Scope:** Replace inline phase-doc tweaks with a top-level quick-change workflow under `docs/tweaks/`; remove tweak sections from future phase/revision phase templates; keep tweak docs lightweight with no formal Test Plan section; keep execution, review, tracker, and verification guards.
-  - **Impact:** M1 scaffold / template / Doctor surfaces; core planning, execution, review, scope-change, revision-boundary, and orchestration docs; root and template agent routing. SRS: MAS-206 created.
-  - **Document:** `docs/milestones/revision-7-standalone-tweak-workflow/revision-7-standalone-tweak-workflow.md`
+_None._

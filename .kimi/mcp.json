@@ -3,10 +3,6 @@
     "chrome_devtools": {
       "command": "npx",
       "args": ["chrome-devtools-mcp@latest"]
-    },
-    "vibe_kanban": {
-      "command": "npx",
-      "args": ["-y", "vibe-kanban@latest", "--mcp"]
     }
   }
 }
