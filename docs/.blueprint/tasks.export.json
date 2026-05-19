@@ -1026,6 +1026,58 @@
       "milestone": "R6",
       "created_at": 1779206988334,
       "updated_at": 1779207976271
+    },
+    {
+      "id": "R7-1.0.1",
+      "title": "[R7-1.0.1] Rewrite tweak-planning.md as standalone top-level quick-change contract",
+      "description": "Gate R7-1.0 — Tweak Contract Canon & Foundation\nRewrite docs/core/tweak-planning.md with TweakDefinition, TweakIntentClassification, TweakReviewGate blocks, boundary rules, worked example, naming convention, no formal Test Plan section.",
+      "state": "DONE",
+      "phase": "R7-1",
+      "stream": "0",
+      "author": "Claude Code (orchestrator)",
+      "implementation_notes": "Completed by execution subagent. Full rewrite includes all required blocks and worked example.",
+      "milestone": "R7",
+      "created_at": 1779216339505,
+      "updated_at": 1779216339505
+    },
+    {
+      "id": "R7-1.0.2",
+      "title": "[R7-1.0.2] Remove ## Tweaks section from PhaseTemplate in phase-planning.md",
+      "description": "Gate R7-1.0 — Remove ## Tweaks section from <PhaseTemplate> block in docs/core/phase-planning.md.",
+      "state": "DONE",
+      "phase": "R7-1",
+      "stream": "0",
+      "author": "Claude Code (orchestrator)",
+      "implementation_notes": "Section removed from PhaseTemplate.",
+      "milestone": "R7",
+      "created_at": 1779216339517,
+      "updated_at": 1779216339517
+    },
+    {
+      "id": "R7-1.0.3",
+      "title": "[R7-1.0.3] Seed docs/tweaks/README.md placeholder",
+      "description": "Gate R7-1.0 — Seed docs/tweaks/README.md with directory purpose, link to tweak-planning.md, naming convention.",
+      "state": "DONE",
+      "phase": "R7-1",
+      "stream": "0",
+      "author": "Claude Code (orchestrator)",
+      "implementation_notes": "docs/tweaks/README.md created with full content.",
+      "milestone": "R7",
+      "created_at": 1779216339529,
+      "updated_at": 1779216339529
+    },
+    {
+      "id": "R7-1.0.4",
+      "title": "[R7-1.0.4] Deepen MAS-206 in srs.md with locked sub-detail + 2026-05-19 changelog",
+      "description": "Gate R7-1.0 — Deepen MAS-206 in docs/srs.md. Status remains approved-pending-implementation.",
+      "state": "DONE",
+      "phase": "R7-1",
+      "stream": "0",
+      "author": "Claude Code (orchestrator)",
+      "implementation_notes": "MAS-206 deepened with locked sub-detail bullets and 2026-05-19 change-log entry.",
+      "milestone": "R7",
+      "created_at": 1779216339541,
+      "updated_at": 1779216339541
     }
   ],
   "comments": [
