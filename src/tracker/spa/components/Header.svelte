@@ -42,9 +42,7 @@
   const phaseCount = $derived(new Set(tasks.map((t) => t.phase).filter(Boolean)).size)
   const streamCount = $derived(new Set(tasks.map((t) => t.stream).filter(Boolean)).size)
   const milestoneCount = $derived(
-    tasks.length > 0
-      ? new Set(tasks.map((t) => (t as Record<string, unknown>).milestone).filter(Boolean)).size || 1
-      : 0
+    new Set(tasks.map((t) => t.milestone).filter(Boolean)).size
   )
 </script>
 

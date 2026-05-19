@@ -93,6 +93,21 @@ describe('T-2.0.5.1: listTasks success path', () => {
     const calledUrl = mockFetch.mock.calls[0][0] as string
     expect(calledUrl).toContain('status=')
   })
+
+  // T-R6-5.B.1 — milestone filter in query string
+  it('appends milestone to URL when filter supplied', async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      status: 200,
+      json: async () => ({ ok: true, data: [] }),
+    })
+
+    await api.listTasks({ milestone: 'R6', phase: 'R6-3', stream: 'A' })
+    const calledUrl = mockFetch.mock.calls[0][0] as string
+    expect(calledUrl).toContain('milestone=R6')
+    expect(calledUrl).toContain('phase=R6-3')
+    expect(calledUrl).toContain('stream=A')
+  })
 })
 
 // T-2.0.5.2 — createTask error: mocked 400 + envelope → { ok: false, error: { code, message } }

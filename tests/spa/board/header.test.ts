@@ -30,10 +30,10 @@ describe('R6-2.A.1: Header', () => {
 
   it('derives milestone/phase/stream counts from tasks', () => {
     const tasks: TaskData[] = [
-      { id: 'R6-2.A.1', phase: 'P2', stream: 'A', status: 'todo' },
-      { id: 'R6-2.A.2', phase: 'P2', stream: 'A', status: 'todo' },
-      { id: 'R6-2.B.1', phase: 'P2', stream: 'B', status: 'in-progress' },
-      { id: 'R6-3.A.1', phase: 'P3', stream: 'A', status: 'todo' },
+      { id: 'R6-2.A.1', phase: 'P2', stream: 'A', status: 'todo', milestone: 'R6' },
+      { id: 'R6-2.A.2', phase: 'P2', stream: 'A', status: 'todo', milestone: 'R6' },
+      { id: 'R6-2.B.1', phase: 'P2', stream: 'B', status: 'in-progress', milestone: 'R6' },
+      { id: 'R6-3.A.1', phase: 'P3', stream: 'A', status: 'todo', milestone: 'R6' },
     ]
     render(Header, {
       props: { projectName: 'Test', projectTagline: 'Tagline', tasks },
@@ -47,6 +47,7 @@ describe('R6-2.A.1: Header', () => {
     render(Header, {
       props: { projectName: 'Test', projectTagline: 'Tagline', tasks: [] },
     })
+    expect(screen.getByTestId('milestone-count')).toHaveTextContent('0')
     expect(screen.getByTestId('phase-count')).toHaveTextContent('0')
     expect(screen.getByTestId('stream-count')).toHaveTextContent('0')
   })
@@ -95,5 +96,31 @@ describe('R6-2.A.1: Header', () => {
       expect(screen.getByTestId('project-name')).toHaveTextContent('—')
     })
     expect(screen.getByTestId('project-tagline')).toHaveTextContent('—')
+  })
+})
+
+describe('R6-5.B.4: Real milestone count', () => {
+  // T-R6-5.B.4.1 — All-R6 tasks render count of 1
+  it('renders milestone count of 1 for all-R6 tasks', () => {
+    const tasks: TaskData[] = [
+      { id: 'R6-2.A.1', phase: 'P2', stream: 'A', milestone: 'R6' },
+      { id: 'R6-3.B.1', phase: 'P3', stream: 'B', milestone: 'R6' },
+    ]
+    render(Header, {
+      props: { projectName: 'Test', projectTagline: 'Tagline', tasks },
+    })
+    expect(screen.getByTestId('milestone-count')).toHaveTextContent('1')
+  })
+
+  // T-R6-5.B.4.2 — Mixed M1 + R6 tasks render count of 2
+  it('renders milestone count of 2 for mixed M1 + R6 tasks', () => {
+    const tasks: TaskData[] = [
+      { id: 'R6-2.A.1', phase: 'R6-2', stream: 'A', milestone: 'R6' },
+      { id: 'M1-1.0.1', phase: 'M1-1', stream: '0', milestone: 'M1' },
+    ]
+    render(Header, {
+      props: { projectName: 'Test', projectTagline: 'Tagline', tasks },
+    })
+    expect(screen.getByTestId('milestone-count')).toHaveTextContent('2')
   })
 })

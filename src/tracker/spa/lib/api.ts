@@ -24,6 +24,7 @@ export interface TaskData {
   state?: string
   phase?: string
   stream?: string | null
+  milestone?: string
   gate?: string
   description?: string
   author?: string | null
@@ -57,6 +58,7 @@ export interface TaskFilter {
   status?: string
   phase?: string
   stream?: string
+  milestone?: string
   gate?: string
   [key: string]: string | undefined
 }

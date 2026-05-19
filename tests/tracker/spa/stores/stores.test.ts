@@ -227,3 +227,43 @@ describe('T-2.0.6.4: comments store cache invalidation', () => {
     expect(mockFetch.mock.calls.length).toBe(countAfterFirst)
   })
 })
+
+// T-R6-5.B.2 — Store filter state holds milestone alongside phase and stream
+describe('T-R6-5.B.2: store filter passes milestone to fetchTasks', () => {
+  beforeEach(() => {
+    vi.useFakeTimers()
+    mockFetch.mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => ({ ok: true, data: [] }),
+    })
+  })
+
+  afterEach(() => {
+    vi.useRealTimers()
+    mockFetch.mockReset()
+  })
+
+  it('passes milestone filter through to fetchTasks', async () => {
+    vi.resetModules()
+    const { createTasksStore } = await import('../../../../src/tracker/spa/stores/tasks.svelte')
+
+    const store = createTasksStore({ intervalMs: 60000 })
+    store.start()
+    await Promise.resolve()
+    await Promise.resolve()
+
+    // Now set filter with milestone
+    store.setFilter({ milestone: 'R6', phase: 'R6-3', stream: 'A' })
+    await Promise.resolve()
+    await Promise.resolve()
+
+    // Find the last fetch call (the one from setFilter)
+    const lastCallUrl = mockFetch.mock.calls[mockFetch.mock.calls.length - 1][0] as string
+    expect(lastCallUrl).toContain('milestone=R6')
+    expect(lastCallUrl).toContain('phase=R6-3')
+    expect(lastCallUrl).toContain('stream=A')
+
+    store.stop()
+  })
+})
