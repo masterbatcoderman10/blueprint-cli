@@ -1000,6 +1000,19 @@
       "milestone": "R6",
       "created_at": 1779187440420,
       "updated_at": 1779187460755
+    },
+    {
+      "id": "R6-BUG.2",
+      "title": "[BUG] orchestrate.md template mirror out of sync",
+      "description": "Symptom: CI test R6-3.C mirror check fails — orchestrate.md and templates/docs/core/orchestrate.md differ.\nExpected: byte-for-byte identical.\nRoot Cause: commit d81558b edited docs/core/orchestrate.md without updating its template mirror (last synced at 72f795f in R6-P3-C).\nFix Approach: cp docs/core/orchestrate.md templates/docs/core/orchestrate.md\nFiles Affected: templates/docs/core/orchestrate.md",
+      "state": "IN-REVIEW",
+      "phase": "R6-BUG",
+      "stream": "C",
+      "author": null,
+      "implementation_notes": null,
+      "milestone": "R6",
+      "created_at": 1779188920763,
+      "updated_at": 1779188920763
     }
   ],
   "comments": [

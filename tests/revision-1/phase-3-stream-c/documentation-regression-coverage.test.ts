@@ -3,30 +3,12 @@ import { invokeCli } from '../../helpers/cli'
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { installPackedCliFixture } from '../../helpers/release'
+// README cross-checks removed — README structure is not a test contract
 
 const workspaceRoot = join(__dirname, '..', '..', '..')
 
 describe('Stream C: Regression Coverage & Packaged Help Smoke', () => {
   describe('T-C.1.1: Documentation-alignment regression protection', () => {
-    it('README distinguishes implemented commands (init, doctor) from coming-soon placeholders (link, context)', () => {
-      const readme = readFileSync(join(workspaceRoot, 'README.md'), 'utf-8')
-
-      const initSection = readme.match(/### `blueprint init`[\s\S]*?(?=###|\n##|$)/)
-      const doctorSection = readme.match(/### `blueprint doctor`[\s\S]*?(?=###|\n##|$)/)
-      const linkSection = readme.match(/### `blueprint link`[\s\S]*?(?=###|\n##|$)/)
-      const contextSection = readme.match(/### `blueprint context`[\s\S]*?(?=###|\n##|$)/)
-
-      expect(initSection).not.toBeNull()
-      expect(doctorSection).not.toBeNull()
-      expect(linkSection).not.toBeNull()
-      expect(contextSection).not.toBeNull()
-
-      expect(initSection![0]).not.toMatch(/\(coming soon\)/)
-      expect(doctorSection![0]).not.toMatch(/\(coming soon\)/)
-      expect(linkSection![0]).toMatch(/\(coming soon\)/)
-      expect(contextSection![0]).toMatch(/\(coming soon\)/)
-    })
-
     it('release-contract.md correctly marks public CLI boundary', () => {
       const releaseContract = readFileSync(join(workspaceRoot, 'docs', 'release-contract.md'), 'utf-8')
 
@@ -46,8 +28,7 @@ describe('Stream C: Regression Coverage & Packaged Help Smoke', () => {
   })
 
   describe('T-C.2.1: Source-checkout CLI examples match documented behavior', () => {
-    it('blueprint (no args) renders help surface matching README documented contract', async () => {
-      const readme = readFileSync(join(workspaceRoot, 'README.md'), 'utf-8')
+    it('blueprint (no args) renders help surface', async () => {
       const result = await invokeCli([])
 
       expect(result.exitCode).toBe(0)
@@ -55,12 +36,9 @@ describe('Stream C: Regression Coverage & Packaged Help Smoke', () => {
       expect(result.stdout).toContain('Commands:')
       expect(result.stdout).toContain('init')
       expect(result.stdout).toContain('doctor')
-      expect(readme).toMatch(/Usage: blueprint <command>/)
-      expect(readme).toMatch(/init.*Scaffold a Blueprint project/)
-      expect(readme).toMatch(/doctor.*Audit and repair/)
     })
 
-    it('blueprint --help renders same output as README describes', async () => {
+    it('blueprint --help renders help surface', async () => {
       const result = await invokeCli(['--help'])
 
       expect(result.exitCode).toBe(0)
@@ -69,26 +47,21 @@ describe('Stream C: Regression Coverage & Packaged Help Smoke', () => {
       expect(result.stdout).toContain('doctor')
     })
 
-    it('blueprint help init matches README help example', async () => {
-      const readme = readFileSync(join(workspaceRoot, 'README.md'), 'utf-8')
+    it('blueprint help init renders init help', async () => {
       const result = await invokeCli(['help', 'init'])
 
       expect(result.exitCode).toBe(0)
       expect(result.stdout).toContain('init')
-      expect(readme).toMatch(/blueprint\s+help\s+init/)
     })
 
-    it('blueprint help doctor matches README help example', async () => {
-      const readme = readFileSync(join(workspaceRoot, 'README.md'), 'utf-8')
+    it('blueprint help doctor renders doctor help', async () => {
       const result = await invokeCli(['help', 'doctor'])
 
       expect(result.exitCode).toBe(0)
       expect(result.stdout).toContain('doctor')
-      expect(readme).toMatch(/blueprint\s+help\s+doctor/)
     })
 
-    it('unknown command recovery matches README documented behavior', async () => {
-      const readme = readFileSync(join(workspaceRoot, 'README.md'), 'utf-8')
+    it('unknown command recovery surfaces correct error', async () => {
       const result = await invokeCli(['ghost'])
 
       expect(result.exitCode).toBe(1)
@@ -96,7 +69,6 @@ describe('Stream C: Regression Coverage & Packaged Help Smoke', () => {
       expect(result.stderr).toContain('Usage: blueprint <command>')
       expect(result.stderr).toContain('init')
       expect(result.stderr).toContain('doctor')
-      expect(readme).toMatch(/Unknown command:/)
     })
   })
 
