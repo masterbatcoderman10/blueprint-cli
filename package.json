@@ -36,7 +36,7 @@
     "dev:board": "vite",
     "build:spa": "vite build",
     "build": "tsc && npm run build:spa",
-    "prepack": "npm run build 1>&2",
+    "prepack": "tsc 1>&2",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "release:pack:verify": "tsx src/release/verify-package-artifact.ts",
