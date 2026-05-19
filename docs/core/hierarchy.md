@@ -111,6 +111,34 @@ are defined in the TaskConventions section of phase-planning.md.
 
 ---
 
+## Tweaks — Top-Level Quick-Change Contract
+
+A **Tweak** is a standalone quick-change contract that sits **outside** the
+Project → Milestone → Phase hierarchy. It is the smallest formal change unit
+in Blueprint.
+
+| Property | Description |
+|----------|-------------|
+| **Naming** | `Tweak <n> — <Name>` (tracker milestone value) |
+| **Document** | `tweak-<n>-<slug>.md` inside `docs/tweaks/` |
+| **Scope** | Small, contained, single-concern correction or adjustment |
+| **Feature status** | Non-feature — it corrects, clarifies, or polishes existing behavior |
+| **Test Plan** | No formal Test Plan. Relies on the existing project test suite. |
+| **Hierarchy** | Outside the five-level tree. A tweak may reference a milestone it impacts, but it does not belong to one. |
+
+Tweaks get their own tracker milestone, their own lightweight document
+structure, and their own execution → review → address → re-review lifecycle.
+They do not appear inside phase documents and they are not owned by any
+milestone or phase.
+
+### Optional Milestone Impact Notes
+
+A tweak document may note that it "impacts milestone M<N>" or "touches code
+introduced in phase X" for traceability. This is a reference, not ownership.
+The tweak remains a top-level contract.
+
+---
+
 ## Naming Convention Summary
 
 | Level | Format | Example |
@@ -121,6 +149,7 @@ are defined in the TaskConventions section of phase-planning.md.
 | Stream | `Stream <Letter> — <Label>` | `Stream A — Sharing Flow` |
 | Gate Task | `M<milestone>-<phase>.<gate>.<seq>` | `M2-4.0.1`, `M2-4.0.3` |
 | Stream Task | `M<milestone>-<phase>.<stream>.<seq>` | `M2-4.A.3`, `M2-4.B.2` |
+| Tweak | `Tweak <n> — <Name>` | `Tweak 3 — Copy Fix` |
 
 ---
 

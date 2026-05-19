@@ -10,6 +10,13 @@ This module is the ONLY place where phase status and milestone
 status in project-progress.md are updated. No other agent or
 module writes to these fields.
 
+**Tweak Completion is NOT owned by phase-completion.** Standalone
+ tweak completion is handled within the tweak workflow defined in
+`docs/core/tweak-planning.md`. A tweak's terminal task moves to
+DONE when its reviewer accepts it and the full project test suite
+is green. Phase completion does not gate, track, or verify tweak
+completion.
+
 ---
 
 <PhaseCompletionProcess>
@@ -231,6 +238,9 @@ module writes to these fields.
   - Phase completion does not auto-advance to the next phase.
     It updates state and suggests next actions. The user decides
     when to proceed.
+  - Phase completion does NOT own standalone tweak completion.
+    Tweaks complete per `docs/core/tweak-planning.md` and are
+    verified by their own reviewer, not by the phase-completion agent.
   - If a regression is found, the bug-resolution.md module defines
     the task format. The phase completion agent creates the tasks
     but does not execute the fixes — that is the execution agent's

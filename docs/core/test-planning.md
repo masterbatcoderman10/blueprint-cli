@@ -218,4 +218,10 @@ A phase cannot begin execution without a completed Test Plan section.
   - During execution, tests are written BEFORE implementation (TDD)
     for all tasks marked as testable. The test plan provides the
     specification; the agent writes the test code from it.
+  - **Tweaks do NOT get their own formal Test Plan.** A tweak relies
+    on the existing project test suite plus any targeted assertions
+    the author adds inline. If a change needs its own formal Test
+    Plan section to be safely verified, that is an **escalation signal**:
+    the work should be routed to revision or milestone planning instead
+    of being treated as a tweak.
 </TestPlanningRules>

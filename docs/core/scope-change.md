@@ -34,6 +34,12 @@ the current plan, this module classifies it and either places it
       models, or behavior are being altered.
       → Load docs/core/revision-planning.md. Follow its process.
 
+    SMALL CONTAINED NON-FEATURE — The change is small, localized,
+      single-concern, and does not introduce a new capability. It
+      corrects, clarifies, adjusts, or polishes existing behavior
+      or documentation. It needs no formal Test Plan of its own.
+      → Load docs/core/tweak-planning.md. Follow its process.
+
     IF unclear, ask the user: "Is the main goal here to add
     something new, or to change how something existing works?"
 
@@ -41,6 +47,12 @@ the current plan, this module classifies it and either places it
     at integration points. That does not make it a revision. The
     distinction is where the bulk of the work lives and what the
     primary intent is.
+
+    TWEAK ROUTING NOTE: If a change is small, contained, and
+    non-feature — even when the user says "just fix this" or
+    "quickly change that" — route to `docs/core/tweak-planning.md`.
+    Tweaks are the correct path for minor corrections that do not
+    warrant a full revision or scope-change cycle.
 </ScopeChangeFlow>
 
 ---
