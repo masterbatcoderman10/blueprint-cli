@@ -3,8 +3,8 @@
 **Project**: blueprint-cli
 **Tracker**: blueprint-cli
 **Current Milestone**: Revision 7 — Standalone Tweak Workflow
-**Current Phase**: Phase 1 — Standalone Tweak Workflow & Scaffold Integration (planned, pending test planning)
-**Status**: Revision 7 Phase 1 planned; test planning pending
+**Current Phase**: Phase 1 — Standalone Tweak Workflow & Scaffold Integration (planned and test-planned, ready for execution)
+**Status**: Revision 7 Phase 1 planned and test-planned; ready for execution
 
 ---
 
@@ -67,6 +67,7 @@
 - 2026-05-19: Revision 6 — Built-in Task Tracker completed. All phases done.
 - 2026-05-19: Identified Revision 7 — Standalone Tweak Workflow to replace inline phase-doc tweaks with a top-level quick-change workflow under `docs/tweaks/`. Scope: redefine `docs/core/tweak-planning.md`, remove tweak sections from future phase/revision phase templates, route small contained non-feature changes through lightweight standalone tweak plans with no formal Test Plan section, scaffold and validate `docs/tweaks/`, and preserve tracker-backed execution/review/verification guards. SRS requirement MAS-206 created (status: approved-pending-implementation). Revision document at `docs/milestones/revision-7-standalone-tweak-workflow/revision-7-standalone-tweak-workflow.md`.
 - 2026-05-19: Revision 7 Phase 1 — Standalone Tweak Workflow & Scaffold Integration was planned. Gate R7-1.0 rewrites `tweak-planning.md` (with prominent tweak definition, intent-classification block, and a worked example), removes the `## Tweaks` section from the phase-plan template, seeds `docs/tweaks/README.md`, and deepens MAS-206 with locked sub-detail (naming `tweak-<n>-<slug>.md`, tracker milestone `Tweak <n> — <name>`). Streams: A (scaffold + generic canonical-set Doctor repair that never overwrites existing files), B (other core docs + `execution.md` tweak-completion gate requiring `npm test` green + R2 inline tweak-contract test supersession), C (byte-for-byte template mirror + root agent routing with proactive tweak classification + mirror test), D (canonical-structure test + parameterized Doctor repair coverage across `docs/tweaks/`, `docs/core/orchestrate.md`, `docs/core/tracker.md`, and any other required-set entries). MAS-206 transitions to `active` on phase completion. Phase document at `docs/milestones/revision-7-standalone-tweak-workflow/phase-1-standalone-tweak-workflow-and-scaffold-integration.md`.
+- 2026-05-19: Revision 7 Phase 1 test plan committed. 32 tests across Gate (9) + Stream A (5) + Stream B (12) + Stream C (6) + Stream D (0). 18 of 25 tasks testable; the 7 not-testable tasks are all test-authoring tasks (R7-1.A.4, R7-1.B.7, R7-1.C.6, R7-1.D.1–D.4) whose coverage is delivered by sibling implementation tests. Phase document ready for execution.
 
 ---
 

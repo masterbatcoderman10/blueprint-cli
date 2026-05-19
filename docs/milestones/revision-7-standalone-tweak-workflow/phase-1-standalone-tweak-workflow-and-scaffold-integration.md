@@ -163,10 +163,97 @@ Stream B (Core Docs + R2 Test) ────────────────�
 
 ---
 
+## Test Plan
+
+> Generated from task analysis. Each testable task has one or more tests
+> mapped to it. Tests are written before implementation (TDD) during
+> task execution. Test-authoring tasks (R7-1.A.4, R7-1.B.7, R7-1.C.6,
+> R7-1.D.1–D.4) are marked not testable; their coverage is delivered by
+> sibling implementation tests (R6 Phase 4 pattern).
+
+### Gate R7-1.0 Tests
+
+| Test ID | Task | Type | Description | Expected Result |
+|---------|------|------|-------------|-----------------|
+| T-R7-1.0.1.1 | R7-1.0.1 | unit | `tweak-planning.md` contains a `<TweakDefinition>` block with both positive and negative examples | Block + examples present |
+| T-R7-1.0.1.2 | R7-1.0.1 | unit | `tweak-planning.md` contains a `<TweakIntentClassification>` block instructing proactive classification regardless of user wording | Block present with classification rule |
+| T-R7-1.0.1.3 | R7-1.0.1 | unit | `tweak-planning.md` contains a `<TweakReviewGate>` block making user confirmation mandatory before any task leaves TO-DO | Block present with TO-DO gate phrasing |
+| T-R7-1.0.1.4 | R7-1.0.1 | unit | `tweak-planning.md` contains a complete worked example tweak document with the lightweight structure | Example section detected end-to-end |
+| T-R7-1.0.1.5 | R7-1.0.1 | unit | `tweak-planning.md` locks naming `tweak-<n>-<slug>.md` and tracker milestone `Tweak <n> — <name>` | Both literal strings present |
+| T-R7-1.0.1.6 | R7-1.0.1 | unit | `tweak-planning.md` has no formal Test Plan section in its template | No `## Test Plan` heading inside template region |
+| T-R7-1.0.2 | R7-1.0.2 | unit | `phase-planning.md` `<PhaseTemplate>` contains no `## Tweaks` heading | Heading absent inside `<PhaseTemplate>` |
+| T-R7-1.0.3 | R7-1.0.3 | unit | `docs/tweaks/README.md` exists, links to `tweak-planning.md`, documents the naming convention | File present + link + naming string |
+| T-R7-1.0.4 | R7-1.0.4 | unit | `docs/srs.md` MAS-206 carries locked sub-detail bullets + 2026-05-19 change-log entry | Required bullets + dated changelog line present |
+
+### Stream A Tests
+
+| Test ID | Task | Type | Description | Expected Result |
+|---------|------|------|-------------|-----------------|
+| T-R7-1.A.1.1 | R7-1.A.1 | integration | `blueprint init` scaffold produces `docs/tweaks/README.md` matching the template | File exists with template content |
+| T-R7-1.A.1.2 | R7-1.A.1 | integration | `blueprint init` summary report lists `docs/tweaks/` in created directories | Output contains the path |
+| T-R7-1.A.2 | R7-1.A.2 | unit | `src/doctor/structure.ts` required-structure set includes `docs/tweaks/` and `docs/tweaks/README.md` | Both entries present |
+| T-R7-1.A.3.1 | R7-1.A.3 | unit | Doctor repair is driven by the canonical-structure list (generic) — adding a new required entry causes repair to attempt restoration without per-file branches | Inspection of repair routine shows list-driven behavior |
+| T-R7-1.A.3.2 | R7-1.A.3 | integration | Doctor repair never overwrites an existing required file regardless of content | Existing file bytes unchanged after repair pass |
+| — | R7-1.A.4 | — | Not testable: this task **is** the scaffold-archive test update; coverage delivered by T-R7-1.A.1.x | — |
+
+### Stream B Tests
+
+| Test ID | Task | Type | Description | Expected Result |
+|---------|------|------|-------------|-----------------|
+| T-R7-1.B.1 | R7-1.B.1 | unit | `blueprint-structure.md` canonical layout + validation checklist include `docs/tweaks/` | Path present in both sections |
+| T-R7-1.B.2 | R7-1.B.2 | unit | `hierarchy.md` describes tweaks as a top-level quick-change contract outside the Project→Milestone→Phase hierarchy | Required clause present |
+| T-R7-1.B.3.1 | R7-1.B.3 | unit | `scope-change.md` routes small contained non-feature changes to tweak planning | Clause present |
+| T-R7-1.B.3.2 | R7-1.B.3 | unit | `revision-planning.md` documents the revision/tweak boundary (multi-phase, features, cross-cutting → revision) | Clause present |
+| T-R7-1.B.4.1 | R7-1.B.4 | unit | `execution.md` allows tweak documents as execution sources | Clause present |
+| T-R7-1.B.4.2 | R7-1.B.4 | unit | `execution.md` defines the tweak-start gate (TO-DO → IN-PROGRESS requires explicit user confirmation of the tweak plan) | Gate language present |
+| T-R7-1.B.4.3 | R7-1.B.4 | unit | `execution.md` defines the tweak-completion gate (`npm test` green before terminal task → DONE) | Gate language present |
+| T-R7-1.B.4.4 | R7-1.B.4 | unit | `review.md` allows tweak gate/stream review through the existing loop | Clause present |
+| T-R7-1.B.4.5 | R7-1.B.4 | unit | `phase-completion.md` disclaims ownership of standalone tweak completion | Clause present |
+| T-R7-1.B.5 | R7-1.B.5 | unit | `test-planning.md` states tweaks do not get a formal test plan and that needing one is an escalation signal | Clause present |
+| T-R7-1.B.6 | R7-1.B.6 | unit | `orchestrate.md` describes how orchestration consumes a tweak's gate/stream map when present | Clause present |
+| — | R7-1.B.7 | — | Not testable: this task **is** the R2 inline-tweak-contract test supersession; coverage delivered by the rewritten R2 contract test itself | — |
+
+### Stream C Tests
+
+| Test ID | Task | Type | Description | Expected Result |
+|---------|------|------|-------------|-----------------|
+| T-R7-1.C.1 | R7-1.C.1 | unit | `templates/docs/core/tweak-planning.md` matches live byte-for-byte | Equal bytes |
+| T-R7-1.C.2 | R7-1.C.2 | unit | `templates/docs/core/phase-planning.md` matches live byte-for-byte | Equal bytes |
+| T-R7-1.C.3 | R7-1.C.3 | unit | All nine Stream B core docs mirror byte-for-byte under `templates/docs/core/` (parameterized over the file set) | Equal bytes for every pair |
+| T-R7-1.C.4.1 | R7-1.C.4 | unit | Root agent routing tables in `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, `QWEN.md` route tweak intent to `docs/core/tweak-planning.md` (parameterized) | Routing row present in each file |
+| T-R7-1.C.4.2 | R7-1.C.4 | unit | Same four root agent files instruct the agent to classify incoming change requests for tweak suitability, independent of user wording | Classification clause present in each |
+| T-R7-1.C.5 | R7-1.C.5 | unit | `templates/AGENTS.md`, `templates/CLAUDE.md`, `templates/GEMINI.md`, `templates/QWEN.md` mirror root routing region byte-for-byte (parameterized) | Equal bytes in routing region |
+| — | R7-1.C.6 | — | Not testable: this task **is** the mirror-test update; coverage delivered by T-R7-1.C.1 through T-R7-1.C.5 | — |
+
+### Stream D Tests
+
+| Test ID | Task | Type | Description | Expected Result |
+|---------|------|------|-------------|-----------------|
+| — | R7-1.D.1 | — | Not testable: this task **is** the canonical-structure test update; coverage delivered by T-R7-1.A.2 | — |
+| — | R7-1.D.2 | — | Not testable: this task **is** the broad parameterized Doctor repair test (covers `docs/tweaks/`, `orchestrate.md`, `tracker.md`, plus any future entries); coverage delivered by T-R7-1.A.3.1 and T-R7-1.A.3.2 | — |
+| — | R7-1.D.3 | — | Not testable: this task **is** the missing-README repair test; coverage delivered by T-R7-1.A.3.2 | — |
+| — | R7-1.D.4 | — | Not testable: this task **is** the drifted-README-left-alone test; coverage delivered by T-R7-1.A.3.2 | — |
+
+### Test Summary
+
+| Component | Total Tasks | Testable | Not Testable |
+|-----------|-------------|----------|--------------|
+| Gate R7-1.0 | 4 | 4 | 0 |
+| Stream A | 4 | 3 | 1 |
+| Stream B | 7 | 6 | 1 |
+| Stream C | 6 | 5 | 1 |
+| Stream D | 4 | 0 | 4 |
+| **Total** | **25** | **18** | **7** |
+
+32 tests total mapped across 18 testable tasks. The 7 not-testable tasks are all test-authoring tasks whose coverage is delivered by sibling implementation tests.
+
+---
+
 ## Definition of Done
 
 - [ ] Gate R7-1.0 acceptance criteria pass.
 - [ ] Stream A, B, C, and D acceptance criteria pass.
+- [ ] All tests in the Test Plan pass.
 - [ ] Full test suite green (no regressions). Existing R2 tweak-contract test passes against the standalone contract; canonical-structure, scaffold archive, and template-mirror tests pass with the expanded R7 expectations.
 - [ ] No lint errors in files touched by this phase.
 - [ ] `docs/tweaks/README.md` and the canonical `docs/tweaks/` directory exist in this repo and in scaffold output.
