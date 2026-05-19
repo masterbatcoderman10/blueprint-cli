@@ -339,4 +339,102 @@ describe('Stream A — milestone filter, POST validation, PATCH update', () => {
       error: { code: 'invalid_milestone', message: expect.any(String) },
     })
   })
+
+  it('POST /tasks with milestone="" (empty string) returns 400 instead of auto-deriving', async () => {
+    const running = await listen(openMemoryDb())
+
+    const response = await requestJson(running.origin, '/tasks', {
+      method: 'POST',
+      body: JSON.stringify({
+        id: 'R6-5.A.empty',
+        title: 'Empty milestone',
+        description: 'Should reject empty string',
+        state: 'TO-DO',
+        phase: 'R6-5',
+        milestone: '',
+      }),
+    })
+
+    expect(response.status).toBe(400)
+    expect(response.body).toMatchObject({
+      ok: false,
+      error: { code: 'invalid_milestone', message: expect.any(String) },
+    })
+  })
+
+  it('POST /tasks with whitespace-only milestone returns 400', async () => {
+    const running = await listen(openMemoryDb())
+
+    const response = await requestJson(running.origin, '/tasks', {
+      method: 'POST',
+      body: JSON.stringify({
+        id: 'R6-5.A.ws',
+        title: 'Whitespace milestone',
+        description: 'Should reject whitespace',
+        state: 'TO-DO',
+        phase: 'R6-5',
+        milestone: '   ',
+      }),
+    })
+
+    expect(response.status).toBe(400)
+    expect(response.body).toMatchObject({
+      ok: false,
+      error: { code: 'invalid_milestone', message: expect.any(String) },
+    })
+  })
+
+  it('PATCH /tasks/:id with whitespace-only milestone returns 400', async () => {
+    const running = await listen(openMemoryDb())
+
+    // Create a task first
+    await requestJson(running.origin, '/tasks', {
+      method: 'POST',
+      body: JSON.stringify({
+        id: 'R6-5.A.patchws',
+        title: 'Patch whitespace target',
+        description: 'Will attempt whitespace update',
+        state: 'TO-DO',
+        phase: 'R6-5',
+      }),
+    })
+
+    const response = await requestJson(running.origin, '/tasks/R6-5.A.patchws', {
+      method: 'PATCH',
+      body: JSON.stringify({ milestone: '   ' }),
+    })
+
+    expect(response.status).toBe(400)
+    expect(response.body).toMatchObject({
+      ok: false,
+      error: { code: 'invalid_milestone', message: expect.any(String) },
+    })
+  })
+
+  it('PATCH /tasks/:id with empty-string milestone returns 400', async () => {
+    const running = await listen(openMemoryDb())
+
+    // Create a task first
+    await requestJson(running.origin, '/tasks', {
+      method: 'POST',
+      body: JSON.stringify({
+        id: 'R6-5.A.patchempty',
+        title: 'Patch empty target',
+        description: 'Will attempt empty update',
+        state: 'TO-DO',
+        phase: 'R6-5',
+      }),
+    })
+
+    const response = await requestJson(running.origin, '/tasks/R6-5.A.patchempty', {
+      method: 'PATCH',
+      body: JSON.stringify({ milestone: '' }),
+    })
+
+    expect(response.status).toBe(400)
+    expect(response.body).toMatchObject({
+      ok: false,
+      error: { code: 'invalid_milestone', message: expect.any(String) },
+    })
+  })
 })

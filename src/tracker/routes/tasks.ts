@@ -101,9 +101,19 @@ export function createTask(db: TrackerDatabase, input: CreateTaskInput): TaskRes
     return duplicateId(input.id)
   }
 
-  // Derive milestone: explicit value > auto-derive from ID > reject
+  // Derive milestone: explicit non-empty value > auto-derive from ID > reject
   let milestone: string
-  if (input.milestone !== undefined && input.milestone !== '') {
+  if (input.milestone !== undefined && input.milestone !== null) {
+    // Reject empty or whitespace-only milestone
+    if (typeof input.milestone !== 'string' || input.milestone.trim() === '') {
+      return {
+        ok: false,
+        error: {
+          code: 'invalid_milestone',
+          message: 'Milestone must be a non-empty string when provided.',
+        },
+      }
+    }
     milestone = input.milestone
   } else {
     const derived = parseMilestoneFromId(input.id)
@@ -189,14 +199,16 @@ export function updateTask(db: TrackerDatabase, input: UpdateTaskInput): TaskRes
     return invalidState(input.state)
   }
 
-  // Validate milestone on PATCH: when present, must be non-empty string
-  if (input.milestone !== undefined && input.milestone === '') {
-    return {
-      ok: false,
-      error: {
-        code: 'invalid_milestone',
-        message: 'Milestone cannot be empty when provided on update.',
-      },
+  // Validate milestone on PATCH: when present, must be non-empty string after trimming
+  if (input.milestone !== undefined) {
+    if (typeof input.milestone !== 'string' || input.milestone.trim() === '') {
+      return {
+        ok: false,
+        error: {
+          code: 'invalid_milestone',
+          message: 'Milestone must be a non-empty string when provided on update.',
+        },
+      }
     }
   }
 
