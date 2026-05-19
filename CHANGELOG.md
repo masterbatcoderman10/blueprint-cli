@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Improved
+- **README redesign**: Streamlined structure with task tracker screenshot, clearer "How It Works" section, and direct professional tone. Reduced cognitive load for new users.
+
 ## [0.2.0] — 2026-05-19
 
 ### Added
