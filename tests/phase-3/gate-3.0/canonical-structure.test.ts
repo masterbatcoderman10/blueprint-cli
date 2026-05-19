@@ -39,12 +39,13 @@ describe('T-3.0.2.1: canonical structure inventory completeness', () => {
       'docs/core/scope-change.md',
       'docs/core/srs-planning.md',
       'docs/core/test-planning.md',
+      'docs/core/tracker.md',
       'docs/core/tweak-planning.md',
     ]
     for (const file of expectedCoreFiles) {
       expect(paths).toContain(file)
     }
-    expect(CANONICAL_CORE_FILES).toHaveLength(20)
+    expect(CANONICAL_CORE_FILES).toHaveLength(21)
   })
 
   it('returns managed agent paths for files in manifest selection', () => {

@@ -4,7 +4,7 @@ import { join, resolve } from 'node:path'
 import { describe, expect, it } from 'vitest'
 
 /**
- * The canonical set of 20 core protocol files that must exist
+ * The canonical set of 21 core protocol files that must exist
  * under templates/docs/core/ for the scaffold engine.
  */
 const CANONICAL_CORE_FILES = [
@@ -27,6 +27,7 @@ const CANONICAL_CORE_FILES = [
   'scope-change.md',
   'srs-planning.md',
   'test-planning.md',
+  'tracker.md',
   'tweak-planning.md',
 ] as const
 
@@ -37,7 +38,7 @@ describe('T-A.2: Core protocol template files', () => {
     const entries = await readdir(TEMPLATES_CORE_DIR)
     const mdFiles = entries.filter((f) => f.endsWith('.md')).sort()
 
-    expect(mdFiles.filter((f) => f !== 'tracker.md')).toEqual([...CANONICAL_CORE_FILES].sort())
+    expect(mdFiles).toEqual([...CANONICAL_CORE_FILES].sort())
     expect(mdFiles).toHaveLength(21)
   })
 

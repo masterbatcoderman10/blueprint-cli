@@ -12,7 +12,7 @@ const TEMPLATES_CORE_DIR = join(ROOT_DIR, 'templates', 'docs', 'core')
 describe('T-R3-1.C.2.1: canonical core template inventory includes srs-planning.md', () => {
   it('tracks docs/core/srs-planning.md in both structure and resolved core template inventory', () => {
     expect(CANONICAL_CORE_FILES).toContain('docs/core/srs-planning.md')
-    expect(CANONICAL_CORE_FILES).toHaveLength(20)
+    expect(CANONICAL_CORE_FILES).toHaveLength(21)
 
     const srsPlanningEntry = resolveAllCoreTemplatePaths().find(
       (entry) => entry.relativePath === 'docs/core/srs-planning.md',
@@ -30,7 +30,7 @@ describe('T-R3-1.C.2.2: templates/docs/core contains exactly 20 Markdown protoco
       .filter((entry) => entry.endsWith('.md'))
       .sort()
 
-    expect(mdFiles.filter((f) => f !== 'tracker.md')).toEqual(CANONICAL_CORE_FILES.map((relativePath) => basename(relativePath)).sort())
+    expect(mdFiles).toEqual(CANONICAL_CORE_FILES.map((relativePath) => basename(relativePath)).sort())
     expect(mdFiles).toHaveLength(21)
     expect(mdFiles).toContain('srs-planning.md')
   })
