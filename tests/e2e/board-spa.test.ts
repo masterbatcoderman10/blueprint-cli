@@ -1,8 +1,8 @@
-import { spawn } from 'node:child_process'
+import { spawn, execFileSync } from 'node:child_process'
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import { afterEach, describe, expect, it } from 'vitest'
+import { afterEach, beforeAll, describe, expect, it } from 'vitest'
 
 import { openDb } from '../../src/tracker/db'
 
@@ -105,6 +105,11 @@ afterEach(async () => {
 })
 
 describe('Stream D — board SPA E2E', () => {
+  beforeAll(() => {
+    if (!existsSync(join(packageRoot, 'dist', 'spa', 'index.html'))) {
+      execFileSync('npm', ['run', 'build:spa'], { cwd: packageRoot, stdio: 'inherit' })
+    }
+  })
   it(
     'D.3: serves SPA index.html, fingerprinted assets, and JSON API side-by-side',
     async () => {

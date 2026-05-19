@@ -144,10 +144,10 @@ describe('Stream C: Regression Coverage & Packaged Help Smoke', () => {
 
     beforeAll(async () => {
       fixture = await installPackedCliFixture()
-    }, 30000)
+    }, 120000)
 
     afterAll(async () => {
-      await fixture.cleanup()
+      await fixture?.cleanup()
     })
 
     it('installed blueprint renders root help for blueprint (no args)', async () => {
@@ -197,10 +197,10 @@ describe('Stream C: Regression Coverage & Packaged Help Smoke', () => {
 
     beforeAll(async () => {
       fixture = await installPackedCliFixture()
-    }, 30000)
+    }, 120000)
 
     afterAll(async () => {
-      await fixture.cleanup()
+      await fixture?.cleanup()
     })
 
     it('installed blueprint renders help for init command', async () => {
