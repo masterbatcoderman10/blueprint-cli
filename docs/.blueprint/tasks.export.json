@@ -987,6 +987,19 @@
       "milestone": "R6",
       "created_at": 1779164298112,
       "updated_at": 1779177736165
+    },
+    {
+      "id": "R6-BUG.1",
+      "title": "[BUG] Task card click never opens Task Detail Rail",
+      "description": "Root cause: App.svelte installs a document click handler inside a dollar-effect that flushes synchronously in Svelte 5 before the card click finishes bubbling. The same click event triggers the newly-installed outside-click handler, calling selectionStore.clear() and undoing the selection in the same tick. Fix: defer addEventListener with setTimeout(0).",
+      "state": "DONE",
+      "phase": "R6-Phase-2",
+      "stream": "B",
+      "author": null,
+      "implementation_notes": null,
+      "milestone": "R6",
+      "created_at": 1779187440420,
+      "updated_at": 1779187460755
     }
   ],
   "comments": [

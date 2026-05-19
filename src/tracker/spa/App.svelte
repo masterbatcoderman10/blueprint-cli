@@ -22,8 +22,13 @@
         selectionStore.clear()
       }
     }
-    document.addEventListener('click', handler)
-    return () => document.removeEventListener('click', handler)
+    // Defer by one tick so the card click that opened the rail
+    // finishes bubbling before this outside-click guard activates.
+    const timeoutId = setTimeout(() => document.addEventListener('click', handler), 0)
+    return () => {
+      clearTimeout(timeoutId)
+      document.removeEventListener('click', handler)
+    }
   })
 </script>
 
