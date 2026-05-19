@@ -12,6 +12,23 @@ their declared dependencies and scopes.
 
 ---
 
+## Session Management in Orchestration
+
+Orchestration often manages multiple parallel streams. Each stream runs as an independent session (or set of sessions) with its own execution, review, and rework loops. 
+
+**Key principle:** Do not try to hold all phase state in the orchestrator's context. Instead:
+
+1. **Delegate to the tracker.** Query tracker state to see which streams are done, blocked, or in review. See `docs/core/tracker.md` for API details.
+2. **Use implementation notes.** When execution or review agents update task implementation notes in the tracker, the orchestrator reads those (not git history) to understand blockers and progress.
+3. **Spawn sessions per stream.** Each execution/review agent gets only its stream's scope (not the whole phase). See `docs/core/context-and-sessions.md` for session best practices.
+4. **Coordinate through state.** The orchestrator signals when dependencies are met (by reading tracker state and notifying waiting streams), not by coordinating context between agents.
+
+This approach prevents the orchestrator from burning context on code details that execution agents already understand. The orchestrator's budget is for **coordination**, delegated to the tracker and git state.
+
+For detailed session management patterns, see: `[Context Rot & Session Management](context-and-sessions.md)`
+
+---
+
 <OrchestratorInvocation>
   PURPOSE: Define when and how an agent enters orchestration mode.
 

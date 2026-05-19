@@ -33,11 +33,21 @@ Built-in task tracker gives you visual control over phases and streams. Manage t
 
 ## What is Blueprint?
 
-Most teams using AI agents build fast and accumulate risk at the same speed. Features ship untested. Agents lose context between sessions. A scope change cascades through four documents that are now out of sync. Plans become fragile.
+Most teams using AI agents build fast and accumulate risk at the same speed. Features ship untested. Agents lose context between sessions. A scope change cascades through four documents that are now out of sync. Plans become fragile. This is **context rot** — the quality degradation that happens as AI fills its context window without structure.
 
-Blueprint enforces test-driven development at the task level, not as an afterthought. Before an agent writes implementation code, it writes the test. The test fails. The agent implements until it passes. This structure is not negotiable — if a test passes before implementation, Blueprint flags it. Every task has acceptance criteria. Every phase ends at a gate where all tasks must be in DONE, all tests must pass, and the Definition of Done must be satisfied. Cross-phase regressions are caught and tracked as bugs before you move forward.
+Blueprint solves this through five mechanisms:
 
-The framework also eliminates execution chaos. Phases decompose into a Gate (blocking foundation) and parallel Streams (independent work tracks). Each stream is scoped and bounded so multiple agents can execute simultaneously without stepping on each other's files or logic. Plans stay coherent when requirements change because phases are progressive — you commit to the level of detail each stage actually requires, no more and no less.
+1. **Bounded tasks** — Each task is one deliverable with acceptance criteria and tests. Small scope means full context fits in an agent's budget.
+
+2. **The tracker as external memory** — Task state, progress, blockers, and implementation notes live in the built-in board. Agents don't need to hold project state in context.
+
+3. **Test contracts** — Every task ships with a test. Tests become specs: future agents know exactly what "DONE" means without re-reading docs.
+
+4. **Progressive documentation** — Plans are written only as detailed as needed. Once a phase is planned, it doesn't change unless scope shifts formally. Agents work from stable specs.
+
+5. **Git as audit trail** — Commit messages, test files, and review notes explain every change. Sessions can end cleanly and resume later with full context from git history.
+
+These mechanisms prevent context rot. Agents work on large phases without overflow, hand off work cleanly, and parallel sessions coordinate through the tracker instead of chaos.
 
 ---
 
@@ -96,10 +106,11 @@ npm install -g @splitwireml/blueprint
 
 ## Learn More
 
-- **[PRD & Planning](docs/prd.md)** — Product requirements and project structure
+- **[Context & Sessions](docs/core/context-and-sessions.md)** — Preventing context rot, managing parallel work, session best practices
+- **[Orchestration](docs/core/orchestrate.md)** — Multi-stream coordination, parallel execution, orchestrator responsibilities
 - **[Core Workflows](docs/core/)** — Phase planning, execution, review, and troubleshooting
+- **[PRD & Planning](docs/prd.md)** — Product requirements and project structure
 - **[Release Notes](https://github.com/splitwireml/blueprint/releases)** — What's new in each version
-- **[Release Contract](docs/release-contract.md)** — How we version and support releases
 
 ---
 
