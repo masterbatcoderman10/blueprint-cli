@@ -189,7 +189,14 @@ describe('T-R7-1.B.7.4: repo-wide guard against reintroducing ## Tweaks', () => 
       { cwd: REPO_ROOT, encoding: 'utf8' },
     )
     const filesWithTweaks = grepResult.trim().split('\n').filter(Boolean)
-    expect(filesWithTweaks).toHaveLength(0)
+
+    // Allowlist: hierarchy.md legitimately contains a ## Tweaks heading describing the tweak contract.
+    const allowlist = ['templates/docs/core/hierarchy.md']
+    const disallowed = filesWithTweaks.filter(
+      (f) => !allowlist.some((a) => f.includes(a)),
+    )
+
+    expect(disallowed).toHaveLength(0)
   })
 })
 

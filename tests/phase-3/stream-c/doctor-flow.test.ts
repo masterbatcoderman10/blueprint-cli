@@ -44,8 +44,8 @@ describe('T-C.3: Doctor End-to-End Flow', () => {
       await writeCanonicalProject(projectDir)
       openDb(projectDir).close()
 
-      const executionPath = join(projectDir, 'docs', 'core', 'execution.md')
-      await writeFile(executionPath, '# Drifted Content\n')
+      const driftedPath = join(projectDir, 'CLAUDE.md')
+      await writeFile(driftedPath, '# Drifted Content\n')
 
       const originalCwd = process.cwd()
       process.chdir(projectDir)
@@ -61,7 +61,7 @@ describe('T-C.3: Doctor End-to-End Flow', () => {
         process.chdir(originalCwd)
       }
 
-      const repairedContent = await readFile(executionPath, 'utf-8')
+      const repairedContent = await readFile(driftedPath, 'utf-8')
       expect(repairedContent).not.toContain('# Drifted Content')
       
       const manifestContent = await readFile(
@@ -98,8 +98,8 @@ describe('T-C.3: Doctor End-to-End Flow', () => {
       const projectDir = await mkdtempJoinTmpdir('blueprint-doctor-cancel-')
       await writeCanonicalProject(projectDir)
 
-      const executionPath = join(projectDir, 'docs', 'core', 'execution.md')
-      await writeFile(executionPath, '# Drifted Content\n')
+      const driftedPath = join(projectDir, 'CLAUDE.md')
+      await writeFile(driftedPath, '# Drifted Content\n')
 
       const clackPrompts = await import('@clack/prompts')
       vi.mocked(clackPrompts.confirm).mockReturnValueOnce(Promise.resolve(false))
@@ -115,7 +115,7 @@ describe('T-C.3: Doctor End-to-End Flow', () => {
         process.chdir(originalCwd)
       }
       
-      const content = await readFile(executionPath, 'utf-8')
+      const content = await readFile(driftedPath, 'utf-8')
       expect(content).toContain('# Drifted Content')
     })
   })

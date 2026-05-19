@@ -43,9 +43,9 @@ async function writePreR6EndToEndProject(projectDir: string): Promise<void> {
     },
   })
 
-  // Drift one canonical core file to differ from the template
-  // This simulates a pre-R6 project where the core docs haven't been updated
-  const driftedPath = join(projectDir, 'docs', 'core', 'alignment.md')
+  // Drift one managed agent file to differ from the template
+  // (Canonical core files are never overwritten by R7 repair policy.)
+  const driftedPath = join(projectDir, 'CLAUDE.md')
   const driftedContent = await readFile(driftedPath, 'utf-8')
   // Append a legacy section that the template doesn't have
   const patchedContent = driftedContent + '\n\n## Legacy Section\n\nThis section does not exist in the template.\n'
@@ -182,13 +182,13 @@ describe('Stream D — end-to-end migration verification', () => {
         readOnly.close()
       }
 
-      // 2. The drifted canonical file has been restored from template
+      // 2. The drifted managed file has been restored from template
       const templateContent = await readFile(
-        join(__dirname, '../../templates/docs/core/alignment.md'),
+        join(__dirname, '../../templates/CLAUDE.md'),
         'utf-8',
       )
       const restoredContent = await readFile(
-        join(projectDir, 'docs', 'core', 'alignment.md'),
+        join(projectDir, 'CLAUDE.md'),
         'utf-8',
       )
       expect(restoredContent).toBe(templateContent)

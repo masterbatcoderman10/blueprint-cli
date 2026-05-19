@@ -53,6 +53,11 @@ export async function writeCanonicalProject(
     await writeFile(destination, content, 'utf-8')
   }
 
+  // R7 canonical tweak structure
+  const tweaksReadmePath = join(dir, 'docs/tweaks/README.md')
+  await mkdir(dirname(tweaksReadmePath), { recursive: true })
+  await writeFile(tweaksReadmePath, await readFile(resolveTemplatePath('docs/tweaks/README.md'), 'utf-8'), 'utf-8')
+
   if (!includeManifest) {
     return
   }

@@ -57,7 +57,7 @@ describe('T-A.3.1: doctor reports malformed metadata with actionable validation 
 })
 
 describe('T-A.3.2: doctor repairs mixed missing and drifted canonical files together', () => {
-  it('detects both classes of issues and repairs them in one cycle', async () => {
+  it('detects both classes of issues and repairs only the missing file (R7 never-overwrite policy)', async () => {
     const projectDir = await mkdtempJoinTmpdir('blueprint-phase4-doctor-')
     await writeCanonicalProject(projectDir, { includeTracker: true })
 
@@ -72,10 +72,10 @@ describe('T-A.3.2: doctor repairs mixed missing and drifted canonical files toge
     expect(result.exitCode).toBe(0)
     expect(result.stdout).toContain('Missing structure')
     expect(result.stdout).toContain('Drifted canonical files')
-    expect(result.stdout).toContain('Successfully applied 2 repair(s).')
+    expect(result.stdout).toContain('Successfully applied 1 repair(s).')
 
     expect(await readFile(missingPath, 'utf-8')).toContain('# Review')
-    expect(await readFile(driftedPath, 'utf-8')).not.toContain('# Drifted Content')
+    expect(await readFile(driftedPath, 'utf-8')).toContain('# Drifted Content')
   })
 })
 
@@ -84,7 +84,7 @@ describe('T-A.3.3: doctor decline and post-repair revalidation flow', () => {
     const projectDir = await mkdtempJoinTmpdir('blueprint-phase4-doctor-')
     await writeCanonicalProject(projectDir, { includeTracker: true })
 
-    const driftedPath = join(projectDir, 'docs', 'core', 'execution.md')
+    const driftedPath = join(projectDir, 'CLAUDE.md')
     await writeFile(driftedPath, '# Drifted Content\n', 'utf-8')
 
     const clackPrompts = await import('@clack/prompts')

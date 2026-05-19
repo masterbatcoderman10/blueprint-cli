@@ -50,17 +50,14 @@ describe('T-C.1: Repair Planner', () => {
   })
 
   describe('T-C.1.2: Drifted canonical files → replace-in-place actions', () => {
-    it('maps drifted core file to replace action', async () => {
+    it('does not create replace action for drifted canonical core file (R7 never-overwrite policy)', async () => {
       const findings: DoctorFinding[] = [
         createDriftedFileFinding('docs/core/execution.md'),
       ]
 
       const plan = await createRepairPlan(findings, projectDir)
 
-      expect(plan.actions).toHaveLength(1)
-      expect(plan.actions[0].type).toBe('replace-in-place')
-      expect(plan.actions[0].targetPath).toBe('docs/core/execution.md')
-      expect(plan.actions[0].description).toContain('Replace drifted canonical file')
+      expect(plan.actions).toHaveLength(0)
     })
 
     it('maps drifted managed agent file to replace action', async () => {
