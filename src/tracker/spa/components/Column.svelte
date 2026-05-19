@@ -93,6 +93,9 @@
       display: flex;
       flex-direction: column;
       gap: 6px;
+      overflow-y: auto;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
     "
   >
     {#if tasks.length === 0}
@@ -139,3 +142,9 @@
     {/if}
   </div>
 </div>
+
+<style>
+  .column-body::-webkit-scrollbar {
+    display: none;
+  }
+</style>

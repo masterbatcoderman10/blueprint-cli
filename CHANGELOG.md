@@ -7,13 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0] — 2026-05-19
+
 ### Added
-- **R6 — Built-in Task Tracker**: Replace external `vibe-kanban` MCP dependency with a built-in per-project task tracker (Phase 1–4 complete; Phase 5 pending)
+- **R6 — Built-in Task Tracker**: Replace external `vibe-kanban` MCP dependency with a built-in per-project task tracker (all 5 phases complete)
   - SQLite-backed tracker with CRUD HTTP server (`better-sqlite3`)
   - Local Svelte SPA board served via `blueprint board` command with auto-open browser
   - Full protocol rewrite: execution, planning, and health-check docs updated for built-in tracker
   - Migration & Doctor integration: automatic DB provisioning, JSON snapshot export/import, schema-currency audit, repo-wide `vibe-kanban` audit
-  - SRS requirements MAS-204 (Built-in Task Tracker) and MAS-205 (Local Project Board UI) added
+  - Milestone field on all tasks with automatic derivation from task ID; milestone filter in board UI
+  - SRS requirements MAS-204 (Built-in Task Tracker) and MAS-205 (Local Project Board UI) transitioned to active
+
+### Fixed
+- **Board SPA — Task state mapping**: Tasks were always rendered in the To Do column because the UI read `task.status` but the server returns `task.state`; all tasks now route to the correct column
+- **Board SPA — Column scroll**: Task cards overflowed their column instead of scrolling; columns now scroll smoothly with hidden scrollbar
+- **Board SPA — Filter dropdowns**: Native `<select>` elements replaced with custom dark-themed dropdown components; filter options no longer shrink when a filter is active (options now sourced from the full unfiltered task list)
 
 ## [0.1.7] — 2026-05-17
 
@@ -91,7 +99,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Minimum Node.js version bumped to 20 for `@clack/prompts` `styleText` compatibility
 
-[Unreleased]: https://github.com/earendil-works/blueprint-cli/compare/v0.1.7...HEAD
+[Unreleased]: https://github.com/earendil-works/blueprint-cli/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/earendil-works/blueprint-cli/compare/v0.1.7...v0.2.0
 [0.1.7]: https://github.com/earendil-works/blueprint-cli/compare/v0.1.6...v0.1.7
 [0.1.6]: https://github.com/earendil-works/blueprint-cli/compare/v0.1.5...v0.1.6
 [0.1.5]: https://github.com/earendil-works/blueprint-cli/compare/v0.1.4...v0.1.5

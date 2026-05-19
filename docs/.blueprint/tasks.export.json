@@ -921,7 +921,7 @@
       "implementation_notes": "Files modified: docs/srs.md\n\nHits found and triaged:\n1. docs/srs.md line 62 — contained vibe-kanban reference in MAS-204 description. FIXED: removed the phrase \"that replaces the external `vibe-kanban` MCP dependency\" from the requirement text.\n2. docs/project-progress.md — multiple hits in Decisions log. ALLOWED (explicit allow-list per task spec).\n3. docs/milestones/revision-6-built-in-tracker/** — numerous hits in revision-history docs. ALLOWED (explicit allow-list per task spec).\n4. tests/stream-c/project-templates-mirror.test.ts — uses \"vibe-kanban\" as assertion search target in tests that verify templates are clean. ALLOWED (the test IS the enforcement mechanism).\n5. tests/revision-6/** — hits in revision-6 test fixtures. ALLOWED (part of revision history verification).\n6. src/ and templates/ — zero hits. CLEAN.\n\nPost-fix rg sweep confirms zero non-allowlisted hits remain.",
       "milestone": "R6",
       "created_at": 1779164259849,
-      "updated_at": 1779173306768
+      "updated_at": 1779177736055
     },
     {
       "id": "R6-5.C.2",
@@ -934,7 +934,7 @@
       "implementation_notes": "Full test suite: GREEN.\n\nTest counts:\n- Phase 4 baseline: 805 tests, 120 files\n- Phase 5 new totals: 865 tests, 124 passed files (+1 skipped = 125 total)\n- Delta: +60 tests, +5 files\n\nFixed pre-existing/merge-related test failures:\n1. tests/revision-6/gate-1.0/schema.test.ts — added milestone column to expectations\n2. tests/revision-6/gate-1.0/db.test.ts — added milestone to INSERT statement\n3. tests/revision-6/gate-1.0/init-tracker.test.ts — updated expected user_version from 1 to 2\n4. tests/revision-6/gate-4.0/migration-foundation.test.ts — added milestone to sampleSnapshot() and insertSampleRows()\n5. tests/tracker/spa/app.test.ts — relaxed Board import assertion to match actual component usage\n6. tests/e2e/board-spa.test.ts — updated project response assertion to include ok:true envelope field\n7. tests/spa/board/e2e.test.ts — added milestone field to test data and updated filter assertion to include milestone",
       "milestone": "R6",
       "created_at": 1779164266478,
-      "updated_at": 1779173306796
+      "updated_at": 1779177736075
     },
     {
       "id": "R6-5.C.3",
@@ -947,7 +947,7 @@
       "implementation_notes": "Files modified: docs/srs.md\n\nChanges:\n- MAS-204 status: approved-pending-implementation → active\n- MAS-205 status: approved-pending-implementation → active\n- Added change-log entries to both referencing Phase 5 completion\n- Also removed vibe-kanban reference from MAS-204 description (done as part of C.1 rg sweep)",
       "milestone": "R6",
       "created_at": 1779164272919,
-      "updated_at": 1779173306814
+      "updated_at": 1779177736096
     },
     {
       "id": "R6-5.C.4",
@@ -960,12 +960,12 @@
       "implementation_notes": "npm run release:check passed cleanly.\n\nAll verification steps completed successfully:\n- npm install (clean)\n- tsc --noEmit (clean)\n- vitest run: 865 tests passed, 2 skipped, 0 failed\n- npm run build (tsc + vite build:spa) succeeded\n- SPA assets built: index.html, index-DaRHighS.js, index-BIMNezfw.css\n\nCI and Publish workflows would succeed. No actual publish performed.",
       "milestone": "R6",
       "created_at": 1779164281035,
-      "updated_at": 1779173306829
+      "updated_at": 1779177736121
     },
     {
       "id": "R6-5.C.5",
       "title": "[R6-5.C.5] Amend revision-6 document Phase 5 row",
-      "description": "Phase: Phase 5 — Milestone Integration, Verification & Cleanup\nGate/Stream: Stream C — Verification, SRS Activation & Release\nDuration: 0.5\nDependencies: R6-5.C.1\n\nDetail:\nAmend docs/milestones/revision-6-built-in-tracker/revision-6-built-in-tracker.md Phase 5 row to reflect expanded scope. Update Success Criteria. Add Deferred Items entry if any.\n\nReview Notes:\n- [RESOLVED] [MINOR] Phase 5 row listed stale test/file counts (865/124). Updated to 869 tests, 126 files to match actual post-execution suite size.\n  Why: Stale counts misrepresented phase scope. Fixed.\n\nRe-Review Notes:\nClean -- no issues found.",
+      "description": "Phase: Phase 5 — Milestone Integration, Verification & Cleanup\nGate/Stream: Stream C — Verification, SRS Activation & Release\nDuration: 0.5\nDependencies: R6-5.C.1\n\nDetail:\nAmend docs/milestones/revision-6-built-in-tracker/revision-6-built-in-tracker.md Phase 5 row to reflect expanded scope. Update Success Criteria. Add Deferred Items entry if any.\n\nReview Notes:\n(empty)",
       "state": "DONE",
       "phase": "R6-5",
       "stream": "C",
@@ -973,7 +973,7 @@
       "implementation_notes": "Files modified: docs/milestones/revision-6-built-in-tracker/revision-6-built-in-tracker.md\n\nChanges:\n- Updated Phase 5 row to reflect expanded scope (milestone integration + verification, not just verification)\n- Added Success Criteria for milestone field, filter, SPA dropdown, migration, snapshot back-compat, schema integrity\n- Added Deferred Items section: no items deferred from Phase 5",
       "milestone": "R6",
       "created_at": 1779164288765,
-      "updated_at": 1779173295156
+      "updated_at": 1779177736143
     },
     {
       "id": "R6-5.C.6",
@@ -986,7 +986,7 @@
       "implementation_notes": "Files modified: tests/tracker/schema-integrity.test.ts\n\nTests added:\n- T-R6-5.C.6.1: PRAGMA integrity_check returns ok, PRAGMA foreign_key_check returns zero rows\n- T-R6-5.C.6.2: TRACKER_SCHEMA_VERSION === 2, every row has milestone IS NOT NULL\n- T-R6-5.C.6.3: idx_tasks_milestone and idx_tasks_milestone_phase exist with correct columns\n\nAll 3 tests pass. TypeScript compiles clean. Full suite green (868 tests, 126 files).",
       "milestone": "R6",
       "created_at": 1779164298112,
-      "updated_at": 1779173306843
+      "updated_at": 1779177736165
     }
   ],
   "comments": [

@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte'
-  import { getProject, type TaskData } from '../lib/api.js'
+  import { getProject, listTasks, type TaskData } from '../lib/api.js'
   import { createTasksStore, type TasksStore } from '../stores/tasks.svelte.js'
   import { createSelectionStore, type SelectionStore } from '../stores/selection.svelte.js'
   import Header from './Header.svelte'
@@ -25,9 +25,15 @@
   const selectionStore = $derived(injectedSelectionStore ?? createSelectionStore())
 
   let fetchedProject = $state<{ name: string; description: string } | null>(null)
+  let allTasks = $state<TaskData[]>([])
 
   onMount(() => {
     tasksStore.start()
+
+    void listTasks({}).then((result) => {
+      if (result.ok) allTasks = result.data
+    })
+
     if (initialProjectName === undefined) {
       void getProject().then((result) => {
         if (result.ok) {
@@ -67,7 +73,7 @@
   const partitioned = $derived(
     tasksStore.tasks.reduce(
       (map, task) => {
-        const col = normalizeStatus(task.status)
+        const col = normalizeStatus(task.state)
         map[col] = map[col] ?? []
         map[col].push(task)
         return map
@@ -102,7 +108,7 @@
       border-bottom: 1px solid #333130;
     "
   >
-    <Filters tasks={tasksStore.tasks} onFilterChange={handleFilterChange} />
+    <Filters tasks={tasksStore.tasks} {allTasks} onFilterChange={handleFilterChange} />
   </div>
 
   <div

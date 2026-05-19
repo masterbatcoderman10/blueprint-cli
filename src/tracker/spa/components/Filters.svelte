@@ -1,29 +1,33 @@
 <script lang="ts">
   import type { TaskData } from '../lib/api.js'
+  import Dropdown from './Dropdown.svelte'
 
   interface Props {
     tasks?: TaskData[]
+    allTasks?: TaskData[]
     onFilterChange?: (filter: { milestone?: string; phase?: string; stream?: string }) => void
   }
 
-  let { tasks = [], onFilterChange }: Props = $props()
+  let { tasks = [], allTasks = [], onFilterChange }: Props = $props()
 
   let selectedMilestone = $state('')
   let selectedPhase = $state('')
   let selectedStream = $state('')
 
+  // Derive options from allTasks (unfiltered) so options never shrink when a filter is active
+  const sourceTasks = $derived(allTasks.length > 0 ? allTasks : tasks)
+
   const milestones = $derived(
-    Array.from(new Set(tasks.map((t) => t.milestone).filter(Boolean) as string[])).sort()
+    Array.from(new Set(sourceTasks.map((t) => t.milestone).filter(Boolean) as string[])).sort()
   )
   const phases = $derived(
-    Array.from(new Set(tasks.map((t) => t.phase).filter(Boolean) as string[])).sort()
+    Array.from(new Set(sourceTasks.map((t) => t.phase).filter(Boolean) as string[])).sort()
   )
   const streams = $derived(
-    Array.from(new Set(tasks.map((t) => t.stream).filter(Boolean) as string[])).sort()
+    Array.from(new Set(sourceTasks.map((t) => t.stream).filter(Boolean) as string[])).sort()
   )
 
-  function handleMilestoneChange(e: Event) {
-    const value = (e.target as HTMLSelectElement).value
+  function handleMilestoneChange(value: string) {
     selectedMilestone = value
     onFilterChange?.({
       milestone: value || undefined,
@@ -32,8 +36,7 @@
     })
   }
 
-  function handlePhaseChange(e: Event) {
-    const value = (e.target as HTMLSelectElement).value
+  function handlePhaseChange(value: string) {
     selectedPhase = value
     onFilterChange?.({
       milestone: selectedMilestone || undefined,
@@ -42,8 +45,7 @@
     })
   }
 
-  function handleStreamChange(e: Event) {
-    const value = (e.target as HTMLSelectElement).value
+  function handleStreamChange(value: string) {
     selectedStream = value
     onFilterChange?.({
       milestone: selectedMilestone || undefined,
@@ -54,99 +56,25 @@
 </script>
 
 <div style="display: flex; gap: 12px;">
-  <div
-    style="
-      display: flex; align-items: center; gap: 8px;
-      padding: 6px 14px;
-      border: 1px solid #333130; border-radius: 6px;
-      background-color: transparent;
-    "
-  >
-    <label for="milestone-filter" style="font-size: 11px; line-height: 14px; color: #6B6560;">Milestone</label>
-    <select
-      id="milestone-filter"
-      aria-label="Milestone"
-      onchange={handleMilestoneChange}
-      style="
-        font-size: 13px; font-weight: 500; line-height: 16px;
-        color: #EDE9E3;
-        background: transparent;
-        border: none;
-        outline: none;
-        appearance: none;
-        cursor: pointer;
-        font-family: 'DM Sans', system-ui, sans-serif;
-      "
-    >
-      <option value="">All Milestones</option>
-      {#each milestones as milestone}
-        <option value={milestone}>{milestone}</option>
-      {/each}
-    </select>
-    <span style="font-size: 10px; line-height: 12px; color: #6B6560;">▾</span>
-  </div>
-
-  <div
-    style="
-      display: flex; align-items: center; gap: 8px;
-      padding: 6px 14px;
-      border: 1px solid #333130; border-radius: 6px;
-      background-color: transparent;
-    "
-  >
-    <label for="phase-filter" style="font-size: 11px; line-height: 14px; color: #6B6560;">Phase</label>
-    <select
-      id="phase-filter"
-      aria-label="Phase"
-      onchange={handlePhaseChange}
-      style="
-        font-size: 13px; font-weight: 500; line-height: 16px;
-        color: #EDE9E3;
-        background: transparent;
-        border: none;
-        outline: none;
-        appearance: none;
-        cursor: pointer;
-        font-family: 'DM Sans', system-ui, sans-serif;
-      "
-    >
-      <option value="">All Phases</option>
-      {#each phases as phase}
-        <option value={phase}>{phase}</option>
-      {/each}
-    </select>
-    <span style="font-size: 10px; line-height: 12px; color: #6B6560;">▾</span>
-  </div>
-
-  <div
-    style="
-      display: flex; align-items: center; gap: 8px;
-      padding: 6px 14px;
-      border: 1px solid #333130; border-radius: 6px;
-      background-color: transparent;
-    "
-  >
-    <label for="stream-filter" style="font-size: 11px; line-height: 14px; color: #6B6560;">Stream</label>
-    <select
-      id="stream-filter"
-      aria-label="Stream"
-      onchange={handleStreamChange}
-      style="
-        font-size: 13px; font-weight: 500; line-height: 16px;
-        color: #EDE9E3;
-        background: transparent;
-        border: none;
-        outline: none;
-        appearance: none;
-        cursor: pointer;
-        font-family: 'DM Sans', system-ui, sans-serif;
-      "
-    >
-      <option value="">All Streams</option>
-      {#each streams as stream}
-        <option value={stream}>{stream}</option>
-      {/each}
-    </select>
-    <span style="font-size: 10px; line-height: 12px; color: #6B6560;">▾</span>
-  </div>
+  <Dropdown
+    label="Milestone"
+    value={selectedMilestone}
+    options={milestones}
+    placeholder="All Milestones"
+    onChange={handleMilestoneChange}
+  />
+  <Dropdown
+    label="Phase"
+    value={selectedPhase}
+    options={phases}
+    placeholder="All Phases"
+    onChange={handlePhaseChange}
+  />
+  <Dropdown
+    label="Stream"
+    value={selectedStream}
+    options={streams}
+    placeholder="All Streams"
+    onChange={handleStreamChange}
+  />
 </div>
