@@ -169,6 +169,11 @@ export function listTasks(db: TrackerDatabase, filter: TaskFilter = {}): TaskRes
     values.push(filter.stream)
   }
 
+  if (filter.milestone !== undefined) {
+    where.push('milestone = ?')
+    values.push(filter.milestone)
+  }
+
   const sql = `SELECT * FROM tasks${where.length > 0 ? ` WHERE ${where.join(' AND ')}` : ''} ORDER BY created_at, id`
   const rows = db.prepare(sql).all(...values) as unknown as TaskRow[]
   return { ok: true, data: rows.map(taskFromRow) }
@@ -182,6 +187,17 @@ export function updateTask(db: TrackerDatabase, input: UpdateTaskInput): TaskRes
 
   if (input.state !== undefined && !isTaskState(input.state)) {
     return invalidState(input.state)
+  }
+
+  // Validate milestone on PATCH: when present, must be non-empty string
+  if (input.milestone !== undefined && input.milestone === '') {
+    return {
+      ok: false,
+      error: {
+        code: 'invalid_milestone',
+        message: 'Milestone cannot be empty when provided on update.',
+      },
+    }
   }
 
   const updatedAt = Math.max(input.now ?? Date.now(), existing.updated_at + 1)
