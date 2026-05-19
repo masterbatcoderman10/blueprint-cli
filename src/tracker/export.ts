@@ -3,6 +3,7 @@ import { join } from 'node:path'
 
 import type { ReviewComment, Task } from './types'
 import type { TrackerDatabase } from './schema'
+import { parseMilestoneFromId } from './migrations'
 
 export interface ProjectMetaSnapshot {
   id: number
@@ -24,6 +25,13 @@ export class SnapshotReadError extends Error {
   constructor(message: string) {
     super(message)
     this.name = 'SnapshotReadError'
+  }
+}
+
+export class SnapshotImportError extends Error {
+  constructor(message: string) {
+    super(message)
+    this.name = 'SnapshotImportError'
   }
 }
 
@@ -124,12 +132,25 @@ export function importSnapshot(db: TrackerDatabase, snapshot: TrackerSnapshot): 
     db.prepare('DELETE FROM tasks').run()
     db.prepare('DELETE FROM project_meta').run()
 
+    // Derive milestone from task ID when missing; aggregate errors for malformed IDs
+    const malformedIds: string[] = []
+    const insertStmt = db.prepare(
+      `INSERT INTO tasks
+        (id, title, description, state, phase, stream, author, implementation_notes, milestone, created_at, updated_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    )
+
     for (const task of data.tasks) {
-      db.prepare(
-        `INSERT INTO tasks
-          (id, title, description, state, phase, stream, author, implementation_notes, created_at, updated_at)
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      ).run(
+      let milestone = task.milestone
+      if (!milestone) {
+        const derived = parseMilestoneFromId(task.id)
+        if (derived === null) {
+          malformedIds.push(task.id)
+          continue
+        }
+        milestone = derived
+      }
+      insertStmt.run(
         task.id,
         task.title,
         task.description,
@@ -138,8 +159,16 @@ export function importSnapshot(db: TrackerDatabase, snapshot: TrackerSnapshot): 
         task.stream,
         task.author,
         task.implementation_notes,
+        milestone,
         task.created_at,
         task.updated_at,
+      )
+    }
+
+    if (malformedIds.length > 0) {
+      throw new SnapshotImportError(
+        `Cannot import snapshot: ${malformedIds.length} task(s) have IDs that do not match expected patterns. ` +
+          `Manual fix required for: ${malformedIds.join(', ')}`,
       )
     }
 

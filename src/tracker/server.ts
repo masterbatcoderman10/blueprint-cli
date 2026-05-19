@@ -31,6 +31,7 @@ interface ErrorEnvelope {
 const ERROR_STATUS: Record<string, number> = {
   duplicate_id: 409,
   invalid_json: 400,
+  invalid_milestone: 400,
   invalid_parent: 400,
   invalid_severity: 400,
   invalid_state: 400,
@@ -171,11 +172,16 @@ function route(db: TrackerDatabase, request: IncomingMessage, body: JsonBody): R
     }
 
     if (method === 'GET') {
+      const milestoneRaw = searchParams.get('milestone')
+      if (milestoneRaw !== null && milestoneRaw.trim() === '') {
+        return errorResult('invalid_milestone', 'Milestone filter cannot be empty.')
+      }
       return taskResult(
         200,
         listTasks(db, {
           phase: searchParams.get('phase') ?? undefined,
           stream: searchParams.get('stream') ?? undefined,
+          milestone: milestoneRaw?.trim() ?? undefined,
         }),
       )
     }

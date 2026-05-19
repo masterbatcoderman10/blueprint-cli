@@ -101,9 +101,19 @@ export function createTask(db: TrackerDatabase, input: CreateTaskInput): TaskRes
     return duplicateId(input.id)
   }
 
-  // Derive milestone: explicit value > auto-derive from ID > reject
+  // Derive milestone: explicit non-empty value > auto-derive from ID > reject
   let milestone: string
-  if (input.milestone !== undefined && input.milestone !== '') {
+  if (input.milestone !== undefined && input.milestone !== null) {
+    // Reject empty or whitespace-only milestone
+    if (typeof input.milestone !== 'string' || input.milestone.trim() === '') {
+      return {
+        ok: false,
+        error: {
+          code: 'invalid_milestone',
+          message: 'Milestone must be a non-empty string when provided.',
+        },
+      }
+    }
     milestone = input.milestone
   } else {
     const derived = parseMilestoneFromId(input.id)
@@ -169,6 +179,11 @@ export function listTasks(db: TrackerDatabase, filter: TaskFilter = {}): TaskRes
     values.push(filter.stream)
   }
 
+  if (filter.milestone !== undefined) {
+    where.push('milestone = ?')
+    values.push(filter.milestone)
+  }
+
   const sql = `SELECT * FROM tasks${where.length > 0 ? ` WHERE ${where.join(' AND ')}` : ''} ORDER BY created_at, id`
   const rows = db.prepare(sql).all(...values) as unknown as TaskRow[]
   return { ok: true, data: rows.map(taskFromRow) }
@@ -182,6 +197,19 @@ export function updateTask(db: TrackerDatabase, input: UpdateTaskInput): TaskRes
 
   if (input.state !== undefined && !isTaskState(input.state)) {
     return invalidState(input.state)
+  }
+
+  // Validate milestone on PATCH: when present, must be non-empty string after trimming
+  if (input.milestone !== undefined) {
+    if (typeof input.milestone !== 'string' || input.milestone.trim() === '') {
+      return {
+        ok: false,
+        error: {
+          code: 'invalid_milestone',
+          message: 'Milestone must be a non-empty string when provided on update.',
+        },
+      }
+    }
   }
 
   const updatedAt = Math.max(input.now ?? Date.now(), existing.updated_at + 1)
