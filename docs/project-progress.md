@@ -3,8 +3,8 @@
 **Project**: blueprint-cli
 **Tracker**: blueprint-cli
 **Current Milestone**: Revision 6 — Built-in Task Tracker
-**Current Phase**: Phase 4 — Migration & Doctor Integration
-**Status**: Revision 6 in progress — Phase 4 complete, Phase 5 pending
+**Current Phase**: TBD — pending phase planning
+**Status**: Revision 6 complete — all phases done
 
 ---
 
@@ -63,6 +63,8 @@
 - 2026-05-18: JSON snapshot contract decided — bidirectional, atomically written by the tracker server on every successful mutation (`POST/PATCH/DELETE` on tasks and comments), consumed by Doctor on missing DB. Shape is flat `{ tasks, comments, meta }` serialized from every table row. Write uses temp-file + atomic rename at `docs/.blueprint/tasks.export.json`. Failures are caught, logged as `[tracker] snapshot write failed`, and never block the HTTP response. Doctor reads the snapshot via `readSnapshot`, validates shape via `assertSnapshot`, and imports via `importSnapshot` under a single transaction (clear + insert).
 - 2026-05-18: Revision 6 Phase 4 — Migration & Doctor Integration completed. All tasks done, DoD satisfied, full test suite green (805 tests, 120 files). 4 regression bugs found during phase completion (pre-existing test fixtures lacked tracker DB), all fixed by adding `includeTracker` option to shared test helper.
 - 2026-05-18: Identified and fixed [BUG] Board SPA blank screen (post-Phase-4). Root cause: server response envelope mismatch — server returned `{ data: [...] }` (TrackerResult format) but client expected `{ ok: true, data: [...] }` (Result format). Client misinterpreted as bare response, assigned object instead of array to tasks store, causing `.map()` call to fail. Fix: added `ok` field to HTTP responses and updated `RouteResult` type. All tracker tests pass; SPA snapshot tests have pre-existing failures from recent store-passing refactor.
+- 2026-05-19: Revision 6 Phase 5 — Milestone Integration, Verification & Cleanup completed. All tasks done, DoD satisfied, full test suite green (869 tests, 126 files).
+- 2026-05-19: Revision 6 — Built-in Task Tracker completed. All phases done.
 
 ---
 
@@ -109,7 +111,7 @@ R6 — Built-in Task Tracker
 ├── Phase 2 — Board SPA + blueprint board Command ✓
 ├── Phase 3 — Protocol Rewrite ✓
 ├── Phase 4 — Migration & Doctor Integration ✓
-└── Phase 5 — Verification & Cleanup ○
+└── Phase 5 — Milestone Integration, Verification & Cleanup ✓
 M2 — Cross-Project Context (Optional Post-MVP)
 └── Phase 1 — TBD ○
 M3 — Workflow Visibility Enhancements (Optional Future)
@@ -123,9 +125,4 @@ M3 — Workflow Visibility Enhancements (Optional Future)
 > Track revisions that have been identified but not yet executed.
 > The agent should surface these at session start.
 
-- **Revision 6 — Built-in Task Tracker**
-  - **Status:** In Progress (Phase 3 complete)
-  - **Priority:** Current
-  - **Scope:** Replace the external `vibe-kanban` MCP dependency with a built-in per-project task tracker (SQLite backend + local Svelte SPA) provisioned by the CLI, including protocol rewrites and REWORK-state adoption.
-  - **Impact:** Hybrid additive + modifying — tracker backend, local board UI, task-state expansion, and cross-doc/template replacement of kanban MCP references. SRS: MAS-204 and MAS-205 created.
-  - **Document:** `docs/milestones/revision-6-built-in-tracker/revision-6-built-in-tracker.md`
+_None. Revision 6 — Built-in Task Tracker is complete. Next milestone or revision is TBD._
