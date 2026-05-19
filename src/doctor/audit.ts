@@ -19,6 +19,7 @@ import { loadManifestState, ManifestParseError, resolveAllCoreTemplatePaths, res
 import { MANIFEST_RELATIVE_PATH, TEMPLATE_VERSION } from './manifest'
 import {
   REQUIRED_BLUEPRINT_DIRECTORIES,
+  REQUIRED_CANONICAL_FILES,
   getManagedAgentPaths,
 } from './structure'
 
@@ -128,6 +129,21 @@ export async function runDoctorAudit(projectDir: string): Promise<DoctorAuditRes
 
   findings.push(...(await auditTrackerDb(projectDir)))
   findings.push(...(await auditTrackerSchema(projectDir)))
+
+  for (const relativePath of REQUIRED_CANONICAL_FILES) {
+    const templatePath = resolveTemplatePath(relativePath)
+    const templateContent = await readFile(templatePath, 'utf-8')
+    const comparison = await compareFileContent(join(projectDir, relativePath), templateContent)
+
+    if (comparison.state === 'missing') {
+      findings.push(createMissingStructureFinding(relativePath, 'file'))
+      continue
+    }
+
+    if (comparison.state === 'drifted') {
+      findings.push(createDriftedFileFinding(relativePath))
+    }
+  }
 
   for (const { relativePath, absolutePath } of resolveAllCoreTemplatePaths()) {
     const templateContent = await readFile(absolutePath, 'utf-8')

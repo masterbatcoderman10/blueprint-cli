@@ -123,12 +123,15 @@ export async function scaffoldBlueprintDirectory(
   const coreDir = join(docsDir, 'core')
   const knowledgeBaseDir = join(docsDir, 'knowledge-base')
   const milestonesDir = join(docsDir, 'milestones')
+  const tweaksDir = join(docsDir, 'tweaks')
 
   await safeMkdirP(coreDir)
   await safeMkdirP(knowledgeBaseDir)
   await safeMkdirP(milestonesDir)
+  await safeMkdirP(tweaksDir)
 
   await copyCoreTemplates(rootDir, options)
+  await copyTweaksTemplate(rootDir, options)
   await copyEditableShells(rootDir, options)
 }
 
@@ -159,6 +162,19 @@ export async function copyCoreTemplates(
         }
       }
     }
+  }
+}
+
+export async function copyTweaksTemplate(
+  rootDir: string,
+  _options: InitOptions,
+): Promise<void> {
+  const tweaksDir = join(resolve(rootDir), 'docs', 'tweaks')
+  const templatePath = join(TEMPLATES_DIR, 'docs', 'tweaks', 'README.md')
+  const destPath = join(tweaksDir, 'README.md')
+
+  if (await fileExists(templatePath)) {
+    await copyFileSafe(templatePath, destPath)
   }
 }
 
@@ -280,7 +296,8 @@ export async function executeScaffold(
   }
 
   await scaffoldBlueprintDirectory(rootDir, options)
-  result.createdDirectories.push('docs/', 'docs/core/', 'docs/knowledge-base/', 'docs/milestones/')
+  result.createdDirectories.push('docs/', 'docs/core/', 'docs/knowledge-base/', 'docs/milestones/', 'docs/tweaks/')
+  result.createdFiles.push('docs/tweaks/README.md')
 
   await generateAgentFiles(rootDir, options)
   const selectedAgents = resolveSelectedAgents(options)

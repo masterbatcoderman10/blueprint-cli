@@ -31,12 +31,16 @@ export const CANONICAL_CORE_FILES: string[] = [
   'docs/core/tweak-planning.md',
 ]
 
-export const REQUIRED_BLUEPRINT_DIRECTORIES: string[] = ['docs', 'docs/core']
+export const REQUIRED_BLUEPRINT_DIRECTORIES: string[] = ['docs', 'docs/core', 'docs/tweaks']
 
 /**
  * User-owned editable project docs. These are scaffolded as shells but
  * thereafter belong to the project. Doctor never flags them for drift.
  */
+export const REQUIRED_CANONICAL_FILES: string[] = [
+  'docs/tweaks/README.md',
+]
+
 export const EDITABLE_PROJECT_DOCS: string[] = [
   'docs/prd.md',
   'docs/project-progress.md',

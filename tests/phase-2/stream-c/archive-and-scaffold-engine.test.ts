@@ -293,6 +293,7 @@ describe('Phase 2 Stream C — Archive and Scaffold Engine', () => {
         await expect(directoryExists(join(tempDir, 'docs', 'core'))).resolves.toBe(true)
         await expect(directoryExists(join(tempDir, 'docs', 'knowledge-base'))).resolves.toBe(true)
         await expect(directoryExists(join(tempDir, 'docs', 'milestones'))).resolves.toBe(true)
+        await expect(directoryExists(join(tempDir, 'docs', 'tweaks'))).resolves.toBe(true)
       })
     })
 
@@ -518,7 +519,13 @@ describe('Phase 2 Stream C — Archive and Scaffold Engine', () => {
         // Verify editable shells created
         await expect(access(join(tempDir, 'docs', 'srs.md'))).resolves.toBeUndefined()
 
+        // Verify tweaks directory and README
+        await expect(directoryExists(join(tempDir, 'docs', 'tweaks'))).resolves.toBe(true)
+        await expect(access(join(tempDir, 'docs', 'tweaks', 'README.md'))).resolves.toBeUndefined()
+
         // Verify result tracking
+        expect(result.createdDirectories).toContain('docs/tweaks/')
+        expect(result.createdFiles).toContain('docs/tweaks/README.md')
         expect(result.createdFiles).toContain('CLAUDE.md')
         expect(result.createdFiles).toContain('GEMINI.md')
         expect(result.gitInitialized).toBe(true)

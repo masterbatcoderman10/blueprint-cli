@@ -4,7 +4,7 @@ import { join } from 'node:path'
 import type { DoctorFinding } from './findings'
 import { resolveAllCoreTemplatePaths, resolveTemplatePath } from './inventory'
 import { MANIFEST_RELATIVE_PATH, type ManifestData, TEMPLATE_VERSION, getCliVersion } from './manifest'
-import { SUPPORTED_AGENT_FILES } from './structure'
+import { CANONICAL_CORE_FILES, REQUIRED_CANONICAL_FILES, SUPPORTED_AGENT_FILES } from './structure'
 
 async function pathExists(path: string): Promise<boolean> {
   try {
@@ -124,14 +124,16 @@ export async function createRepairPlan(findings: DoctorFinding[], projectDir: st
     }
 
     if (finding.kind === 'drifted-file') {
-      const coreTemplate = resolveAllCoreTemplatePaths().find((template) => template.relativePath === finding.targetPath)
+      // Canonical structure files are never overwritten; only missing files are restored.
+      if (CANONICAL_CORE_FILES.includes(finding.targetPath) || REQUIRED_CANONICAL_FILES.includes(finding.targetPath)) {
+        continue
+      }
+
       actions.push({
         type: 'replace-in-place',
         targetPath: finding.targetPath,
-        templatePath: coreTemplate?.absolutePath ?? resolveTemplatePath(finding.targetPath),
-        description: coreTemplate
-          ? `Replace drifted canonical file with bundled template: ${finding.targetPath}`
-          : `Replace drifted managed agent file with bundled template: ${finding.targetPath}`,
+        templatePath: resolveTemplatePath(finding.targetPath),
+        description: `Replace drifted managed agent file with bundled template: ${finding.targetPath}`,
       })
       continue
     }
