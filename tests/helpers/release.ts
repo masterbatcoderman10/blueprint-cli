@@ -1,6 +1,6 @@
 import { execFile, spawn } from 'node:child_process'
-import { access, mkdtemp, mkdir, readFile, rm, writeFile } from 'node:fs/promises'
-import { constants } from 'node:fs'
+import { access, cp, mkdtemp, mkdir, readFile, rm, writeFile } from 'node:fs/promises'
+import { constants, existsSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { dirname, join, resolve } from 'node:path'
 import { promisify } from 'node:util'
@@ -81,7 +81,15 @@ export async function installPackedCliFixture(): Promise<PackedCliFixture> {
     const tarballPath = join(packDir, tarballName)
 
     await runCommand(npmExecutable, ['init', '-y'], { cwd: project.rootDir })
-    await runCommand(npmExecutable, ['install', tarballPath], { cwd: project.rootDir })
+    await runCommand(npmExecutable, ['install', '--ignore-scripts', tarballPath], { cwd: project.rootDir })
+
+    // Copy the already-compiled better-sqlite3 native binary from the workspace
+    // to avoid triggering node-gyp in CI (which has no npm cache and takes >2 minutes).
+    const srcBuild = join(workspaceRoot, 'node_modules', 'better-sqlite3', 'build')
+    const destBuild = join(project.rootDir, 'node_modules', 'better-sqlite3', 'build')
+    if (existsSync(srcBuild)) {
+      await cp(srcBuild, destBuild, { recursive: true })
+    }
 
     const binPath = join(project.rootDir, 'node_modules', '.bin', blueprintExecutable)
 

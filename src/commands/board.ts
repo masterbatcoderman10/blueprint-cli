@@ -6,7 +6,7 @@ import type { CommandDefinition } from '../runtime'
 import { clearLock, isLockAlive, readLock, writeLock } from '../tracker/board-lock'
 import { BOARD_PORTS, findFreePort } from '../tracker/board-port'
 import { openUrl } from '../tracker/browser-open'
-import { openDb, type TrackerDbHandle } from '../tracker/db'
+import type { TrackerDbHandle } from '../tracker/db'
 import { findProjectRoot } from '../tracker/project-root'
 import { createServer } from '../tracker/server'
 import { serveStatic } from '../tracker/static-handler'
@@ -101,6 +101,7 @@ async function runBoard({ headless }: { headless: boolean }): Promise<{ exitCode
       await clearLock(projectRoot)
     }
 
+    const { openDb } = await import('../tracker/db')
     trackerDb = openDb(projectRoot)
 
     const apiServer = createServer({ db: trackerDb.db })
