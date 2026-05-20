@@ -1524,28 +1524,28 @@
     {
       "id": "TW1.2",
       "title": "[TW1.2] Add no-direct-review anti-pattern",
-      "description": "Tweak: Tweak 1 — Orchestrator Delegation Discipline\nTask: Add an anti-pattern to docs/core/orchestrate.md forbidding the orchestrator from performing review work directly.\nDependencies: TW1.1",
-      "state": "IN-REVIEW",
+      "description": "Tweak: Tweak 1 — Orchestrator Delegation Discipline\nTask: Add an anti-pattern to docs/core/orchestrate.md forbidding the orchestrator from performing review work directly.\nDependencies: TW1.1\n\nReview Notes:\nClean -- no issues found.",
+      "state": "DONE",
       "phase": "TW1",
       "stream": "0",
       "author": "Codex",
       "implementation_notes": "Added Orchestrator Acting as Reviewer anti-pattern to docs/core/orchestrate.md and explicitly routed review work to docs/core/review.md (ReviewProcess / ReReview). Expanded focused contract test and reran npm test -- tests/revision-5/gate-1.0/orchestrate-delegation-discipline.test.ts.",
       "milestone": "Tweak 1 — Orchestrator Delegation Discipline",
       "created_at": 1779256371133,
-      "updated_at": 1779260720036
+      "updated_at": 1779263161044
     },
     {
       "id": "TW1.1",
       "title": "[TW1.1] Add no-direct-execution anti-pattern",
-      "description": "Tweak: Tweak 1 — Orchestrator Delegation Discipline\nTask: Add an anti-pattern to docs/core/orchestrate.md forbidding the orchestrator from executing implementation tasks directly.\nDependencies: None",
-      "state": "IN-REVIEW",
+      "description": "Tweak: Tweak 1 — Orchestrator Delegation Discipline\nTask: Add an anti-pattern to docs/core/orchestrate.md forbidding the orchestrator from executing implementation tasks directly.\nDependencies: None\n\nReview Notes:\nClean -- no issues found.",
+      "state": "DONE",
       "phase": "TW1",
       "stream": "0",
       "author": "Codex",
       "implementation_notes": "Updated docs/core/orchestrate.md so the executor anti-pattern explicitly routes implementation work to docs/core/execution.md (StartGateOrStream / ApplyReviewNotes). Added focused contract test at tests/revision-5/gate-1.0/orchestrate-delegation-discipline.test.ts and verified red->green with npm test -- tests/revision-5/gate-1.0/orchestrate-delegation-discipline.test.ts.",
       "milestone": "Tweak 1 — Orchestrator Delegation Discipline",
       "created_at": 1779256371135,
-      "updated_at": 1779260677540
+      "updated_at": 1779263161039
     },
     {
       "id": "BUG-001",
@@ -1576,67 +1576,67 @@
     {
       "id": "TW1.4",
       "title": "[TW1.4] Add minimal subagent prompt anti-pattern",
-      "description": "Tweak: Tweak 1 — Orchestrator Delegation Discipline\nTask: Add an anti-pattern to docs/core/orchestrate.md forbidding oversized custom subagent prompts and requiring minimal action + phase/stream context.\nDependencies: TW1.1",
-      "state": "IN-REVIEW",
+      "description": "Tweak: Tweak 1 — Orchestrator Delegation Discipline\nTask: Add an anti-pattern to docs/core/orchestrate.md forbidding oversized custom subagent prompts and requiring minimal action + phase/stream context.\nDependencies: TW1.1\n\nReview Notes:\nClean -- no issues found.",
+      "state": "DONE",
       "phase": "TW1",
       "stream": "0",
       "author": "Codex",
       "implementation_notes": "Added Oversized Custom Subagent Prompts anti-pattern to docs/core/orchestrate.md. The guidance now constrains delegation prompts to the action plus phase/stream context. Expanded focused contract test and reran npm test -- tests/revision-5/gate-1.0/orchestrate-delegation-discipline.test.ts.",
       "milestone": "Tweak 1 — Orchestrator Delegation Discipline",
       "created_at": 1779257335471,
-      "updated_at": 1779260816294
+      "updated_at": 1779263161050
     },
     {
       "id": "TW1.3",
       "title": "[TW1.3] Add no-direct-bug-fixing anti-pattern",
-      "description": "Tweak: Tweak 1 — Orchestrator Delegation Discipline\nTask: Add an anti-pattern to docs/core/orchestrate.md forbidding the orchestrator from diagnosing or fixing phase-completion bugs directly.\nDependencies: TW1.1",
-      "state": "IN-REVIEW",
+      "description": "Tweak: Tweak 1 — Orchestrator Delegation Discipline\nTask: Add an anti-pattern to docs/core/orchestrate.md forbidding the orchestrator from diagnosing or fixing phase-completion bugs directly.\nDependencies: TW1.1\n\nReview Notes:\nClean -- no issues found.",
+      "state": "DONE",
       "phase": "TW1",
       "stream": "0",
       "author": "Codex",
       "implementation_notes": "Added Orchestrator Acting as Bug Fixer anti-pattern to docs/core/orchestrate.md and explicitly routed post-phase-completion regression handling through docs/core/phase-completion.md and docs/core/bug-resolution.md. Expanded focused contract test and reran npm test -- tests/revision-5/gate-1.0/orchestrate-delegation-discipline.test.ts.",
       "milestone": "Tweak 1 — Orchestrator Delegation Discipline",
       "created_at": 1779257335473,
-      "updated_at": 1779260772042
+      "updated_at": 1779263161047
     },
     {
       "id": "TW1.5",
       "title": "[TW1.5] Add orchestration board closeout guidance",
-      "description": "Tweak: Tweak 1 — Orchestrator Delegation Discipline\nTask: Add orchestration closeout guidance telling the orchestrator to stop the board after phase or stream orchestration finishes.\nDependencies: TW1.1",
-      "state": "IN-REVIEW",
+      "description": "Tweak: Tweak 1 — Orchestrator Delegation Discipline\nTask: Add orchestration closeout guidance telling the orchestrator to stop the board after phase or stream orchestration finishes.\nDependencies: TW1.1\n\nReview Notes:\nClean -- no issues found.",
+      "state": "DONE",
       "phase": "TW1",
       "stream": "0",
       "author": "Codex",
       "implementation_notes": "Added OrchestrationCloseout guidance to docs/core/orchestrate.md instructing the orchestrator to stop the board after phase or stream orchestration finishes. Expanded focused contract test and reran npm test -- tests/revision-5/gate-1.0/orchestrate-delegation-discipline.test.ts.",
       "milestone": "Tweak 1 — Orchestrator Delegation Discipline",
       "created_at": 1779257335553,
-      "updated_at": 1779260874608
+      "updated_at": 1779263161053
     },
     {
       "id": "TW1.6",
       "title": "[TW1.6] Mirror orchestration guidance template",
-      "description": "Tweak: Tweak 1 — Orchestrator Delegation Discipline\nTask: Mirror the additive orchestration guidance into templates/docs/core/orchestrate.md.\nDependencies: TW1.1-TW1.5",
-      "state": "IN-REVIEW",
+      "description": "Tweak: Tweak 1 — Orchestrator Delegation Discipline\nTask: Mirror the additive orchestration guidance into templates/docs/core/orchestrate.md.\nDependencies: TW1.1-TW1.5\n\nReview Notes:\nClean -- no issues found.",
+      "state": "DONE",
       "phase": "TW1",
       "stream": "0",
       "author": "Codex",
       "implementation_notes": "Mirrored docs/core/orchestrate.md into templates/docs/core/orchestrate.md after verifying the existing parity test failed first. Verified green with npm test -- tests/stream-c/project-templates-mirror.test.ts -t orchestrate.md.",
       "milestone": "Tweak 1 — Orchestrator Delegation Discipline",
       "created_at": 1779257335557,
-      "updated_at": 1779260915653
+      "updated_at": 1779263161055
     },
     {
       "id": "TW1.7",
       "title": "[TW1.7] Refresh orchestration doc-contract tests",
-      "description": "Tweak: Tweak 1 — Orchestrator Delegation Discipline\nTask: Refresh focused orchestration doc-contract tests for anti-pattern guidance, board closeout, and live/template parity.\nDependencies: TW1.6",
-      "state": "IN-REVIEW",
+      "description": "Tweak: Tweak 1 — Orchestrator Delegation Discipline\nTask: Refresh focused orchestration doc-contract tests for anti-pattern guidance, board closeout, and live/template parity.\nDependencies: TW1.6\n\nReview Notes:\nClean -- no issues found.",
+      "state": "DONE",
       "phase": "TW1",
       "stream": "0",
       "author": "Codex",
       "implementation_notes": "Added explicit live/template parity coverage to tests/revision-5/gate-1.0/orchestrate-delegation-discipline.test.ts and verified focused orchestration coverage with npm test -- tests/revision-5/gate-1.0/orchestrate-delegation-discipline.test.ts tests/stream-c/project-templates-mirror.test.ts -t orchestrate. Diagnosed and fixed the worktree-only Vitest blocker by replacing node_modules-based setup-file paths with a repo-local tests/setup/vitest.setup.ts and disabling svelteTesting autoCleanup injection in vitest.config.ts. Verified with npm test -- tests/spa/board/board.test.ts and then full npm test green in TW1-0 (129 passed, 1 skipped).",
       "milestone": "Tweak 1 — Orchestrator Delegation Discipline",
       "created_at": 1779257335561,
-      "updated_at": 1779263046472
+      "updated_at": 1779263161057
     }
   ],
   "comments": [

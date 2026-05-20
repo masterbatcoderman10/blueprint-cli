@@ -1,6 +1,6 @@
 # Phase 1 - Quality of Life Workflow Hardening Plan
 
-**Status**: Planning
+**Status**: In Progress
 **Milestone**: Revision 8 - Tweak Revamp and Quality of Life Changes
 **Task ID prefix**: `R8-1`
 
@@ -50,6 +50,7 @@
 
 - [ ] Tracker mutation anti-patterns exist in execution, review, git execution, and git review workflows.
 - [ ] Each anti-pattern points agents to the tracker HTTP API recipes in `docs/core/tracker.md`.
+- [ ] Added anti-patterns match the format, naming, and structural conventions of anti-patterns found in other core documents.
 - [ ] Session-start guidance includes `docs/core/tracker.md` for populated tracker-backed projects.
 - [ ] Execution guidance uses milestone + phase + stream filters when available.
 - [ ] Task creation guidance omits stream-title duplication and `Review Notes` scaffolding.

@@ -124,7 +124,7 @@ R6 — Built-in Task Tracker
 R7 — Standalone Tweak Workflow
 └── Phase 1 — Standalone Tweak Workflow & Scaffold Integration ✓
 R8 — Tweak Revamp and Quality of Life Changes
-├── Phase 1 — Quality of Life Workflow Hardening ○
+├── Phase 1 — Quality of Life Workflow Hardening ●
 └── Phase 2 — Tweak Planning Flow Rewrite ○
 M2 — Cross-Project Context (Optional Post-MVP)
 └── Phase 1 — TBD ○
