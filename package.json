@@ -1,7 +1,7 @@
 {
-  "name": "@splitwireml/blueprint",
+  "name": "blueprint-agentic-development",
   "version": "0.2.4",
-  "description": "Blueprint CLI — project scaffolding and workflow tool",
+  "description": "Plan in detail. Execute in parallel. Blueprint is the agentic development framework that gives Claude Code, Codex & Cursor autonomous, structured execution across milestones, phases, and parallel streams.",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -13,9 +13,25 @@
   },
   "keywords": [
     "blueprint",
-    "cli",
-    "project-scaffolding",
-    "workflow"
+    "claude-code",
+    "claude",
+    "codex",
+    "cursor",
+    "agentic-development",
+    "ai-agent",
+    "ai-agents",
+    "coding-agent",
+    "autonomous-coding",
+    "llm-workflow",
+    "ai-productivity",
+    "ai-assisted-development",
+    "project-planning",
+    "task-management",
+    "kanban",
+    "developer-tooling",
+    "workflow-orchestration",
+    "scaffolding",
+    "cli"
   ],
   "bin": {
     "blueprint": "./dist/index.js"
