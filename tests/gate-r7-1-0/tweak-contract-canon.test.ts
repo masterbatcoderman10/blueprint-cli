@@ -140,9 +140,10 @@ describe('T-R7-1.0.4: docs/srs.md MAS-206 deepening', () => {
     const metaEndMatch = content.slice(metaStart + 1).search(/^### MAS-/m)
     const metaBlock = metaEndMatch === -1 ? content.slice(metaStart) : content.slice(metaStart, metaStart + 1 + metaEndMatch)
 
-    // ID, priority, status unchanged.
+    // ID, priority unchanged; status superseded by MAS-207.
     expect(metaBlock).toContain('Priority: Must')
-    expect(metaBlock).toContain('Status: active')
+    expect(metaBlock).toContain('Status: superseded')
+    expect(metaBlock).toContain('Superseded by: MAS-207')
     // 2026-05-19 change-log entry present.
     expect(metaBlock).toMatch(/^- 2026-05-19\s+-\s+.+/m)
   })
