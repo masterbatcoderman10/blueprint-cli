@@ -413,7 +413,8 @@ describe('T-R8-2.A.9: MAS-207 in docs/srs.md carries locked sub-detail bullets',
     expect(metaBlock).toMatch(/^- 2026-/m)
   })
 
-  it('MAS-207 status remains approved-pending-implementation (not yet active)', async () => {
+  // NOTE: Updated at Phase 2 completion — MAS-207 transitions to active per DoD.
+  it('MAS-207 status is active (Phase 2 complete)', async () => {
     const content = await readDoc(SRS_PATH)
     const metaStart = content.search(/^### MAS-207\s*$/m)
     expect(metaStart).toBeGreaterThan(-1)
@@ -423,8 +424,8 @@ describe('T-R8-2.A.9: MAS-207 in docs/srs.md carries locked sub-detail bullets',
         ? content.slice(metaStart)
         : content.slice(metaStart, metaStart + 1 + metaEndMatch)
 
-    expect(metaBlock).toContain('Status: approved-pending-implementation')
-    expect(metaBlock).not.toContain('Status: active')
+    expect(metaBlock).toContain('Status: active')
+    expect(metaBlock).not.toContain('Status: approved-pending-implementation')
   })
 
   it('MAS-206 remains superseded by MAS-207', async () => {

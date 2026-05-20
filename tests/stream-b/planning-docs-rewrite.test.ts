@@ -80,9 +80,13 @@ describe('R6-3.B.4: tweak-planning.md', () => {
     expect(hits.trim()).toBe('')
   })
 
-  it('uses tracker note', () => {
+  // NOTE: R8 Phase 2 rewrote this module for the MAS-207 change-first workflow.
+  // The original "tracker note" assertion (MAS-206) is superseded. The module
+  // still references the tracker to forbid tracker/board task creation during
+  // Tweak Mode (MAS-207 anti-ceremony contract).
+  it('references tracker in anti-ceremony context (MAS-207 contract)', () => {
     const content = readFileSync(resolve(DOCS_CORE, 'tweak-planning.md'), 'utf-8')
-    expect(content).toContain('tracker note')
+    expect(content).toContain('tracker')
   })
 })
 

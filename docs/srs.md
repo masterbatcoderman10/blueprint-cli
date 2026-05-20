@@ -21,7 +21,7 @@ This SRS exists for blueprint-cli to act as the persistent requirement layer bet
 | MAS-204 | Built-in Task Tracker | Must | active | Revision 6 |
 | MAS-205 | Local Project Board UI | Must | active | Revision 6 |
 | MAS-206 | Standalone Tweak Workflow | Must | superseded | Revision 7 |
-| MAS-207 | Change-First Tweak Workflow | Must | approved-pending-implementation | Revision 8 |
+| MAS-207 | Change-First Tweak Workflow | Must | active | Revision 8 |
 
 ---
 
@@ -254,7 +254,7 @@ Change log:
 ### MAS-207
 - Title: Change-First Tweak Workflow
 - Priority: Must
-- Status: approved-pending-implementation
+- Status: active
 - Assigned milestone: Revision 8
 - Source: Revision 8 Tweak Revamp and QoL
 - Introduced by: Revision 8 Phase 2
@@ -263,6 +263,7 @@ Change log:
 
 Change log:
 - 2026-05-20 - Created from Revision 8 Phase 2 planning. Locked sub-detail bullets added: Tweak Mode anti-ceremony rules, change-first loop (understand → restate → confirm → change → cycle → verify → post-hoc doc), audit-only post-hoc doc shape (Status / Summary of Change / Files Touched / User Acceptance Note), naming convention `tweak-<n>-<slug>.md`, code-change test gate (npm test green AND user approval required; docs-only tweaks exempt), escalation hard-stop (no auto-routing; user decides), anti-patterns list. Status remains `approved-pending-implementation` until Revision 8 Phase 2 completion.
+- 2026-05-20 - Transitioned to active. Revision 8 Phase 2 complete: tweak-planning.md rewritten end-to-end for the change-first workflow, templates mirrored byte-for-byte, CLAUDE.md routing updated, doc-contract tests locked, R7 and R2 contract tests updated to MAS-207, tweak-5 marked superseded. Full test suite green (1010 tests).
 
 ---
 

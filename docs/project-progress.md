@@ -3,8 +3,8 @@
 **Project**: blueprint-cli
 **Tracker**: blueprint-cli
 **Current Milestone**: Revision 8 - Tweak Revamp and Quality of Life Changes
-**Current Phase**: Phase 2 — Tweak Planning Flow Rewrite
-**Status**: In Progress
+**Current Phase**: TBD — pending phase planning
+**Status**: Complete
 
 ---
 
@@ -75,6 +75,8 @@
 - 2026-05-20: Revision 8 planning cleanup — Tweak 2 through Tweak 5 docs were marked superseded by Revision 8, and TW2-TW5 tracker tasks were removed through the tracker HTTP API.
 - 2026-05-20: Revision 8 Phase 1 — Quality of Life Workflow Hardening was planned without a separate setup gate. Stream A hardens tracker-facing workflow contracts; Stream B updates task-detail default-open and quick-swap behavior; Stream C formalizes bug orchestration scope and phase-completion bug delegation loop. Phase document at `docs/milestones/revision-8-tweak-revamp-qol/phase-1-quality-of-life-workflow-hardening.md`.
 - 2026-05-20: Revision 8 Phase 1 — Quality of Life Workflow Hardening completed. All tasks done, DoD satisfied, full test suite green (959 tests, 133 files).
+- 2026-05-20: Revision 8 Phase 2 — Tweak Planning Flow Rewrite completed. All tasks done, DoD satisfied, full test suite green (1010 tests). tweak-planning.md rewritten end-to-end for MAS-207 change-first workflow; templates mirrored byte-for-byte; CLAUDE.md routing updated; doc-contract, R7, and R2 contract tests updated to MAS-207; tweak-5 marked superseded; MAS-207 transitioned to active in SRS.
+- 2026-05-20: Revision 8 — Tweak Revamp and Quality of Life Changes completed. All phases done.
 
 ---
 
@@ -126,7 +128,7 @@ R7 — Standalone Tweak Workflow
 └── Phase 1 — Standalone Tweak Workflow & Scaffold Integration ✓
 R8 — Tweak Revamp and Quality of Life Changes
 ├── Phase 1 — Quality of Life Workflow Hardening ✓
-└── Phase 2 — Tweak Planning Flow Rewrite ○
+└── Phase 2 — Tweak Planning Flow Rewrite ✓
 M2 — Cross-Project Context (Optional Post-MVP)
 └── Phase 1 — TBD ○
 M3 — Workflow Visibility Enhancements (Optional Future)
@@ -142,4 +144,3 @@ M3 — Workflow Visibility Enhancements (Optional Future)
 
 | Revision | Name | Status | Notes |
 |----------|------|--------|-------|
-| 8 | Tweak Revamp and Quality of Life Changes | Planned | Phase 1 planned; Phase 2 pending planning. |

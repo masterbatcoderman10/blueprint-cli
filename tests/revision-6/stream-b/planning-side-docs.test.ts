@@ -68,10 +68,13 @@ describe('T-R6-3.B.3: docs/core/phase-planning.md rewrite', () => {
 })
 
 describe('T-R6-3.B.4: docs/core/tweak-planning.md rewrite', () => {
-  it('T-R6-3.B.4: has zero kanban hits and uses tracker note wording', async () => {
+  // NOTE: R8 Phase 2 rewrote this module for the MAS-207 change-first workflow.
+  // "tracker note" wording (MAS-206) is superseded. The module now references
+  // the tracker only to forbid tracker/board task creation in Tweak Mode.
+  it('T-R6-3.B.4: has zero kanban hits and references tracker in anti-ceremony context (MAS-207)', async () => {
     const content = await loadDoc('tweak-planning.md')
     expect(kanbanHits(content)).toHaveLength(0)
-    expect(content).toMatch(/tracker note/i)
+    expect(content).toMatch(/tracker/i)
   })
 })
 
