@@ -3,8 +3,8 @@
 **Project**: blueprint-cli
 **Tracker**: blueprint-cli
 **Current Milestone**: Revision 8 - Tweak Revamp and Quality of Life Changes
-**Current Phase**: Phase 1 - Quality of Life Workflow Hardening
-**Status**: Revision 8 identified; Phase 1 planned; pending execution
+**Current Phase**: Phase 2 — Tweak Planning Flow Rewrite (TBD — pending phase planning)
+**Status**: Revision 8 Phase 1 complete; Phase 2 pending planning
 
 ---
 
@@ -74,6 +74,7 @@
 - 2026-05-20: Identified Revision 8 — Tweak Revamp and Quality of Life Changes to reclassify confirmed Tweaks 2 through 5 into revision planning. Scope: Phase 1 combines tracker workflow contract hardening, task-detail rail quality-of-life behavior, and bug orchestration / phase-completion loop language; Phase 2 rewrites tweak planning into a change-first, user-reviewed, no-board-task workflow with post-hoc tweak documentation. SRS MAS-206 superseded by MAS-207; MAS-203, MAS-204, and MAS-205 elaborated without changing IDs. Revision document at `docs/milestones/revision-8-tweak-revamp-qol/revision-8-tweak-revamp-qol.md`.
 - 2026-05-20: Revision 8 planning cleanup — Tweak 2 through Tweak 5 docs were marked superseded by Revision 8, and TW2-TW5 tracker tasks were removed through the tracker HTTP API.
 - 2026-05-20: Revision 8 Phase 1 — Quality of Life Workflow Hardening was planned without a separate setup gate. Stream A hardens tracker-facing workflow contracts; Stream B updates task-detail default-open and quick-swap behavior; Stream C formalizes bug orchestration scope and phase-completion bug delegation loop. Phase document at `docs/milestones/revision-8-tweak-revamp-qol/phase-1-quality-of-life-workflow-hardening.md`.
+- 2026-05-20: Revision 8 Phase 1 — Quality of Life Workflow Hardening completed. All tasks done, DoD satisfied, full test suite green (959 tests, 133 files).
 
 ---
 
@@ -124,7 +125,7 @@ R6 — Built-in Task Tracker
 R7 — Standalone Tweak Workflow
 └── Phase 1 — Standalone Tweak Workflow & Scaffold Integration ✓
 R8 — Tweak Revamp and Quality of Life Changes
-├── Phase 1 — Quality of Life Workflow Hardening ●
+├── Phase 1 — Quality of Life Workflow Hardening ✓
 └── Phase 2 — Tweak Planning Flow Rewrite ○
 M2 — Cross-Project Context (Optional Post-MVP)
 └── Phase 1 — TBD ○
