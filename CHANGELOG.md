@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0] — 2026-05-20
+
+### Added
+- **R7 — Standalone Tweak Workflow**: Promoted tweaks from inline phase corrections into a first-class, top-level quick-change workflow
+  - `docs/tweaks/` becomes a required Blueprint directory, scaffolded into every initialized project
+  - Each tweak gets a standalone Markdown plan with goals, dependencies, tasks, acceptance criteria, and verification notes
+  - Core protocol docs rewritten: `tweak-planning.md`, `phase-planning.md`, `blueprint-structure.md`, `hierarchy.md`, `scope-change.md`, `revision-planning.md`, `execution.md`, `review.md`, `phase-completion.md`, `test-planning.md`, `orchestrate.md`
+  - Scaffold engine, Doctor validation, and template mirroring updated for standalone tweak contract
+  - Agent routing documents (`AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, `QWEN.md`) updated to route tweak intent as top-level quick-change planning
+  - Historical Revision 2 tweak contract superseded; historical docs preserved as audit history
+
 ### Improved
 - **README redesign**: Streamlined structure with task tracker screenshot, clearer "How It Works" section, and direct professional tone. Reduced cognitive load for new users.
 
