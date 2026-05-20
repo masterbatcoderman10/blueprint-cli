@@ -1,6 +1,6 @@
 # Phase 2 - Tweak Planning Flow Rewrite Plan
 
-**Status**: Planning
+**Status**: In Progress
 **Milestone**: Revision 8 - Tweak Revamp and Quality of Life Changes
 **Task ID prefix**: `R8-2`
 

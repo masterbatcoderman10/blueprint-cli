@@ -3,8 +3,8 @@
 **Project**: blueprint-cli
 **Tracker**: blueprint-cli
 **Current Milestone**: Revision 8 - Tweak Revamp and Quality of Life Changes
-**Current Phase**: Phase 2 — Tweak Planning Flow Rewrite (TBD — pending phase planning)
-**Status**: Revision 8 Phase 1 complete; Phase 2 pending planning
+**Current Phase**: Phase 2 — Tweak Planning Flow Rewrite
+**Status**: In Progress
 
 ---
 
