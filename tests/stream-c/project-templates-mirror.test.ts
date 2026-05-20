@@ -128,6 +128,37 @@ describe('R6-3.C: Project + Templates Mirror', () => {
     })
   })
 
+  describe('T-R8-2.B.2: Root CLAUDE.md and templates/CLAUDE.md describe tweak intent in change-first terms', () => {
+    const agentPairs = [
+      { root: 'CLAUDE.md', template: 'templates/CLAUDE.md' },
+    ]
+
+    it.each(agentPairs)('%s describes tweak intent using Tweak Mode and change-first loop language', async ({ root }) => {
+      const content = await readFile(join(ROOT_DIR, root), 'utf-8')
+      expect(content).toContain('Tweak Mode')
+      expect(content).toContain('change-first')
+    })
+
+    it.each(agentPairs)('%s (template) describes tweak intent using Tweak Mode and change-first loop language', async ({ template }) => {
+      const content = await readFile(join(ROOT_DIR, template), 'utf-8')
+      expect(content).toContain('Tweak Mode')
+      expect(content).toContain('change-first')
+    })
+
+    it.each(agentPairs)('%s contains no pre-task board-planning language for tweak intent', async ({ root }) => {
+      const content = await readFile(join(ROOT_DIR, root), 'utf-8')
+      // "pre-task board planning" language that implied tracker/board tasks before the change-first workflow
+      expect(content).not.toContain('pre-task board planning')
+      expect(content).not.toContain('board task')
+    })
+
+    it.each(agentPairs)('%s (template) contains no pre-task board-planning language for tweak intent', async ({ template }) => {
+      const content = await readFile(join(ROOT_DIR, template), 'utf-8')
+      expect(content).not.toContain('pre-task board planning')
+      expect(content).not.toContain('board task')
+    })
+  })
+
   describe('C.5: Template agent files mirror root routing region byte-for-byte', () => {
     const agentPairs = [
       { root: 'AGENTS.md', template: 'templates/AGENTS.md' },
