@@ -98,14 +98,17 @@ describe('T-R7-1.B.7.3: standalone-contract structural rules', () => {
     expect(body).toMatch(/regardless|even (if|when)/)
   })
 
-  it('tweak-planning.md contains <TweakReviewGate> with mandatory confirmation before TO-DO → IN-PROGRESS', async () => {
+  it('tweak-planning.md contains <TweakChangeFirstLoop> with mandatory confirmation (MAS-207 replaces MAS-206 <TweakReviewGate>)', async () => {
+    // MAS-206 had a <TweakReviewGate> block; MAS-207 (R8 Phase 2) replaces it with the
+    // change-first loop (<TweakChangeFirstLoop>) where CONFIRM (STEP 3) is mandatory before
+    // any change is made. This test is updated to assert the MAS-207 contract.
     const content = await readDoc(TWEAK_PLANNING_PATH)
-    const block = extractBlock(content, 'TweakReviewGate')
-    expect(block, '<TweakReviewGate> block must be present').not.toBeNull()
+    const block = extractBlock(content, 'TweakChangeFirstLoop')
+    expect(block, '<TweakChangeFirstLoop> block must be present (MAS-207 contract)').not.toBeNull()
     const body = block ?? ''
-    expect(body).toContain('TO-DO')
+    // The change-first loop requires mandatory CONFIRM before CHANGE.
     expect(body.toLowerCase()).toContain('mandatory')
-    expect(body.toLowerCase()).toMatch(/confirm|confirmation/)
+    expect(body.toLowerCase()).toMatch(/confirm/)
   })
 })
 
@@ -121,16 +124,22 @@ describe('T-R7-1.B.7.1: tweak-start gate behavior', () => {
     expect(lower).toMatch(/explicit.*confirm|confirm.*explicit/)
   })
 
-  it('tweak-planning.md <TweakReviewGate> blocks execution until user confirms the drafted tweak plan', async () => {
+  it('tweak-planning.md <TweakChangeFirstLoop> blocks change until user confirms (MAS-207 replaces MAS-206 <TweakReviewGate>)', async () => {
+    // MAS-206 required no task to leave TO-DO without confirmation.
+    // MAS-207 (R8 Phase 2) removes board tasks entirely from the tweak workflow.
+    // The equivalent gate is: CONFIRM (STEP 3) is mandatory before CHANGE (STEP 4).
     const content = await readDoc(TWEAK_PLANNING_PATH)
-    const block = extractBlock(content, 'TweakReviewGate')
-    expect(block).not.toBeNull()
+    const block = extractBlock(content, 'TweakChangeFirstLoop')
+    expect(block, '<TweakChangeFirstLoop> block must be present (MAS-207 contract)').not.toBeNull()
     const body = (block ?? '').toLowerCase()
-    // No task may leave TO-DO until explicit confirmation
-    expect(body).toContain('to-do')
-    expect(body).toContain('in-progress')
-    expect(body).toMatch(/no.*task.*(leave|move|transition)/)
-    expect(body).toMatch(/explicit.*confirm|confirmed/)
+    // Explicit confirmation must gate the change step.
+    expect(body).toMatch(/explicit.*confirm|explicit.*yes|confirmed/)
+    // STEP 3 must precede STEP 4 (change cannot happen before confirm).
+    const step3 = body.indexOf('step 3')
+    const step4 = body.indexOf('step 4')
+    expect(step3).toBeGreaterThan(-1)
+    expect(step4).toBeGreaterThan(-1)
+    expect(step3).toBeLessThan(step4)
   })
 })
 
@@ -144,14 +153,20 @@ describe('T-R7-1.B.7.2: tweak-completion gate behavior', () => {
     expect(lower).toContain('done')
   })
 
-  it('tweak-planning.md <TweakExecutionLifecycle> enforces npm test green before DONE', async () => {
+  it('tweak-planning.md code-change test gate enforces npm test green before doc creation (MAS-207 replaces MAS-206 <TweakExecutionLifecycle>)', async () => {
+    // MAS-206 had a <TweakExecutionLifecycle> block that required npm test green before DONE.
+    // MAS-207 (R8 Phase 2) replaces this with a code-change test gate in <TweakChangeFirstLoop>
+    // (STEP 6 — VERIFY): npm test green AND user approval required before creating the tweak doc.
     const content = await readDoc(TWEAK_PLANNING_PATH)
-    const block = extractBlock(content, 'TweakExecutionLifecycle')
-    expect(block, '<TweakExecutionLifecycle> block must be present').not.toBeNull()
+    const block = extractBlock(content, 'TweakChangeFirstLoop')
+    expect(block, '<TweakChangeFirstLoop> block must be present (MAS-207 contract)').not.toBeNull()
     const body = (block ?? '').toLowerCase()
+    // npm test must be referenced in the verify step.
     expect(body).toContain('npm test')
-    expect(body).toContain('done')
-    expect(body).toMatch(/green|pass|exit.*0/)
+    // Green/pass result required.
+    expect(body).toMatch(/green|pass/)
+    // The test must be required before doc creation.
+    expect(body).toMatch(/tweak document|post.hoc/)
   })
 })
 
