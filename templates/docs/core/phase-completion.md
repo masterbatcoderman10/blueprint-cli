@@ -206,8 +206,16 @@ completion.
 
     IF invoked by the orchestrator (via `docs/core/orchestrate.md`):
       → The orchestrator automatically spawns a bug-resolution
-        stream and re-runs phase completion when that stream
-        closes out. No manual re-trigger is needed.
+        stream, delegating each bug task to an execution agent per
+        `docs/core/execution.md` and `docs/core/bug-resolution.md`.
+      → After the bug-resolution stream closes out (all bug tasks
+        DONE, branch merged), the orchestrator re-runs the
+        phase-completion subagent from STEP 1.
+      → This loop repeats until the full test suite is green and
+        phase completion passes. No manual re-trigger is needed.
+      → If phase completion reveals bugs a second time, the
+        orchestrator delegates a second bug-resolution stream and
+        reruns completion after that batch closes out.
 
     IF invoked directly by the user:
       Inform the user:

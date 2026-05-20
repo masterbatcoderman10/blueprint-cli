@@ -40,7 +40,7 @@ describe('T-R5-1.0.2.2: template file exists and is valid at templates/docs/core
 
     expect(templateContent.length).toBeGreaterThan(0)
     expect(templateContent.trimStart().startsWith('#')).toBe(true)
-    // Template equality skipped: live doc rewritten in R6-3.A; template mirror pending Stream C
-    // expect(templateContent).toBe(liveContent)
+    // Template parity restored in R8-1.C.6
+    expect(templateContent).toBe(liveContent)
   })
 })
