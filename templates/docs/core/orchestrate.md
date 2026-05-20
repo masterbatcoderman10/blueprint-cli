@@ -54,6 +54,9 @@ For detailed session management patterns, see: `[Context Rot & Session Managemen
     - Read the phase document and its parallelization map.
     - Spawn work in dependency order.
     - Manage the execute→review→address→rereview lifecycle per stream.
+    - Coordinate bug-task streams using the same stream lifecycle as
+      planned streams. Bug orchestration is not a separate workflow;
+      it reuses the existing execute→review→address→rereview loop.
     - Report progress, blockers, and completion without merging branches.
 
   ORCHESTRATOR BOUNDARIES:
@@ -179,6 +182,32 @@ For detailed session management patterns, see: `[Context Rot & Session Managemen
 
 ---
 
+<BugOrchestrationLifecycle>
+  PURPOSE: Clarify that bug-task orchestration reuses the same
+  execute→review→address→rereview lifecycle as planned streams.
+  Bug orchestration does not define a separate or parallel lifecycle.
+
+  When the orchestrator coordinates bug tasks — whether surfaced
+  during review, phase completion, or user-reported — it uses the
+  same `<StreamLifecycle>` loop defined above:
+
+    1. EXECUTE — Delegate to `execution.md` and `bug-resolution.md`.
+    2. REVIEW — Delegate to `review.md`.
+    3. ADDRESS — Delegate to `execution.md` ApplyReviewNotes.
+    4. REREVIEW — Delegate to `review.md` ReReview.
+    5. CLOSEOUT — Merge and clean up.
+
+  The only differences from a planned stream are:
+    - Bug tasks are typically fewer and scoped to a single regression.
+    - Bug tasks reference `bug-resolution.md` for diagnostic guidance.
+    - Bug tasks may appear at any point during or after phase execution.
+
+  These are scoping differences, not lifecycle differences. The
+  orchestrator does not create a special workflow for bug tasks.
+</BugOrchestrationLifecycle>
+
+---
+
 <FailureClassification>
   PURPOSE: Distinguish failure types so the orchestrator responds
   appropriately.
@@ -270,6 +299,44 @@ For detailed session management patterns, see: `[Context Rot & Session Managemen
     - Once the prerequisite stream is fully closed out, blocked
       dependent streams become eligible for spawn.
 </BlockedDependentStreams>
+
+---
+
+<DelegationPromptGuidance>
+  PURPOSE: Define how the orchestrator writes delegation prompts for
+  sub-agents. Prompts must be minimal and context-based.
+
+  When the orchestrator delegates work to an execution, review, or
+  phase-completion sub-agent, the delegation prompt must include
+  ONLY the following:
+
+    1. ACTION — The intent to perform:
+       `execute`, `review`, `address`, `rereview`, or `phase completion`.
+
+    2. CONTEXT — The phase and stream (or bug scope) the sub-agent
+       is responsible for:
+       - Phase ID (e.g., `R8-1`)
+       - Stream letter or gate number (e.g., `Stream C`)
+       - Phase document path
+       - Tracker phase/stream filter values
+
+    3. ROUTING — Let the delegated module carry detailed workflow rules.
+       Do not inline rules from execution.md, review.md, or
+       git-execution-workflow.md into the prompt.
+
+  PROMPT TEMPLATE:
+    "Task: [Action] [Stream/Gate] of Phase [Phase ID].
+     Phase doc: [path to phase document].
+     Use [tool] for tracker API.
+     Worktree branch: [branch name]."
+
+  ANTI-PATTERN REINFORCEMENT:
+    See `<AntiPattern name="Oversized Custom Subagent Prompts">` for
+    the rationale behind minimal delegation. The orchestrator must
+    not restate workflow rules, copy task descriptions, or embed
+    review criteria into delegation prompts. The sub-agent loads
+    its own modules and follows its own workflow.
+</DelegationPromptGuidance>
 
 ---
 
