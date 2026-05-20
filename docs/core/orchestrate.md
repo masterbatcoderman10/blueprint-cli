@@ -362,6 +362,20 @@ For detailed session management patterns, see: `[Context Rot & Session Managemen
 
 ---
 
+<OrchestrationCloseout>
+  PURPOSE: Define the cleanup step after phase or stream orchestration finishes.
+
+  WHEN phase or stream orchestration finishes:
+    - Report the final status first: complete, blocked, or user-stopped.
+    - Stop the board after phase or stream orchestration finishes so the
+      orchestration session does not leave background tracker processes
+      running unnecessarily.
+    - If the board is already stopped or the lock is gone, treat closeout
+      as already satisfied and continue.
+</OrchestrationCloseout>
+
+---
+
 <ModuleBoundaries>
   PURPOSE: Clarify what this module references vs. defines.
 
@@ -393,7 +407,22 @@ For detailed session management patterns, see: `[Context Rot & Session Managemen
 <AntiPatterns>
   <AntiPattern name="Orchestrator Acting as Executor">
     <BadExample>The orchestrator writes implementation code, creates tests, or runs linting directly instead of delegating to an execution agent.</BadExample>
-    <Why>The orchestrator's job is coordination, not implementation. Mixing orchestration with execution creates a single point of failure, prevents parallel stream execution, and makes the orchestrator's logic harder to reason about.</Why>
+    <Why>The orchestrator's job is coordination, not implementation. Mixing orchestration with execution creates a single point of failure, prevents parallel stream execution, and makes the orchestrator's logic harder to reason about. If implementation work is needed, route it to `docs/core/execution.md` (`StartGateOrStream` or `ApplyReviewNotes`) instead of doing the work directly.</Why>
+  </AntiPattern>
+
+  <AntiPattern name="Orchestrator Acting as Reviewer">
+    <BadExample>The orchestrator inspects code diffs, decides whether tasks are clean, and writes acceptance or rejection notes itself instead of delegating review.</BadExample>
+    <Why>Execution and review are separate control points. When the orchestrator performs review directly, it collapses that separation and weakens the quality gate. Route review work to `docs/core/review.md` (`ReviewProcess` or `ReReview`) instead of reviewing inside the orchestrator session.</Why>
+  </AntiPattern>
+
+  <AntiPattern name="Orchestrator Acting as Bug Fixer">
+    <BadExample>The orchestrator sees a phase-completion regression, diagnoses the failing code path, and starts writing the fix itself instead of dispatching a bug-resolution stream.</BadExample>
+    <Why>Phase-completion failures are handled by a separate verification and repair loop. When regressions appear, re-run `docs/core/phase-completion.md` to create the follow-up bug tasks, then route diagnosis and implementation through `docs/core/bug-resolution.md` and `docs/core/execution.md` rather than fixing the bug inside the orchestrator session.</Why>
+  </AntiPattern>
+
+  <AntiPattern name="Oversized Custom Subagent Prompts">
+    <BadExample>The orchestrator writes long custom prompts that restate the entire phase document, review criteria, and git workflow every time it delegates a stream action.</BadExample>
+    <Why>Oversized prompts waste context budget and make it harder for execution and review agents to isolate the work they actually own. Delegation prompts should name only the action (`execute`, `review`, `address`, `rereview`, or `phase completion`) plus the relevant phase/stream context. Let the delegated module carry the detailed workflow rules.</Why>
   </AntiPattern>
 
   <AntiPattern name="Map Infidelity">
