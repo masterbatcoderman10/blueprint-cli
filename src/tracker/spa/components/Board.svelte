@@ -52,6 +52,16 @@
   const projectName = $derived(initialProjectName ?? fetchedProject?.name ?? '—')
   const projectTagline = $derived(initialProjectTagline ?? fetchedProject?.description ?? '—')
 
+  // R8-1.B.1 / R8-1.B.2: Auto-select a deterministic initial task when no hash
+  // selection exists and tasks are available. The first task by sorted ID is chosen.
+  $effect(() => {
+    const tasks = tasksStore.tasks
+    if (selectionStore.selectedId !== null || tasks.length === 0) return
+    const sorted = [...tasks].sort((a, b) => (a.id ?? '').localeCompare(b.id ?? ''))
+    const firstId = sorted[0]?.id
+    if (firstId) selectionStore.select(firstId)
+  })
+
   const COLUMNS = [
     { id: 'todo', label: 'To Do', dot: '#6B6560' },
     { id: 'in-progress', label: 'In Progress', dot: '#F97316' },
