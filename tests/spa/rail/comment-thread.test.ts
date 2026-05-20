@@ -1,11 +1,19 @@
 // @vitest-environment jsdom
-import { describe, it, expect, afterEach } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { render, screen, fireEvent, cleanup } from '@testing-library/svelte'
 import CommentThread from '../../../src/tracker/spa/components/CommentThread.svelte'
 import { createMockCommentsStore } from './helpers.svelte'
 
+const mockFetch = vi.fn()
+
+beforeEach(() => {
+  vi.stubGlobal('fetch', mockFetch)
+  mockFetch.mockReset()
+})
+
 afterEach(() => {
   cleanup()
+  vi.restoreAllMocks()
 })
 
 describe('R6-2.B.4: CommentThread', () => {
@@ -132,5 +140,35 @@ describe('R6-2.B.4: CommentThread', () => {
     const comments = createMockCommentsStore([])
     render(CommentThread, { props: { taskId: 't1', comments } })
     expect(screen.getByTestId('empty-comments').textContent).toBe('No comments yet.')
+  })
+
+  it('invalidates comment cache before reloading after submit (BUG-001)', async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      status: 201,
+      json: async () => ({ ok: true, data: { id: 'new-comment' } }),
+    })
+
+    const comments = createMockCommentsStore([])
+    const invalidateSpy = vi.spyOn(comments, 'invalidate')
+    const loadSpy = vi.spyOn(comments, 'loadForTask')
+
+    render(CommentThread, { props: { taskId: 't1', comments } })
+
+    await fireEvent.click(screen.getByTestId('add-major'))
+    await fireEvent.input(screen.getByTestId('composer-body'), {
+      target: { value: 'New comment' },
+    })
+    await fireEvent.click(screen.getByTestId('composer-submit'))
+
+    await vi.waitFor(() => {
+      expect(invalidateSpy).toHaveBeenCalledWith('t1')
+      expect(loadSpy).toHaveBeenCalledWith('t1')
+    })
+
+    // Verify invalidate is called before loadForTask
+    const invalidateCallOrder = invalidateSpy.mock.invocationCallOrder[0]
+    const loadCallOrder = loadSpy.mock.invocationCallOrder[0]
+    expect(invalidateCallOrder).toBeLessThan(loadCallOrder)
   })
 })

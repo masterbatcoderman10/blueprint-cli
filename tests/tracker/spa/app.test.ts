@@ -37,6 +37,12 @@ describe('T-2.0.4.1: App.svelte root layout', () => {
     expect(appSource).toContain('let railOpen = $derived(selectionStore.selectedId !== null)')
     expect(appSource).toMatch(/data-open=\{String\(railOpen\)\}/)
   })
+
+  it('outside-click handler guards against task-card clicks (BUG-002)', () => {
+    expect(appSource).toContain('data-testid="task-card"')
+    expect(appSource).toContain('e.target instanceof Element')
+    expect(appSource).toContain('closest?.(\'[data-testid="task-card"]\')')
+  })
 })
 
 describe('T-2.0.4.1: Board.svelte 5-column structure', () => {

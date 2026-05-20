@@ -47,6 +47,7 @@
 
   function handleSubmitted() {
     showComposer = false
+    comments.invalidate(taskId)
     comments.loadForTask(taskId)
   }
 </script>
@@ -76,7 +77,10 @@
         {comment}
         {taskId}
         replies={repliesByParent.get(comment.id ?? '') ?? []}
-        onReplySubmitted={() => comments.loadForTask(taskId)}
+        onReplySubmitted={() => {
+          comments.invalidate(taskId)
+          comments.loadForTask(taskId)
+        }}
       />
     {:else}
       <div class="empty" data-testid="empty-comments">No comments yet.</div>

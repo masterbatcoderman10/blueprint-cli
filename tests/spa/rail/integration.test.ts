@@ -264,4 +264,22 @@ describe('R6-2.B.5 / R6-2.B.6: Integration', () => {
     await tick()
     expect(screen.queryByTestId('task-detail-rail')).toBeNull()
   })
+
+  it('does not dismiss on task-card click (BUG-002)', async () => {
+    const selection = createMockSelectionStore('task-1')
+    const tasks = createMockTasksStore([
+      { id: 'task-1', title: 'Task One', state: 'TO-DO', description: '' },
+      { id: 'task-2', title: 'Task Two', state: 'IN-PROGRESS', description: '' },
+    ])
+    const comments = createMockCommentsStore([])
+
+    const { container } = render(BackgroundClickWrapper, { props: { selection, tasks, comments } })
+    await tick()
+    expect(container.querySelector('[data-testid="task-detail-rail"]')).toBeTruthy()
+
+    await fireEvent.click(screen.getByTestId('task-card'))
+    await tick()
+    expect(container.querySelector('[data-testid="task-detail-rail"]')).toBeTruthy()
+    expect(selection.selectedId).toBe('task-2')
+  })
 })

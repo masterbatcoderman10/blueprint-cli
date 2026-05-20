@@ -19,6 +19,9 @@
     const handler = (e: MouseEvent) => {
       const rail = document.querySelector('[data-rail]')
       if (rail && !rail.contains(e.target as Node)) {
+        // Guard: task-card clicks switch selection; do not treat them as rail-close
+        const targetEl = e.target instanceof Element ? e.target : (e.target as Node).parentElement
+        if (targetEl?.closest?.('[data-testid="task-card"]')) return
         selectionStore.clear()
       }
     }
