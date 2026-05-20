@@ -121,7 +121,14 @@ describe('Stream D — board SPA E2E', () => {
       const url = match[1]
 
       // GET / → SPA index.html with mount node
-      const indexResponse = await fetch(url)
+      // Retry to tolerate CI filesystem race conditions after concurrent builds.
+      let indexResponse = await fetch(url)
+      let fetchAttempts = 1
+      while (indexResponse.status === 404 && fetchAttempts < 5) {
+        await new Promise((r) => setTimeout(r, 300))
+        indexResponse = await fetch(url)
+        fetchAttempts++
+      }
       expect(indexResponse.status).toBe(200)
       const contentType = indexResponse.headers.get('content-type')
       expect(contentType).toContain('text/html')

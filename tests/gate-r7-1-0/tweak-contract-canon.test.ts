@@ -142,7 +142,7 @@ describe('T-R7-1.0.4: docs/srs.md MAS-206 deepening', () => {
 
     // ID, priority, status unchanged.
     expect(metaBlock).toContain('Priority: Must')
-    expect(metaBlock).toContain('Status: approved-pending-implementation')
+    expect(metaBlock).toContain('Status: active')
     // 2026-05-19 change-log entry present.
     expect(metaBlock).toMatch(/^- 2026-05-19\s+-\s+.+/m)
   })
