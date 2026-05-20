@@ -38,7 +38,7 @@ describe('T-C.1.1: package metadata matches the intended public release surface'
   it('exposes scoped public release metadata for npm consumers', () => {
     const packageJson = readPackageJson()
 
-    expect(packageJson.name).toBe('@splitwireml/blueprint')
+    expect(packageJson.name).toBe('blueprint-agentic-development')
     expect(packageJson.bin).toEqual({ blueprint: './dist/index.js' })
     expect(packageJson.license).toBe('MIT')
     expect(packageJson.repository).toEqual({
@@ -51,7 +51,7 @@ describe('T-C.1.1: package metadata matches the intended public release surface'
     })
     expect(packageJson.publishConfig).toEqual({ access: 'public' })
     expect(packageJson.keywords).toEqual(
-      expect.arrayContaining(['blueprint', 'cli', 'project-scaffolding', 'workflow']),
+      expect.arrayContaining(['blueprint', 'cli', 'agentic-development', 'claude-code']),
     )
   })
 })

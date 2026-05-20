@@ -15,8 +15,7 @@ describe('T-C.3.1: maintainer release docs cover publish prerequisites and recov
   it('documents scope setup, release tags, auth requirements, and failure handling', () => {
     const releaseDoc = readFileSync(maintainerDocPath, 'utf-8')
 
-    expect(releaseDoc).toContain('@splitwireml/blueprint')
-    expect(releaseDoc).toContain('splitwireml')
+    expect(releaseDoc).toContain('blueprint-agentic-development')
     expect(releaseDoc).toContain('vMAJOR.MINOR.PATCH')
     expect(releaseDoc).toContain('ACTIONS_ID_TOKEN_REQUEST_URL')
     expect(releaseDoc).toContain('NPM_TOKEN')

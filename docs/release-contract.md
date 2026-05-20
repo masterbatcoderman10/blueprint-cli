@@ -4,7 +4,7 @@ This document is the Phase 4 source of truth for the public M1 release baseline.
 
 ## Package Identity
 
-- npm package: `@splitwireml/blueprint`
+- npm package: `blueprint-agentic-development`
 - Installed executable: `blueprint`
 - Supported Node.js policy: `>=18.0.0`
 

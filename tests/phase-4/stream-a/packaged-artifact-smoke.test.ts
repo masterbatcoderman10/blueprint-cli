@@ -26,7 +26,7 @@ describe('T-A.4.2: packed artifact includes runtime assets and supports release-
     const fixture = await installPackedCliFixture()
 
     try {
-      const installedPackageRoot = join(fixture.rootDir, 'node_modules', '@splitwireml', 'blueprint')
+      const installedPackageRoot = join(fixture.rootDir, 'node_modules', 'blueprint-agentic-development')
       const smokeProjectDir = join(fixture.rootDir, 'smoke-project')
 
       expect(await pathExists(join(installedPackageRoot, 'dist', 'index.js'))).toBe(true)

@@ -1,11 +1,10 @@
 # Releasing Blueprint CLI
 
-This guide is for maintainers preparing the public npm release of `@splitwireml/blueprint`.
+This guide is for maintainers preparing the public npm release of `blueprint-agentic-development`.
 
 ## Package Identity
 
-- npm package: `@splitwireml/blueprint`
-- npm scope: `splitwireml`
+- npm package: `blueprint-agentic-development`
 - Installed executable: `blueprint`
 - Public access requirement: `package.json` must keep `publishConfig.access` set to `public`
 
@@ -33,7 +32,7 @@ Underlying script entrypoints:
 
 Before automated publishing is enabled, make sure the package and repository are ready:
 
-1. Confirm the `splitwireml` npm scope exists and has permission to publish `@splitwireml/blueprint`.
+1. Confirm the `blueprint-agentic-development` package is registered on npm and the publishing account has write access.
 2. Confirm the repository is the canonical source for the package and exposes the correct `GITHUB_REPOSITORY` value in automation.
 3. Keep the package public by preserving `publishConfig.access` as `public`.
 4. Keep the release contract aligned with [`docs/release-contract.md`](./release-contract.md).

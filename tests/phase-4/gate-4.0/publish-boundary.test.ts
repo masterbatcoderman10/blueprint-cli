@@ -10,7 +10,7 @@ function createInput(overrides: Partial<PublishPreflightInput> = {}): PublishPre
     releaseTag: undefined,
     environment: {},
     packageJson: {
-      name: '@splitwireml/blueprint',
+      name: 'blueprint-agentic-development',
       publishConfig: { access: 'public' },
     },
     ...overrides,
@@ -23,7 +23,7 @@ describe('T-4.0.3.1: publish prerequisite failures are actionable', () => {
       createInput({
         releaseTag: 'v0.1.0',
         packageJson: {
-          name: '@splitwireml/blueprint',
+          name: 'blueprint-agentic-development',
         },
       }),
     )
