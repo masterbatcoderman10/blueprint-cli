@@ -200,6 +200,55 @@ Stream A runs first end-to-end because both B and C consume its outputs. Within 
 
 ---
 
+## Test Plan
+
+> Generated from task analysis. Each testable task has one or more
+> tests mapped to it. Tests are written before implementation (TDD)
+> during task execution.
+
+### Stream A Tests
+
+| Test ID | Task | Type | Description | Expected Result |
+|---------|------|------|-------------|-----------------|
+| T-R8-2.A.1 | R8-2.A.1 | unit | Doc-contract: `docs/core/tweak-planning.md` describes the change-first loop in order (understand → restate → confirm → change → cycle → verify → post-hoc doc). | All seven step labels present in the documented sequence. |
+| T-R8-2.A.2 | R8-2.A.2 | unit | Doc-contract: a `Tweak Mode` section exists and forbids tracker/board task creation, planning-module loads (phase/test/revision/milestone), gate/stream subdivision, formal test plans, pre-execution planning artifacts, and ModuleRouting detours. | All six anti-ceremony clauses present in the Tweak Mode section. |
+| T-R8-2.A.3 | R8-2.A.3 | unit | Doc-contract: the post-hoc tweak document shape lists exactly Status, Summary of Change, Files Touched, and User Acceptance Note. | All four sections named under the doc-shape guidance; no additional section headers introduced by the module's doc-shape block. |
+| T-R8-2.A.4 | R8-2.A.4 | unit | Doc-contract: the code-change test gate requires `npm test` green AND user approval before tweak doc creation, and exempts docs-only tweaks. | Both gate clauses and the docs-only exemption are present. |
+| T-R8-2.A.5 | R8-2.A.5 | unit | Doc-contract: the escalation block hard-stops Tweak Mode and routes the decision to the user without automatic rerouting. | Hard-stop language and user-decides routing present. |
+| T-R8-2.A.6 | R8-2.A.6 | unit | Doc-contract: an Anti-Patterns section lists each forbidden ceremony item from the contract (board tasks, pre-change doc, planning module loads, gates/streams, formal test plan, skipped confirm, skipped test gate, ignored escalation). | All eight anti-pattern items present. |
+| T-R8-2.A.7 | R8-2.A.7 | unit | Doc-contract negative assertion / grep guard: `docs/core/tweak-planning.md` contains no `Tweak <n> — <name>` tracker-milestone string and no tracker-task scaffolding language. | Zero matches for the tracker-milestone string and tracker-task scaffolding patterns. |
+| T-R8-2.A.8 | R8-2.A.8 | unit | Doc-contract: a worked example section exists and ends with a sample post-hoc tweak document in the audit-only shape. | Worked-example header present; sample post-hoc document shape (Status / Summary of Change / Files Touched / User Acceptance Note) detected at the example's tail. |
+| T-R8-2.A.9 | R8-2.A.9 | unit | SRS contract: MAS-207 in `docs/srs.md` carries the locked sub-detail bullets (Tweak Mode, change-first loop, audit-only doc shape, naming `tweak-<n>-<slug>.md`, code-change test gate, escalation hard-stop, anti-patterns) and a Phase 2 planning change-log entry; status remains `approved-pending-implementation` until Phase 2 completion. | All sub-detail bullets present, change-log entry added, status unchanged until phase completion. |
+
+### Stream B Tests
+
+| Test ID | Task | Type | Description | Expected Result |
+|---------|------|------|-------------|-----------------|
+| T-R8-2.B.1 | R8-2.B.1 | integration | Template parity: `docs/core/tweak-planning.md` and `templates/docs/core/tweak-planning.md` are byte-identical. | Byte-equal file contents. |
+| T-R8-2.B.2 | R8-2.B.2 | unit | Doc-contract: root `CLAUDE.md` and `templates/docs/CLAUDE.md` describe tweak intent in change-first terms (Tweak Mode / change-first loop) and contain no pre-task board-planning language. | Change-first / Tweak Mode references present; pre-task board-planning language absent. |
+| — | R8-2.B.3 | — | Not testable: test-authoring task; coverage is delivered by T-R8-2.B.1, which this task creates / refreshes. | — |
+
+### Stream C Tests
+
+| Test ID | Task | Type | Description | Expected Result |
+|---------|------|------|-------------|-----------------|
+| T-R8-2.C.1 | R8-2.C.1 | unit | Doc-contract: `docs/tweaks/tweak-5-pre-task-tweak-confirmation-gate.md` carries a "Superseded by Revision 8 Phase 2" marker referencing this phase document. | Superseded marker line present and references R8 Phase 2. |
+| — | R8-2.C.2 | — | Not testable: test-authoring task; coverage is delivered by T-R8-2.A.1 through T-R8-2.A.8 (this task creates them). | — |
+| — | R8-2.C.3 | — | Not testable: test-authoring task; coverage is delivered by updated `tests/revision-7/**` and `tests/gate-r7-1-0/**` cases asserting MAS-207 contract and MAS-206 supersession. | — |
+| — | R8-2.C.4 | — | Not testable: test-authoring task; coverage is delivered by the updated `tests/revision-2/gate-1.0/tweak-contract.test.ts` aligned to MAS-207. | — |
+| — | R8-2.C.5 | — | Not testable: conditional test-authoring task; coverage is delivered by the updated SRS contract test if one exists in the current test surface. | — |
+
+### Test Summary
+
+| Component | Total Tasks | Testable | Not Testable |
+|-----------|-------------|----------|--------------|
+| Stream A | 9 | 9 | 0 |
+| Stream B | 3 | 2 | 1 |
+| Stream C | 5 | 1 | 4 |
+| **Total** | **17** | **12** | **5** |
+
+---
+
 ## Definition of Done
 
 - [ ] Stream A, B, and C acceptance criteria pass.
@@ -207,6 +256,7 @@ Stream A runs first end-to-end because both B and C consume its outputs. Within 
 - [ ] SRS MAS-207 transitions to `active` with a Phase 2 completion change-log entry; MAS-206 remains `superseded`.
 - [ ] `docs/tweaks/tweak-5-pre-task-tweak-confirmation-gate.md` carries the Superseded-by-R8-Phase-2 marker.
 - [ ] Doc-contract, template-parity, R7, R2, and (if present) SRS contract tests pass under the new MAS-207 assertions.
+- [ ] All tests in the Test Plan pass.
 - [ ] Full `npm test` is green.
 - [ ] No lint errors in files touched by this phase.
 - [ ] `docs/project-progress.md` records Phase 2 completion and Revision 8 closure when execution finishes.
