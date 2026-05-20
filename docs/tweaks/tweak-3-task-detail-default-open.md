@@ -1,5 +1,9 @@
 # Tweak 3 — Task Detail Default Open
 
+> Superseded by Revision 8 Phase 1 — Quality of Life Workflow Hardening.
+> This document remains as an audit record; executable work moved to
+> `docs/milestones/revision-8-tweak-revamp-qol/phase-1-quality-of-life-workflow-hardening.md`.
+
 Open the task-detail rail by default so the board starts in a detail-visible state instead of a collapsed state.
 
 ---
@@ -56,4 +60,4 @@ Open the task-detail rail by default so the board starts in a detail-visible sta
 
 ## Status
 
-Confirmed.
+Superseded by Revision 8 Phase 1.

@@ -20,7 +20,8 @@ This SRS exists for blueprint-cli to act as the persistent requirement layer bet
 | MAS-203 | Agent Orchestration Protocol Module | Must | active | Revision 5 |
 | MAS-204 | Built-in Task Tracker | Must | active | Revision 6 |
 | MAS-205 | Local Project Board UI | Must | active | Revision 6 |
-| MAS-206 | Standalone Tweak Workflow | Must | active | Revision 7 |
+| MAS-206 | Standalone Tweak Workflow | Must | superseded | Revision 7 |
+| MAS-207 | Change-First Tweak Workflow | Must | approved-pending-implementation | Revision 8 |
 
 ---
 
@@ -57,6 +58,8 @@ The system must provide an orchestration protocol module (`docs/core/orchestrate
 - The protocol must support both stream-level invocation (single parallel loop) and phase-level invocation (gate + all streams).
 - The protocol must reference, not duplicate, existing per-task and per-stream rules defined in `execution.md`, `review.md`, and `git-execution-workflow.md`.
 - The module must be scaffolded into new Blueprint projects via `templates/docs/core/orchestrate.md` and registered in Doctor / template-integrity surfaces as a required core file.
+- The protocol must explicitly support bug-task orchestration as stream-like orchestration work when formal orchestration is appropriate.
+- Bugs revealed by review or phase completion must be delegated to executor agents, then phase completion must be rerun until clean.
 
 #### MAS-204 - Built-in Task Tracker
 
@@ -68,6 +71,8 @@ The system must provide a built-in per-project task tracker, owned end-to-end by
 - The service must bind to `127.0.0.1` only on a dynamic port; no network exposure and no authentication is required.
 - The canonical forward transition out of REWORK must be `REWORK → IN-PROGRESS → IN-REVIEW`.
 - No external service or runtime dependency may be added beyond Node.js built-ins (`node:sqlite` / `better-sqlite3` as confirmed by R6 Phase 1) and the existing `@clack/prompts` runtime dep.
+- Tracker state must be mutated through the local tracker HTTP API, not by raw SQL or direct edits to `docs/.blueprint/tasks.db`.
+- Actionable review feedback must be recorded as tracker comments, and implementers addressing feedback should reply to those comments.
 
 #### MAS-205 - Local Project Board UI
 
@@ -78,8 +83,11 @@ The system must provide a single-page browser UI for the built-in task tracker, 
 - The board surface must render five columns (TO-DO / IN-PROGRESS / IN-REVIEW / REWORK / DONE) with live count badges, task cards (multi-line title + stream/gate tag chip + task ID), header filters for phase and stream, and the Done-column collapse for the long tail of completed tasks.
 - The Task Detail rail must open on task-card click, display the task's status, title, description, and a threaded review-comment thread with `MAJOR` / `MINOR` severity chips, single-level replies, and `+ MAJOR` / `+ MINOR` / `Reply` composer affordances.
 - Pre-built SPA assets must ship under `dist/spa/` inside the published npm tarball; consumers must not invoke any build step locally.
+- The Task Detail rail should open by default to a deterministic task when no valid task hash is present, preserve valid hash-driven selection, and swap immediately to another task when a different card is clicked.
 
 #### MAS-206 - Standalone Tweak Workflow
+
+**Superseded by MAS-207.**
 
 The system must provide a standalone top-level tweak workflow for small, contained changes that should move faster than revisions while preserving Blueprint planning, tracker, review, and verification guards.
 
@@ -92,6 +100,18 @@ The system must provide a standalone top-level tweak workflow for small, contain
 - New features, major edits, regressive changes, cross-cutting contract changes, work needing a formal test plan, or work needing multiple phases must route to revision or milestone planning instead.
 - Phase and revision phase templates must not include a `## Tweaks` section.
 - Tweak tasks must use the built-in tracker and the normal execution, review, address-notes, rereview, and verification lifecycle. The terminal tweak task may only move to DONE when the full project test suite (`npm test`) is green.
+
+#### MAS-207 - Change-First Tweak Workflow
+
+The system must provide a change-first tweak workflow for small, contained changes that should move faster than revisions while preserving user confirmation and post-hoc traceability without creating board tasks.
+
+- The agent must understand what the user asked and briefly restate that understanding.
+- The agent must get user confirmation before making the tweak.
+- The agent must make the change first, then cycle with the user while the user reviews the result.
+- Tweak workflow must not create tracker or board tasks.
+- Once the user confirms the completed change, the agent must create a tweak document under `docs/tweaks/` to record what was done.
+- Tweak documents are audit records created after user-confirmed changes, not pre-execution task plans.
+- Work that needs multi-phase planning, cross-cutting requirement changes, formal test planning, or broader coordination must route to revision or milestone planning instead.
 
 ### Should Have
 
@@ -181,6 +201,7 @@ Change log:
 Change log:
 - 2026-05-17 - Created from Revision 5
 - 2026-05-17 - Activated in Revision 5 Phase 1 (Gate R5-1.0)
+- 2026-05-20 - Elaborated by Revision 8 planning: bug-task orchestration is a formal stream-like orchestration scope; bugs revealed by review or phase completion must be delegated to executor agents and phase completion rerun until clean. Meaning unchanged; ID unchanged.
 
 ### MAS-204
 - Title: Built-in Task Tracker
@@ -197,6 +218,7 @@ Change log:
 - 2026-05-18 - Deepened by R6 Phase 4: bidirectional JSON snapshot sub-detail — server-side hook writes `tasks.export.json` atomically on every mutation; Doctor imports snapshot on missing DB. Meaning unchanged; ID unchanged.
 - 2026-05-18 - Deepened by R6 Phase 5: added `milestone TEXT NOT NULL` column to the tasks-table schema detail for multi-milestone grouping and filtering. Permitted schema-detail deepening per `phase-planning.md`; meaning unchanged; ID unchanged.
 - 2026-05-19 - Transitioned to active. Phase 5 complete: milestone field, filter, migration, and board rendering all implemented and verified.
+- 2026-05-20 - Elaborated by Revision 8 planning: tracker mutation must go through the tracker HTTP API, not raw SQL or direct database edits; actionable review feedback should use tracker comments and replies. Meaning unchanged; ID unchanged.
 
 ### MAS-205
 - Title: Local Project Board UI
@@ -211,21 +233,37 @@ Change log:
 Change log:
 - 2026-05-17 - Created from Revision 6 (recorded 2026-05-18 via R6 Phase 3 pre-phase SRS repair)
 - 2026-05-19 - Transitioned to active. Phase 5 complete: local board SPA with milestone filter dropdown and real milestone count rendering implemented and verified.
+- 2026-05-20 - Elaborated by Revision 8 planning: task-detail rail opens by default to a deterministic task when no valid hash is present, preserves valid hash-selected tasks, and swaps immediately when another task card is clicked. Meaning unchanged; ID unchanged.
 
 ### MAS-206
 - Title: Standalone Tweak Workflow
 - Priority: Must
-- Status: active
+- Status: superseded
 - Assigned milestone: Revision 7
 - Source: Revision 7 Standalone Tweak Workflow
 - Introduced by: Revision 7
 - Supersedes: None
-- Superseded by: None
+- Superseded by: MAS-207
 
 Change log:
 - 2026-05-19 - Created from Revision 7 planning.
 - 2026-05-19 - Deepened by R7 Phase 1 Gate (R7-1.0): locked sub-detail bullets added — naming convention `tweak-<n>-<slug>.md`, tracker milestone value `Tweak <n> — <name>`, lightweight phase-shaped structure, no formal test plan, Doctor scaffold integration for older projects. Status remains `approved-pending-implementation` until phase completion. ID unchanged; meaning unchanged.
 - 2026-05-20 - Transitioned to active. Phase 1 complete: standalone tweak workflow implemented, `docs/tweaks/` scaffolded and repaired by Doctor, `tweak-planning.md` rewritten with intent classification and review gates, all core docs and templates updated, R2 inline tweak contract superseded, full test suite green.
+- 2026-05-20 - Superseded by MAS-207 via Revision 8 planning. The active target tweak workflow now changes from pre-planned tracker-backed tweak tasks to a change-first, no-board-task, post-hoc documentation workflow.
+
+### MAS-207
+
+- Title: Change-First Tweak Workflow
+- Priority: Must
+- Status: approved-pending-implementation
+- Assigned milestone: Revision 8
+- Source: Revision 8 Tweak Revamp and Quality of Life Changes
+- Introduced by: Revision
+- Supersedes: MAS-206
+- Superseded by: None
+
+Change log:
+- 2026-05-20 - Created by Revision 8 planning as the approved target state replacing MAS-206.
 
 ---
 

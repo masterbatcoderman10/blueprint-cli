@@ -1,5 +1,9 @@
 # Tweak 2 — Tracker Workflow Contract Hardening
 
+> Superseded by Revision 8 Phase 1 — Quality of Life Workflow Hardening.
+> This document remains as an audit record; executable work moved to
+> `docs/milestones/revision-8-tweak-revamp-qol/phase-1-quality-of-life-workflow-hardening.md`.
+
 Align session-start, execution, review, and git workflows around additive tracker API and comment-first anti-pattern guidance.
 
 ---
@@ -73,4 +77,4 @@ Align session-start, execution, review, and git workflows around additive tracke
 
 ## Status
 
-Confirmed.
+Superseded by Revision 8 Phase 1.

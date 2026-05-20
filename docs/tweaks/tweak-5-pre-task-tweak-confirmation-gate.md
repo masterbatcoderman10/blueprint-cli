@@ -1,5 +1,10 @@
 # Tweak 5 — Pre-Task Tweak Confirmation Gate
 
+> Superseded by Revision 8 Phase 2 — Tweak Planning Flow Rewrite.
+> This document remains as an audit record; executable work moved to
+> `docs/milestones/revision-8-tweak-revamp-qol/revision-8-tweak-revamp-qol.md`
+> and will be replanned as Revision 8 Phase 2.
+
 Tighten tweak planning so no board tasks are created until the user has manually confirmed the drafted tweak plan.
 
 ---
@@ -61,4 +66,4 @@ Tighten tweak planning so no board tasks are created until the user has manually
 
 ## Status
 
-Confirmed. Tracker tasks may be created under the confirmed-plan gate.
+Superseded by Revision 8 Phase 2.

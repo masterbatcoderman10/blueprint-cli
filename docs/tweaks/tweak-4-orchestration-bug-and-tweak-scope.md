@@ -1,5 +1,9 @@
 # Tweak 4 — Orchestration Bug and Tweak Scope
 
+> Superseded by Revision 8 Phase 1 — Quality of Life Workflow Hardening.
+> This document remains as an audit record; executable work moved to
+> `docs/milestones/revision-8-tweak-revamp-qol/phase-1-quality-of-life-workflow-hardening.md`.
+
 Add formal orchestration language for bug tasks and tweak tasks so they are treated like stream orchestration and use the same execute, review, address, and rereview loop as other orchestrated work.
 
 ---
@@ -66,4 +70,4 @@ Add formal orchestration language for bug tasks and tweak tasks so they are trea
 
 ## Status
 
-Confirmed. Tracker tasks may be created under the confirmed-plan gate.
+Superseded by Revision 8 Phase 1.

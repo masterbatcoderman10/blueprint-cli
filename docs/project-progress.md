@@ -2,9 +2,9 @@
 
 **Project**: blueprint-cli
 **Tracker**: blueprint-cli
-**Current Milestone**: None active
-**Current Phase**: None active
-**Status**: Revision 7 Phase 1 complete; Revision 7 complete
+**Current Milestone**: Revision 8 - Tweak Revamp and Quality of Life Changes
+**Current Phase**: Phase 1 - Quality of Life Workflow Hardening
+**Status**: Revision 8 identified; Phase 1 planned; pending execution
 
 ---
 
@@ -71,6 +71,9 @@
 - 2026-05-19: Revision 7 Phase 1 test plan tightened after independent subagent audit. Three high-impact gaps closed: (1) T-R7-1.A.3.1 replaced from "inspection-of-source" with a real probe-entry parameterized fixture proving Doctor repair restores every canonical-set entry byte-for-byte (and added T-R7-1.A.3.3 for the partial-present missing-file scenario, re-pointing D.3's coverage); (2) R7-1.B.7 promoted from not-testable to testable with four explicit assertions (T-R7-1.B.7.1 tweak-start gate behavior, T-R7-1.B.7.2 tweak-completion gate behavior, T-R7-1.B.7.3 standalone-contract structural rules, T-R7-1.B.7.4 repo-wide grep guard against new `## Tweaks` headings); (3) added the grep-guard test as analogue to R6's `vibe-kanban` audit precedent. New totals: 36 tests, 19 testable tasks, 6 not-testable.
 - 2026-05-20: Revision 7 Phase 1 — Standalone Tweak Workflow & Scaffold Integration completed. All tasks done, DoD satisfied, full test suite green.
 - 2026-05-20: Revision 7 — Standalone Tweak Workflow completed. All phases done.
+- 2026-05-20: Identified Revision 8 — Tweak Revamp and Quality of Life Changes to reclassify confirmed Tweaks 2 through 5 into revision planning. Scope: Phase 1 combines tracker workflow contract hardening, task-detail rail quality-of-life behavior, and bug orchestration / phase-completion loop language; Phase 2 rewrites tweak planning into a change-first, user-reviewed, no-board-task workflow with post-hoc tweak documentation. SRS MAS-206 superseded by MAS-207; MAS-203, MAS-204, and MAS-205 elaborated without changing IDs. Revision document at `docs/milestones/revision-8-tweak-revamp-qol/revision-8-tweak-revamp-qol.md`.
+- 2026-05-20: Revision 8 planning cleanup — Tweak 2 through Tweak 5 docs were marked superseded by Revision 8, and TW2-TW5 tracker tasks were removed through the tracker HTTP API.
+- 2026-05-20: Revision 8 Phase 1 — Quality of Life Workflow Hardening was planned without a separate setup gate. Stream A hardens tracker-facing workflow contracts; Stream B updates task-detail default-open and quick-swap behavior; Stream C formalizes bug orchestration scope and phase-completion bug delegation loop. Phase document at `docs/milestones/revision-8-tweak-revamp-qol/phase-1-quality-of-life-workflow-hardening.md`.
 
 ---
 
@@ -120,6 +123,9 @@ R6 — Built-in Task Tracker
 └── Phase 5 — Milestone Integration, Verification & Cleanup ✓
 R7 — Standalone Tweak Workflow
 └── Phase 1 — Standalone Tweak Workflow & Scaffold Integration ✓
+R8 — Tweak Revamp and Quality of Life Changes
+├── Phase 1 — Quality of Life Workflow Hardening ○
+└── Phase 2 — Tweak Planning Flow Rewrite ○
 M2 — Cross-Project Context (Optional Post-MVP)
 └── Phase 1 — TBD ○
 M3 — Workflow Visibility Enhancements (Optional Future)
@@ -133,4 +139,6 @@ M3 — Workflow Visibility Enhancements (Optional Future)
 > Track revisions that have been identified but not yet executed.
 > The agent should surface these at session start.
 
-_None._
+| Revision | Name | Status | Notes |
+|----------|------|--------|-------|
+| 8 | Tweak Revamp and Quality of Life Changes | Planned | Phase 1 planned; Phase 2 pending planning. |
