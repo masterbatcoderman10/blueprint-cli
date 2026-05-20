@@ -87,7 +87,7 @@ The system must provide a single-page browser UI for the built-in task tracker, 
 
 #### MAS-206 - Standalone Tweak Workflow
 
-**Superseded by MAS-207.**
+**Superseded by MAS-207 (Change-First Tweak Workflow) in Revision 8 Phase 2.**
 
 The system must provide a standalone top-level tweak workflow for small, contained changes that should move faster than revisions while preserving Blueprint planning, tracker, review, and verification guards.
 
@@ -103,15 +103,15 @@ The system must provide a standalone top-level tweak workflow for small, contain
 
 #### MAS-207 - Change-First Tweak Workflow
 
-The system must provide a change-first tweak workflow for small, contained changes that should move faster than revisions while preserving user confirmation and post-hoc traceability without creating board tasks.
+The system must provide a **change-first tweak workflow** that replaces the tracker-backed MAS-206 workflow. Tweaks move faster and with less ceremony: the agent makes the change first, iterates with the user as the live review loop, and writes a minimal audit-only record after the user approves.
 
-- The agent must understand what the user asked and briefly restate that understanding.
-- The agent must get user confirmation before making the tweak.
-- The agent must make the change first, then cycle with the user while the user reviews the result.
-- Tweak workflow must not create tracker or board tasks.
-- Once the user confirms the completed change, the agent must create a tweak document under `docs/tweaks/` to record what was done.
-- Tweak documents are audit records created after user-confirmed changes, not pre-execution task plans.
-- Work that needs multi-phase planning, cross-cutting requirement changes, formal test planning, or broader coordination must route to revision or milestone planning instead.
+- **Tweak Mode** is the anti-ceremony operating mode the agent enters after classifying a request as a tweak. While Tweak Mode is active, the agent does NOT create tracker/board tasks, does NOT load full planning modules (phase/test/revision/milestone), does NOT subdivide the work into gates or streams, does NOT scaffold a formal test plan, does NOT write a planning artifact in advance of the change, and does NOT re-route through ModuleRouting.
+- **Change-first loop**: the agent follows a seven-step loop — understand → restate → confirm → change → cycle → verify → post-hoc doc. No planning artifact is written before the change step.
+- **Audit-only post-hoc doc shape**: after the user approves the completed change, the agent writes a minimal post-hoc document under `docs/tweaks/tweak-<n>-<slug>.md` containing exactly four sections: Status, Summary of Change, Files Touched, and User Acceptance Note. No Goals, Dependencies, Tasks, Acceptance Criteria, Verification, or Definition of Done sections.
+- **Naming convention** (retained from MAS-206): `tweak-<n>-<slug>.md` with monotonically increasing `<n>`.
+- **Code-change test gate**: when the tweak touches code (any file outside `docs/**`), `npm test` must be green AND the user must explicitly approve before the post-hoc document is created. Docs-only tweaks are exempt from the test gate but still require user approval.
+- **Escalation hard-stop**: if mid-cycle the work grows beyond a contained change (new feature surface, cross-cutting contract change, multi-phase coordination, formal test plan required, regressive behavior change, multiple distinct concerns), the agent performs a hard stop on Tweak Mode, surfaces the escalation to the user, and waits for the user to decide routing. No automatic rerouting. No partial tweak doc.
+- **Anti-patterns** explicitly forbidden in Tweak Mode: creating tracker/board tasks, writing the tweak doc before the change, loading planning modules, carving the tweak into gates/streams/task-tables, drafting a formal test plan, skipping the confirm step, skipping `npm test` for a code-touching tweak, and continuing in Tweak Mode after escalation criteria are met.
 
 ### Should Have
 
@@ -249,21 +249,20 @@ Change log:
 - 2026-05-19 - Created from Revision 7 planning.
 - 2026-05-19 - Deepened by R7 Phase 1 Gate (R7-1.0): locked sub-detail bullets added — naming convention `tweak-<n>-<slug>.md`, tracker milestone value `Tweak <n> — <name>`, lightweight phase-shaped structure, no formal test plan, Doctor scaffold integration for older projects. Status remains `approved-pending-implementation` until phase completion. ID unchanged; meaning unchanged.
 - 2026-05-20 - Transitioned to active. Phase 1 complete: standalone tweak workflow implemented, `docs/tweaks/` scaffolded and repaired by Doctor, `tweak-planning.md` rewritten with intent classification and review gates, all core docs and templates updated, R2 inline tweak contract superseded, full test suite green.
-- 2026-05-20 - Superseded by MAS-207 via Revision 8 planning. The active target tweak workflow now changes from pre-planned tracker-backed tweak tasks to a change-first, no-board-task, post-hoc documentation workflow.
+- 2026-05-20 - Superseded by MAS-207 (Change-First Tweak Workflow) in Revision 8 Phase 2. The tracker-backed ceremony (pre-change plan, tracker tasks, formal review gate) is replaced by the change-first loop with audit-only post-hoc documentation.
 
 ### MAS-207
-
 - Title: Change-First Tweak Workflow
 - Priority: Must
 - Status: approved-pending-implementation
 - Assigned milestone: Revision 8
-- Source: Revision 8 Tweak Revamp and Quality of Life Changes
-- Introduced by: Revision
+- Source: Revision 8 Tweak Revamp and QoL
+- Introduced by: Revision 8 Phase 2
 - Supersedes: MAS-206
 - Superseded by: None
 
 Change log:
-- 2026-05-20 - Created by Revision 8 planning as the approved target state replacing MAS-206.
+- 2026-05-20 - Created from Revision 8 Phase 2 planning. Locked sub-detail bullets added: Tweak Mode anti-ceremony rules, change-first loop (understand → restate → confirm → change → cycle → verify → post-hoc doc), audit-only post-hoc doc shape (Status / Summary of Change / Files Touched / User Acceptance Note), naming convention `tweak-<n>-<slug>.md`, code-change test gate (npm test green AND user approval required; docs-only tweaks exempt), escalation hard-stop (no auto-routing; user decides), anti-patterns list. Status remains `approved-pending-implementation` until Revision 8 Phase 2 completion.
 
 ---
 
