@@ -106,6 +106,11 @@
     qualifies, even when the user did not say "tweak". The agent must
     surface the classification to the user before drafting.
 
+    When tweak intent is confirmed, the agent enters **Tweak Mode** and
+    follows the change-first loop: understand → restate → confirm → change
+    → cycle → verify → post-hoc doc. No tracker tasks, no planning
+    artifacts, no ceremony. The user is the live review loop.
+
   IF the user's request spans multiple intents (e.g., "finish this task and commit"):
     Load each required module before executing its corresponding workflow.
     Execute in logical order. Do not batch.

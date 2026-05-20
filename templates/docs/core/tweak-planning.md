@@ -1,27 +1,16 @@
 # Tweak Planning
 
-This module defines the **standalone tweak workflow** — a top-level
-quick-change contract for small, contained corrections and adjustments
-that should move faster than revisions while preserving every Blueprint
-planning, tracker, review, and verification guard.
-
-Tweaks live at the top of the project tree under `docs/tweaks/`. They
-are **not** sections inside phase documents and they are **not** owned
-by any milestone or phase. They are the smallest formal change contract
-in Blueprint.
-
-A tweak gets its own standalone Markdown document, its own tracker
-milestone, and its own execution → review → address-notes → re-review
-lifecycle. What it does **not** get is a formal Test Plan section —
-needing one is an escalation signal that the work should be routed to
-revision or milestone planning instead.
+This module defines the **change-first tweak workflow** — a lightweight, fast-paced
+contract for small, contained corrections and adjustments. The agent makes the change
+first, iterates with the user as the live review loop, and writes a minimal audit record
+after the user approves. No tracker tasks, no planning artifacts, no ceremony.
 
 ---
 
 <TweakDefinition>
   PURPOSE: Define exactly what a tweak is, what it is not, and how to
   recognize one. This is the contract every agent and reviewer reads
-  before classifying or drafting a tweak.
+  before classifying or entering Tweak Mode.
 
   A tweak IS:
     - **Small.** A handful of file edits or a single targeted change.
@@ -35,12 +24,10 @@ revision or milestone planning instead.
     - **No formal Test Plan.** A tweak relies on the existing project
       test suite plus any targeted assertions the author chooses to add
       inline. If the work needs its own formal Test Plan section, it is
-      not a tweak.
-    - **Standalone-documented.** Lives at `docs/tweaks/tweak-<n>-<slug>.md`,
-      not inside a phase or revision document.
-    - **Tracker-backed.** Every task lives on the built-in tracker under
-      the milestone value `Tweak <n> — <name>` and moves through the
-      normal five-state machine.
+      not a tweak — escalate.
+    - **Standalone-documented (post-hoc).** After the change is accepted,
+      a minimal audit record is written under `docs/tweaks/tweak-<n>-<slug>.md`.
+      The document is written after the change, not before.
 
   A tweak is NOT:
     - **A new feature.** New capabilities, new commands, new endpoints,
@@ -51,9 +38,9 @@ revision or milestone planning instead.
       path → bug-resolution.
     - **A scope addition.** An additive new ask the user has just raised
       that did not exist in the plan → scope-change.
-    - **A way to skip planning rigor.** Tweaks still get a written
-      document, user review, tracker tasks, and a green full test suite
-      before they are marked DONE.
+    - **A way to skip planning rigor.** Tweaks are fast-paced but still
+      require user review, code-change test validation, and a post-hoc
+      audit record.
 
   ### Positive examples
 
@@ -63,8 +50,7 @@ revision or milestone planning instead.
     it to "Submit", updates one screen test snapshot, and ships.
   - **Add a single anti-pattern to a core module.** A reviewer notices a
     recurring foot-gun missing from `docs/core/execution.md`'s
-    `<AntiPatterns>` section; the tweak appends one new entry with name,
-    bad example, and explanation.
+    anti-patterns block; the tweak appends one new entry.
   - **Lock a previously vague convention.** `docs/conventions.md` says
     "use kebab-case file names" but does not specify how to handle
     acronyms; the tweak adds one clarifying bullet plus an example.
@@ -109,11 +95,11 @@ revision or milestone planning instead.
 
   CLASSIFICATION RULE — applies to every change request:
 
-  1. The agent must classify the request proactively before drafting
-     any plan. The user is NOT required to say the word "tweak". Even
-     when the user says "just change X", "quickly fix Y", "tweak the
-     wording", "add this small thing", "redo this", or simply describes
-     a small change, the agent runs the classification.
+  1. The agent must classify the request proactively before acting.
+     The user is NOT required to say the word "tweak". Even when the
+     user says "just change X", "quickly fix Y", "tweak the wording",
+     "add this small thing", "redo this", or simply describes a small
+     change, the agent runs the classification.
 
   2. The agent applies general intelligence to four dimensions:
 
@@ -135,11 +121,11 @@ revision or milestone planning instead.
         If no → tweak-candidate.
 
   3. The agent surfaces the classification to the user **before**
-     drafting the tweak document, in one of these forms:
+     drafting or acting, in one of these forms:
 
      - "I'm classifying this as a tweak — small, contained, non-feature,
-       no new test plan needed. I'll draft it under
-       `docs/tweaks/tweak-<n>-<slug>.md`. OK to proceed?"
+       no new test plan needed. I'll enter Tweak Mode and make the
+       change. OK to proceed?"
      - "This looks like a revision, not a tweak — it touches multiple
        phases / adds a new feature / would need its own test plan.
        I'd route this to `docs/core/revision-planning.md`. Confirm?"
@@ -148,8 +134,8 @@ revision or milestone planning instead.
        `docs/core/bug-resolution.md`. Confirm?"
 
   4. The user may overrule the classification, but the agent must record
-     the override in the tweak document's Status section, naming what
-     was overridden and why.
+     the override in the post-hoc tweak document's Status section,
+     naming what was overridden and why.
 
   HARD RULES:
     - The agent NEVER skips classification because the user used or
@@ -163,221 +149,234 @@ revision or milestone planning instead.
 
 ---
 
-<TweakReviewGate>
-  PURPOSE: Make user review of the drafted tweak plan **mandatory**
-  before any task leaves TO-DO on the tracker. Mirrors the planning →
-  review → commit discipline used by `planning.md` STEP 4–5.
+<TweakMode>
+  PURPOSE: Define the anti-ceremony operating mode the agent enters
+  after classifying a request as a tweak. Tweak Mode is fast-paced
+  and direct. The user is the live review loop.
 
-  GATE — every tweak must satisfy this before execution begins:
+  WHILE TWEAK MODE IS ACTIVE, THE AGENT:
 
-  1. The agent drafts the tweak document at
-     `docs/tweaks/tweak-<n>-<slug>.md` and creates the tracker tasks
-     under milestone `Tweak <n> — <name>` in the **TO-DO** state.
+  - Does NOT create tracker/board tasks.
+  - Does NOT load full planning modules (phase-planning, test-planning,
+    revision-planning, milestone-planning).
+  - Does NOT subdivide the work into gates, streams, or task tables.
+  - Does NOT scaffold a formal test plan section.
+  - Does NOT write a planning artifact in advance of the change.
+  - Does NOT detour through ModuleRouting again to reroute the tweak
+    through another flow.
 
-  2. The agent presents the drafted tweak document to the user — full
-     content, not a summary — and explicitly requests user confirmation
-     of:
+  Edits are fast-paced and direct: read → restate → confirm → change →
+  cycle. The agent treats the user as the live review loop.
 
-     - The tweak scope (Goals, Dependencies)
-     - The task table
-     - The Acceptance Criteria
-     - The Verification approach
-     - The Definition of Done
-
-  3. No tracker task may transition from **TO-DO** to **IN-PROGRESS**
-     until the user has explicitly confirmed the drafted tweak document.
-     "Looks fine, continue" or "yes, proceed" both count. Silence or
-     ambiguous responses do not.
-
-  4. If the user requests changes, the agent **re-loops the draft**:
-     - Updates the document.
-     - Adjusts the tracker tasks if scope changed.
-     - Re-presents the updated document.
-     - Waits again for explicit confirmation.
-
-     There is no upper limit on re-loops. The gate holds until the user
-     explicitly confirms.
-
-  5. Only after explicit confirmation may the agent move the first
-     tracker task to **IN-PROGRESS** and begin execution per
-     `<TweakExecutionLifecycle>`.
+  Tweak Mode ends when:
+    (a) the user approves the completed change and the post-hoc tweak
+        document is written, OR
+    (b) the escalation rule triggers a hard stop.
 
   HARD RULES:
-    - Confirmation is **mandatory**, not optional. No work begins
-      without it.
-    - The gate phrasing on the tracker is the literal state machine:
-      tasks stay in **TO-DO** until confirmed.
-    - The agent never assumes confirmation from context. The agent asks
-      directly and waits for an explicit yes.
-    - Re-loops preserve the tracker tasks where possible — do not
-      destroy and re-create unless the task list itself changed.
-</TweakReviewGate>
+    - No tracker/board task creation during Tweak Mode — ever.
+    - No planning-module loads (phase/test/revision/milestone) during
+      Tweak Mode.
+    - No gate or stream subdivision during Tweak Mode.
+    - No formal test plan section drafted during Tweak Mode.
+    - No pre-execution planning artifact written during Tweak Mode.
+    - No re-routing through ModuleRouting while in Tweak Mode.
+</TweakMode>
 
 ---
 
-<TweakProcess>
-  PURPOSE: Walk through scoping, drafting, gating, executing, and
-  completing a tweak end-to-end.
+<TweakChangeFirstLoop>
+  PURPOSE: Walk through the change-first loop end-to-end. This is the
+  execution flow for every tweak once Tweak Mode is active.
 
-  PRECONDITIONS:
-  - `docs/project-progress.md` is loaded.
-  - `docs/conventions.md` is loaded.
-  - The local tracker server is reachable.
-  - The agent has classified the request per `<TweakIntentClassification>`
-    and the user has confirmed the tweak route.
+  STEP 1 — UNDERSTAND
+    Read the user request. Read only the files needed to act. Do not
+    load unrelated modules. If the request is ambiguous, ask one focused
+    clarifying question before proceeding.
 
-  STEP 1 — UNDERSTAND THE CHANGE
-    Clarify with the user:
-    - What needs to change?
-    - Why (source of truth: convention, bug report, copy edit, etc.)?
-    - What is the smallest possible scope that addresses the intent?
+  STEP 2 — RESTATE
+    Briefly state the agent's understanding back to the user in one or
+    two sentences. Name what will change and what will stay the same.
+    Do not produce a long document.
 
-    If the answer to "what is the smallest possible scope" exceeds one
-    coherent concern or escapes localized surface area, re-classify per
-    `<TweakIntentClassification>`.
+  STEP 3 — CONFIRM
+    Get explicit confirmation before changing behavior or files.
+    Wait for a clear yes: "yes", "proceed", "looks fine", "go ahead".
+    Silence or ambiguous responses do not count. Re-present the restate
+    and wait again.
 
-  STEP 2 — RESERVE THE TWEAK NUMBER AND SLUG
-    Assign the next available `<n>` by scanning `docs/tweaks/` for the
-    highest existing `tweak-<n>-*.md` and incrementing by one. Choose a
-    short kebab-case `<slug>` describing the change.
+  STEP 4 — CHANGE
+    Make the requested change. Touch only the files needed.
+    Do not refactor unrelated code. Do not add new features.
 
-    File path: `docs/tweaks/tweak-<n>-<slug>.md`
-    Tracker milestone: `Tweak <n> — <name>` (em-dash, human-readable name)
+  STEP 5 — CYCLE
+    Present the result to the user. Show what changed (a diff summary
+    or the updated content is sufficient). Iterate — the user may
+    request adjustments. Return to STEP 4 for each adjustment.
+    Repeat until the user signals the change is complete.
 
-  STEP 3 — DRAFT THE TWEAK DOCUMENT
-    Create the tweak document using the structure defined in
-    `<TweakDocumentStructure>`. The document is lightweight: Goals,
-    Dependencies, one or more small Task tables, Acceptance Criteria,
-    Verification, Definition of Done, Status.
+  STEP 6 — VERIFY (code changes only)
+    When the change touches code (any file outside `docs/**`):
+    - Run `npm test`. A green result is required before creating the
+      tweak document.
+    - Both `npm test` green AND explicit user approval are required
+      before proceeding to STEP 7.
+    - If `npm test` fails, loop with the user to fix the failures before
+      proceeding. Do not create the tweak document while tests are red.
 
-    Do NOT include a formal Test Plan section. Add inline test notes in
-    Verification if a targeted assertion is needed.
+    Docs-only tweaks (changes limited to `docs/**` only) skip the test
+    gate. The agent proceeds directly to user approval and STEP 7.
 
-  STEP 4 — CREATE TRACKER TASKS
-    For every task in the document's task table, create a tracker task
-    via `POST /tasks` with:
-    - `id`: tweak-scoped ID (e.g. `TW<n>.1`, `TW<n>.2`)
-    - `milestone`: `Tweak <n> — <name>`
-    - `phase`: same as milestone (or `TW<n>` if a short form is
-      preferred), `stream`: `0`
-    - `state`: `TO-DO`
-
-    Tasks stay in TO-DO until `<TweakReviewGate>` is satisfied.
-
-  STEP 5 — RUN THE REVIEW GATE
-    Execute `<TweakReviewGate>` end-to-end. Do not proceed past this
-    step without explicit user confirmation.
-
-  STEP 6 — EXECUTE
-    Execute the tweak per `<TweakExecutionLifecycle>`. All tasks move
-    TO-DO → IN-PROGRESS → IN-REVIEW.
-
-  STEP 7 — REVIEW AND ADDRESS NOTES
-    Reviewer reviews each task, adds notes if needed. Tasks needing
-    rework move IN-REVIEW → REWORK. Author addresses notes, returns
-    REWORK → IN-PROGRESS → IN-REVIEW.
-
-  STEP 8 — COMPLETE
-    When all review notes are addressed and `npm test` is green for the
-    project, the reviewer moves the terminal task to DONE. The tweak's
-    Status section is updated to **Complete**. The tweak document is
-    archived in place under `docs/tweaks/` and is never deleted.
-</TweakProcess>
-
----
-
-<TweakExecutionLifecycle>
-  PURPOSE: Define the tracker-backed lifecycle for a tweak's tasks.
-  This mirrors the standard execute → review → address → re-review
-  loop used elsewhere in Blueprint.
-
-  STATES:
-    TO-DO → IN-PROGRESS → IN-REVIEW → (REWORK → IN-PROGRESS → IN-REVIEW)* → DONE
-
-  TRANSITIONS (curl recipes per `docs/core/tracker.md`):
-
-  - **TO-DO → IN-PROGRESS**: gated by `<TweakReviewGate>`. Only after
-    explicit user confirmation of the drafted tweak document.
-
-  - **IN-PROGRESS → IN-REVIEW**: when the author has implemented the
-    task and the project test suite is green for the touched surface
-    area.
-
-  - **IN-REVIEW → REWORK**: reviewer rejects with notes.
-
-  - **REWORK → IN-PROGRESS**: author addresses notes; canonical forward
-    transition out of REWORK.
-
-  - **IN-REVIEW → DONE**: reviewer accepts. The terminal task may only
-    move to DONE when the full project test suite (`npm test`) is green.
-    This is the **tweak-completion gate**.
+  STEP 7 — DOCUMENT (post-hoc)
+    After the user confirms the completed change is accepted:
+    - Create the post-hoc tweak document under `docs/tweaks/` using the
+      audit-only shape defined in `<TweakPostHocDocShape>`.
+    - Do not create the document before this step.
+    - Do not create the document before tests are green (for code changes).
+    - Do not create the document before explicit user approval.
 
   HARD RULES:
-    - The executing agent NEVER moves a task to DONE. Only the reviewer
-      does.
-    - The terminal task cannot transition to DONE while `npm test` is
-      failing.
-    - Every task transition is recorded by the tracker; no informal
-      side-channel state.
-    - When a tweak touches work originally produced by a phase task,
-      add a tracker note to the relevant phase task on the tracker
-      referencing the tweak ID and naming what changed. This preserves
-      traceability between the original task and the tweak that
-      adjusted it.
-</TweakExecutionLifecycle>
+    - CONFIRM (STEP 3) is mandatory before CHANGE (STEP 4).
+    - The post-hoc document is created AFTER the change, never before.
+    - For code changes: `npm test` green AND user approval are both
+      required before STEP 7. Neither alone is sufficient.
+    - For docs-only changes: user approval alone gates STEP 7.
+</TweakChangeFirstLoop>
 
 ---
 
-<TweakDocumentStructure>
-  PURPOSE: Define the lightweight structure every tweak document uses.
-  Mirrors the phase-plan shape but stripped to the minimum and **with no
-  formal Test Plan section**.
+<TweakPostHocDocShape>
+  PURPOSE: Define the minimal audit-only shape of the post-hoc tweak
+  document. This document is an audit record, not a plan.
 
   FILE NAMING (locked):
     `docs/tweaks/tweak-<n>-<slug>.md`
 
-  TRACKER MILESTONE (locked):
-    `Tweak <n> — <name>`
+  NUMBERING:
+    Monotonically increasing across the project. Assign the next free
+    integer by scanning `docs/tweaks/` for the highest existing
+    `tweak-<n>-*.md` and incrementing by one. Superseded tweaks retain
+    their original number.
 
-  REQUIRED SECTIONS (in order):
+  REQUIRED SECTIONS (exactly these, in order, no more):
 
-  1. **Title + header line.**
-     `# Tweak <n> — <Name>`
-     One line summarizing intent.
+  1. **Status**
+     Current state of the tweak: Complete | Superseded.
+     Post-hoc tweak documents are written after the change; the default
+     state is Complete. Include any classification-override notes here.
 
-  2. **Goals.**
-     `## Goals` — bulleted list of what the tweak achieves.
+  2. **Summary of Change**
+     1–3 sentences describing what changed and why.
 
-  3. **Dependencies.**
-     `## Dependencies` — what must be true before the tweak can run
-     (other tweaks complete, an external decision made, etc.). Use a
-     small table with Dependency / Status columns.
+  3. **Files Touched**
+     Bullet list of file paths modified by this tweak.
 
-  4. **Task table.**
-     A small task table (one or two rows is typical). Columns:
-     Task ID / Task / Dependencies. The ID format is `TW<n>.<seq>`.
+  4. **User Acceptance Note**
+     One line confirming the user approved the change. Reference the date.
+     Example: "User approved on 2026-05-20."
 
-  5. **Acceptance Criteria.**
-     `## Acceptance Criteria` — observable, verifiable conditions.
+  FORBIDDEN SECTIONS:
+    - No Goals section.
+    - No Dependencies section.
+    - No Task tables.
+    - No Acceptance Criteria section.
+    - No Verification section.
+    - No Definition of Done section.
+    - No Test Plan section.
 
-  6. **Verification.**
-     `## Verification` — how the change will be verified. Inline
-     references to existing tests, ad-hoc commands to run, or targeted
-     assertions to add. Not a formal Test Plan.
+  The document is an audit record. It does not plan; it records.
+</TweakPostHocDocShape>
 
-  7. **Definition of Done.**
-     `## Definition of Done` — checklist gating completion. Must include
-     "`npm test` is green for the project" as one of the items.
+---
 
-  8. **Status.**
-     `## Status` — current state of the tweak: Draft / In Progress /
-     Complete, plus any classification overrides or re-loop notes from
-     `<TweakReviewGate>`.
+<TweakEscalationRule>
+  PURPOSE: Define the hard-stop condition that ends Tweak Mode when
+  the scope has grown beyond a contained change.
 
-  FORBIDDEN:
-    - **No formal Test Plan section.** Needing one is an escalation
-      signal — route to revision/milestone planning instead.
-</TweakDocumentStructure>
+  ESCALATION TRIGGERS — any one of these conditions ends Tweak Mode:
+
+  - The work surfaces a new feature that the system did not previously offer.
+  - The change becomes cross-cutting: it touches contracts, APIs, or
+    behavior across multiple phases or modules.
+  - The change requires multi-phase coordination to implement safely.
+  - A formal Test Plan section is required to verify the work.
+  - A regressive behavior change emerges that was not in the original request.
+  - Multiple distinct concerns are found bundled in what appeared to be
+    a single tweak.
+
+  ESCALATION PROTOCOL:
+
+  1. The agent performs a **hard stop** on Tweak Mode immediately.
+     No further implementation steps. No partial tweak doc created.
+     No tracker/board tasks created.
+
+  2. The agent surfaces the escalation to the user with a one-line
+     explanation of why the work no longer fits the tweak shape.
+     Example: "This change now requires a new feature surface — I need
+     to hard-stop Tweak Mode. It no longer fits a tweak."
+
+  3. The user decides how to proceed:
+     - Shrink the scope back into a contained tweak (return to STEP 1).
+     - Route through `docs/core/revision-planning.md`.
+     - Route through `docs/core/milestone-planning.md`.
+
+  HARD RULES:
+    - No automatic rerouting. The agent presents the situation and waits
+      for the user to decide.
+    - No partial tweak document is written when escalation triggers.
+    - No board or tracker task is created during or after escalation.
+    - The agent does NOT decide unilaterally which route to take.
+    - User decides means the user decides.
+</TweakEscalationRule>
+
+---
+
+<TweakAntiPatterns>
+  PURPOSE: Enumerate the forbidden ceremony behaviors that Tweak Mode
+  prohibits. These are the patterns most likely to corrupt a tweak into
+  unnecessary overhead.
+
+  ANTI-PATTERNS — each of the following is forbidden in Tweak Mode:
+
+  1. **Creating tracker/board tasks for a tweak.**
+     Tweaks do not generate board tasks. The user is the live review
+     loop; the tracker is for gates and streams in planned phases.
+
+  2. **Writing a tweak document before the change is made.**
+     The post-hoc document is an audit record, not a plan. Writing it
+     before the change inverts the workflow and adds ceremony with no
+     value.
+
+  3. **Loading phase/test/revision/milestone planning modules during
+     Tweak Mode.**
+     Loading planning modules triggers full-scale planning rigor that
+     is incompatible with the fast-paced tweak contract. Do not load
+     them.
+
+  4. **Carving the tweak into gates, streams, or task tables.**
+     Tweaks are a single unit of work. Subdividing them into gates and
+     streams is overhead that belongs to revision planning, not tweaks.
+
+  5. **Drafting a formal test plan for a tweak.**
+     The absence of a formal test plan is a defining property of a
+     tweak. Needing one is an escalation signal.
+
+  6. **Skipping the change-first confirm step and editing immediately.**
+     CONFIRM before CHANGE is mandatory. Making a change without
+     explicit user confirmation skips the core safety check of the
+     tweak flow.
+
+  7. **Skipping `npm test` for a code-touching tweak before doc
+     creation.**
+     The code-change test gate is mandatory for any tweak that touches
+     files outside `docs/**`. Creating the post-hoc document before
+     `npm test` is green is forbidden.
+
+  8. **Continuing in Tweak Mode after escalation criteria are met.**
+     When any escalation trigger is detected, the agent must hard-stop
+     immediately. Continuing to implement after escalation criteria are
+     met corrupts scope and bypasses the revision planning guard.
+</TweakAntiPatterns>
 
 ---
 
@@ -423,28 +422,31 @@ revision or milestone planning instead.
 <TweakRules>
   RULES:
 
-  RULE 1 — STANDALONE-DOCUMENTED
-    Every tweak lives at `docs/tweaks/tweak-<n>-<slug>.md`. Tweaks are
-    never recorded inside a phase or revision document.
+  RULE 1 — STANDALONE-DOCUMENTED (POST-HOC)
+    Every tweak produces a post-hoc audit record at
+    `docs/tweaks/tweak-<n>-<slug>.md`. Tweaks are never documented
+    inside a phase or revision document. The audit record is written
+    after the change is accepted, not before.
 
-  RULE 2 — TRACKER-BACKED
-    Every tweak has tracker tasks under the milestone value
-    `Tweak <n> — <name>`. All state changes go through the tracker. No
-    informal side-channel state.
+  RULE 2 — CHANGE-FIRST LOOP
+    The agent follows the change-first loop: understand → restate →
+    confirm → change → cycle → verify → post-hoc doc. No planning
+    artifact is written before STEP 4 (change).
 
-  RULE 3 — REVIEW GATE BEFORE EXECUTION
-    No task leaves TO-DO until `<TweakReviewGate>` is satisfied with
-    explicit user confirmation. The agent re-loops on requested
-    changes.
+  RULE 3 — NO PRE-CHANGE DOCUMENT
+    No tracker tasks, no tweak doc, no planning artifact is created
+    before the change is confirmed as accepted by the user.
 
   RULE 4 — NO FORMAL TEST PLAN
     Tweak documents must not include a `## Test Plan` section. Needing
     one is an escalation signal: route the work to revision/milestone
     planning.
 
-  RULE 5 — PROJECT SUITE GREEN BEFORE DONE
-    The terminal tweak task cannot transition to DONE while `npm test`
-    is failing for the project.
+  RULE 5 — CODE-CHANGE TEST GATE
+    For any tweak that touches code (files outside `docs/**`): both
+    `npm test` green AND explicit user approval are required before
+    the post-hoc document is written. Docs-only tweaks are exempt
+    from `npm test` but still require user approval.
 
   RULE 6 — PROACTIVE CLASSIFICATION
     The agent classifies every change request per
@@ -459,188 +461,101 @@ revision or milestone planning instead.
   RULE 8 — SINGLE CONCERN
     One tweak = one coherent concern. Bundles of unrelated fixes split
     into multiple tweaks or escalate to a revision.
+
+  RULE 9 — ESCALATION HARD STOP
+    When any escalation trigger fires mid-cycle, the agent hard-stops
+    Tweak Mode immediately, surfaces the reason to the user, and waits
+    for the user to decide on routing. No automatic rerouting.
 </TweakRules>
 
 ---
 
-<TweakTemplate>
-  PURPOSE: The literal template a tweak document uses. Copy this when
-  drafting a new tweak; replace placeholders.
-
-  Note: this template intentionally has **no `## Test Plan` section**.
-  Needing one is an escalation signal to revision/milestone planning.
-
-  ```markdown
-  # Tweak <n> — <Name>
-
-  One-line summary of intent.
-
-  ---
-
-  ## Goals
-
-  - {{Goal 1 — what the tweak achieves}}
-  - {{Goal 2 (optional)}}
-
-  ---
-
-  ## Dependencies
-
-  | Dependency | Status |
-  |------------|--------|
-  | {{Other tweak or decision required}} | {{Complete | Pending}} |
-
-  ---
-
-  ## Tasks
-
-  | Task ID | Task | Dependencies |
-  |---------|------|--------------|
-  | TW<n>.1 | {{Concrete task}} | None |
-  | TW<n>.2 | {{Concrete task}} | TW<n>.1 |
-
-  ---
-
-  ## Acceptance Criteria
-
-  - [ ] {{Observable, verifiable condition}}
-  - [ ] {{Observable, verifiable condition}}
-
-  ---
-
-  ## Verification
-
-  - {{How the change is verified — touched test, ad-hoc command, or
-    targeted inline assertion. Not a formal Test Plan.}}
-
-  ---
-
-  ## Definition of Done
-
-  - [ ] All acceptance criteria met.
-  - [ ] All tracker tasks for `Tweak <n> — <name>` are DONE.
-  - [ ] `npm test` is green for the project.
-  - [ ] No lint errors in files touched by this tweak.
-
-  ---
-
-  ## Status
-
-  Draft | In Progress | Complete
-
-  - {{Any classification overrides recorded here.}}
-  - {{Re-loop notes from <TweakReviewGate>, if any.}}
-  ```
-</TweakTemplate>
-
----
-
 <TweakWorkedExample>
-  PURPOSE: A complete worked example tweak document, end-to-end. Use it
-  to see the lightweight structure applied to a real, small change.
+  PURPOSE: A complete worked example showing the change-first flow
+  end-to-end, including the post-hoc audit record in audit-only shape.
 
   ### Scenario
 
-  A reviewer notices that `docs/core/execution.md` does not warn agents
-  against running commands outside their worktree directory mid-session
-  (a recurring foot-gun across recent reviews). The fix is to append one
-  new entry to the existing `<AntiPatterns>` block.
+  A developer notices that `docs/conventions.md` says "use kebab-case
+  file names" but does not specify how to handle acronyms (e.g., should
+  `APIClient` become `api-client.ts` or `apiclient.ts`?). The fix is
+  to add one clarifying bullet with an example.
 
   This is a positive-example tweak: small, contained, single concern,
-  no new feature, no formal test plan needed.
+  docs-only, no formal test plan needed.
 
-  ### Reserved identifiers
+  ### Step-by-step trace
 
-  - File: `docs/tweaks/tweak-1-execution-anti-pattern.md`
-  - Tracker milestone: `Tweak 1 — Execution Anti-Pattern Addition`
+  **STEP 1 — UNDERSTAND**
+  Agent reads `docs/conventions.md`. The kebab-case rule is in the File
+  Naming section. No example for acronyms. Single file, single section.
 
-  ### The worked example document
+  **STEP 2 — RESTATE**
+  > "I'll add one clarifying bullet to the File Naming section of
+  > `docs/conventions.md` specifying that acronyms are lowercased in
+  > kebab-case names (e.g., `api-client.ts`, not `APIClient.ts`). No
+  > other changes."
 
-  Below is the complete worked example tweak document end-to-end,
-  rendered exactly as the file at
-  `docs/tweaks/tweak-1-execution-anti-pattern.md` would appear:
+  **STEP 3 — CONFIRM**
+  User: "Yes, go ahead."
+
+  **STEP 4 — CHANGE**
+  Agent appends the clarifying bullet to `docs/conventions.md`.
+
+  **STEP 5 — CYCLE**
+  Agent shows the diff. User: "Looks good — accepted."
+
+  **STEP 6 — VERIFY**
+  This is a docs-only tweak (only `docs/**` touched). The test gate is
+  skipped. User approval already given in STEP 5.
+
+  **STEP 7 — DOCUMENT (post-hoc)**
+  Agent creates `docs/tweaks/tweak-6-conventions-acronym-casing.md`:
+
+  ---
+
+  ### Sample post-hoc tweak document
+
+  Below is the complete post-hoc audit record for this worked example,
+  in the audit-only shape:
 
   ```markdown
-  # Tweak 1 — Execution Anti-Pattern Addition
-
-  Append a single new entry to the `<AntiPatterns>` block in
-  `docs/core/execution.md` warning against running commands outside the
-  active worktree.
-
-  ---
-
-  ## Goals
-
-  - Make the worktree-isolation foot-gun explicit in `execution.md`'s
-    `<AntiPatterns>` block.
-  - Preserve existing anti-pattern entries byte-for-byte.
-
-  ---
-
-  ## Dependencies
-
-  | Dependency | Status |
-  |------------|--------|
-  | `docs/core/execution.md` exists with current `<AntiPatterns>` block | Complete |
-
-  ---
-
-  ## Tasks
-
-  | Task ID | Task | Dependencies |
-  |---------|------|--------------|
-  | TW1.1 | Add `<AntiPattern name="Editing Outside a Worktree">` entry to `<AntiPatterns>` in `docs/core/execution.md` with bad-example and why fields. | None |
-
-  ---
-
-  ## Acceptance Criteria
-
-  - [ ] `<AntiPatterns>` in `docs/core/execution.md` contains a new
-    `<AntiPattern>` named "Editing Outside a Worktree".
-  - [ ] Existing anti-pattern entries are unchanged.
-  - [ ] The bad-example and why fields name the worktree directory
-    explicitly.
-
-  ---
-
-  ## Verification
-
-  - Open `docs/core/execution.md`, scroll to `<AntiPatterns>`, confirm
-    the new entry is present and existing entries are unchanged.
-  - Run `npm test` — the project suite remains green; no test is
-    expected to change.
-
-  ---
-
-  ## Definition of Done
-
-  - [ ] Acceptance criteria met.
-  - [ ] Tracker task `TW1.1` under milestone `Tweak 1 — Execution
-    Anti-Pattern Addition` is DONE.
-  - [ ] `npm test` is green for the project.
-  - [ ] No lint errors in files touched by this tweak.
-
-  ---
-
   ## Status
 
   Complete
 
-  - Classified as tweak: small, contained, single concern, doc-only,
-    no formal test plan needed. User confirmed before any task left
-    TO-DO.
-  - No re-loops; draft accepted on first review.
+  ---
+
+  ## Summary of Change
+
+  Added a clarifying bullet to the File Naming section of
+  `docs/conventions.md` specifying that acronyms are lowercased in
+  kebab-case names (e.g., `api-client.ts`, not `APIClient.ts`).
+  Change requested after the existing rule was found ambiguous in code review.
+
+  ---
+
+  ## Files Touched
+
+  - `docs/conventions.md`
+
+  ---
+
+  ## User Acceptance Note
+
+  User approved on 2026-05-20.
   ```
 
   ### Why this example qualifies
 
-  - **Small.** One file, one block, one new sub-entry.
-  - **Contained.** Localized to `docs/core/execution.md`'s anti-patterns
+  - **Small.** One file, one section, one new bullet.
+  - **Contained.** Localized to `docs/conventions.md`'s File Naming
     section.
-  - **Single concern.** One foot-gun documented.
+  - **Single concern.** One ambiguity resolved.
   - **Non-feature.** Documentation clarification only.
-  - **No formal Test Plan.** The project suite covers it; no targeted
-    test required.
+  - **Docs-only.** No code touched; test gate skipped per the exemption.
+  - **Post-hoc doc.** The audit record is written after the user
+    accepts the change, not before.
 </TweakWorkedExample>
 
 ---
@@ -653,4 +568,5 @@ revision or milestone planning instead.
   raised.
 - `docs/core/bug-resolution.md` — for reproducible defects in
   implemented behavior.
-- `docs/core/tracker.md` — for tracker API recipes used by tweak tasks.
+- `docs/core/tracker.md` — for tracker API recipes used by phase
+  execution tasks (not tweaks).
