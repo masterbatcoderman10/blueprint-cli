@@ -64,6 +64,7 @@ describe('R6-3.C: Project + Templates Mirror', () => {
       { source: 'docs/core/execution.md', template: 'templates/docs/core/execution.md' },
       { source: 'docs/core/review.md', template: 'templates/docs/core/review.md' },
       { source: 'docs/core/git-execution-workflow.md', template: 'templates/docs/core/git-execution-workflow.md' },
+      { source: 'docs/core/git-review-workflow.md', template: 'templates/docs/core/git-review-workflow.md' },
       { source: 'docs/core/phase-completion.md', template: 'templates/docs/core/phase-completion.md' },
       { source: 'docs/core/bug-resolution.md', template: 'templates/docs/core/bug-resolution.md' },
       { source: 'docs/core/orchestrate.md', template: 'templates/docs/core/orchestrate.md' },

@@ -144,5 +144,9 @@ Loaded by review.md at the start of ReviewProcess.
     <BadExample>Completing a review, moving all tasks to DONE, and merging the branch to main — but leaving the worktree directory and branch in place indefinitely.</BadExample>
     <Why>Worktrees and branches left after a completed review accumulate over time, cluttering git worktree list with stale entries and making it impossible to tell what is actively in-flight versus already merged. The cleanup step in WorktreeCleanup is automatic and non-optional — it runs immediately after a successful merge, not as a separate follow-up. Skipping it is not a time-saving shortcut; it creates confusion for every agent that checks worktree state afterward.</Why>
   </AntiPattern>
+  <AntiPattern name="Direct Tracker Database Mutation">
+    <BadExample>Opening docs/.blueprint/tasks.db with SQLite directly, running raw SQL queries to read or modify task state, or editing the database file with any tool other than the tracker HTTP API.</BadExample>
+    <Why>The tracker HTTP API is the sole interface for reading and writing tracker state. Direct database access bypasses validation, triggers, and the snapshot engine, producing inconsistent state that the board UI and other agents cannot reconcile. Always use the HTTP recipes in docs/core/tracker.md (e.g., PATCH /tasks/:id for state changes, GET /tasks for lookups).</Why>
+  </AntiPattern>
 </AntiPatterns>
 ```

@@ -29,10 +29,12 @@ and applying review notes after a review cycle.
     Detail:
     {{Any additional context from the phase doc or implementation notes}}
 
-    Review Notes:
-    (empty -- populated during review)
-
   RULES:
+  - Do not duplicate the stream title in the description body; the
+    Gate/Stream field already identifies the stream.
+  - Do not scaffold a Review Notes section in the description.
+    Review feedback is left as tracker comments via
+    `POST /tasks/:id/comments`, not as task-description prose.
   - Create ALL tasks for the gate or stream at once before
     beginning execution.
   - Do not create tasks for other gates or streams -- only the
@@ -82,6 +84,17 @@ and applying review notes after a review cycle.
     Look up the tasks for the specified gate or stream on the tracker.
     Use `GET /tasks?phase=<phase>&stream=<stream>` as documented
     in `docs/core/tracker.md`.
+
+    FILTERED LOOKUP GUIDANCE:
+    When milestone, phase, and stream context are all available
+    (as they typically are during execution), use the query
+    parameters to narrow results:
+      GET /tasks?phase=R8-1&stream=A
+    This returns only the tasks for the target gate or stream,
+    avoiding the need to filter client-side from a larger set.
+    The phase value is the phase ID prefix (e.g., "R8-1"),
+    and the stream value is the stream letter (e.g., "A")
+    or "0" for the gate.
 
     IF tasks do not exist:
       Create them per <TaskCreation>.
@@ -261,6 +274,11 @@ and applying review notes after a review cycle.
     Retrieve all tasks for the specified gate or stream that are
     in the IN-REVIEW or REWORK state.
 
+    Use filtered lookup when milestone, phase, and stream context
+    are available:
+      GET /tasks?phase=<phase>&stream=<stream>
+    Then filter the results for IN-REVIEW or REWORK state.
+
     IF no tasks are in IN-REVIEW or REWORK:
       Inform user: "No tasks found in review or rework for this gate/stream."
       STOP.
@@ -269,35 +287,45 @@ and applying review notes after a review cycle.
     must already exist from the execution phase.
     IF it does not exist, STOP and flag to the user.
 
-  STEP 2 -- READ REVIEW NOTES
+  STEP 2 -- READ REVIEW COMMENTS
     For each task in the specified gate or stream that is in IN-REVIEW
-    or REWORK, read the review notes from the task description.
+    or REWORK, retrieve the review comments from the tracker.
+    Use `GET /tasks/:id/comments` as documented in
+    `docs/core/tracker.md`.
     Only inspect tasks belonging to the gate or stream the user
     specified -- do not read or act on tasks from other streams.
 
-    IF a task in IN-REVIEW has no review notes:
-      Flag to user: "Task [ID] is in review but has no review notes.
+    IF a task in IN-REVIEW has no review comments:
+      Flag to user: "Task [ID] is in review but has no review comments.
       Should this be moved to done or does it need review?"
       Wait for user direction before proceeding with that task.
 
-  STEP 3 -- ADDRESS NOTES (sequentially, one task at a time)
-    For each task in the specified gate or stream that has review notes:
+  STEP 3 -- ADDRESS COMMENTS (sequentially, one task at a time)
+    For each task in the specified gate or stream that has review
+    comments:
 
     a. If the task is in REWORK, move it to IN-PROGRESS.
        If the task is in IN-REVIEW, move it to IN-PROGRESS.
        Use `PATCH /tasks/:id` as documented in `docs/core/tracker.md`.
-    b. Read each review note.
-    c. Address the note -- make the required changes.
+    b. Retrieve the review comments using `GET /tasks/:id/comments`.
+       Identify reviewer comments that require a response.
+    c. Address each comment -- make the required code changes.
     d. Run linting on files modified. Fix any lint errors in those
        files only.
     e. Run the tests for the current gate or stream. All tests must
        pass. Fix any failures caused by the changes.
-    f. Respond to each note on the task description, directly below
-       the reviewer's comment, explaining what was done.
+    f. Reply to each reviewer comment using
+       `POST /tasks/:id/comments` with `parent_id` set to the
+       original comment's ID, explaining what was done.
        Example:
-         Review: "Error handling missing on share endpoint"
-         Response: "Added try/catch with specific error types
-         in share.controller.ts -- handles 404, 403, and 500."
+         curl -X POST http://127.0.0.1:7300/tasks/R6-3.0.1/comments \
+           -H "Content-Type: application/json" \
+           -d '{
+             "severity": "MINOR",
+             "body": "Added try/catch with specific error types in share.controller.ts -- handles 404, 403, and 500.",
+             "author": "implementer",
+             "parent_id": 42
+           }'
     g. Move task to IN-REVIEW using `PATCH /tasks/:id`.
 
     Repeat for the next task.
@@ -314,10 +342,12 @@ and applying review notes after a review cycle.
     review notes. Only the reviewer does.
   - Tasks move IN-PROGRESS to IN-REVIEW, never IN-PROGRESS to DONE.
   - Tasks in REWORK move REWORK → IN-PROGRESS → IN-REVIEW.
-  - The agent responds to every review note. No note is silently
+  - The agent responds to every review comment. No comment is silently
     skipped or ignored.
-  - If a review note is unclear, ask the user for clarification
+  - If a review comment is unclear, ask the user for clarification
     before making changes.
+  - Replies use `parent_id` to thread under the original reviewer
+    comment, keeping the conversation traceable.
 </ApplyReviewNotes>
 
 ---
@@ -363,3 +393,16 @@ and applying review notes after a review cycle.
   is made during task execution that affects the project direction.
   This is the only write an execution agent makes to project-progress.md.
 </ProjectProgressUpdate>
+
+---
+
+## Anti-Patterns
+
+```xml
+<AntiPatterns>
+  <AntiPattern name="Direct Tracker Database Mutation">
+    <BadExample>Opening docs/.blueprint/tasks.db with SQLite directly, running raw SQL queries to read or modify task state, or editing the database file with any tool other than the tracker HTTP API.</BadExample>
+    <Why>The tracker HTTP API is the sole interface for reading and writing tracker state. Direct database access bypasses validation, triggers, and the snapshot engine, producing inconsistent state that the board UI and other agents cannot reconcile. Always use the HTTP recipes in docs/core/tracker.md (e.g., PATCH /tasks/:id for state changes, GET /tasks for lookups).</Why>
+  </AntiPattern>
+</AntiPatterns>
+```

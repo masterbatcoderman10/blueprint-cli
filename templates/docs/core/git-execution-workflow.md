@@ -139,5 +139,9 @@ referenced again at completion for commit.
     <BadExample>Replacing the reviewer's original feedback with the agent's responses during note application, or discarding earlier review rounds when preparing for re-review.</BadExample>
     <Why>Review notes are a durable record of quality assurance. They document what was caught, why it mattered, and how it was resolved. Overwriting them destroys the audit trail and hides quality signals from future reviewers. When addressing notes, append responses directly below each reviewer comment. When entering a new review round, preserve all prior rounds intact.</Why>
   </AntiPattern>
+  <AntiPattern name="Direct Tracker Database Mutation">
+    <BadExample>Opening docs/.blueprint/tasks.db with SQLite directly, running raw SQL queries to read or modify task state, or editing the database file with any tool other than the tracker HTTP API.</BadExample>
+    <Why>The tracker HTTP API is the sole interface for reading and writing tracker state. Direct database access bypasses validation, triggers, and the snapshot engine, producing inconsistent state that the board UI and other agents cannot reconcile. Always use the HTTP recipes in docs/core/tracker.md (e.g., PATCH /tasks/:id for state changes, GET /tasks for lookups).</Why>
+  </AntiPattern>
 </AntiPatterns>
 ```

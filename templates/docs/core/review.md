@@ -70,15 +70,19 @@ the tracker and either approves it or leaves structured feedback.
     e. Determine outcome:
 
        IF no issues found:
-         Write "Clean -- no issues found" in the Review Notes
-         section of the task description.
+         Leave a tracker comment with severity MAJOR and body
+         "Clean -- no issues found." using
+         `POST /tasks/:id/comments` as documented in
+         `docs/core/tracker.md`.
          Move task to DONE.
 
        IF issues found:
-         Write detailed review notes in the Review Notes section
-         of the task description per <ReviewNoteFormat>.
+         Leave each issue as a separate tracker comment using
+         `POST /tasks/:id/comments` with the appropriate severity
+         (MAJOR or MINOR) per <ReviewNoteFormat>.
          Move task to REWORK.
-         Include the canonical transition note:
+         Also leave a summary comment with the canonical
+         transition note:
            "Task moved to REWORK. After corrections, the agent must
             follow the canonical REWORK → IN-PROGRESS → IN-REVIEW
             transition per docs/core/tracker.md before this task
@@ -134,22 +138,27 @@ the tracker and either approves it or leaves structured feedback.
   Review is a multi-turn process. A single pass rarely resolves
   all issues. The cycle repeats until every task is clean:
 
-  1. Reviewer examines tasks, leaves notes on tasks with issues,
-     moves clean tasks to DONE. Tasks with issues are moved to REWORK.
+  1. Reviewer examines tasks, leaves feedback as tracker comments
+     on tasks with issues, moves clean tasks to DONE. Tasks with
+     issues are moved to REWORK.
   2. Executing agent addresses notes via ApplyReviewNotes in
-     execution.md. Tasks in REWORK move to IN-PROGRESS, then back
-     to IN-REVIEW following the canonical transition
-     REWORK → IN-PROGRESS → IN-REVIEW.
+     execution.md. The agent replies to each reviewer comment
+     using `POST /tasks/:id/comments` with `parent_id` set to
+     the original comment's ID. Tasks in REWORK move to
+     IN-PROGRESS, then back to IN-REVIEW following the canonical
+     transition REWORK → IN-PROGRESS → IN-REVIEW.
   3. Reviewer RE-REVIEWS the same tasks:
-     - For each task, read the agent's responses to each note.
+     - For each task, read the agent's reply comments (use
+       `GET /tasks/:id/comments` to list all comments and replies).
      - Verify the fix actually resolves the issue -- do not take
        the agent's word for it. Check the code.
-     - If the fix is correct: mark the note as resolved.
+     - If the fix is correct: mark the reply comment as resolved
+       by leaving a follow-up comment acknowledging resolution.
      - If the fix is incomplete or introduces a new issue:
-       leave a new note explaining what is still wrong.
-     - If all notes on a task are resolved: write "Clean" and
-       move to DONE.
-     - If any notes remain unresolved or new issues are found:
+       leave a new comment explaining what is still wrong.
+     - If all comments on a task are resolved: leave a "Clean"
+       comment and move to DONE.
+     - If any comments remain unresolved or new issues are found:
        move the task to REWORK.
   4. Repeat from step 2 until all tasks are in DONE.
 
@@ -229,13 +238,15 @@ the tracker and either approves it or leaves structured feedback.
 ---
 
 <ReviewNoteFormat>
-  Review notes are written in the Review Notes section of the
-  task description on the tracker.
+  Review feedback is left as tracker comments using the
+  `POST /tasks/:id/comments` endpoint documented in
+  `docs/core/tracker.md`.
 
-  Each issue is a separate bullet point with:
-    - Severity: MAJOR or MINOR
-    - Description of the issue
-    - Explanation of what problem it causes or could cause
+  Each issue is a separate comment with:
+    - Severity: MAJOR or MINOR (set via the `severity` field)
+    - Body: Description of the issue and explanation of what
+      problem it causes or could cause (set via the `body` field)
+    - Author: Name of the reviewer (set via the `author` field)
 
   MAJOR -- Must be fixed before the task can move to DONE.
     Incorrect logic, missing functionality, convention violations
@@ -245,32 +256,27 @@ the tracker and either approves it or leaves structured feedback.
     Style inconsistencies not caught by linting, minor naming
     improvements, small refactors that would improve clarity.
 
-  FORMAT:
-    Review Notes:
-    - [MAJOR] {{Description of issue}}
-      Why: {{What problem this causes or could cause}}
-    - [MAJOR] {{Description of issue}}
-      Why: {{What problem this causes or could cause}}
-    - [MINOR] {{Description of issue}}
-      Why: {{What problem this causes or could cause}}
+  BODY FORMAT for each comment:
+    {{Description of issue}}
+    Why: {{What problem this causes or could cause}}
 
-  EXAMPLE:
-    Review Notes:
-    - [MAJOR] Share endpoint does not validate email format before
-      sending the invite.
-      Why: Invalid emails will pass through to the mail service,
-      causing silent failures and confusing error states.
-    - [MAJOR] Permission check in document routes uses string
-      comparison instead of the enum defined in M2-4.0.1.
-      Why: Bypasses the single source of truth for permission
-      levels, making future changes error-prone.
-    - [MINOR] Variable name `perm` in sharing service -- use
-      `permissionLevel` for consistency with conventions.md.
-      Why: Abbreviations reduce readability across the codebase.
+  EXAMPLE (creating a MAJOR comment via the API):
+    curl -X POST http://127.0.0.1:7300/tasks/M2-4.A.1/comments \
+      -H "Content-Type: application/json" \
+      -d '{
+        "severity": "MAJOR",
+        "body": "Share endpoint does not validate email format before sending the invite.\nWhy: Invalid emails will pass through to the mail service, causing silent failures and confusing error states.",
+        "author": "reviewer"
+      }'
 
   When a task is clean:
-    Review Notes:
-    Clean -- no issues found.
+    curl -X POST http://127.0.0.1:7300/tasks/M2-4.A.1/comments \
+      -H "Content-Type: application/json" \
+      -d '{
+        "severity": "MAJOR",
+        "body": "Clean -- no issues found.",
+        "author": "reviewer"
+      }'
 </ReviewNoteFormat>
 
 ---
@@ -286,3 +292,16 @@ the tracker and either approves it or leaves structured feedback.
     documents them. The executing agent addresses them via
     the ApplyReviewNotes flow in execution.md.
 </ReviewScope>
+
+---
+
+## Anti-Patterns
+
+```xml
+<AntiPatterns>
+  <AntiPattern name="Direct Tracker Database Mutation">
+    <BadExample>Opening docs/.blueprint/tasks.db with SQLite directly, running raw SQL queries to read or modify task state, or editing the database file with any tool other than the tracker HTTP API.</BadExample>
+    <Why>The tracker HTTP API is the sole interface for reading and writing tracker state. Direct database access bypasses validation, triggers, and the snapshot engine, producing inconsistent state that the board UI and other agents cannot reconcile. Always use the HTTP recipes in docs/core/tracker.md (e.g., PATCH /tasks/:id for state changes, POST /tasks/:id/comments for review feedback).</Why>
+  </AntiPattern>
+</AntiPatterns>
+```
