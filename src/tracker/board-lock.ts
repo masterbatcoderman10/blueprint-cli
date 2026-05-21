@@ -1,19 +1,20 @@
-import { mkdir, readFile, unlink, writeFile } from 'node:fs/promises'
+import { mkdir, readFile, stat, unlink, writeFile } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
 
-interface LockData {
+export interface LockData {
   pid: number
   port: number
   started_at: number
+  worktree: string
 }
 
-function lockPath(projectRoot: string): string {
-  return join(projectRoot, 'docs', '.blueprint', 'board.lock')
+function lockPath(commonDir: string): string {
+  return join(commonDir, 'blueprint-board.lock')
 }
 
-export async function readLock(projectRoot: string): Promise<LockData | null> {
+export async function readLock(commonDir: string): Promise<LockData | null> {
   try {
-    const raw = await readFile(lockPath(projectRoot), 'utf8')
+    const raw = await readFile(lockPath(commonDir), 'utf8')
     const parsed = JSON.parse(raw) as LockData
     return parsed
   } catch {
@@ -21,22 +22,37 @@ export async function readLock(projectRoot: string): Promise<LockData | null> {
   }
 }
 
-export async function writeLock(projectRoot: string, data: { pid: number; port: number }): Promise<void> {
+export async function writeLock(
+  commonDir: string,
+  data: { pid: number; port: number; worktree: string },
+): Promise<void> {
   const payload: LockData = {
     pid: data.pid,
     port: data.port,
     started_at: Date.now(),
+    worktree: data.worktree,
   }
-  const path = lockPath(projectRoot)
+  const path = lockPath(commonDir)
   await mkdir(dirname(path), { recursive: true })
   await writeFile(path, JSON.stringify(payload), 'utf8')
 }
 
-export async function clearLock(projectRoot: string): Promise<void> {
+export async function clearLock(commonDir: string): Promise<void> {
   try {
-    await unlink(lockPath(projectRoot))
+    await unlink(lockPath(commonDir))
   } catch {
     // idempotent — file may already be absent
+  }
+}
+
+export async function sweepLegacyLock(worktreeRoot: string): Promise<boolean> {
+  const legacyPath = join(worktreeRoot, 'docs', '.blueprint', 'board.lock')
+  try {
+    await stat(legacyPath)
+    await unlink(legacyPath)
+    return true
+  } catch {
+    return false
   }
 }
 

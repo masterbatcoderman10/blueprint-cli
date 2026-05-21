@@ -11,12 +11,12 @@ import {
   writeLock,
 } from '../../src/tracker/board-lock'
 
-function makeProjectRoot(): string {
-  const dir = mkdtempSync(join(tmpdir(), 'blueprint-lock-'))
+function makeCommonDir(): string {
+  const dir = mkdtempSync(join(tmpdir(), 'blueprint-common-'))
   return dir
 }
 
-let projectRoots: string[] = []
+let commonDirs: string[] = []
 let servers: ReturnType<typeof createServer>[] = []
 
 afterEach(() => {
@@ -24,29 +24,26 @@ afterEach(() => {
     server.close()
   }
   servers = []
-  for (const root of projectRoots) {
-    rmSync(root, { recursive: true, force: true })
+  for (const dir of commonDirs) {
+    rmSync(dir, { recursive: true, force: true })
   }
-  projectRoots = []
+  commonDirs = []
 })
 
 describe('R6-2.C.4 — board-lock', () => {
   it('T-C.4.1: writeLock then readLock round-trips', async () => {
-    const projectRoot = makeProjectRoot()
-    projectRoots.push(projectRoot)
+    const commonDir = makeCommonDir()
+    commonDirs.push(commonDir)
 
-    const lockData = { pid: process.pid, port: 7300 }
-    await writeLock(projectRoot, lockData)
+    const lockData = { pid: process.pid, port: 7300, worktree: '/wt' }
+    await writeLock(commonDir, lockData)
 
-    const read = await readLock(projectRoot)
-    expect(read).toMatchObject({ pid: lockData.pid, port: lockData.port })
+    const read = await readLock(commonDir)
+    expect(read).toMatchObject({ pid: lockData.pid, port: lockData.port, worktree: lockData.worktree })
     expect(read).toHaveProperty('started_at')
   })
 
   it('T-C.4.2: isLockAlive true when PID alive and /project ping returns 200', async () => {
-    const projectRoot = makeProjectRoot()
-    projectRoots.push(projectRoot)
-
     const server = createServer((req, res) => {
       if (req.url === '/project') {
         res.writeHead(200, { 'content-type': 'application/json' })
@@ -61,7 +58,7 @@ describe('R6-2.C.4 — board-lock', () => {
     servers.push(server)
 
     const address = server.address() as { port: number }
-    const lock = { pid: process.pid, port: address.port, started_at: Date.now() }
+    const lock = { pid: process.pid, port: address.port, started_at: Date.now(), worktree: '/wt' }
 
     const alive = await isLockAlive(lock)
     expect(alive).toBe(true)
@@ -74,7 +71,7 @@ describe('R6-2.C.4 — board-lock', () => {
       throw err
     })
 
-    const lock = { pid: 99999, port: 7300, started_at: Date.now() }
+    const lock = { pid: 99999, port: 7300, started_at: Date.now(), worktree: '/wt' }
     const alive = await isLockAlive(lock)
     expect(alive).toBe(false)
 
@@ -82,22 +79,22 @@ describe('R6-2.C.4 — board-lock', () => {
   })
 
   it('T-C.4.4: isLockAlive false when PID alive but port times out within 250ms', async () => {
-    const lock = { pid: process.pid, port: 1, started_at: Date.now() }
+    const lock = { pid: process.pid, port: 1, started_at: Date.now(), worktree: '/wt' }
     const alive = await isLockAlive(lock)
     expect(alive).toBe(false)
   })
 
   it('T-C.4.5: clearLock removes the lock file; idempotent if absent', async () => {
-    const projectRoot = makeProjectRoot()
-    projectRoots.push(projectRoot)
+    const commonDir = makeCommonDir()
+    commonDirs.push(commonDir)
 
-    await writeLock(projectRoot, { pid: 1, port: 7300 })
-    await clearLock(projectRoot)
+    await writeLock(commonDir, { pid: 1, port: 7300, worktree: '/wt' })
+    await clearLock(commonDir)
 
-    const read = await readLock(projectRoot)
+    const read = await readLock(commonDir)
     expect(read).toBeNull()
 
     // idempotent
-    await expect(clearLock(projectRoot)).resolves.toBeUndefined()
+    await expect(clearLock(commonDir)).resolves.toBeUndefined()
   })
 })
