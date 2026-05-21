@@ -234,7 +234,8 @@ describe('Stream B — reviewer-verb endpoints (approve / reject)', () => {
     seedTask(db, 'R9-1.B.1', 'IN-REVIEW')
     const running = await listen(db)
 
-    const res = await requestJson(running.origin, '/tasks/R9-1.B.1/approve', {
+    // Invalid severity in batch
+    const severityRes = await requestJson(running.origin, '/tasks/R9-1.B.1/approve', {
       method: 'POST',
       body: JSON.stringify({
         comments: [
@@ -244,13 +245,35 @@ describe('Stream B — reviewer-verb endpoints (approve / reject)', () => {
       }),
     })
 
-    expect(res.status).toBe(400)
-    expect(res.body).toMatchObject({ error: { code: 'invalid_severity' } })
+    expect(severityRes.status).toBe(400)
+    expect(severityRes.body).toMatchObject({ error: { code: 'invalid_severity' } })
 
-    const taskRow = db.prepare('SELECT state FROM tasks WHERE id = ?').get('R9-1.B.1') as { state: string }
+    let taskRow = db.prepare('SELECT state FROM tasks WHERE id = ?').get('R9-1.B.1') as { state: string }
     expect(taskRow.state).toBe('IN-REVIEW')
 
-    const commentRows = db
+    let commentRows = db
+      .prepare('SELECT COUNT(*) AS count FROM review_comments WHERE task_id = ?')
+      .get('R9-1.B.1') as { count: number }
+    expect(commentRows.count).toBe(0)
+
+    // Missing / empty body in batch
+    const bodyRes = await requestJson(running.origin, '/tasks/R9-1.B.1/approve', {
+      method: 'POST',
+      body: JSON.stringify({
+        comments: [
+          { severity: 'MAJOR', body: 'Valid' },
+          { severity: 'MAJOR', body: '' },
+        ],
+      }),
+    })
+
+    expect(bodyRes.status).toBe(400)
+    expect(bodyRes.body).toMatchObject({ error: { code: 'invalid_comments' } })
+
+    taskRow = db.prepare('SELECT state FROM tasks WHERE id = ?').get('R9-1.B.1') as { state: string }
+    expect(taskRow.state).toBe('IN-REVIEW')
+
+    commentRows = db
       .prepare('SELECT COUNT(*) AS count FROM review_comments WHERE task_id = ?')
       .get('R9-1.B.1') as { count: number }
     expect(commentRows.count).toBe(0)
@@ -446,7 +469,8 @@ describe('Stream B — reviewer-verb endpoints (approve / reject)', () => {
     seedTask(db, 'R9-1.B.2', 'IN-REVIEW')
     const running = await listen(db)
 
-    const res = await requestJson(running.origin, '/tasks/R9-1.B.2/reject', {
+    // Invalid severity in batch
+    const severityRes = await requestJson(running.origin, '/tasks/R9-1.B.2/reject', {
       method: 'POST',
       body: JSON.stringify({
         comments: [
@@ -457,13 +481,36 @@ describe('Stream B — reviewer-verb endpoints (approve / reject)', () => {
       }),
     })
 
-    expect(res.status).toBe(400)
-    expect(res.body).toMatchObject({ error: { code: 'invalid_severity' } })
+    expect(severityRes.status).toBe(400)
+    expect(severityRes.body).toMatchObject({ error: { code: 'invalid_severity' } })
 
-    const taskRow = db.prepare('SELECT state FROM tasks WHERE id = ?').get('R9-1.B.2') as { state: string }
+    let taskRow = db.prepare('SELECT state FROM tasks WHERE id = ?').get('R9-1.B.2') as { state: string }
     expect(taskRow.state).toBe('IN-REVIEW')
 
-    const commentRows = db
+    let commentRows = db
+      .prepare('SELECT COUNT(*) AS count FROM review_comments WHERE task_id = ?')
+      .get('R9-1.B.2') as { count: number }
+    expect(commentRows.count).toBe(0)
+
+    // Missing / empty body in batch
+    const bodyRes = await requestJson(running.origin, '/tasks/R9-1.B.2/reject', {
+      method: 'POST',
+      body: JSON.stringify({
+        comments: [
+          { severity: 'MAJOR', body: 'Valid 1' },
+          { severity: 'MAJOR', body: 'Valid 2' },
+          { severity: 'MAJOR', body: '' },
+        ],
+      }),
+    })
+
+    expect(bodyRes.status).toBe(400)
+    expect(bodyRes.body).toMatchObject({ error: { code: 'invalid_comments' } })
+
+    taskRow = db.prepare('SELECT state FROM tasks WHERE id = ?').get('R9-1.B.2') as { state: string }
+    expect(taskRow.state).toBe('IN-REVIEW')
+
+    commentRows = db
       .prepare('SELECT COUNT(*) AS count FROM review_comments WHERE task_id = ?')
       .get('R9-1.B.2') as { count: number }
     expect(commentRows.count).toBe(0)
@@ -491,19 +538,67 @@ describe('Stream B — reviewer-verb endpoints (approve / reject)', () => {
       const db = openMemoryDb()
       const running = await listen(db)
 
-      for (const { verb, prep, taskId } of verbs) {
-        prep(db)
-        const body = verb === 'reject' ? { comments: [{ severity: 'MINOR', body: 'x' }] } : undefined
+      // Missing author → null for both approve and reject, parity-checked against direct POST /comments
+      for (const { verb, taskIdSuffix } of [
+        { verb: 'approve' as const, taskIdSuffix: 'author-approve' },
+        { verb: 'reject' as const, taskIdSuffix: 'author-reject' },
+      ]) {
+        const taskId = `R9-1.B.${taskIdSuffix}`
+        seedTask(db, taskId, 'IN-REVIEW')
 
-        const res = await requestJson(running.origin, `/tasks/${taskId}/${verb}`, {
+        const workflowBody = verb === 'reject'
+          ? { comments: [{ severity: 'MINOR', body: 'Missing author' }] }
+          : { comments: [{ severity: 'MINOR', body: 'Missing author' }] }
+
+        const workflowRes = await requestJson(running.origin, `/tasks/${taskId}/${verb}`, {
           method: 'POST',
-          body: body ? JSON.stringify(body) : undefined,
+          body: JSON.stringify(workflowBody),
         })
 
-        expect(res.status).toBe(200)
-        if (verb === 'reject') {
-          expect(res.body.data.comments[0].author).toBeNull()
-        }
+        expect(workflowRes.status).toBe(200)
+        expect(workflowRes.body.data.comments[0].author).toBeNull()
+
+        // Parity: direct POST /tasks/:id/comments with missing author also produces null
+        const commentRes = await requestJson(running.origin, `/tasks/${taskId}/comments`, {
+          method: 'POST',
+          body: JSON.stringify({ severity: 'MINOR', body: 'Direct comment' }),
+        })
+        expect(commentRes.status).toBe(201)
+        expect(commentRes.body.data.author).toBeNull()
+      }
+
+      // Non-string author → coerced to string consistently across workflow and direct comments
+      for (const { verb, taskIdSuffix } of [
+        { verb: 'approve' as const, taskIdSuffix: 'author-ns-approve' },
+        { verb: 'reject' as const, taskIdSuffix: 'author-ns-reject' },
+      ]) {
+        const taskId = `R9-1.B.${taskIdSuffix}`
+        seedTask(db, taskId, 'IN-REVIEW')
+
+        const workflowBody = verb === 'reject'
+          ? { comments: [{ severity: 'MINOR', body: 'Non-string author', author: 123 }] }
+          : { comments: [{ severity: 'MINOR', body: 'Non-string author', author: 123 }] }
+
+        const workflowRes = await requestJson(running.origin, `/tasks/${taskId}/${verb}`, {
+          method: 'POST',
+          body: JSON.stringify(workflowBody),
+        })
+
+        expect(workflowRes.status).toBe(200)
+        expect(typeof workflowRes.body.data.comments[0].author).toBe('string')
+        const workflowAuthor = workflowRes.body.data.comments[0].author as string
+
+        // Parity: direct POST /tasks/:id/comments with non-string author
+        const commentRes = await requestJson(running.origin, `/tasks/${taskId}/comments`, {
+          method: 'POST',
+          body: JSON.stringify({ severity: 'MINOR', body: 'Direct ns', author: 123 }),
+        })
+        expect(commentRes.status).toBe(201)
+        expect(typeof commentRes.body.data.author).toBe('string')
+        const directAuthor = commentRes.body.data.author as string
+
+        // Both paths must coerce to the same string representation
+        expect(workflowAuthor).toBe(directAuthor)
       }
     })
 
