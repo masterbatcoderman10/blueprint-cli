@@ -3,7 +3,7 @@
 **Project**: blueprint-cli
 **Tracker**: blueprint-cli
 **Current Milestone**: Revision 9 - Tracker Workflow QoL
-**Current Phase**: R9 Phase 1 — Tracker Workflow Endpoints & Contract QoL (planned + test-planned, pending execution)
+**Current Phase**: R9 Phase 2 — Tracker Cheatsheet & Board Stop Command (planned, pending execution)
 **Status**: Planning
 
 ---
@@ -80,6 +80,7 @@
 - 2026-05-21: Identified Revision 9 — Tracker Workflow QoL to add gated workflow HTTP endpoints (`POST /tasks/:id/start | submit | approve | reject | resume` with source-state enforcement; `approve` and `reject` accept multi-comment payloads applied atomically), tighten tracker workflow contracts in execution / review / phase-planning / orchestrate / health-check, rewrite `docs/core/tracker.md` cheatsheet-first, and add a `blueprint board stop` subcommand that terminates the live board via `board.lock` and clears stale locks. Impact spans R6 (tracker core + board CLI + protocol docs) and R8 (workflow contract hardening). SRS: MAS-204 and MAS-205 elaborated same-ID; MAS-203 untouched. 2 phases planned. Revision document at `docs/milestones/revision-9-tracker-workflow-qol/revision-9-tracker-workflow-qol.md`. Phase 1 health-check.md edit dropped from scope after planning; tracker.md cheatsheet rewrite consolidated into Phase 2.
 - 2026-05-21: Revision 9 Phase 1 — Tracker Workflow Endpoints & Contract QoL was planned. Strict source-state + idempotent no-op semantics locked; `approve` accepts optional `comments[]` (0..N); `reject` requires `comments[]` with ≥1 entry (empty/missing/non-array → 400); state change + comment inserts run in a single SQLite transaction returning `{ task, comments }` inside the existing `{ ok, data }` envelope; snapshot writes exactly once after commit. Stream split: Gate R9-1.0 (validator + transactional helper + types + snapshot single-write), Stream A (start/submit/resume), Stream B (approve/reject with multi-comment atomic), Stream C (execution.md + review.md + phase-planning.md anti-pattern + orchestrate.md + templates mirror + SRS MAS-204 change log + R6/R7/R8 doc-contract test forward-updates). Phase document committed and ready for execution.
 - 2026-05-21: Revision 9 Phase 1 test plan committed after subagent gap audit. 16 tasks total (Gate 4 / A 3 / B 2 / C 7); 15 testable, 1 not-testable (pure types). Locked design call: idempotent no-op on `approve` / `reject` does NOT insert supplied comments (reviewers add notes via `POST /tasks/:id/comments` when state is already at the destination). Gap fixes folded in: concurrency serialization test, no-op snapshot single-write contract, snapshot failure isolation, raw-PATCH regression coverage, parameterized envelope / method-not-allowed / body-ignored sweeps, parameterized author / cross-task `parent_id` / malformed-JSON / non-array `comments` coverage across approve+reject, line-anchored negative grep for removed `PATCH state` recipes, anti-pattern placement asserted inside the `<AntiPatterns>` block, reuse of the existing parameterized template-mirror test instead of duplication, SRS prior-entry preservation, and a new R9-1.C.7 task to forward-update R6/R7/R8 doc-contract tests.
+- 2026-05-21: Phase R9-1 — Tracker Workflow Endpoints & Contract QoL completed. All tasks done, DoD satisfied, full test suite green (1073 tests passed, 2 pre-existing skips from R4, 0 failures).
 
 ---
 
@@ -133,7 +134,7 @@ R8 — Tweak Revamp and Quality of Life Changes
 ├── Phase 1 — Quality of Life Workflow Hardening ✓
 └── Phase 2 — Tweak Planning Flow Rewrite ✓
 R9 — Tracker Workflow QoL
-├── Phase 1 — Tracker Workflow Endpoints & Contract QoL ● (planned + test-planned)
+├── Phase 1 — Tracker Workflow Endpoints & Contract QoL ✓
 └── Phase 2 — Tracker Cheatsheet & Board Stop Command ○
 M2 — Cross-Project Context (Optional Post-MVP)
 └── Phase 1 — TBD ○
@@ -150,4 +151,4 @@ M3 — Workflow Visibility Enhancements (Optional Future)
 
 | Revision | Name | Status | Notes |
 |----------|------|--------|-------|
-| R9 | Tracker Workflow QoL | Planning | 2 phases. Gated workflow endpoints + multi-comment approve/reject; cheatsheet-first tracker.md; `blueprint board stop`. Elaborates MAS-204 and MAS-205 same-ID. Phase 1 planned + test-planned and ready for execution. |
+| R9 | Tracker Workflow QoL | Planning | 2 phases. Phase 1 complete. Phase 2: cheatsheet-first tracker.md rewrite; `blueprint board stop` subcommand. Elaborates MAS-204 and MAS-205 same-ID. |
