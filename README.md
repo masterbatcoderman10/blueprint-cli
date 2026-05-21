@@ -2,12 +2,12 @@
 
 **Software engineering discipline for AI-aided development.** Blueprint structures planning and execution so you stay in control: phases decompose into testable tasks, agents run in parallel without conflict, and scope changes don't break your plan. Write tests first. Review code before shipping. Track progress in your repo.
 
-[![npm version](https://img.shields.io/npm/v/@splitwireml/blueprint)](https://www.npmjs.com/package/@splitwireml/blueprint) [![Node.js >= 20.0.0](https://img.shields.io/badge/Node.js-%3E%3D20.0.0-brightgreen)](https://nodejs.org/) [![MIT License](https://img.shields.io/badge/License-MIT-blue)](#license)
+[![npm version](https://img.shields.io/npm/v/blueprint-agentic-development)](https://www.npmjs.com/package/blueprint-agentic-development) [![Node.js >= 20.0.0](https://img.shields.io/badge/Node.js-%3E%3D20.0.0-brightgreen)](https://nodejs.org/) [![MIT License](https://img.shields.io/badge/License-MIT-blue)](#license)
 
 ## Get Started
 
 ```bash
-npm install -g @splitwireml/blueprint
+npm install -g blueprint-agentic-development
 blueprint init
 ```
 
@@ -15,11 +15,12 @@ blueprint init
 
 ## Recent Updates
 
-- **v0.2.0** — Built-in task tracker (SQLite + Svelte SPA). Kanban board for phases and streams.
-- **R6 Phase 5** — Milestone Integration & Verification complete. Full test coverage, doctor command working.
-- **R5** — New orchestration protocol for multi-agent parallel execution.
+- **v0.2.6** — Renamed to `blueprint-agentic-development`. Unscoped npm package for better discoverability. Trusted publishing via GitHub Actions OIDC.
+- **v0.2.4** — R8 Phase 2 complete: Tweak Planning Flow Rewrite. Parallel agent execution hardened. Tweak workflow elevated to first-class planning mode.
+- **v0.2.3** — R7 Standalone Tweak Workflow. Tweaks are now top-level first-class quick-change workflow with dedicated plans, acceptance criteria, and verification.
+- **v0.2.0** — Built-in task tracker (SQLite + Svelte SPA). Kanban board for phases and streams. Removed external `vibe-kanban` dependency.
 
-[See all releases →](https://github.com/splitwireml/blueprint/releases)
+[See full changelog →](CHANGELOG.md)
 
 ---
 
@@ -77,7 +78,7 @@ For detailed guides and command reference, see the [core documentation](docs/cor
 ## Installation
 
 ```bash
-npm install -g @splitwireml/blueprint
+npm install -g blueprint-agentic-development
 ```
 
 **Requirements:** Node.js `>=20.0.0`

@@ -7,6 +7,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.7] — 2026-05-21
+
+### Changed
+- **README**: Updated install instructions, badges, and recent updates to reflect new package name
+- **Changelog**: Backfilled entries for 0.2.4–0.2.6
+
+## [0.2.6] — 2026-05-21
+
+### Changed
+- **Package rename**: Migrated from `@splitwireml/blueprint` to `blueprint-agentic-development` (unscoped, keyword-rich, better npm discoverability)
+- **npm SEO**: Description rewritten to lead with autonomy, parallelism, and agentic framing; keywords expanded from 4 generic tags to 20 high-signal discovery terms (`claude-code`, `agentic-development`, `codex`, `cursor`, `ai-agent`, etc.)
+- Updated all internal references, release contract, tests, and docs from old package name to new
+
+## [0.2.5] — 2026-05-21
+
+### Changed
+- Version bump to resolve tag conflict during package rename migration
+
+## [0.2.4] — 2026-05-20
+
+### Added
+- **R8 Phase 2 — Tweak Planning Flow Rewrite**: Complete rewrite of the tweak planning flow for parallel agent execution
+  - Tweak workflow hardened as a first-class autonomous planning mode
+  - Parallel stream execution improved with clearer agent dispatch contracts
+  - Acceptance criteria and verification protocols tightened across all tweak-related modules
+
 ## [0.2.3] — 2026-05-20
 
 ### Added
@@ -113,13 +139,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Minimum Node.js version bumped to 20 for `@clack/prompts` `styleText` compatibility
 
-[Unreleased]: https://github.com/earendil-works/blueprint-cli/compare/v0.2.0...HEAD
-[0.2.0]: https://github.com/earendil-works/blueprint-cli/compare/v0.1.7...v0.2.0
-[0.1.7]: https://github.com/earendil-works/blueprint-cli/compare/v0.1.6...v0.1.7
-[0.1.6]: https://github.com/earendil-works/blueprint-cli/compare/v0.1.5...v0.1.6
-[0.1.5]: https://github.com/earendil-works/blueprint-cli/compare/v0.1.4...v0.1.5
-[0.1.4]: https://github.com/earendil-works/blueprint-cli/compare/v0.1.3...v0.1.4
-[0.1.3]: https://github.com/earendil-works/blueprint-cli/compare/v0.1.2...v0.1.3
-[0.1.2]: https://github.com/earendil-works/blueprint-cli/compare/v0.1.1...v0.1.2
-[0.1.1]: https://github.com/earendil-works/blueprint-cli/compare/v0.1.0...v0.1.1
-[0.1.0]: https://github.com/earendil-works/blueprint-cli/releases/tag/v0.1.0
+[Unreleased]: https://github.com/masterbatcoderman10/blueprint-cli/compare/v0.2.7...HEAD
+[0.2.7]: https://github.com/masterbatcoderman10/blueprint-cli/compare/v0.2.6...v0.2.7
+[0.2.6]: https://github.com/masterbatcoderman10/blueprint-cli/compare/v0.2.5...v0.2.6
+[0.2.5]: https://github.com/masterbatcoderman10/blueprint-cli/compare/v0.2.4...v0.2.5
+[0.2.4]: https://github.com/masterbatcoderman10/blueprint-cli/compare/v0.2.3...v0.2.4
+[0.2.3]: https://github.com/masterbatcoderman10/blueprint-cli/compare/v0.2.0...v0.2.3
+[0.2.0]: https://github.com/masterbatcoderman10/blueprint-cli/compare/v0.1.7...v0.2.0
+[0.1.7]: https://github.com/masterbatcoderman10/blueprint-cli/compare/v0.1.6...v0.1.7
+[0.1.6]: https://github.com/masterbatcoderman10/blueprint-cli/compare/v0.1.5...v0.1.6
+[0.1.5]: https://github.com/masterbatcoderman10/blueprint-cli/compare/v0.1.4...v0.1.5
+[0.1.4]: https://github.com/masterbatcoderman10/blueprint-cli/compare/v0.1.3...v0.1.4
+[0.1.3]: https://github.com/masterbatcoderman10/blueprint-cli/compare/v0.1.2...v0.1.3
+[0.1.2]: https://github.com/masterbatcoderman10/blueprint-cli/compare/v0.1.1...v0.1.2
+[0.1.1]: https://github.com/masterbatcoderman10/blueprint-cli/compare/v0.1.0...v0.1.1
+[0.1.0]: https://github.com/masterbatcoderman10/blueprint-cli/releases/tag/v0.1.0
