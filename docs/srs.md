@@ -219,6 +219,7 @@ Change log:
 - 2026-05-18 - Deepened by R6 Phase 5: added `milestone TEXT NOT NULL` column to the tasks-table schema detail for multi-milestone grouping and filtering. Permitted schema-detail deepening per `phase-planning.md`; meaning unchanged; ID unchanged.
 - 2026-05-19 - Transitioned to active. Phase 5 complete: milestone field, filter, migration, and board rendering all implemented and verified.
 - 2026-05-20 - Elaborated by Revision 8 planning: tracker mutation must go through the tracker HTTP API, not raw SQL or direct database edits; actionable review feedback should use tracker comments and replies. Meaning unchanged; ID unchanged.
+- 2026-05-21 - Deepened by Revision 9 Phase 1: added gated workflow endpoints (`POST /tasks/:id/start`, `submit`, `resume`, `approve`, `reject`) with strict source-state enforcement, idempotent no-op semantics, and atomic multi-comment payload on approve/reject. JSON snapshot writes exactly once per gated call after transaction commit. Meaning unchanged; ID unchanged.
 
 ### MAS-205
 - Title: Local Project Board UI

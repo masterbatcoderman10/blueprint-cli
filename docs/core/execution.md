@@ -134,7 +134,11 @@ and applying review notes after a review cycle.
 
     FOR EACH TASK:
 
-    a. Move task to IN-PROGRESS using `PATCH /tasks/:id`.
+    a. Move task to IN-PROGRESS using `POST /tasks/:id/start`.
+       ```bash
+       curl -X POST http://127.0.0.1:7300/tasks/<id>/start \
+         -H "Content-Type: application/json"
+       ```
     b. Write agent identity as author on the task.
        Use the name of the tool being used:
        Claude Code, Codex, OpenCode, Gemini CLI, or whichever agent is active.
@@ -174,7 +178,11 @@ and applying review notes after a review cycle.
     f. Update task notes during implementation with relevant details
        (files modified, tests written, decisions made, anything the
        reviewer should know).
-    g. Move task to IN-REVIEW using `PATCH /tasks/:id`.
+    g. Move task to IN-REVIEW using `POST /tasks/:id/submit`.
+       ```bash
+       curl -X POST http://127.0.0.1:7300/tasks/<id>/submit \
+         -H "Content-Type: application/json"
+       ```
 
     Repeat until all tasks in the gate or stream are in IN-REVIEW.
 
@@ -304,9 +312,11 @@ and applying review notes after a review cycle.
     For each task in the specified gate or stream that has review
     comments:
 
-    a. If the task is in REWORK, move it to IN-PROGRESS.
-       If the task is in IN-REVIEW, move it to IN-PROGRESS.
-       Use `PATCH /tasks/:id` as documented in `docs/core/tracker.md`.
+    a. If the task is in REWORK, move it to IN-PROGRESS using
+       `POST /tasks/:id/resume`.
+       If the task is in IN-REVIEW, move it to IN-PROGRESS using
+       `PATCH /tasks/:id` (this is a non-canonical transition; the
+       gated endpoints cover the five canonical transitions only).
     b. Retrieve the review comments using `GET /tasks/:id/comments`.
        Identify reviewer comments that require a response.
     c. Address each comment -- make the required code changes.
@@ -326,7 +336,7 @@ and applying review notes after a review cycle.
              "author": "implementer",
              "parent_id": 42
            }'
-    g. Move task to IN-REVIEW using `PATCH /tasks/:id`.
+    g. Move task to IN-REVIEW using `POST /tasks/:id/submit`.
 
     Repeat for the next task.
 
@@ -402,7 +412,7 @@ and applying review notes after a review cycle.
 <AntiPatterns>
   <AntiPattern name="Direct Tracker Database Mutation">
     <BadExample>Opening docs/.blueprint/tasks.db with SQLite directly, running raw SQL queries to read or modify task state, or editing the database file with any tool other than the tracker HTTP API.</BadExample>
-    <Why>The tracker HTTP API is the sole interface for reading and writing tracker state. Direct database access bypasses validation, triggers, and the snapshot engine, producing inconsistent state that the board UI and other agents cannot reconcile. Always use the HTTP recipes in docs/core/tracker.md (e.g., PATCH /tasks/:id for state changes, GET /tasks for lookups).</Why>
+    <Why>The tracker HTTP API is the sole interface for reading and writing tracker state. Direct database access bypasses validation, triggers, and the snapshot engine, producing inconsistent state that the board UI and other agents cannot reconcile. Always use the HTTP recipes in docs/core/tracker.md (e.g., POST /tasks/:id/start, submit, resume, approve, reject for canonical state changes, PATCH /tasks/:id for non-canonical edits, GET /tasks for lookups).</Why>
   </AntiPattern>
 </AntiPatterns>
 ```

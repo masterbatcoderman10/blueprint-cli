@@ -132,11 +132,12 @@ describe('T-R6-3.A.6: orchestrate.md tracker rewrite', () => {
     expect(hasNoKanbanHits(content)).toBe(true)
   })
 
+  // R9-1.C.7 forward-update: REWORK --resume--> IN-PROGRESS --submit--> IN-REVIEW
   it('T-R6-3.A.6.2: per-stream loop documents 5-state machine + REWORK loop', async () => {
     const content = await readCoreDoc('orchestrate.md')
     for (const state of ['TO-DO', 'IN-PROGRESS', 'IN-REVIEW', 'REWORK', 'DONE']) {
       expect(content).toContain(state)
     }
-    expect(content).toMatch(/REWORK\s*→\s*IN-PROGRESS\s*→\s*IN-REVIEW/)
+    expect(content).toMatch(/REWORK\s*--resume-->\s*IN-PROGRESS\s*--submit-->\s*IN-REVIEW/)
   })
 })

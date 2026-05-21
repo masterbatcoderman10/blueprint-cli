@@ -172,6 +172,10 @@ and parallel streams of tasks.
     <BadExample>Stream alphabetic order skips letters or is not in sequence (e.g., Stream B and Stream D running in parallel, but Stream C is scheduled after them).</BadExample>
     <Why>Skipping letters breaks the sequential processing convention. Always name streams in strict alphabetic sequence based on their execution order (e.g., rename Stream D to Stream C and ensure sequential processing).</Why>
   </AntiPattern>
+  <AntiPattern name="Stream-Title Duplication in Task Titles">
+    <BadExample>Task titles repeat the gate or stream name they live inside, e.g., "Stream A — Build share endpoint" inside Stream A, or "Gate 4.0 — Define permission levels enum" inside Gate 4.0.</BadExample>
+    <Why>The Gate/Stream field in the task table and the task ID prefix already identify where a task belongs. Repeating that context in the title wastes space and creates visual noise in tracker listings and board views. Task titles should describe the work, not its container.</Why>
+  </AntiPattern>
 </AntiPatterns>
 ```
 

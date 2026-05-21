@@ -70,17 +70,57 @@ the tracker and either approves it or leaves structured feedback.
     e. Determine outcome:
 
        IF no issues found:
-         Leave a tracker comment with severity MAJOR and body
-         "Clean -- no issues found." using
-         `POST /tasks/:id/comments` as documented in
-         `docs/core/tracker.md`.
-         Move task to DONE.
+         Approve the task using `POST /tasks/:id/approve`.
+         This transitions the task from IN-REVIEW to DONE.
+         ```bash
+         curl -X POST http://127.0.0.1:7300/tasks/<id>/approve \
+           -H "Content-Type: application/json"
+         ```
+         You may also attach optional review comments atomically
+         with the approval by supplying a `comments` array:
+         ```bash
+         curl -X POST http://127.0.0.1:7300/tasks/<id>/approve \
+           -H "Content-Type: application/json" \
+           -d '{
+             "comments": [
+               { "severity": "MINOR", "body": "Clean -- no issues found.", "author": "reviewer" },
+               { "severity": "MINOR", "body": "Consider renaming the helper for clarity in a follow-up.", "author": "reviewer" }
+             ]
+           }'
+         ```
 
        IF issues found:
-         Leave each issue as a separate tracker comment using
-         `POST /tasks/:id/comments` with the appropriate severity
-         (MAJOR or MINOR) per <ReviewNoteFormat>.
-         Move task to REWORK.
+         Reject the task using `POST /tasks/:id/reject`. Rejection
+         requires at least one comment (`comments` array with ≥1
+         entry). An empty or missing array returns `400` and leaves
+         the task state unchanged.
+         ```bash
+         curl -X POST http://127.0.0.1:7300/tasks/<id>/reject \
+           -H "Content-Type: application/json" \
+           -d '{
+             "comments": [
+               {
+                 "severity": "MAJOR",
+                 "body": "Share endpoint does not validate email format before sending the invite.\nWhy: Invalid emails will pass through to the mail service, causing silent failures and confusing error states.",
+                 "author": "reviewer"
+               },
+               {
+                 "severity": "MINOR",
+                 "body": "The variable name `x` is not descriptive. Consider `recipientEmail`.",
+                 "author": "reviewer"
+               },
+               {
+                 "severity": "MINOR",
+                 "body": "Missing JSDoc on the public `share` function.",
+                 "author": "reviewer"
+               }
+             ]
+           }'
+         ```
+         All comments in the array are inserted atomically with the
+         state change. If any comment fails validation, the entire
+         transaction rolls back and the task remains in IN-REVIEW.
+
          Also leave a summary comment with the canonical
          transition note:
            "Task moved to REWORK. After corrections, the agent must
@@ -156,10 +196,11 @@ the tracker and either approves it or leaves structured feedback.
        by leaving a follow-up comment acknowledging resolution.
      - If the fix is incomplete or introduces a new issue:
        leave a new comment explaining what is still wrong.
-     - If all comments on a task are resolved: leave a "Clean"
-       comment and move to DONE.
+     - If all comments on a task are resolved: approve the task
+       using `POST /tasks/:id/approve` and leave a "Clean" comment.
      - If any comments remain unresolved or new issues are found:
-       move the task to REWORK.
+       reject the task using `POST /tasks/:id/reject` with at least
+       one comment explaining what is still wrong.
   4. Repeat from step 2 until all tasks are in DONE.
 
   There is no limit to the number of review rounds. The cycle
@@ -301,7 +342,7 @@ the tracker and either approves it or leaves structured feedback.
 <AntiPatterns>
   <AntiPattern name="Direct Tracker Database Mutation">
     <BadExample>Opening docs/.blueprint/tasks.db with SQLite directly, running raw SQL queries to read or modify task state, or editing the database file with any tool other than the tracker HTTP API.</BadExample>
-    <Why>The tracker HTTP API is the sole interface for reading and writing tracker state. Direct database access bypasses validation, triggers, and the snapshot engine, producing inconsistent state that the board UI and other agents cannot reconcile. Always use the HTTP recipes in docs/core/tracker.md (e.g., PATCH /tasks/:id for state changes, POST /tasks/:id/comments for review feedback).</Why>
+    <Why>The tracker HTTP API is the sole interface for reading and writing tracker state. Direct database access bypasses validation, triggers, and the snapshot engine, producing inconsistent state that the board UI and other agents cannot reconcile. Always use the HTTP recipes in docs/core/tracker.md (e.g., POST /tasks/:id/approve or reject for reviewer state changes, POST /tasks/:id/start, submit, resume for implementer state changes, POST /tasks/:id/comments for standalone review feedback).</Why>
   </AntiPattern>
 </AntiPatterns>
 ```

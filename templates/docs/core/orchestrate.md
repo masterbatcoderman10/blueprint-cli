@@ -129,14 +129,15 @@ For detailed session management patterns, see: `[Context Rot & Session Managemen
   or review unless the parallelization map declares a dependency.
 
   The tracker state machine for every stream follows the five canonical
-  states:
+  states, driven by gated endpoints:
 
   ```
-  TO-DO → IN-PROGRESS → IN-REVIEW → REWORK → DONE
+  TO-DO --start--> IN-PROGRESS --submit--> IN-REVIEW --approve--> DONE
+                                └--reject--> REWORK --resume--> IN-PROGRESS
   ```
 
   Canonical forward transition after review rejection:
-  REWORK → IN-PROGRESS → IN-REVIEW
+  REWORK --resume--> IN-PROGRESS --submit--> IN-REVIEW
 
   LOOP STEPS:
 

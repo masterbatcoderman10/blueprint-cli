@@ -121,10 +121,12 @@ describe('T-R8-1.A.8: Review comment feedback guidance', () => {
     expect(content).toMatch(/severity.*MAJOR|severity.*MINOR/)
   })
 
+  // R9-1.C.7 forward-update: review.md now uses POST /tasks/:id/reject (gated endpoint)
   it('ReviewProcess STEP 2 uses tracker comments instead of description prose', async () => {
     const content = await readDoc(['docs', 'core', 'review.md'])
-    expect(content).toMatch(/Leave each issue as a separate tracker comment/)
-    expect(content).toMatch(/Leave a tracker comment with severity/)
+    expect(content).toMatch(/Reject the task using/)
+    expect(content).toMatch(/POST \/tasks\/:id\/reject/)
+    expect(content).toMatch(/severity.*MAJOR|severity.*MINOR/)
   })
 
   it('ReReview section references comment listing and replies', async () => {
