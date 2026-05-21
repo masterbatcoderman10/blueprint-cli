@@ -17,6 +17,9 @@ function createTempDir(prefix: string): string {
   const dir = mkdtempSync(join(tmpdir(), prefix))
   tempDirs.push(dir)
   mkdirSync(join(dir, 'docs', '.blueprint'), { recursive: true })
+  execFileSync('git', ['init'], { cwd: dir, stdio: 'ignore' })
+  execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: dir, stdio: 'ignore' })
+  execFileSync('git', ['config', 'user.name', 'Test'], { cwd: dir, stdio: 'ignore' })
   return dir
 }
 

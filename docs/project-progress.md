@@ -3,8 +3,8 @@
 **Project**: blueprint-cli
 **Tracker**: blueprint-cli
 **Current Milestone**: Revision 9 - Tracker Workflow QoL
-**Current Phase**: R9 Phase 2 — Tracker Cheatsheet & Board Stop Command (planned, pending execution)
-**Status**: Planning
+**Current Phase**: R9 Phase 2 — Tracker Cheatsheet, Board Stop & Worktree-Aware Lifecycle (complete)
+**Status**: Complete — Revision 9 done. Next: plan next revision or milestone.
 
 ---
 
@@ -83,6 +83,8 @@
 - 2026-05-21: Phase R9-1 — Tracker Workflow Endpoints & Contract QoL completed. All tasks done, DoD satisfied, full test suite green (1073 tests passed, 2 pre-existing skips from R4, 0 failures).
 - 2026-05-21: Revision 9 Phase 2 — Tracker Cheatsheet, Board Stop & Worktree-Aware Lifecycle was planned. Scope locked: shared lock moved to `<git-common-dir>/blueprint-board.lock` with new `worktree` field; `blueprint board` requires git context; duplicate-start (same or peer worktree) refuses with exit 1 and no browser auto-open; first boot under new code sweeps legacy `docs/.blueprint/board.lock` with a one-line warning; new `blueprint board stop` (SIGTERM → SIGKILL fallback after 2s, stale/missing = silent no-op exit 0) and `blueprint board status` (live=0, stale=1, none=2) subcommands; `docs/core/tracker.md` rewritten cheatsheet-first in order Board lifecycle → Gated transitions → Comment recipes → Task creation → deeper detail; template mirror byte-for-byte; MAS-204 and MAS-205 same-ID change-log entries. Out of scope: Doctor advisory, tracker schema, SPA, orchestrate.md, port pool changes. Gate R9-2.0 (lock contract foundation) + Stream A (board command surface) + Stream B (cheatsheet rewrite + SRS). Phase document at `docs/milestones/revision-9-tracker-workflow-qol/phase-2-tracker-cheatsheet-board-stop.md`. Ready for test planning.
 - 2026-05-21: Revision 9 Phase 2 test plan committed after subagent gap audit. 39 tests total (Gate 14 / Stream A 20 / Stream B 5); 12 of 13 tasks testable, 1 not-testable (R9-2.B.2 mirror, covered by existing parameterized template-mirror test). Audit-driven additions: reciprocal peer→main lock read (T-R9-2.0.2.5), corrupt-JSON readLock guard (T-R9-2.0.2.6), worktree-field provenance pinned to booting worktree (T-R9-2.A.2.7), explicit happy-path `openUrl` call assertion (T-R9-2.A.2.8), zero-warning on subsequent boots (T-R9-2.A.2.9), post-race lock-content pinning (T-R9-2.A.2.10), stale-by-port stop branch (T-R9-2.A.3.5). Tightenings: cross-subcommand byte-identical no-git refusal (parameterized in T-R9-2.0.4.2), 1s `/project` unreachability window on stop, 2.0–2.5s SIGKILL escalation window, regex-pinned uptime format, heading-token sequence parse for cheatsheet order, POST+URL pattern per gated verb, token-based assertions on user-facing messages. Drops: dispatcher/headless redundancies (A.1.2, A.5.2 collapsed into A.5.1 and A.2.6); MAS-204/205 change-log assertions collapsed to one parameterized test.
+- 2026-05-21: Revision 9 Phase 2 — Tracker Cheatsheet, Board Stop & Worktree-Aware Lifecycle completed. All 13 tasks done (Gate 4 / Stream A 5 / Stream B 4), DoD satisfied, full test suite green (1106 tests, 0 failures). Regression fix: two E2E board tests missing git-init in temp dirs (caused by Gate's requireGitContext addition) fixed as part of phase completion.
+- 2026-05-21: Revision 9 — Tracker Workflow QoL completed. All phases done.
 
 ---
 
@@ -137,7 +139,7 @@ R8 — Tweak Revamp and Quality of Life Changes
 └── Phase 2 — Tweak Planning Flow Rewrite ✓
 R9 — Tracker Workflow QoL
 ├── Phase 1 — Tracker Workflow Endpoints & Contract QoL ✓
-└── Phase 2 — Tracker Cheatsheet & Board Stop Command ○
+└── Phase 2 — Tracker Cheatsheet, Board Stop & Worktree-Aware Lifecycle ✓
 M2 — Cross-Project Context (Optional Post-MVP)
 └── Phase 1 — TBD ○
 M3 — Workflow Visibility Enhancements (Optional Future)
@@ -153,4 +155,3 @@ M3 — Workflow Visibility Enhancements (Optional Future)
 
 | Revision | Name | Status | Notes |
 |----------|------|--------|-------|
-| R9 | Tracker Workflow QoL | Planning | 2 phases. Phase 1 complete. Phase 2: cheatsheet-first tracker.md rewrite; `blueprint board stop` subcommand. Elaborates MAS-204 and MAS-205 same-ID. |
