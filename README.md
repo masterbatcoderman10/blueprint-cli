@@ -26,7 +26,9 @@ blueprint init
 
 ## What is Blueprint?
 
-Most teams using AI agents build fast and accumulate risk at the same speed. Features ship untested. Agents lose context between sessions. A scope change cascades through four documents that are now out of sync. Plans become fragile. This is **context rot** — the quality degradation that happens as AI fills its context window without structure.
+AI agents are fast. That speed is also the problem. Without structure, agents sprint in the wrong direction, duplicate work across parallel sessions, and lose coherence the moment scope shifts. Plans written in plain chat drift the second a new session starts. This is **context rot** — and it compounds silently until your codebase is ahead of your docs, your docs are ahead of your tests, and nobody's sure what's actually done.
+
+Blueprint gives agents a stable foundation to work from: a five-level hierarchy of milestones, phases, streams, and tasks — each scoped tightly, documented progressively, and tracked in a built-in Kanban board that lives in your repo.
 
 Blueprint solves this through five mechanisms:
 

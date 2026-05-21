@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.8] — 2026-05-21
+
+### Changed
+- **README**: Rewrote "What is Blueprint?" opening with original copy; removed similarity to third-party project descriptions
+
 ## [0.2.7] — 2026-05-21
 
 ### Changed
@@ -139,7 +144,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Minimum Node.js version bumped to 20 for `@clack/prompts` `styleText` compatibility
 
-[Unreleased]: https://github.com/masterbatcoderman10/blueprint-cli/compare/v0.2.7...HEAD
+[Unreleased]: https://github.com/masterbatcoderman10/blueprint-cli/compare/v0.2.8...HEAD
+[0.2.8]: https://github.com/masterbatcoderman10/blueprint-cli/compare/v0.2.7...v0.2.8
 [0.2.7]: https://github.com/masterbatcoderman10/blueprint-cli/compare/v0.2.6...v0.2.7
 [0.2.6]: https://github.com/masterbatcoderman10/blueprint-cli/compare/v0.2.5...v0.2.6
 [0.2.5]: https://github.com/masterbatcoderman10/blueprint-cli/compare/v0.2.4...v0.2.5
