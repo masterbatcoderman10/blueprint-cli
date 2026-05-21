@@ -9,7 +9,7 @@
 - **Runtime:** Node.js >=18.0.0 (required for the `better-sqlite3` tracker storage backend)
 - **Package manager:** npm
 - **Language:** TypeScript
-- **Distribution:** npm global install (`npm install -g @splitwireml/blueprint`)
+- **Distribution:** npm global install (`npm install -g blueprint-agentic-development`)
 - **Primary scope:** filesystem and markdown-oriented CLI operations
 
 ## Libraries & Tools
@@ -60,16 +60,18 @@
 
 ## Releasing
 
-- **Package:** `@splitwireml/blueprint`
-- **Release tag format:** `vMAJOR.MINOR.PATCH` (e.g., `v0.1.3`)
+- **Package:** `blueprint-agentic-development` (unscoped, published at npmjs.com/package/blueprint-agentic-development)
+- **Release tag format:** `vMAJOR.MINOR.PATCH` (e.g., `v0.2.7`)
 - **Release flow:**
-  1. Bump version: `npm version <version> --no-git-tag-version`
+  1. Bump version in `package.json`
   2. Run release verification: `npm run release:check`
-  3. Commit: `git add package.json package-lock.json && git commit -m "v<version>: <summary>"`
+  3. Commit: `git add package.json && git commit -m "chore: bump version to <version>"`
   4. Tag: `git tag v<version>`
   5. Push with tags: `git push origin main --tags`
-  6. Verify deployment: `gh run list --limit 5` — confirm both CI and Publish workflows pass
-- **Automation:** Pushing a `vMAJOR.MINOR.PATCH` tag triggers the GitHub Actions Publish workflow, which deploys to npm automatically
+  6. Verify deployment: `gh run watch <run-id>` — confirm all steps green including **Publish to npm**
+- **Automation:** Pushing a `vMAJOR.MINOR.PATCH` tag triggers the GitHub Actions `publish.yml` workflow, which publishes to npm via OIDC trusted publishing (no token required)
+- **First publish of a new package name:** Must be done manually (`npm publish`) to establish npm ownership before OIDC takes over
+- **OIDC config:** npmjs.com → package Settings → Automated Publishing → repo `masterbatcoderman10/blueprint-cli`, workflow `publish.yml`
 - **Release contract:** `docs/release-contract.md`
 - **Maintainer guide:** `docs/releasing.md`
 
