@@ -174,6 +174,7 @@ and parallel streams of tasks.
   </AntiPattern>
   <AntiPattern name="Stream-Title Duplication in Task Titles">
     <BadExample>Task titles repeat the gate or stream name they live inside, e.g., "Stream A — Build share endpoint" inside Stream A, or "Gate 4.0 — Define permission levels enum" inside Gate 4.0.</BadExample>
+    <GoodExample>Task title: "Build share endpoint" inside Stream A. The stream context comes from the ID prefix and Gate/Stream field — no need to repeat it in the title.</GoodExample>
     <Why>The Gate/Stream field in the task table and the task ID prefix already identify where a task belongs. Repeating that context in the title wastes space and creates visual noise in tracker listings and board views. Task titles should describe the work, not its container.</Why>
   </AntiPattern>
 </AntiPatterns>

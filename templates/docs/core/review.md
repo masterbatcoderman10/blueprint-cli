@@ -77,14 +77,27 @@ the tracker and either approves it or leaves structured feedback.
            -H "Content-Type: application/json"
          ```
          You may also attach optional review comments atomically
-         with the approval by supplying a `comments` array:
+         with the approval by supplying a `comments` array.
+
+         Single MAJOR note (acknowledged, non-blocking):
+         ```bash
+         curl -X POST http://127.0.0.1:7300/tasks/<id>/approve \
+           -H "Content-Type: application/json" \
+           -d '{
+             "comments": [
+               { "severity": "MAJOR", "body": "Clean overall. Note: error path in helper skips logging -- acceptable for now but worth revisiting before next release.", "author": "reviewer" }
+             ]
+           }'
+         ```
+
+         Batch with reply (parent_id threads a note under a prior comment):
          ```bash
          curl -X POST http://127.0.0.1:7300/tasks/<id>/approve \
            -H "Content-Type: application/json" \
            -d '{
              "comments": [
                { "severity": "MINOR", "body": "Clean -- no issues found.", "author": "reviewer" },
-               { "severity": "MINOR", "body": "Consider renaming the helper for clarity in a follow-up.", "author": "reviewer" }
+               { "severity": "MINOR", "body": "Consider renaming the helper for clarity in a follow-up.", "author": "reviewer", "parent_id": <prior-comment-id> }
              ]
            }'
          ```
