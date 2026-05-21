@@ -28,6 +28,13 @@ function validateComment(
     }
   }
 
+  if (typeof input.body !== 'string' || input.body.trim() === '') {
+    return {
+      code: 'invalid_comments',
+      message: 'Comment body must be a non-empty string.',
+    }
+  }
+
   if (input.parent_id) {
     const parent = db
       .prepare('SELECT task_id FROM review_comments WHERE id = ?')

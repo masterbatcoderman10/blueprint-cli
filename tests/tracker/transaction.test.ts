@@ -128,6 +128,24 @@ describe('Gate R9-1.0.2 — workflow transactional helper', () => {
     })
   })
 
+  it('T-R9-1.0.2.2: rolls back on missing or empty comment body', () => {
+    const db = openMemoryDb()
+    seedTask(db, 'R9-1.0.2-body', 'TO-DO')
+
+    const missingBody = runWorkflowTransaction(db, 'R9-1.0.2-body', 'IN-PROGRESS', [
+      { severity: 'MAJOR', body: '' },
+    ])
+    expect(missingBody.ok).toBe(false)
+    if (missingBody.ok) return
+    expect(missingBody.error.code).toBe('invalid_comments')
+
+    const taskRow = db.prepare('SELECT state FROM tasks WHERE id = ?').get('R9-1.0.2-body') as { state: string }
+    expect(taskRow.state).toBe('TO-DO')
+
+    const commentRows = db.prepare('SELECT COUNT(*) AS count FROM review_comments WHERE task_id = ?').get('R9-1.0.2-body') as { count: number }
+    expect(commentRows.count).toBe(0)
+  })
+
   it('T-R9-1.0.2.4: two concurrent gated calls on the same task serialize through SQLite', () => {
     const db = openMemoryDb()
     seedTask(db, 'R9-1.0.2', 'IN-REVIEW')

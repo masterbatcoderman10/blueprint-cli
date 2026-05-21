@@ -7,7 +7,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import BetterSqlite3 from 'better-sqlite3'
 
-import { serializeSnapshot } from '../../src/tracker/export'
+import { serializeSnapshot, writeSnapshotAtomic } from '../../src/tracker/export'
 import { createServer } from '../../src/tracker/server'
 import { applySchema } from '../../src/tracker/schema'
 
@@ -119,6 +119,7 @@ afterEach(async () => {
 
 describe('Gate R9-1.0.4 — workflow endpoint snapshot behavior', () => {
   it('T-R9-1.0.4.1: successful gated endpoint call triggers exactly one JSON snapshot write per request', async () => {
+    const writeSpy = vi.spyOn(await import('../../src/tracker/export'), 'writeSnapshotAtomic')
     const running = await listen()
 
     await requestJson(running.origin, '/tasks', {
@@ -133,22 +134,22 @@ describe('Gate R9-1.0.4 — workflow endpoint snapshot behavior', () => {
       }),
     })
 
-    const before = readSnapshotJson(running.projectRoot)
-    const beforeCount = before.tasks.length
+    const beforeCount = writeSpy.mock.calls.length
 
     const started = await requestJson(running.origin, '/tasks/R9-1.0.4/start', {
       method: 'POST',
     })
 
     expect(started.status).toBe(200)
+    expect(writeSpy.mock.calls.length - beforeCount).toBe(1)
     const after = readSnapshotJson(running.projectRoot)
     expect(after.tasks).toEqual(
       expect.arrayContaining([expect.objectContaining({ id: 'R9-1.0.4', state: 'IN-PROGRESS' })]),
     )
-    expect(after.tasks.length).toBe(beforeCount)
   })
 
   it('T-R9-1.0.4.2: failed gated call (validation error rollback) writes no snapshot', async () => {
+    const writeSpy = vi.spyOn(await import('../../src/tracker/export'), 'writeSnapshotAtomic')
     const running = await listen()
 
     await requestJson(running.origin, '/tasks', {
@@ -169,18 +170,18 @@ describe('Gate R9-1.0.4 — workflow endpoint snapshot behavior', () => {
       body: JSON.stringify({ state: 'IN-REVIEW' }),
     })
 
-    const before = readSnapshotJson(running.projectRoot)
+    const beforeCount = writeSpy.mock.calls.length
 
     const failed = await requestJson(running.origin, '/tasks/R9-1.0.4-fail/start', {
       method: 'POST',
     })
 
     expect(failed.status).toBe(409)
-    const after = readSnapshotJson(running.projectRoot)
-    expect(after).toEqual(before)
+    expect(writeSpy.mock.calls.length - beforeCount).toBe(0)
   })
 
   it('T-R9-1.0.4.3: idempotent no-op call writes the snapshot exactly once', async () => {
+    const writeSpy = vi.spyOn(await import('../../src/tracker/export'), 'writeSnapshotAtomic')
     const running = await listen()
 
     await requestJson(running.origin, '/tasks', {
@@ -195,13 +196,14 @@ describe('Gate R9-1.0.4 — workflow endpoint snapshot behavior', () => {
       }),
     })
 
-    const before = readSnapshotJson(running.projectRoot)
+    const beforeCount = writeSpy.mock.calls.length
 
     const noop = await requestJson(running.origin, '/tasks/R9-1.0.4-noop/start', {
       method: 'POST',
     })
 
     expect(noop.status).toBe(200)
+    expect(writeSpy.mock.calls.length - beforeCount).toBe(1)
     const after = readSnapshotJson(running.projectRoot)
     expect(after.tasks).toEqual(
       expect.arrayContaining([expect.objectContaining({ id: 'R9-1.0.4-noop', state: 'IN-PROGRESS' })]),
