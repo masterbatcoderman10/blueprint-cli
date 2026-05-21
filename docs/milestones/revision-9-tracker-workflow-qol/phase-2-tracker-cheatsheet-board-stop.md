@@ -115,11 +115,82 @@ Stream A depends on the Gate (git-context resolver, shared-lock module rewrite, 
 
 ---
 
+## Test Plan
+
+> Generated from task analysis. Each testable task has one or more tests mapped to it. Tests are written before implementation (TDD) during task execution. Assertions favor token-based / structural matching over exact human-string equality to limit churn risk on copy edits.
+
+### Gate R9-2.0 Tests
+
+| Test ID | Task | Type | Description | Expected Result |
+|---------|------|------|-------------|-----------------|
+| T-R9-2.0.1.1 | R9-2.0.1 | integration | `getGitCommonDir(cwd)` resolves the canonical git common dir for a repo root | Returns absolute path equal to `git rev-parse --git-common-dir` |
+| T-R9-2.0.1.2 | R9-2.0.1 | integration | `getGitCommonDir` from a peer worktree returns the same absolute path as from the main worktree | Both calls return byte-identical absolute path |
+| T-R9-2.0.1.3 | R9-2.0.1 | unit | `getGitCommonDir` outside any git repo / when git unavailable | Returns `{ ok: false, code: 'no_git' }`; no throw |
+| T-R9-2.0.1.4 | R9-2.0.1 | integration | `getWorktreeRoot(cwd)` returns absolute worktree top | Equals `git rev-parse --show-toplevel` |
+| T-R9-2.0.2.1 | R9-2.0.2 | integration | `writeLock` writes only to `<git-common-dir>/blueprint-board.lock`; legacy `docs/.blueprint/board.lock` is not created | Shared-lock file exists at common dir; legacy path absent |
+| T-R9-2.0.2.2 | R9-2.0.2 | integration | `writeLock` payload includes `pid`, `port`, `started_at`, and `worktree` (absolute path captured at write time) | All four fields present and correctly typed |
+| T-R9-2.0.2.3 | R9-2.0.2 | integration | `readLock` in peer worktree reads lock written from main worktree | Returns payload identical to the writer's |
+| T-R9-2.0.2.4 | R9-2.0.2 | unit | `clearLock` removes shared-lock file; idempotent when absent | File gone; second call resolves with no throw |
+| T-R9-2.0.2.5 | R9-2.0.2 | integration | Reciprocal: lock written from peer worktree readable byte-identical from main worktree | Both reads return identical payload |
+| T-R9-2.0.2.6 | R9-2.0.2 | unit | `readLock` on truncated / corrupt JSON returns `null` without throwing | Graceful null; no crash; no partial-data return |
+| T-R9-2.0.3.1 | R9-2.0.3 | unit | `sweepLegacyLock(worktreeRoot)` removes legacy `docs/.blueprint/board.lock` and returns `true` | File deleted; return value `true` |
+| T-R9-2.0.3.2 | R9-2.0.3 | unit | `sweepLegacyLock` no-op when legacy file absent | Returns `false`; no error |
+| T-R9-2.0.4.1 | R9-2.0.4 | unit | `requireGitContext` returns `{ commonDir, worktreeRoot }` inside repo | Tuple matches the two resolver helpers |
+| T-R9-2.0.4.2 | R9-2.0.4 | integration | Parameterized across `start` / `stop` / `status`: outside git, each subcommand surfaces a byte-identical canonical refusal string sourced from `NoGitContextError` | All three captured outputs equal each other; error is `instanceof NoGitContextError` |
+
+### Stream A Tests
+
+| Test ID | Task | Type | Description | Expected Result |
+|---------|------|------|-------------|-----------------|
+| T-R9-2.A.1.1 | R9-2.A.1 | integration | `blueprint board <unknown>` returns a usage error with exit `1` | stderr contains usage line; exit code `1` |
+| T-R9-2.A.2.1 | R9-2.A.2 | integration | `blueprint board` outside any git repo refuses with canonical message, exit `1`, no lock written | Token-match canonical refusal; exit `1`; no shared lock created |
+| T-R9-2.A.2.2 | R9-2.A.2 | integration | First boot with legacy `docs/.blueprint/board.lock` present: exactly one migration warning, legacy deleted, shared lock written | One warning line (count asserted = 1); legacy file gone; shared lock present |
+| T-R9-2.A.2.3 | R9-2.A.2 | integration | Second `blueprint board` in same worktree while live lock → refusal contains URL + originating worktree (token-based), exit `1`, `openUrl` NOT called | Output contains URL token and worktree path token; `openUrl` mock uncalled; exit `1` |
+| T-R9-2.A.2.4 | R9-2.A.2 | integration | Second `blueprint board` in **peer worktree** of same repo → same refusal; originating worktree token equals first worktree | Worktree token in output equals first worktree; exit `1` |
+| T-R9-2.A.2.5 | R9-2.A.2 | integration | Concurrent boots in two peer worktrees → exactly one starts the server | One process binds port + writes lock; the other exits `1` with refusal |
+| T-R9-2.A.2.6 | R9-2.A.2 | integration | `--headless` flag and BOARD_PORTS dynamic binding (7300–7309) preserved after refactor | Boot succeeds without `openUrl`; bound port within range |
+| T-R9-2.A.2.7 | R9-2.A.2 | integration | Lock `worktree` field equals `git rev-parse --show-toplevel` of the **booting** worktree (peer case) — not cwd, not project root | Field equals booting worktree absolute path |
+| T-R9-2.A.2.8 | R9-2.A.2 | integration | Happy-path non-headless boot: `openUrl` called exactly once with the bound URL | Mock called 1x; argument equals printed URL |
+| T-R9-2.A.2.9 | R9-2.A.2 | integration | Second / subsequent boots after one-time legacy sweep emit zero migration warnings | No legacy-warning substring in output of second boot |
+| T-R9-2.A.2.10 | R9-2.A.2 | integration | Post-race lock contents pin: after concurrent boot race, lock JSON parses cleanly and `pid` / `port` match the surviving server (no torn write) | Lock parses; pid + port equal the winner; not the loser's values |
+| T-R9-2.A.3.1 | R9-2.A.3 | integration | `blueprint board stop` with no lock → "no board running" message, exit `0` | Message token present; exit `0` |
+| T-R9-2.A.3.2 | R9-2.A.3 | integration | `blueprint board stop` with stale lock (pid-dead) → cleanup message, exit `0`, lock removed | Cleanup token present; exit `0`; lock file gone |
+| T-R9-2.A.3.3 | R9-2.A.3 | integration | `blueprint board stop` against live board → SIGTERM kills process; `/project` confirmed unreachable **within 1s** post-signal; lock cleared; exit `0` | Live proc exits; `/project` fetch fails within 1s window; no lock; "Stopped board…" token |
+| T-R9-2.A.3.4 | R9-2.A.3 | integration | `blueprint board stop` against SIGTERM-ignoring child: escalates to SIGKILL within the 2s–2.5s window | Child terminated; elapsed time ≥ 2.0s and ≤ 2.5s; lock cleared; exit `0` |
+| T-R9-2.A.3.5 | R9-2.A.3 | integration | `blueprint board stop` against stale-by-port lock (pid alive, port unreachable) → cleanup message, exit `0`, lock cleared | Cleanup token present; exit `0`; lock file gone |
+| T-R9-2.A.4.1 | R9-2.A.4 | integration | `blueprint board status` with no lock → "no board running for this repo" message, exit `2` | Message token present; exit code exactly `2` |
+| T-R9-2.A.4.2 | R9-2.A.4 | integration | `blueprint board status` with stale lock → "Stale lock detected" output; hint references `blueprint board stop`; exit `1` | Both substrings present; exit code exactly `1` |
+| T-R9-2.A.4.3 | R9-2.A.4 | integration | `blueprint board status` against live board → output contains URL, pid, worktree, and uptime; uptime matches `\d+[hms](?:\s\d+[ms])*`; exit `0` | All four tokens present; uptime matches regex; exit `0` |
+| T-R9-2.A.5.1 | R9-2.A.5 | integration | All four invocations route through the dispatcher: `blueprint board`, `… start`, `… stop`, `… status` | Each routes to its expected handler (verified via behavior probe) |
+
+### Stream B Tests
+
+| Test ID | Task | Type | Description | Expected Result |
+|---------|------|------|-------------|-----------------|
+| T-R9-2.B.1.1 | R9-2.B.1 | unit | Markdown heading-token sequence at the top of `docs/core/tracker.md` is exactly `[Board lifecycle, Gated transitions, Comment recipes, Task creation, …deeper-detail headings]` in that order | Parsed heading list matches expected prefix sequence |
+| T-R9-2.B.1.2 | R9-2.B.1 | unit | Board lifecycle section documents the three subcommands (`start` default / `stop` / `status`), the shared-lock path `<git-common-dir>/blueprint-board.lock`, the duplicate-start refusal contract, and the legacy-lock migration note | All four required tokens present under the lifecycle heading scope |
+| T-R9-2.B.1.3 | R9-2.B.1 | unit | Gated transitions section has at least one curl recipe per verb — each with `POST` and `/tasks/:id/<verb>` URL fragment for `start` / `submit` / `approve` / `reject` / `resume` | Five POST+URL patterns present (one per verb) |
+| T-R9-2.B.1.4 | R9-2.B.1 | unit | Deeper-detail block retains a full curl reference including raw `PATCH /tasks/:id`, explicitly marked non-canonical for the five gated transitions | Both substrings present; non-canonical disclaimer in same scope |
+| — | R9-2.B.2 | — | Not testable (no new test): coverage delivered by existing parameterized `tests/stream-c/project-templates-mirror.test.ts` which already enforces byte-for-byte equality of every templated core doc. | — |
+| T-R9-2.B.3.1 | R9-2.B.3, R9-2.B.4 | unit | Parameterized over `[MAS-204, MAS-205]`: `docs/srs.md` contains a new Phase 2 change-log entry under that requirement covering the locked elaboration (MAS-205: lifecycle + shared lock + refusal + sweep; MAS-204: no server-surface change) and prior change-log entries are preserved | Both parameter cases pass: new entry token present; prior entries still present |
+
+### Test Summary
+
+| Component | Total Tasks | Testable | Not Testable | Tests |
+|-----------|-------------|----------|--------------|-------|
+| Gate R9-2.0 | 4 | 4 | 0 | 14 |
+| Stream A | 5 | 5 | 0 | 20 |
+| Stream B | 4 | 3 | 1 | 5 |
+| **Total** | **13** | **12** | **1** | **39** |
+
+---
+
 ## Definition of Done
 
 - [ ] Gate R9-2.0 acceptance criteria pass.
 - [ ] Stream A acceptance criteria pass.
 - [ ] Stream B acceptance criteria pass.
+- [ ] All tests in the Test Plan pass.
 - [ ] No lint errors in files touched by this phase.
 - [ ] Full test suite green after forward-only test additions covering the new lock path, the new subcommands, and the cheatsheet structural assertions.
 - [ ] `docs/core/tracker.md` and `templates/docs/core/tracker.md` remain byte-for-byte aligned via the existing parameterized template-mirror test.
