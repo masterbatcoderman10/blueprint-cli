@@ -256,8 +256,8 @@ describe('Stream B — reviewer-verb endpoints (approve / reject)', () => {
       .get('R9-1.B.1') as { count: number }
     expect(commentRows.count).toBe(0)
 
-    // Missing / empty body in batch
-    const bodyRes = await requestJson(running.origin, '/tasks/R9-1.B.1/approve', {
+    // Empty body in batch
+    const emptyBodyRes = await requestJson(running.origin, '/tasks/R9-1.B.1/approve', {
       method: 'POST',
       body: JSON.stringify({
         comments: [
@@ -267,8 +267,30 @@ describe('Stream B — reviewer-verb endpoints (approve / reject)', () => {
       }),
     })
 
-    expect(bodyRes.status).toBe(400)
-    expect(bodyRes.body).toMatchObject({ error: { code: 'invalid_comments' } })
+    expect(emptyBodyRes.status).toBe(400)
+    expect(emptyBodyRes.body).toMatchObject({ error: { code: 'invalid_comments' } })
+
+    taskRow = db.prepare('SELECT state FROM tasks WHERE id = ?').get('R9-1.B.1') as { state: string }
+    expect(taskRow.state).toBe('IN-REVIEW')
+
+    commentRows = db
+      .prepare('SELECT COUNT(*) AS count FROM review_comments WHERE task_id = ?')
+      .get('R9-1.B.1') as { count: number }
+    expect(commentRows.count).toBe(0)
+
+    // Omitted body property in batch (typeof input.body !== 'string' branch)
+    const omittedBodyRes = await requestJson(running.origin, '/tasks/R9-1.B.1/approve', {
+      method: 'POST',
+      body: JSON.stringify({
+        comments: [
+          { severity: 'MAJOR', body: 'Valid' },
+          { severity: 'MAJOR' },
+        ],
+      }),
+    })
+
+    expect(omittedBodyRes.status).toBe(400)
+    expect(omittedBodyRes.body).toMatchObject({ error: { code: 'invalid_comments' } })
 
     taskRow = db.prepare('SELECT state FROM tasks WHERE id = ?').get('R9-1.B.1') as { state: string }
     expect(taskRow.state).toBe('IN-REVIEW')
@@ -492,8 +514,8 @@ describe('Stream B — reviewer-verb endpoints (approve / reject)', () => {
       .get('R9-1.B.2') as { count: number }
     expect(commentRows.count).toBe(0)
 
-    // Missing / empty body in batch
-    const bodyRes = await requestJson(running.origin, '/tasks/R9-1.B.2/reject', {
+    // Empty body in batch
+    const emptyBodyRes = await requestJson(running.origin, '/tasks/R9-1.B.2/reject', {
       method: 'POST',
       body: JSON.stringify({
         comments: [
@@ -504,8 +526,31 @@ describe('Stream B — reviewer-verb endpoints (approve / reject)', () => {
       }),
     })
 
-    expect(bodyRes.status).toBe(400)
-    expect(bodyRes.body).toMatchObject({ error: { code: 'invalid_comments' } })
+    expect(emptyBodyRes.status).toBe(400)
+    expect(emptyBodyRes.body).toMatchObject({ error: { code: 'invalid_comments' } })
+
+    taskRow = db.prepare('SELECT state FROM tasks WHERE id = ?').get('R9-1.B.2') as { state: string }
+    expect(taskRow.state).toBe('IN-REVIEW')
+
+    commentRows = db
+      .prepare('SELECT COUNT(*) AS count FROM review_comments WHERE task_id = ?')
+      .get('R9-1.B.2') as { count: number }
+    expect(commentRows.count).toBe(0)
+
+    // Omitted body property in batch (typeof input.body !== 'string' branch)
+    const omittedBodyRes = await requestJson(running.origin, '/tasks/R9-1.B.2/reject', {
+      method: 'POST',
+      body: JSON.stringify({
+        comments: [
+          { severity: 'MAJOR', body: 'Valid 1' },
+          { severity: 'MAJOR', body: 'Valid 2' },
+          { severity: 'MAJOR' },
+        ],
+      }),
+    })
+
+    expect(omittedBodyRes.status).toBe(400)
+    expect(omittedBodyRes.body).toMatchObject({ error: { code: 'invalid_comments' } })
 
     taskRow = db.prepare('SELECT state FROM tasks WHERE id = ?').get('R9-1.B.2') as { state: string }
     expect(taskRow.state).toBe('IN-REVIEW')
