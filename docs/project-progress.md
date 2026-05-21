@@ -2,9 +2,9 @@
 
 **Project**: blueprint-cli
 **Tracker**: blueprint-cli
-**Current Milestone**: Revision 8 - Tweak Revamp and Quality of Life Changes
+**Current Milestone**: Revision 9 - Tracker Workflow QoL
 **Current Phase**: TBD — pending phase planning
-**Status**: Complete
+**Status**: Planning
 
 ---
 
@@ -77,6 +77,7 @@
 - 2026-05-20: Revision 8 Phase 1 — Quality of Life Workflow Hardening completed. All tasks done, DoD satisfied, full test suite green (959 tests, 133 files).
 - 2026-05-20: Revision 8 Phase 2 — Tweak Planning Flow Rewrite completed. All tasks done, DoD satisfied, full test suite green (1010 tests). tweak-planning.md rewritten end-to-end for MAS-207 change-first workflow; templates mirrored byte-for-byte; CLAUDE.md routing updated; doc-contract, R7, and R2 contract tests updated to MAS-207; tweak-5 marked superseded; MAS-207 transitioned to active in SRS.
 - 2026-05-20: Revision 8 — Tweak Revamp and Quality of Life Changes completed. All phases done.
+- 2026-05-21: Identified Revision 9 — Tracker Workflow QoL to add gated workflow HTTP endpoints (`POST /tasks/:id/start | submit | approve | reject | resume` with source-state enforcement; `approve` and `reject` accept multi-comment payloads applied atomically), tighten tracker workflow contracts in execution / review / phase-planning / orchestrate / health-check, rewrite `docs/core/tracker.md` cheatsheet-first, and add a `blueprint board stop` subcommand that terminates the live board via `board.lock` and clears stale locks. Impact spans R6 (tracker core + board CLI + protocol docs) and R8 (workflow contract hardening). SRS: MAS-204 and MAS-205 elaborated same-ID; MAS-203 untouched. 2 phases planned. Revision document at `docs/milestones/revision-9-tracker-workflow-qol/revision-9-tracker-workflow-qol.md`.
 
 ---
 
@@ -129,6 +130,9 @@ R7 — Standalone Tweak Workflow
 R8 — Tweak Revamp and Quality of Life Changes
 ├── Phase 1 — Quality of Life Workflow Hardening ✓
 └── Phase 2 — Tweak Planning Flow Rewrite ✓
+R9 — Tracker Workflow QoL
+├── Phase 1 — Tracker Workflow Endpoints & Contract QoL ○
+└── Phase 2 — Tracker Cheatsheet & Board Stop Command ○
 M2 — Cross-Project Context (Optional Post-MVP)
 └── Phase 1 — TBD ○
 M3 — Workflow Visibility Enhancements (Optional Future)
@@ -144,3 +148,4 @@ M3 — Workflow Visibility Enhancements (Optional Future)
 
 | Revision | Name | Status | Notes |
 |----------|------|--------|-------|
+| R9 | Tracker Workflow QoL | Planning | 2 phases. Gated workflow endpoints + multi-comment approve/reject; cheatsheet-first tracker.md; `blueprint board stop`. Elaborates MAS-204 and MAS-205 same-ID. |
