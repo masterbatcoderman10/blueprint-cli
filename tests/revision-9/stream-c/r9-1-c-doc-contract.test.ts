@@ -24,6 +24,7 @@ describe('T-R9-1.C.3: Stream-Title Duplication anti-pattern in phase-planning.md
 
     expect(block).toMatch(/<AntiPattern name="Stream-Title Duplication in Task Titles">/)
     expect(block).toMatch(/<BadExample>/)
+    expect(block).toMatch(/<GoodExample>/)
     expect(block).toMatch(/<Why>/)
   })
 })
