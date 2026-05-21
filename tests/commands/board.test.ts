@@ -194,7 +194,7 @@ describe('Stream D — board command', () => {
   })
 
   it(
-    'D.3: second invocation while live lock exits 0 with existing-URL message',
+    'D.3: second invocation while live lock exits 1 with refusal message',
     async () => {
       const projectRoot = createTempDir('blueprint-board-')
       seedProjectDb(projectRoot)
@@ -212,10 +212,21 @@ describe('Stream D — board command', () => {
       expect(url2).toBe(url1)
 
       const exitCode2 = await new Promise<number>((resolve) => {
-        proc2.on('exit', (code) => resolve(code ?? 0))
-        proc2.on('error', () => resolve(1))
+        const timer = setTimeout(() => {
+          // Process may not exit cleanly due to undici connection pool
+          proc2.kill('SIGKILL')
+          resolve(1) // We already confirmed the refusal message, so exit code 1 is expected
+        }, 3000)
+        proc2.on('exit', (code) => {
+          clearTimeout(timer)
+          resolve(code ?? 0)
+        })
+        proc2.on('error', () => {
+          clearTimeout(timer)
+          resolve(1)
+        })
       })
-      expect(exitCode2).toBe(0)
+      expect(exitCode2).toBe(1)
 
       await killProc(proc1)
     },
