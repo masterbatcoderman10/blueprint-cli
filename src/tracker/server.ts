@@ -280,7 +280,18 @@ export function createServer(options: ServerOptions): Server {
 
   return createHttpServer(async (request, response) => {
     try {
-      const body = request.method === 'GET' || request.method === 'DELETE' ? undefined : await readJson(request)
+      const url = new URL(request.url ?? '/', 'http://127.0.0.1')
+      const parts = url.pathname.split('/').filter(Boolean)
+      const isSimpleVerb =
+        request.method === 'POST' &&
+        parts.length === 3 &&
+        parts[0] === 'tasks' &&
+        (parts[2] === 'start' || parts[2] === 'submit' || parts[2] === 'resume')
+
+      const body =
+        isSimpleVerb || request.method === 'GET' || request.method === 'DELETE'
+          ? undefined
+          : await readJson(request)
       const result = route(options.db, request, body)
 
       // Ordering contract: route() applies the DB mutation synchronously, then

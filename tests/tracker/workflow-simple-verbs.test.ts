@@ -334,5 +334,54 @@ describe('Stream A — Simple-Verb Endpoints', () => {
         },
       })
     })
+
+    it('T-R9-1.A.1.7-malformed: malformed JSON body is silently ignored without error', async () => {
+      const running = await listen(openMemoryDb())
+      seedTask(running.db, 'R9-1.A.1-7m-start', 'TO-DO')
+      seedTask(running.db, 'R9-1.A.1-7m-submit', 'IN-PROGRESS')
+      seedTask(running.db, 'R9-1.A.1-7m-resume', 'REWORK')
+
+      const start = await fetch(`${running.origin}/tasks/R9-1.A.1-7m-start/start`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: '{bad json',
+      })
+      expect(start.status).toBe(200)
+      expect(await start.json()).toEqual({
+        ok: true,
+        data: {
+          task: expect.objectContaining({ id: 'R9-1.A.1-7m-start', state: 'IN-PROGRESS' }),
+          comments: [],
+        },
+      })
+
+      const submit = await fetch(`${running.origin}/tasks/R9-1.A.1-7m-submit/submit`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: '{bad json',
+      })
+      expect(submit.status).toBe(200)
+      expect(await submit.json()).toEqual({
+        ok: true,
+        data: {
+          task: expect.objectContaining({ id: 'R9-1.A.1-7m-submit', state: 'IN-REVIEW' }),
+          comments: [],
+        },
+      })
+
+      const resume = await fetch(`${running.origin}/tasks/R9-1.A.1-7m-resume/resume`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: '{bad json',
+      })
+      expect(resume.status).toBe(200)
+      expect(await resume.json()).toEqual({
+        ok: true,
+        data: {
+          task: expect.objectContaining({ id: 'R9-1.A.1-7m-resume', state: 'IN-PROGRESS' }),
+          comments: [],
+        },
+      })
+    })
   })
 })
