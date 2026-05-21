@@ -7,6 +7,7 @@ import { clearLock, isLockAlive, readLock, writeLock } from '../tracker/board-lo
 import { BOARD_PORTS, findFreePort } from '../tracker/board-port'
 import { openUrl } from '../tracker/browser-open'
 import type { TrackerDbHandle } from '../tracker/db'
+import { requireGitContext } from '../tracker/git-context'
 import { findProjectRoot } from '../tracker/project-root'
 import { createServer } from '../tracker/server'
 import { serveStatic } from '../tracker/static-handler'
@@ -80,13 +81,19 @@ async function runBoard({ headless }: { headless: boolean }): Promise<{ exitCode
   let trackerDb: TrackerDbHandle | undefined
   let server: ReturnType<typeof createHttpServer> | undefined
   let projectRoot: string | undefined
+  let commonDir: string | undefined
+  let worktreeRoot: string | undefined
   let lockWritten = false
 
   try {
     projectRoot = findProjectRoot(process.cwd())
 
+    const gitContext = requireGitContext(process.cwd())
+    commonDir = gitContext.commonDir
+    worktreeRoot = gitContext.worktreeRoot
+
     // Check for existing live lock
-    const existingLock = await readLock(projectRoot)
+    const existingLock = await readLock(commonDir)
     if (existingLock) {
       const alive = await isLockAlive(existingLock)
       if (alive) {
@@ -98,7 +105,7 @@ async function runBoard({ headless }: { headless: boolean }): Promise<{ exitCode
         return { exitCode: 0 }
       }
       // Stale lock — remove it
-      await clearLock(projectRoot)
+      await clearLock(commonDir)
     }
 
     const { openDb } = await import('../tracker/db')
@@ -125,7 +132,7 @@ async function runBoard({ headless }: { headless: boolean }): Promise<{ exitCode
     const address = server.address() as AddressInfo
     const url = `http://${address.address}:${address.port}`
 
-    await writeLock(projectRoot, { pid: process.pid, port: address.port })
+    await writeLock(commonDir, { pid: process.pid, port: address.port, worktree: worktreeRoot })
     lockWritten = true
 
     console.log(`Board available at ${url}`)
@@ -160,9 +167,9 @@ async function runBoard({ headless }: { headless: boolean }): Promise<{ exitCode
         // Ignore close errors during cleanup
       }
     }
-    if (lockWritten && projectRoot) {
+    if (lockWritten && commonDir) {
       try {
-        await clearLock(projectRoot)
+        await clearLock(commonDir)
       } catch {
         // Ignore lock-clear errors during cleanup
       }
