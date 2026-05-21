@@ -3,7 +3,9 @@ import { createServer as createHttpServer } from 'node:http'
 import { resolve } from 'node:path'
 
 import type { CommandDefinition } from '../runtime'
-import { clearLock, isLockAlive, readLock, writeLock } from '../tracker/board-lock'
+import { runBoardStop } from './board-stop'
+import { runBoardStatus } from './board-status'
+import { clearLock, isLockAlive, readLock, sweepLegacyLock, writeLock } from '../tracker/board-lock'
 import { BOARD_PORTS, findFreePort } from '../tracker/board-port'
 import { openUrl } from '../tracker/browser-open'
 import type { TrackerDbHandle } from '../tracker/db'
@@ -86,11 +88,17 @@ async function runBoard({ headless }: { headless: boolean }): Promise<{ exitCode
   let lockWritten = false
 
   try {
-    projectRoot = findProjectRoot(process.cwd())
-
     const gitContext = requireGitContext(process.cwd())
     commonDir = gitContext.commonDir
     worktreeRoot = gitContext.worktreeRoot
+
+    projectRoot = findProjectRoot(process.cwd())
+
+    // Sweep legacy lock if present
+    const swept = await sweepLegacyLock(worktreeRoot)
+    if (swept) {
+      console.log('Migrating legacy board lock to shared location.')
+    }
 
     // Check for existing live lock
     const existingLock = await readLock(commonDir)
@@ -98,11 +106,8 @@ async function runBoard({ headless }: { headless: boolean }): Promise<{ exitCode
       const alive = await isLockAlive(existingLock)
       if (alive) {
         const url = `http://127.0.0.1:${existingLock.port}`
-        console.log(`Board already running at ${url}`)
-        if (!headless) {
-          await openUrl(url)
-        }
-        return { exitCode: 0 }
+        console.log(`Board already running at ${url} (started from ${existingLock.worktree}). Run \`blueprint board stop\` to stop it.`)
+        return { exitCode: 1 }
       }
       // Stale lock — remove it
       await clearLock(commonDir)
@@ -180,7 +185,24 @@ async function runBoard({ headless }: { headless: boolean }): Promise<{ exitCode
 export const boardCommand: CommandDefinition = {
   name: 'board',
   handler: async ({ args }) => {
-    const headless = args.includes('--headless')
-    return runBoard({ headless })
+    const flags = args.filter((a) => a.startsWith('-'))
+    const positionals = args.filter((a) => !a.startsWith('-'))
+    const subcommand = positionals[0]
+
+    if (!subcommand || subcommand === 'start') {
+      const headless = flags.includes('--headless')
+      return runBoard({ headless })
+    }
+
+    if (subcommand === 'stop') {
+      return runBoardStop()
+    }
+
+    if (subcommand === 'status') {
+      return runBoardStatus()
+    }
+
+    console.error('Usage: blueprint board [start|stop|status] [--headless]')
+    return { exitCode: 1 }
   },
 }
