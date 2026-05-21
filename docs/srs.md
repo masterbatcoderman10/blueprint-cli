@@ -220,6 +220,7 @@ Change log:
 - 2026-05-19 - Transitioned to active. Phase 5 complete: milestone field, filter, migration, and board rendering all implemented and verified.
 - 2026-05-20 - Elaborated by Revision 8 planning: tracker mutation must go through the tracker HTTP API, not raw SQL or direct database edits; actionable review feedback should use tracker comments and replies. Meaning unchanged; ID unchanged.
 - 2026-05-21 - Deepened by Revision 9 Phase 1: added gated workflow endpoints (`POST /tasks/:id/start`, `submit`, `resume`, `approve`, `reject`) with strict source-state enforcement, idempotent no-op semantics, and atomic multi-comment payload on approve/reject. JSON snapshot writes exactly once per gated call after transaction commit. Meaning unchanged; ID unchanged.
+- 2026-05-21 - Confirmed unchanged by Revision 9 Phase 2: the tracker HTTP server surface (endpoints, schema, SPA) is not modified by the Phase 2 board-lifecycle changes. Board lifecycle CLI surface (`stop`, `status`, shared lock, duplicate-start refusal) is owned by MAS-205. Meaning unchanged; ID unchanged.
 
 ### MAS-205
 - Title: Local Project Board UI
@@ -235,6 +236,7 @@ Change log:
 - 2026-05-17 - Created from Revision 6 (recorded 2026-05-18 via R6 Phase 3 pre-phase SRS repair)
 - 2026-05-19 - Transitioned to active. Phase 5 complete: local board SPA with milestone filter dropdown and real milestone count rendering implemented and verified.
 - 2026-05-20 - Elaborated by Revision 8 planning: task-detail rail opens by default to a deterministic task when no valid hash is present, preserves valid hash-selected tasks, and swaps immediately when another task card is clicked. Meaning unchanged; ID unchanged.
+- 2026-05-21 - Elaborated by Revision 9 Phase 2: `blueprint board stop` and `blueprint board status` subcommands added; board lock moved to `<git-common-dir>/blueprint-board.lock` (shared lock across worktrees) with `worktree` field; duplicate-start refusal (same or peer worktree) with no browser auto-open; legacy `docs/.blueprint/board.lock` swept on first boot. Meaning unchanged; ID unchanged.
 
 ### MAS-206
 - Title: Standalone Tweak Workflow

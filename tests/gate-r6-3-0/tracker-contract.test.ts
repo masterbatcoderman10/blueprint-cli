@@ -31,15 +31,17 @@ function sectionAfter(content: string, headingKeyword: string): string {
 }
 
 describe('T-R6-3.0.1: docs/core/tracker.md contract canon', () => {
-  it('T-R6-3.0.1.1: contains all 6 required section headers', async () => {
+  it('T-R6-3.0.1.1: contains all required section headers', async () => {
     const content = await loadTrackerDoc()
     const requiredHeaders = [
+      'Board lifecycle',
+      'Gated transitions',
+      'Comment recipes',
+      'Task creation',
       'Storage location',
       'Schema reference',
       '5-state machine',
-      'CRUD endpoints',
       'Lock-file semantics',
-      'blueprint board lifecycle',
     ]
 
     for (const header of requiredHeaders) {
@@ -61,15 +63,17 @@ describe('T-R6-3.0.1: docs/core/tracker.md contract canon', () => {
 
   it('T-R6-3.0.1.3: contains curl recipes for required endpoints', async () => {
     const content = await loadTrackerDoc()
-    const crudSection = sectionAfter(content, 'CRUD endpoints')
-    expect(crudSection.length, 'CRUD endpoints section should exist and be non-empty').toBeGreaterThan(0)
+    // After R9-2 cheatsheet rewrite, curl recipes are distributed across
+    // Gated transitions, Comment recipes, Task creation, and Full curl reference.
+    const fullCurlSection = sectionAfter(content, 'Full curl reference')
+    expect(fullCurlSection.length, 'Full curl reference section should exist and be non-empty').toBeGreaterThan(0)
 
-    expect(crudSection).toContain('POST /tasks')
-    expect(crudSection).toContain('PATCH /tasks/:id')
-    expect(crudSection).toContain('GET /tasks?phase=')
-    expect(crudSection).toContain('stream=')
-    expect(crudSection).toContain('POST /tasks/:id/comments')
-    expect(crudSection).toContain('GET /project')
+    expect(content).toContain('POST /tasks')
+    expect(content).toContain('PATCH /tasks/:id')
+    expect(content).toContain('GET /tasks?phase=')
+    expect(content).toContain('stream=')
+    expect(content).toContain('POST /tasks/:id/comments')
+    expect(content).toContain('GET /project')
   })
 
   it('T-R6-3.0.1.4: lifecycle section documents agent-initiated background boot', async () => {
