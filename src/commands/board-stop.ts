@@ -25,10 +25,16 @@ export async function runBoardStop(): Promise<{ exitCode: number }> {
       process.kill(lock.pid, 'SIGKILL')
       await new Promise(r => setTimeout(r, 500))
     }
+    let portUnreachable = false
     const portDeadline = Date.now() + 1000
     while (Date.now() < portDeadline) {
-      try { await fetch(`http://127.0.0.1:${lock.port}/project`); await new Promise(r => setTimeout(r, 100)) }
-      catch { break }
+      try {
+        await fetch(`http://127.0.0.1:${lock.port}/project`, { signal: AbortSignal.timeout(200) })
+        await new Promise(r => setTimeout(r, 100))
+      } catch {
+        portUnreachable = true
+        break
+      }
     }
     await clearLock(commonDir)
     console.log(`Stopped board (pid ${lock.pid}, port ${lock.port}).`)

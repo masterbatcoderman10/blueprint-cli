@@ -88,11 +88,11 @@ async function runBoard({ headless }: { headless: boolean }): Promise<{ exitCode
   let lockWritten = false
 
   try {
-    projectRoot = findProjectRoot(process.cwd())
-
     const gitContext = requireGitContext(process.cwd())
     commonDir = gitContext.commonDir
     worktreeRoot = gitContext.worktreeRoot
+
+    projectRoot = findProjectRoot(process.cwd())
 
     // Sweep legacy lock if present
     const swept = await sweepLegacyLock(worktreeRoot)
