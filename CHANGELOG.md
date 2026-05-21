@@ -16,9 +16,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.2.6] — 2026-05-21
 
 ### Changed
-- **Package rename**: Migrated from `@splitwireml/blueprint` to `blueprint-agentic-development` (unscoped, keyword-rich, better npm discoverability)
-- **npm SEO**: Description rewritten to lead with autonomy, parallelism, and agentic framing; keywords expanded from 4 generic tags to 20 high-signal discovery terms (`claude-code`, `agentic-development`, `codex`, `cursor`, `ai-agent`, etc.)
-- Updated all internal references, release contract, tests, and docs from old package name to new
+- **Package rename**: Renamed from `@splitwireml/blueprint` to `blueprint-agentic-development`
+- **npm metadata**: Description and keywords updated to reflect the agentic development framing
+- Updated all internal references, release contract, tests, and docs to new package name
 
 ## [0.2.5] — 2026-05-21
 
