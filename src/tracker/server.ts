@@ -4,8 +4,15 @@ import { dirname, resolve } from 'node:path'
 import { serializeSnapshot, writeSnapshotAtomic } from './export'
 import { createComment, deleteComment, listComments, updateComment } from './routes/comments'
 import { createTask, deleteTask, getTask, listTasks, updateTask } from './routes/tasks'
+import {
+  workflowApprove,
+  workflowReject,
+  workflowResume,
+  workflowStart,
+  workflowSubmit,
+} from './routes/workflow'
 import type { TrackerDatabase } from './schema'
-import type { CommentError, Result, TaskError, TrackerResult } from './types'
+import type { CommentError, JsonObject, Result, TaskError, TrackerResult, WorkflowError } from './types'
 
 interface ServerOptions {
   db: TrackerDatabase
@@ -19,7 +26,6 @@ interface ProjectMetaRow {
   stream_count: number | null
 }
 
-type JsonObject = Record<string, unknown>
 type JsonBody = JsonObject | undefined
 type RouteResult = { status: number; body: Result<unknown, ErrorEnvelope> }
 
@@ -30,6 +36,8 @@ interface ErrorEnvelope {
 
 const ERROR_STATUS: Record<string, number> = {
   duplicate_id: 409,
+  illegal_transition: 409,
+  invalid_comments: 400,
   invalid_json: 400,
   invalid_milestone: 400,
   invalid_parent: 400,
@@ -39,6 +47,8 @@ const ERROR_STATUS: Record<string, number> = {
   not_found: 404,
   project_not_found: 404,
   task_not_found: 404,
+  unknown_state: 400,
+  unknown_verb: 400,
 }
 
 function sendJson(response: ServerResponse, status: number, body: TrackerResult<unknown, ErrorEnvelope>): void {
@@ -78,6 +88,10 @@ function taskResult<TData>(status: number, result: Result<TData, TaskError>): Ro
 
 function commentResult<TData>(status: number, result: TrackerResult<TData, CommentError>): RouteResult {
   return 'data' in result ? dataResult(status, result.data) : errorResult(result.error.code, result.error.message)
+}
+
+function workflowResult(result: Result<unknown, WorkflowError>): RouteResult {
+  return result.ok ? dataResult(200, result.data) : errorResult(result.error.code, result.error.message)
 }
 
 function notFound(): RouteResult {
@@ -207,19 +221,42 @@ function route(db: TrackerDatabase, request: IncomingMessage, body: JsonBody): R
     return methodNotFound()
   }
 
-  if (parts.length === 3 && parts[0] === 'tasks' && parts[2] === 'comments') {
+  if (parts.length === 3 && parts[0] === 'tasks') {
     const taskId = parts[1]
+    const verb = parts[2]
 
-    if (method === 'POST') {
-      return commentResult(201, createComment(db, taskId, body as unknown as Parameters<typeof createComment>[2]))
+    if (verb === 'comments') {
+      if (method === 'POST') {
+        return commentResult(201, createComment(db, taskId, body as unknown as Parameters<typeof createComment>[2]))
+      }
+
+      if (method === 'GET') {
+        const missingTask = ensureTaskExists(db, taskId)
+        return missingTask ? errorResult(missingTask.code, missingTask.message) : commentResult(200, listComments(db, taskId))
+      }
+
+      return methodNotFound()
     }
 
-    if (method === 'GET') {
-      const missingTask = ensureTaskExists(db, taskId)
-      return missingTask ? errorResult(missingTask.code, missingTask.message) : commentResult(200, listComments(db, taskId))
-    }
+    const workflowVerbs = new Set(['start', 'submit', 'resume', 'approve', 'reject'])
+    if (workflowVerbs.has(verb)) {
+      if (method === 'POST') {
+        switch (verb) {
+          case 'start':
+            return workflowResult(workflowStart(db, taskId))
+          case 'submit':
+            return workflowResult(workflowSubmit(db, taskId))
+          case 'resume':
+            return workflowResult(workflowResume(db, taskId))
+          case 'approve':
+            return workflowResult(workflowApprove(db, taskId, body))
+          case 'reject':
+            return workflowResult(workflowReject(db, taskId, body))
+        }
+      }
 
-    return methodNotFound()
+      return methodNotFound()
+    }
   }
 
   if (parts.length === 4 && parts[0] === 'tasks' && parts[2] === 'comments') {

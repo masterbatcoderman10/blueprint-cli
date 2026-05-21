@@ -2,6 +2,8 @@ export type TrackerResult<TData, TError> = { data: TData } | { error: TError }
 
 export type Result<TData, TError> = { ok: true; data: TData } | { ok: false; error: TError }
 
+export type JsonObject = Record<string, unknown>
+
 export const TASK_STATES = ['TO-DO', 'IN-PROGRESS', 'IN-REVIEW', 'REWORK', 'DONE'] as const
 
 export type TaskState = (typeof TASK_STATES)[number]
@@ -98,3 +100,40 @@ export interface CommentError {
 export interface DeleteCommentResult {
   deleted: true
 }
+
+// ─── Gated Workflow Endpoints ───
+
+export type WorkflowVerb = 'start' | 'submit' | 'resume' | 'approve' | 'reject'
+
+export interface WorkflowCommentInput {
+  severity: CommentSeverity | string
+  body: string
+  author?: string | null
+  line?: string | null
+  parent_id?: string | null
+}
+
+export interface WorkflowRequest {
+  comments?: WorkflowCommentInput[]
+}
+
+export interface WorkflowResult {
+  task: Task
+  comments: ReviewComment[]
+}
+
+export type WorkflowValidationResult =
+  | { ok: true; kind: 'transition'; verb: WorkflowVerb; from: TaskState; to: TaskState }
+  | { ok: true; kind: 'noop'; verb: WorkflowVerb; state: TaskState }
+  | { ok: false; code: 'illegal_transition'; message: string }
+  | { ok: false; code: 'unknown_verb'; message: string }
+  | { ok: false; code: 'unknown_state'; message: string }
+
+export type WorkflowError =
+  | { code: 'illegal_transition'; message: string }
+  | { code: 'unknown_verb'; message: string }
+  | { code: 'unknown_state'; message: string }
+  | { code: 'task_not_found'; message: string }
+  | { code: 'invalid_comments'; message: string }
+  | { code: 'invalid_severity'; message: string }
+  | { code: 'invalid_parent'; message: string }
