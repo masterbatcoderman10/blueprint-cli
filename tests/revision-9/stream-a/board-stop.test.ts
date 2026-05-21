@@ -99,8 +99,13 @@ describe('R9-2.A.3 — board stop', () => {
 
     const log = vi.spyOn(console, 'log').mockImplementation(() => {})
 
-    // We need to mock process.kill so it doesn't actually kill our process
-    const killSpy = vi.spyOn(process, 'kill').mockImplementation(() => true)
+    // Mock process.kill: close server on SIGTERM/SIGKILL, not on signal-0 liveness checks
+    const killSpy = vi.spyOn(process, 'kill').mockImplementation((pid, signal) => {
+      if (signal === 'SIGTERM' || signal === 'SIGKILL') {
+        server.close()
+      }
+      return true
+    })
 
     const result = await runBoardStop()
 
