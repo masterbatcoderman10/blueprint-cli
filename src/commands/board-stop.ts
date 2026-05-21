@@ -37,7 +37,11 @@ export async function runBoardStop(): Promise<{ exitCode: number }> {
       }
     }
     await clearLock(commonDir)
-    console.log(`Stopped board (pid ${lock.pid}, port ${lock.port}).`)
+    if (portUnreachable) {
+      console.log(`Stopped board (pid ${lock.pid}, port ${lock.port}).`)
+    } else {
+      console.log(`Stopped board (pid ${lock.pid}, port ${lock.port}). Note: port may still be briefly reachable.`)
+    }
     return { exitCode: 0 }
   } catch (error) {
     console.error(error instanceof Error ? error.message : String(error))
