@@ -21,3 +21,10 @@ pnpm-debug.log*
 # Editor
 .vscode/
 .idea/
+
+# Agent / AI tooling (local only)
+.agents/
+.antigravitycli/
+.claude/
+.codex/
+.kimi/
