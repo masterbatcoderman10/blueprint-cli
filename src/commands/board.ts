@@ -7,7 +7,7 @@ import { clearLock, isLockAlive, readLock, writeLock } from '../tracker/board-lo
 import { BOARD_PORTS, findFreePort } from '../tracker/board-port'
 import { openUrl } from '../tracker/browser-open'
 import type { TrackerDbHandle } from '../tracker/db'
-import { getGitCommonDir, getWorktreeRoot, NoGitContextError } from '../tracker/git-context'
+import { requireGitContext } from '../tracker/git-context'
 import { findProjectRoot } from '../tracker/project-root'
 import { createServer } from '../tracker/server'
 import { serveStatic } from '../tracker/static-handler'
@@ -88,17 +88,9 @@ async function runBoard({ headless }: { headless: boolean }): Promise<{ exitCode
   try {
     projectRoot = findProjectRoot(process.cwd())
 
-    const commonResult = getGitCommonDir(process.cwd())
-    if (!commonResult.ok) {
-      throw new NoGitContextError()
-    }
-    commonDir = commonResult.path
-
-    const worktreeResult = getWorktreeRoot(process.cwd())
-    if (!worktreeResult.ok) {
-      throw new NoGitContextError()
-    }
-    worktreeRoot = worktreeResult.path
+    const gitContext = requireGitContext(process.cwd())
+    commonDir = gitContext.commonDir
+    worktreeRoot = gitContext.worktreeRoot
 
     // Check for existing live lock
     const existingLock = await readLock(commonDir)

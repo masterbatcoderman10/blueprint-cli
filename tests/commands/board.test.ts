@@ -1,11 +1,13 @@
-import { spawn } from 'node:child_process'
+import { execSync, spawn } from 'node:child_process'
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { createRequire } from 'node:module'
 import { tmpdir } from 'node:os'
-import { join } from 'node:path'
+import { dirname, join } from 'node:path'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { boardCommand } from '../../src/commands/board'
 import { openDb } from '../../src/tracker/db'
+import { getGitCommonDir } from '../../src/tracker/git-context'
 import { projectRootErrorMessage } from '../../src/tracker/project-root'
 import * as browserOpen from '../../src/tracker/browser-open'
 
@@ -14,7 +16,8 @@ vi.mock('../../src/tracker/browser-open', () => ({
 }))
 
 const packageRoot = process.cwd()
-const tsxPath = join(packageRoot, 'node_modules/.bin/tsx')
+const require = createRequire(import.meta.url)
+const tsxPath = join(dirname(require.resolve('tsx/package.json')), 'dist', 'cli.mjs')
 const srcIndexPath = join(packageRoot, 'src/index.ts')
 
 const tempDirs: string[] = []
@@ -26,6 +29,12 @@ function createTempDir(prefix: string): string {
   const dir = mkdtempSync(join(tmpdir(), prefix))
   tempDirs.push(dir)
   mkdirSync(join(dir, 'docs', '.blueprint'), { recursive: true })
+  execSync('git init', { cwd: dir, stdio: 'ignore' })
+  execSync('git config user.email "test@example.com"', { cwd: dir, stdio: 'ignore' })
+  execSync('git config user.name "Test User"', { cwd: dir, stdio: 'ignore' })
+  writeFileSync(join(dir, 'init.txt'), 'init', 'utf8')
+  execSync('git add init.txt', { cwd: dir, stdio: 'ignore' })
+  execSync('git commit -m "init"', { cwd: dir, stdio: 'ignore' })
   return dir
 }
 
@@ -137,7 +146,10 @@ describe('Stream D — board command', () => {
       const url = match[1]
       const port = Number(url.split(':').pop())
 
-      const lockPath = join(projectRoot, 'docs', '.blueprint', 'board.lock')
+      const commonResult = getGitCommonDir(projectRoot)
+      expect(commonResult.ok).toBe(true)
+      if (!commonResult.ok) return
+      const lockPath = join(commonResult.path, 'blueprint-board.lock')
       expect(existsSync(lockPath)).toBe(true)
 
       const lockRaw = readFileSync(lockPath, 'utf8')
@@ -215,9 +227,12 @@ describe('Stream D — board command', () => {
     async () => {
       const projectRoot = createTempDir('blueprint-board-')
       seedProjectDb(projectRoot)
-      const lockPath = join(projectRoot, 'docs', '.blueprint', 'board.lock')
 
       // Write a stale lock with a non-existent PID and unresponsive port
+      const commonResult = getGitCommonDir(projectRoot)
+      expect(commonResult.ok).toBe(true)
+      if (!commonResult.ok) return
+      const lockPath = join(commonResult.path, 'blueprint-board.lock')
       writeFileSync(
         lockPath,
         JSON.stringify({ pid: 99999, port: 1, started_at: Date.now() }),
