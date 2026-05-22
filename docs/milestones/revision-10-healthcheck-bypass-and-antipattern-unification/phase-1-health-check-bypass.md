@@ -9,11 +9,11 @@
 
 - A new session begins directly with intent classification. No structural / operational health-check protocol runs before user intent is identified.
 - `docs/core/health-check.md` and `templates/docs/core/health-check.md` are deleted from the repo.
-- All 7 agent entry-point variants (`CLAUDE.md` / `AGENTS.md` / `GEMINI.md` at root + `CLAUDE.md` / `AGENTS.md` / `GEMINI.md` / `QWEN.md` under `templates/`) are stripped of `<SessionStart>` STEP 1 (load health-check + result handling), `<HardRules>` RULE 3 (validation gate), and the `<ModuleRouting>` "Check project health" row. Affected blocks stay byte-identical across all 7 variants after the edit.
+- All 7 agent entry-point variants (`CLAUDE.md` / `AGENTS.md` / `GEMINI.md` at root + `CLAUDE.md` / `AGENTS.md` / `GEMINI.md` / `QWEN.md` under `templates/`) are stripped of `<SessionStart>` STEP 1 (load health-check + result handling), `<HardRules>` RULE 3 (validation gate), and the `<ModuleRouting>` "Check project health" row.
 - `docs/core/blueprint-structure.md` and its template mirror no longer reference `health-check.md` in either the file-tree listing or the prose.
 - Doctor's `CANONICAL_CORE_FILES` set in `src/doctor/structure.ts` no longer lists `docs/core/health-check.md`.
 - Obsolete R6-3 doc-contract tests that asserted `health-check.md`'s content are deleted outright (the file the assertions target no longer exists).
-- A new parameterized regression test asserts the affected `<SessionStart>` / `<HardRules>` / `<ModuleRouting>` blocks remain byte-identical across the 7 entry-point variants.
+- The shipped scaffold surface (everything under `templates/`) contains zero `health-check` references after the phase.
 - Full project test suite (`npm test`) is green.
 
 ---
@@ -60,13 +60,11 @@ No code logic outside `src/doctor/structure.ts` is touched. CLI surface, tracker
 | R10-1.A.3 | Scrub `health-check.md` references from `docs/core/blueprint-structure.md`: remove the `health-check.md` line in the file-tree listing (~line 19) and the `"health-check.md uses this checklist..."` reference paragraph (~line 152) | 0.25 | Gate | Dependent |
 | R10-1.A.4 | Mirror R10-1.A.3's edits byte-for-byte into `templates/docs/core/blueprint-structure.md` | 0.25 | R10-1.A.3 | Dependent |
 | R10-1.A.5 | Delete `docs/core/health-check.md` and `templates/docs/core/health-check.md` | 0.25 | R10-1.A.2, R10-1.A.4 | Dependent |
-| R10-1.A.6 | Add a new parameterized regression test (suggested location: `tests/revision-10/stream-a/entry-point-block-identity.test.ts`) that loads `CLAUDE.md`, `AGENTS.md`, `GEMINI.md` (root) and `templates/CLAUDE.md`, `templates/AGENTS.md`, `templates/GEMINI.md`, `templates/QWEN.md`, extracts the `<SessionStart>...</SessionStart>`, `<HardRules>...</HardRules>`, and `<ModuleRouting>...</ModuleRouting>` blocks from each, and asserts the three block strings are byte-identical across all 7 variants. Use the source `CLAUDE.md` as the reference; assert the other 6 match it exactly | 0.75 | R10-1.A.2 | Dependent |
 
 ### Stream A Acceptance Criteria
 
-- [ ] No occurrence of the literal `health-check` token in any of the 7 entry-point variants, in either `blueprint-structure.md` (source + template), or anywhere under `docs/core/` or `templates/docs/core/`.
+- [ ] No occurrence of the literal `health-check` token anywhere under `templates/` (the shipped scaffold surface).
 - [ ] `docs/core/health-check.md` and `templates/docs/core/health-check.md` are removed from the working tree (confirmed via `git status` + `ls`).
-- [ ] The parameterized block-identity test passes for all three blocks (`<SessionStart>`, `<HardRules>`, `<ModuleRouting>`) across all 7 variants.
 - [ ] `<SessionStart>` in every variant now begins at STEP 1 with the project-progress branching that was previously STEP 2; no STEP 2 remains.
 - [ ] `<HardRules>` in every variant contains exactly RULE 1, RULE 2, and RULE 4 — renumbered to RULE 1, RULE 2, RULE 3 (i.e. the former RULE 4 — ASK BEFORE ASSUMING is now RULE 3).
 - [ ] The `<ModuleRouting>` table in every variant contains no row whose left cell is `Check project health`.
@@ -85,13 +83,44 @@ Stream A (Entry-Point & Structure-Doc Cleanup)
    ├── R10-1.A.3 (structure source) ──► R10-1.A.4 (structure template)─┤
    │                                                                    │
    │   R10-1.A.5 (delete files) ◄── needs A.2 + A.4 ────────────────────┤
-   │   R10-1.A.6 (block-identity test) ◄── needs A.2 ───────────────────┤
    │                                                                    │
    ▼                                                                    ▼
                                                           Phase 1 complete
 ```
 
-Stream A has internal parallelism: A.1/A.2 (entry-point chain) and A.3/A.4 (structure-doc chain) are independent of each other and can run concurrently after the gate. A.5 depends on both chains completing. A.6 depends on A.2 only.
+Stream A has internal parallelism: A.1/A.2 (entry-point chain) and A.3/A.4 (structure-doc chain) are independent of each other and can run concurrently after the gate. A.5 depends on both chains completing.
+
+---
+
+## Test Plan
+
+> Generated from task analysis. Each testable task has one or more
+> tests mapped to it. Tests are written before implementation (TDD)
+> during task execution.
+
+### Gate R10-1.0 Tests
+
+| Test ID | Task | Type | Description | Expected Result |
+|---------|------|------|-------------|-----------------|
+| — | R10-1.0.1 | — | Not testable: Doctor canonical-set constant edit. Functional outcome (removing `health-check.md` from `CANONICAL_CORE_FILES`) is verified by the existing `tests/phase-3/gate-3.0/canonical-structure.test.ts` and `tests/phase-3/stream-b/doctor-structure-audit.test.ts` continuing to pass after R10-1.0.3 updates their fixtures. Covered by `npm test` greenness in Phase DoD. | — |
+| — | R10-1.0.2 | — | Not testable: deletion of obsolete R6-3 content tests + drop of the srs-surface row. The deletion itself cannot meaningfully assert against its own absence; correctness is that `npm test` no longer attempts those assertions. Covered by `npm test` greenness in Phase DoD. | — |
+| — | R10-1.0.3 | — | Not testable: test-fixture maintenance. The fixture updates align the existing canonical-set / template-mirror tests with R10-1.0.1's new state; correctness is asserted by those existing tests continuing to pass. Covered by `npm test` greenness in Phase DoD. | — |
+
+### Stream A Tests
+
+| Test ID | Task | Type | Description | Expected Result |
+|---------|------|------|-------------|-----------------|
+| — | R10-1.A.1 | — | Not testable: source-repo dev artifact edits (root entry-point variants are not the shipped scaffold surface). Covered by `npm test` greenness in Phase DoD. | — |
+| T-R10-1.A | R10-1.A.2, R10-1.A.4, R10-1.A.5 | integration | Recursively scan every file under `templates/` and assert no file contains the literal `health-check` token (case-sensitive). Additionally assert `existsSync('templates/docs/core/health-check.md') === false`. Suggested location: `tests/revision-10/stream-a/template-surface-clean.test.ts`. | Zero `health-check` matches across all files under `templates/`; `templates/docs/core/health-check.md` does not exist. |
+| — | R10-1.A.3 | — | Not testable: source-repo dev artifact edit (`docs/core/blueprint-structure.md` is not the shipped scaffold surface). Covered by `npm test` greenness in Phase DoD. | — |
+
+### Test Summary
+
+| Component | Total Tasks | Testable | Not Testable |
+|-----------|-------------|----------|--------------|
+| Gate R10-1.0 | 3 | 0 | 3 |
+| Stream A | 5 | 3 (covered by 1 test) | 2 |
+| **Total** | **8** | **3** | **5** |
 
 ---
 
@@ -99,6 +128,7 @@ Stream A has internal parallelism: A.1/A.2 (entry-point chain) and A.3/A.4 (stru
 
 - [ ] Gate R10-1.0 acceptance criteria pass.
 - [ ] Stream A acceptance criteria pass.
+- [ ] All tests in the Test Plan pass (`T-R10-1.A` green).
 - [ ] `npm test` is green end-to-end. No regressions introduced; pre-existing unrelated failures (if any) are documented but not caused by this phase.
 - [ ] `git grep "health-check"` returns hits only inside `docs/milestones/revision-10-*/` (revision documents) and `docs/project-progress.md` (Decisions log) — i.e. only historical-record contexts. No live module, template, source file, or test references the deleted protocol.
 - [ ] No lint errors in files touched by this phase.
