@@ -22,6 +22,9 @@ pnpm-debug.log*
 .vscode/
 .idea/
 
+# Blueprint runtime (mutable, per-machine)
+docs/.blueprint/tasks.db
+
 # Agent / AI tooling (local only)
 .agents/
 .antigravitycli/
