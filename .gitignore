@@ -31,3 +31,9 @@ docs/.blueprint/tasks.db
 .claude/
 .codex/
 .kimi/
+
+# Local Blueprint runtime state
+docs/.blueprint/board.lock
+docs/.blueprint/tasks.db
+docs/.blueprint/tasks.db-*
+worktrees/

@@ -331,52 +331,40 @@ after the user approves. No tracker tasks, no planning artifacts, no ceremony.
 
 ---
 
-<TweakAntiPatterns>
-  PURPOSE: Enumerate the forbidden ceremony behaviors that Tweak Mode
-  prohibits. These are the patterns most likely to corrupt a tweak into
-  unnecessary overhead.
-
-  ANTI-PATTERNS — each of the following is forbidden in Tweak Mode:
-
-  1. **Creating tracker/board tasks for a tweak.**
-     Tweaks do not generate board tasks. The user is the live review
-     loop; the tracker is for gates and streams in planned phases.
-
-  2. **Writing a tweak document before the change is made.**
-     The post-hoc document is an audit record, not a plan. Writing it
-     before the change inverts the workflow and adds ceremony with no
-     value.
-
-  3. **Loading phase/test/revision/milestone planning modules during
-     Tweak Mode.**
-     Loading planning modules triggers full-scale planning rigor that
-     is incompatible with the fast-paced tweak contract. Do not load
-     them.
-
-  4. **Carving the tweak into gates, streams, or task tables.**
-     Tweaks are a single unit of work. Subdividing them into gates and
-     streams is overhead that belongs to revision planning, not tweaks.
-
-  5. **Drafting a formal test plan for a tweak.**
-     The absence of a formal test plan is a defining property of a
-     tweak. Needing one is an escalation signal.
-
-  6. **Skipping the change-first confirm step and editing immediately.**
-     CONFIRM before CHANGE is mandatory. Making a change without
-     explicit user confirmation skips the core safety check of the
-     tweak flow.
-
-  7. **Skipping `npm test` for a code-touching tweak before doc
-     creation.**
-     The code-change test gate is mandatory for any tweak that touches
-     files outside `docs/**`. Creating the post-hoc document before
-     `npm test` is green is forbidden.
-
-  8. **Continuing in Tweak Mode after escalation criteria are met.**
-     When any escalation trigger is detected, the agent must hard-stop
-     immediately. Continuing to implement after escalation criteria are
-     met corrupts scope and bypasses the revision planning guard.
-</TweakAntiPatterns>
+<AntiPatterns>
+  <AntiPattern name="Creating Tracker Tasks for a Tweak">
+    <BadExample>The agent creates board tasks for a tweak. Tweaks do not generate board tasks; the user is the live review loop and the tracker is for gates and streams in planned phases.</BadExample>
+    <Why>The user is the live review loop; the tracker is for gates and streams in planned phases.</Why>
+  </AntiPattern>
+  <AntiPattern name="Writing Tweak Doc Before Change">
+    <BadExample>The agent writes a tweak document before the change is made. The post-hoc document is an audit record, not a plan; writing it before the change inverts the workflow and adds ceremony with no value.</BadExample>
+    <Why>The post-hoc document is an audit record, not a plan; writing it before the change inverts the workflow and adds ceremony with no value.</Why>
+  </AntiPattern>
+  <AntiPattern name="Loading Planning Modules in Tweak Mode">
+    <BadExample>The agent loads phase/test/revision/milestone planning modules during Tweak Mode. Loading planning modules triggers full-scale planning rigor that is incompatible with the fast-paced tweak contract.</BadExample>
+    <Why>Loading planning modules triggers full-scale planning rigor that is incompatible with the fast-paced tweak contract.</Why>
+  </AntiPattern>
+  <AntiPattern name="Carving Tweak into Gates or Streams">
+    <BadExample>The agent carves the tweak into gates, streams, or task tables. Tweaks are a single unit of work; subdividing them into gates and streams is overhead that belongs to revision planning, not tweaks.</BadExample>
+    <Why>Tweaks are a single unit of work; subdividing them into gates and streams is overhead that belongs to revision planning, not tweaks.</Why>
+  </AntiPattern>
+  <AntiPattern name="Drafting Formal Test Plan for Tweak">
+    <BadExample>The agent drafts a formal test plan for a tweak. The absence of a formal test plan is a defining property of a tweak; needing one is an escalation signal.</BadExample>
+    <Why>The absence of a formal test plan is a defining property of a tweak; needing one is an escalation signal.</Why>
+  </AntiPattern>
+  <AntiPattern name="Skipping Change-First Confirm Step">
+    <BadExample>The agent skips the change-first confirm step and edits immediately. CONFIRM before CHANGE is mandatory; making a change without explicit user confirmation skips the core safety check of the tweak flow.</BadExample>
+    <Why>CONFIRM before CHANGE is mandatory; making a change without explicit user confirmation skips the core safety check of the tweak flow.</Why>
+  </AntiPattern>
+  <AntiPattern name="Skipping npm test Before Doc Creation">
+    <BadExample>The agent skips npm test for a code-touching tweak before doc creation. The code-change test gate is mandatory for any tweak that touches files outside docs/**; creating the post-hoc document before npm test is green is forbidden.</BadExample>
+    <Why>The code-change test gate is mandatory for any tweak that touches files outside docs/**; creating the post-hoc document before npm test is green is forbidden.</Why>
+  </AntiPattern>
+  <AntiPattern name="Continuing in Tweak Mode After Escalation">
+    <BadExample>The agent continues in Tweak Mode after escalation criteria are met. When any escalation trigger is detected, the agent must hard-stop immediately; continuing to implement after escalation criteria are met corrupts scope and bypasses the revision planning guard.</BadExample>
+    <Why>Continuing to implement after escalation criteria are met corrupts scope and bypasses the revision planning guard.</Why>
+  </AntiPattern>
+</AntiPatterns>
 
 ---
 
