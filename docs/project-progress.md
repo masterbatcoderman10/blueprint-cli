@@ -3,8 +3,8 @@
 **Project**: blueprint-cli
 **Tracker**: blueprint-cli
 **Current Milestone**: Revision 10 — Health-Check Bypass & Anti-Pattern Shape Unification
-**Current Phase**: Phase 1 — Health-Check Bypass (Test-planned — ready for execution)
-**Status**: Revision 10 identified. Phase 1 planned + test-planned. Phase 2 (anti-pattern unification) queued.
+**Current Phase**: Phase 2 — Anti-Pattern Shape Unification (pending phase planning)
+**Status**: Revision 10 Phase 1 complete. Phase 2 pending phase planning.
 
 ---
 
@@ -88,6 +88,7 @@
 - 2026-05-22: Revision 10 Phase 1 test plan committed. 8 tasks (Gate 3 / Stream A 5 after dropping A.6 block-identity test); 3 testable, 5 not-testable. Single integration test `T-R10-1.A` covers A.2 + A.4 + A.5: scans every file under `templates/` for zero `health-check` token occurrences and asserts `templates/docs/core/health-check.md` is absent. Locked design call: shipped scaffold surface (`templates/`) is the only functional concern; root entry-point variants, source `blueprint-structure.md`, Doctor canonical-set constant, and fixture-update tasks are not-testable individually and covered by `npm test` greenness in Phase DoD. A.6 (parameterized SessionStart/HardRules/ModuleRouting byte-identity test across all 7 variants) dropped from Stream A — subsumed by templates-clean grep and not aligned with the test-functionality principle. Phase document ready for execution.
 - 2026-05-22: Revision 10 Phase 1 — Health-Check Bypass was planned. Gate R10-1.0 (3 tasks, 1.25 units) removes `'docs/core/health-check.md'` from `CANONICAL_CORE_FILES` in `src/doctor/structure.ts`, deletes obsolete R6-3 content-assertion tests (`tests/revision-6/stream-b/planning-side-docs.test.ts`, `tests/stream-b/planning-docs-rewrite.test.ts`) + drops the `health-check.md` row and dedicated test case from `tests/stream-a/srs-surface-contract.test.ts`, and updates canonical-set test fixtures in 4 test files. Stream A (6 tasks, 3.0 units) strips `<SessionStart>` STEP 1 / `<HardRules>` RULE 3 / `<ModuleRouting>` "Check project health" row from all 7 entry-point variants (3 root + 4 template) with internal parallel chains (A.1→A.2 entry-points, A.3→A.4 structure-doc), deletes `docs/core/health-check.md` + template mirror, and adds a parameterized block-identity regression test pinning `<SessionStart>` / `<HardRules>` / `<ModuleRouting>` byte-identical across all 7 variants. Phase document at `docs/milestones/revision-10-healthcheck-bypass-and-antipattern-unification/phase-1-health-check-bypass.md`. Ready for test planning.
 - 2026-05-22: Identified Revision 10 — Health-Check Bypass & Anti-Pattern Shape Unification. Docs/protocol-only revision bundling two ceremony-reduction concerns. Phase 1 deletes `docs/core/health-check.md` (source + template), strips SessionStart STEP 1, HardRule 3, and the "Check project health" ModuleRouting row from all 7 agent entry-point variants (CLAUDE.md / AGENTS.md / GEMINI.md at root and CLAUDE.md / AGENTS.md / GEMINI.md / QWEN.md under `templates/`), scrubs `health-check.md` refs from `blueprint-structure.md` (source + template), and removes the file from the Doctor canonical set if listed. Phase 2 rewrites every `<AntiPatterns>` block across `docs/core/` to match `docs/core/srs-planning.md`'s canonical shape (fenced ```xml, `<AntiPatterns>` wrapper, bare `name=` attribute, `<BadExample>` / `<GoodExample>` / `<Why>` minimum with optional domain-prefixed `<BadFooExample>` variants), converts `docs/core/tweak-planning.md`'s `<TweakAntiPatterns>` numbered-list narrative into eight canonical `<AntiPattern>` entries, mirrors all 11 source rewrites into `templates/docs/core/`, and adds a canonical-shape Anti-Patterns paragraph to `docs/conventions.md` (mirrored to template). No SRS edits — MAS-200..207 untouched. No PRD milestone touched. Revision document at `docs/milestones/revision-10-healthcheck-bypass-and-antipattern-unification/revision-10-healthcheck-bypass-and-antipattern-unification.md`.
+- 2026-05-23: Revision 10 Phase 1 — Health-Check Bypass completed. All tasks done, DoD satisfied with user-approved overrides for historical `health-check` grep matches and absent repo lint configuration, full test suite green (1078 passed, 2 skipped, 0 failed).
 
 ---
 
@@ -143,6 +144,9 @@ R8 — Tweak Revamp and Quality of Life Changes
 R9 — Tracker Workflow QoL
 ├── Phase 1 — Tracker Workflow Endpoints & Contract QoL ✓
 └── Phase 2 — Tracker Cheatsheet, Board Stop & Worktree-Aware Lifecycle ✓
+R10 — Health-Check Bypass & Anti-Pattern Shape Unification
+├── Phase 1 — Health-Check Bypass ✓
+└── Phase 2 — Anti-Pattern Shape Unification ○
 M2 — Cross-Project Context (Optional Post-MVP)
 └── Phase 1 — TBD ○
 M3 — Workflow Visibility Enhancements (Optional Future)
@@ -158,4 +162,4 @@ M3 — Workflow Visibility Enhancements (Optional Future)
 
 | Revision | Name | Status | Notes |
 |----------|------|--------|-------|
-| Revision 10 | Health-Check Bypass & Anti-Pattern Shape Unification | Identified — pending phase planning | Two phases. Phase 1 deletes `docs/core/health-check.md` (source + template), strips SessionStart STEP 1 / HardRule 3 / ModuleRouting row from all 7 agent entry-point variants (CLAUDE / AGENTS / GEMINI root + CLAUDE / AGENTS / GEMINI / QWEN templates), and scrubs `blueprint-structure.md` refs. Phase 2 rewrites every `<AntiPatterns>` block in `docs/core/` to the `srs-planning.md` canonical shape, converts `tweak-planning.md`'s `<TweakAntiPatterns>` numbered list into canonical entries, mirrors templates, and adds the canonical-shape convention to `docs/conventions.md`. No SRS changes. Revision document at `docs/milestones/revision-10-healthcheck-bypass-and-antipattern-unification/revision-10-healthcheck-bypass-and-antipattern-unification.md`. |
+| Revision 10 | Health-Check Bypass & Anti-Pattern Shape Unification | Phase 1 complete — Phase 2 pending phase planning | Two phases total. Phase 1 is complete. Remaining scope: Phase 2 rewrites every `<AntiPatterns>` block in `docs/core/` to the `srs-planning.md` canonical shape, converts `tweak-planning.md`'s `<TweakAntiPatterns>` numbered list into canonical entries, mirrors templates, and adds the canonical-shape convention to `docs/conventions.md`. No SRS changes. Revision document at `docs/milestones/revision-10-healthcheck-bypass-and-antipattern-unification/revision-10-healthcheck-bypass-and-antipattern-unification.md`. |
