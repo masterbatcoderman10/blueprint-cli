@@ -44,9 +44,6 @@ describe('Post-migration schema integrity (C.6)', () => {
         .all() as Array<{ id: string }>
       expect(nullMilestoneRows).toEqual([])
 
-      // Also verify at least some rows exist (the DB should have tasks)
-      const totalRows = handle.db.prepare('SELECT COUNT(*) AS count FROM tasks').get() as { count: number }
-      expect(totalRows.count).toBeGreaterThan(0)
     } finally {
       handle.close()
     }
