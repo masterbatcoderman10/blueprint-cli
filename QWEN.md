@@ -17,11 +17,7 @@
   PURPOSE: Orient the agent at the start of every session.
   This sequence runs EVERY time. No exceptions.
 
-  STEP 1: Load docs/core/health-check.md. Follow its protocol.
-    → IF health check fails → STOP. Resolve failures before proceeding.
-    → IF health check passes → Continue to STEP 2.
-
-  STEP 2: Load docs/project-progress.md. Check if it is populated.
+  STEP 1: Load docs/project-progress.md. Check if it is populated.
 
   IF project-progress.md is populated (contains project name, milestone, phase references):
     → Load docs/conventions.md.
@@ -92,8 +88,6 @@
   │ Commit / git operations │ docs/core/git-execution-workflow.md  │
   │                         │ or docs/core/git-review-workflow.md  │
   ├─────────────────────────┼──────────────────────────────────────┤
-  │ Check project health    │ docs/core/health-check.md            │
-  ├─────────────────────────┼──────────────────────────────────────┤
   │ Modify docs structure   │ docs/core/blueprint-structure.md     │
   ├─────────────────────────┼──────────────────────────────────────┤
   │ Discuss / clarify       │ No module needed. Use loaded context.│
@@ -127,11 +121,7 @@
     Load only what the current intent requires.
     If intent changes mid-session, load the new module at that point.
 
-  RULE 3 — VALIDATION GATE
-    NEVER proceed past <SessionStart> without passing the health check.
-    All failures must be resolved before work begins.
-
-  RULE 4 — ASK BEFORE ASSUMING
+  RULE 3 — ASK BEFORE ASSUMING
     If intent is ambiguous, ASK. Do not infer and proceed.
     This applies to user requests, unclear scope, and missing context.
 </HardRules>

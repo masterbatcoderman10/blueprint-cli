@@ -16,7 +16,6 @@ docs/
 ├── srs.md                                   # Software Requirements Specification
 ├── core/                                    # Protocol and reference modules (read-only during execution)
 │   ├── blueprint-structure.md               # This file — defines the layout
-│   ├── health-check.md                      # Session startup validation
 │   ├── alignment.md                         # Analyze existing code/docs for Blueprint adoption
 │   ├── prd-planning.md                      # How to author a PRD
 │   ├── planning.md                          # Planning philosophy and orchestration
@@ -148,5 +147,3 @@ A valid Blueprint project has ALL of the following:
 - [ ] No files at docs/ root other than `project-progress.md`, `prd.md`, `conventions.md`, and `srs.md`
 - [ ] `docs/tweaks/` exists and contains at minimum a `README.md`
 - [ ] Every phase doc is inside a milestone subfolder under `docs/milestones/`
-
-health-check.md uses this checklist to verify project integrity.
