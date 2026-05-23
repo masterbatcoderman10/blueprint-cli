@@ -52,6 +52,18 @@
 - Don't infer linked-project state from anything except Blueprint docs
 - Don't use silent fallback behavior for missing required files
 
+## Anti-Pattern Block Shape
+
+All `<AntiPatterns>` blocks in `docs/core/*.md` use the unfenced canonical XML shape. The wrapper is `<AntiPatterns>` (never `<TweakAntiPatterns>` or other variants). Each `<AntiPattern>` element carries a bare `name="<short title>"` attribute with no `ANTI-PATTERN:` prefix. Required children are `<BadExample>` and `<Why>`. Optional children are `<GoodExample>` and domain-prefixed variants (`<Bad<Domain>Example>`, `<Good<Domain>Example>`, `<GoodSub<Domain>Example>`) when they aid illustration. The block is never wrapped in a ```xml fence. After Phase 2 of Revision 10 lands, `docs/core/srs-planning.md` is the in-repo reference exemplar of this shape.
+
+<AntiPatterns>
+  <AntiPattern name="Short Title">
+    <BadExample>Description of the forbidden behavior.</BadExample>
+    <GoodExample>Description of the correct behavior. (Optional)</GoodExample>
+    <Why>One-line explanation of why the bad behavior is forbidden.</Why>
+  </AntiPattern>
+</AntiPatterns>
+
 ## Agent Tools
 
 - **Blueprint protocol docs** under `docs/core/`

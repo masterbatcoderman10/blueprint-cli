@@ -214,34 +214,32 @@ describe('T-R8-2.A.5: escalation block in docs/core/tweak-planning.md', () => {
 // T-R8-2.A.6: Anti-Patterns section
 // ---------------------------------------------------------------------------
 describe('T-R8-2.A.6: Anti-Patterns section in docs/core/tweak-planning.md', () => {
-  it('contains a <TweakAntiPatterns> block', async () => {
+  it('contains an <AntiPatterns> block', async () => {
     const content = await readDoc(TWEAK_PLANNING_PATH)
-    const block = extractBlock(content, 'TweakAntiPatterns')
-    expect(block, '<TweakAntiPatterns> block must be present').not.toBeNull()
+    const block = extractBlock(content, 'AntiPatterns')
+    expect(block, '<AntiPatterns> block must be present').not.toBeNull()
   })
 
-  it('lists all eight forbidden ceremony anti-patterns', async () => {
+  it('lists all eight forbidden ceremony anti-patterns by locked entry name', async () => {
     const content = await readDoc(TWEAK_PLANNING_PATH)
-    const block = extractBlock(content, 'TweakAntiPatterns')
-    expect(block, '<TweakAntiPatterns> block must be present').not.toBeNull()
-    const sectionContent = (block ?? '').toLowerCase()
+    const block = extractBlock(content, 'AntiPatterns')
+    expect(block, '<AntiPatterns> block must be present').not.toBeNull()
+    const blockText = block ?? ''
 
-    // 1. Creating tracker/board tasks for a tweak
-    expect(sectionContent).toMatch(/tracker.*task|board.*task|creat.*tracker|creat.*board/)
-    // 2. Writing a tweak document before the change is made
-    expect(sectionContent).toMatch(/before the change|pre.change doc|writing.*before/)
-    // 3. Loading planning modules during Tweak Mode
-    expect(sectionContent).toMatch(/loading.*module|load.*planning.*module/)
-    // 4. Carving the tweak into gates, streams, or task tables
-    expect(sectionContent).toMatch(/gates.*streams|streams.*gates|gate.*stream|carving/)
-    // 5. Drafting a formal test plan for a tweak
-    expect(sectionContent).toMatch(/formal test plan/)
-    // 6. Skipping the change-first confirm step
-    expect(sectionContent).toMatch(/skip.*confirm|skipping.*confirm/)
-    // 7. Skipping npm test for a code-touching tweak
-    expect(sectionContent).toMatch(/skip.*npm test|skipping.*npm test|skipped.*test gate/)
-    // 8. Continuing in Tweak Mode after escalation criteria are met
-    expect(sectionContent).toMatch(/escalation.*met|after escalation|continu.*tweak mode.*escalation/)
+    const lockedNames = [
+      'Creating Tracker Tasks for a Tweak',
+      'Writing Tweak Doc Before Change',
+      'Loading Planning Modules in Tweak Mode',
+      'Carving Tweak into Gates or Streams',
+      'Drafting Formal Test Plan for Tweak',
+      'Skipping Change-First Confirm Step',
+      'Skipping npm test Before Doc Creation',
+      'Continuing in Tweak Mode After Escalation',
+    ]
+
+    for (const name of lockedNames) {
+      expect(blockText, `AntiPatterns block must contain entry named "${name}"`).toContain(`name="${name}"`)
+    }
   })
 })
 

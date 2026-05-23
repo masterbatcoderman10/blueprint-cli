@@ -144,20 +144,26 @@ describe('T-R8-2.C.2: docs/core/tweak-planning.md contains MAS-207 contract (esc
 })
 
 describe('T-R8-2.C.2: docs/core/tweak-planning.md contains MAS-207 contract (Anti-Patterns block)', () => {
-  it('contains a <TweakAntiPatterns> block listing all eight forbidden ceremony behaviors', async () => {
+  it('contains an <AntiPatterns> block listing all eight locked entry names', async () => {
     const content = await readDoc(TWEAK_PLANNING_PATH)
-    const block = extractBlock(content, 'TweakAntiPatterns')
-    expect(block, '<TweakAntiPatterns> block must be present').not.toBeNull()
-    const lower = (block ?? '').toLowerCase()
+    const block = extractBlock(content, 'AntiPatterns')
+    expect(block, '<AntiPatterns> block must be present').not.toBeNull()
+    const blockText = block ?? ''
 
-    expect(lower).toMatch(/tracker.*task|board.*task|creat.*tracker|creat.*board/)
-    expect(lower).toMatch(/before the change|pre.change doc|writing.*before/)
-    expect(lower).toMatch(/loading.*module|load.*planning.*module/)
-    expect(lower).toMatch(/gates.*streams|streams.*gates|gate.*stream|carving/)
-    expect(lower).toMatch(/formal test plan/)
-    expect(lower).toMatch(/skip.*confirm|skipping.*confirm/)
-    expect(lower).toMatch(/skip.*npm test|skipping.*npm test|skipped.*test gate/)
-    expect(lower).toMatch(/escalation.*met|after escalation|continu.*tweak mode.*escalation/)
+    const lockedNames = [
+      'Creating Tracker Tasks for a Tweak',
+      'Writing Tweak Doc Before Change',
+      'Loading Planning Modules in Tweak Mode',
+      'Carving Tweak into Gates or Streams',
+      'Drafting Formal Test Plan for Tweak',
+      'Skipping Change-First Confirm Step',
+      'Skipping npm test Before Doc Creation',
+      'Continuing in Tweak Mode After Escalation',
+    ]
+
+    for (const name of lockedNames) {
+      expect(blockText, `AntiPatterns block must contain entry named "${name}"`).toContain(`name="${name}"`)
+    }
   })
 })
 
