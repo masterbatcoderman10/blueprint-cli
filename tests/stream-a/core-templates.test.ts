@@ -14,7 +14,6 @@ const CANONICAL_CORE_FILES = [
   'execution.md',
   'git-execution-workflow.md',
   'git-review-workflow.md',
-  'health-check.md',
   'hierarchy.md',
   'milestone-planning.md',
   'orchestrate.md',
@@ -34,12 +33,12 @@ const CANONICAL_CORE_FILES = [
 const TEMPLATES_CORE_DIR = resolve(__dirname, '..', '..', 'templates', 'docs', 'core')
 
 describe('T-A.2: Core protocol template files', () => {
-  it('T-A.2.1: all 21 core protocol files exist under templates/docs/core/', async () => {
+  it('T-A.2.1: all 20 core protocol files exist under templates/docs/core/', async () => {
     const entries = await readdir(TEMPLATES_CORE_DIR)
     const mdFiles = entries.filter((f) => f.endsWith('.md')).sort()
 
     expect(mdFiles).toEqual([...CANONICAL_CORE_FILES].sort())
-    expect(mdFiles).toHaveLength(21)
+    expect(mdFiles).toHaveLength(20)
   })
 
   it('T-A.2.2: core protocol template files are valid Markdown (non-empty, begin with heading)', async () => {

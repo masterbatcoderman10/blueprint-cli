@@ -26,9 +26,8 @@ describe('T-R3-1.C.2.1: canonical core template inventory includes srs-planning.
 
 describe('T-R3-1.C.2.2: templates/docs/core contains exactly 20 Markdown protocol files including srs-planning.md', () => {
   it('matches the canonical inventory and count', async () => {
-    // health-check.md removed from CANONICAL_CORE_FILES (R10-1.0.1); template file deleted in R10-1 Stream A
     const mdFiles = (await readdir(TEMPLATES_CORE_DIR))
-      .filter((entry) => entry.endsWith('.md') && entry !== 'health-check.md')
+      .filter((entry) => entry.endsWith('.md'))
       .sort()
 
     expect(mdFiles).toEqual(CANONICAL_CORE_FILES.map((relativePath) => basename(relativePath)).sort())
