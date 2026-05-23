@@ -22,7 +22,6 @@ describe('T-R4-2.A.1.1: docs/core/srs-planning.md warns against flat requirement
     expect(antiPatternsIndex).toBeGreaterThan(-1)
     expect(srsExampleEndIndex).toBeGreaterThan(-1)
     expect(antiPatternsIndex).toBeGreaterThan(srsExampleEndIndex)
-    expect(liveContent).toContain('```xml')
     expect(liveContent).toContain('<AntiPatterns>')
     expect(liveContent).toContain('<AntiPattern name="Flat Requirement Lists">')
     expect(liveContent).toContain(

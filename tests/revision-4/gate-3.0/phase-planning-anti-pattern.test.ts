@@ -17,7 +17,6 @@ describe('T-R4-3.0.1.1: docs/core/phase-planning.md contains the Skipping Schema
   it('adds Skipping Schema Ideation guidance in a standalone Anti-Patterns XML block', async () => {
     const liveContent = await readFile(LIVE_PATH, 'utf-8')
 
-    expect(liveContent).toContain('```xml')
     expect(liveContent).toContain('<AntiPatterns>')
     expect(liveContent).toContain('<AntiPattern name="Skipping Schema Ideation">')
     expect(liveContent).toContain(

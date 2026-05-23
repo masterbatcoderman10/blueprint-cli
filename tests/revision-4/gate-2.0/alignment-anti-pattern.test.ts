@@ -16,7 +16,6 @@ describe(`T-R4-2.0.1.1: docs/core/alignment.md contains the "Don't Rush" anti-pa
     expect(antiPatternsIndex).toBeGreaterThan(-1)
     expect(documentProductionEndIndex).toBeGreaterThan(-1)
     expect(antiPatternsIndex).toBeGreaterThan(documentProductionEndIndex)
-    expect(liveContent).toContain('```xml')
     expect(liveContent).toContain('<AntiPatterns>')
     expect(liveContent).toContain(`<AntiPattern name="Don't Rush">`)
     expect(liveContent).toContain(

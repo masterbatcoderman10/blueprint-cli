@@ -119,7 +119,6 @@ related phases that together deliver a meaningful product increment.
 
 ## Anti-Patterns
 
-```xml
 <AntiPatterns>
   <AntiPattern name="Undivided Requirement Assignment">
     <BadExample>During milestone planning, the draft names multiple phases but does not associate any of them with specific SRS requirement IDs or sub-requirement IDs.</BadExample>
@@ -134,7 +133,6 @@ related phases that together deliver a meaningful product increment.
     <Why>When an existing requirement is not dense but still under-specified, milestone planning should expand the same requirement instead of leaving it thin or forcing an unnecessary replacement. That preserves the stable requirement ID while recording the clearer product meaning learned during milestone planning.</Why>
   </AntiPattern>
 </AntiPatterns>
-```
 
 ---
 

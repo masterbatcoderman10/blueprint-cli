@@ -22,7 +22,6 @@ describe('T-R4-2.B.1.1: docs/core/milestone-planning.md contains the phase-assig
     expect(antiPatternsIndex).toBeGreaterThan(-1)
     expect(milestoneProcessEndIndex).toBeGreaterThan(-1)
     expect(antiPatternsIndex).toBeGreaterThan(milestoneProcessEndIndex)
-    expect(liveContent).toContain('```xml')
     expect(liveContent).toContain('<AntiPatterns>')
     expect(liveContent).toContain('<AntiPattern name="Undivided Requirement Assignment">')
     expect(liveContent).toContain(
