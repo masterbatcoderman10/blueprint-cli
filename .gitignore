@@ -28,3 +28,6 @@ pnpm-debug.log*
 .claude/
 .codex/
 .kimi/
+
+# Tracker runtime database
+docs/.blueprint/tasks.db
