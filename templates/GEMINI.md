@@ -21,6 +21,7 @@
 
   IF project-progress.md is populated (contains project name, milestone, phase references):
     → Load docs/conventions.md.
+    → Load docs/core/tracker.md (provides HTTP API recipes and state-machine context for the built-in task tracker).
     → IF project-progress.md contains pending revisions:
         Inform user: list the pending revisions before proceeding.
     → GOTO <ModuleRouting>. Determine user intent and load the appropriate module.
@@ -99,6 +100,11 @@
     need — and proactively route to tweak planning when the request
     qualifies, even when the user did not say "tweak". The agent must
     surface the classification to the user before drafting.
+
+    When tweak intent is confirmed, the agent enters **Tweak Mode** and
+    follows the change-first loop: understand → restate → confirm → change
+    → cycle → verify → post-hoc doc. No tracker tasks, no planning
+    artifacts, no ceremony. The user is the live review loop.
 
   IF the user's request spans multiple intents (e.g., "finish this task and commit"):
     Load each required module before executing its corresponding workflow.

@@ -21,6 +21,7 @@
 
   IF project-progress.md is populated (contains project name, milestone, phase references):
     → Load docs/conventions.md.
+    → Load docs/core/tracker.md (provides HTTP API recipes and state-machine context for the built-in task tracker).
     → IF project-progress.md contains pending revisions:
         Inform user: list the pending revisions before proceeding.
     → GOTO <ModuleRouting>. Determine user intent and load the appropriate module.
