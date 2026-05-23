@@ -7,7 +7,6 @@ const ROOT = resolve(__dirname, '..', '..')
 
 const DOC_PAIRS = [
   ['docs/core/blueprint-structure.md', 'templates/docs/core/blueprint-structure.md'],
-  ['docs/core/health-check.md', 'templates/docs/core/health-check.md'],
   ['docs/core/planning.md', 'templates/docs/core/planning.md'],
 ] as const
 
@@ -27,24 +26,8 @@ describe('T-A.4: SRS protocol surfaces are represented in the live and template 
     }
   })
 
-  it('health-check documents docs/srs.md and the legacy repair path', async () => {
-    for (const [livePath, templatePath] of [DOC_PAIRS[1]]) {
-      const [liveContent, templateContent] = await Promise.all([
-        readFile(resolve(ROOT, livePath), 'utf-8'),
-        readFile(resolve(ROOT, templatePath), 'utf-8'),
-      ])
-
-      for (const content of [liveContent, templateContent]) {
-        expect(content).toContain('docs/srs.md')
-        expect(content).toContain('STOP with a compatibility-path message')
-        expect(content).toContain('predates SRS integration')
-        expect(content).toContain('repairing from templates/srs.md')
-      }
-    }
-  })
-
   it('planning represents SRS between PRD and milestone planning', async () => {
-    for (const [livePath, templatePath] of [DOC_PAIRS[2]]) {
+    for (const [livePath, templatePath] of [DOC_PAIRS[1]]) {
       const [liveContent, templateContent] = await Promise.all([
         readFile(resolve(ROOT, livePath), 'utf-8'),
         readFile(resolve(ROOT, templatePath), 'utf-8'),

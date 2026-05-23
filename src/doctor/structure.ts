@@ -15,7 +15,6 @@ export const CANONICAL_CORE_FILES: string[] = [
   'docs/core/execution.md',
   'docs/core/git-execution-workflow.md',
   'docs/core/git-review-workflow.md',
-  'docs/core/health-check.md',
   'docs/core/hierarchy.md',
   'docs/core/milestone-planning.md',
   'docs/core/orchestrate.md',

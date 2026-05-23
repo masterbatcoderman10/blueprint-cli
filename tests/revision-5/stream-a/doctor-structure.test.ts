@@ -15,6 +15,6 @@ describe('T-R5-1.A.2.2: getCanonicalStructurePaths includes orchestrate.md and c
   it('exposes orchestrate.md and the core file count is 20', () => {
     const paths = getCanonicalStructurePaths()
     expect(paths).toContain('docs/core/orchestrate.md')
-    expect(CANONICAL_CORE_FILES).toHaveLength(21)
+    expect(CANONICAL_CORE_FILES).toHaveLength(20)
   })
 })

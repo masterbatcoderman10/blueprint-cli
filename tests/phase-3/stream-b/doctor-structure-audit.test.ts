@@ -36,10 +36,6 @@ describe('T-B.2.1: Doctor reports missing required Blueprint structure', () => {
           kind: 'missing-structure',
           targetPath: 'docs/core/alignment.md',
         }),
-        expect.objectContaining({
-          kind: 'missing-structure',
-          targetPath: 'docs/core/health-check.md',
-        }),
       ]),
     )
   })

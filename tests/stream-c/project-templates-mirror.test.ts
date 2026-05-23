@@ -69,7 +69,6 @@ describe('R6-3.C: Project + Templates Mirror', () => {
       { source: 'docs/core/bug-resolution.md', template: 'templates/docs/core/bug-resolution.md' },
       { source: 'docs/core/orchestrate.md', template: 'templates/docs/core/orchestrate.md' },
       // Stream B
-      { source: 'docs/core/health-check.md', template: 'templates/docs/core/health-check.md' },
       { source: 'docs/core/alignment.md', template: 'templates/docs/core/alignment.md' },
       { source: 'docs/core/phase-planning.md', template: 'templates/docs/core/phase-planning.md' },
       { source: 'docs/core/tweak-planning.md', template: 'templates/docs/core/tweak-planning.md' },

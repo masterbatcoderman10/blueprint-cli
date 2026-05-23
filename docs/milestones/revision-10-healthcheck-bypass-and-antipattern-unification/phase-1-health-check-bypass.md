@@ -33,12 +33,17 @@ No code logic outside `src/doctor/structure.ts` is touched. CLI surface, tracker
 ## Gate R10-1.0 — Canonical-Set & Obsolete-Test Foundation
 
 > Lock the Doctor canonical-set and clear out tests that target the doomed file so the file-delete + entry-point edits in Stream A land green on first run.
+>
+> User-approved forward allocation: if the gate branch already satisfies the
+> eventual template-side DoD of Stream A (`templates/docs/core/health-check.md`
+> removed and the template-inventory fixtures aligned to that surface), that
+> cleanup may be absorbed into the gate rather than deferred strictly to Stream A.
 
 | Task ID | Task | Duration | Dependencies | Type |
 |---------|------|----------|--------------|------|
 | R10-1.0.1 | Remove `'docs/core/health-check.md'` from `CANONICAL_CORE_FILES` in `src/doctor/structure.ts` | 0.25 | None | Independent |
 | R10-1.0.2 | Delete obsolete R6-3 content-assertion tests targeting `health-check.md`: `tests/revision-6/stream-b/planning-side-docs.test.ts`, `tests/stream-b/planning-docs-rewrite.test.ts`. Drop the `health-check.md` row from the parameterized `SURFACE_CASES` table in `tests/stream-a/srs-surface-contract.test.ts` and remove the dedicated `it('health-check documents docs/srs.md and the legacy repair path', ...)` case in that file | 0.5 | None | Independent |
-| R10-1.0.3 | Update canonical-set test fixtures so they no longer reference `docs/core/health-check.md` or its template mirror: drop the entry in `tests/phase-3/gate-3.0/canonical-structure.test.ts` expected list (line ~31) and remove the `isEditableProjectDoc('docs/core/health-check.md')` assertion (line ~100); drop the `'docs/core/health-check.md'` audit-target case in `tests/phase-3/stream-b/doctor-structure-audit.test.ts` (~line 41); drop `'health-check.md'` from `tests/stream-a/core-templates.test.ts` (~line 17); drop the `{ source: 'docs/core/health-check.md', template: 'templates/docs/core/health-check.md' }` pair from `tests/stream-c/project-templates-mirror.test.ts` (~line 72) | 0.5 | R10-1.0.1 | Dependent |
+| R10-1.0.3 | Update canonical-set test fixtures so they no longer reference `docs/core/health-check.md` or its template mirror: drop the entry in `tests/phase-3/gate-3.0/canonical-structure.test.ts` expected list (line ~31) and remove the `isEditableProjectDoc('docs/core/health-check.md')` assertion (line ~100); drop the `'docs/core/health-check.md'` audit-target case in `tests/phase-3/stream-b/doctor-structure-audit.test.ts` (~line 41); drop `'health-check.md'` from `tests/stream-a/core-templates.test.ts` (~line 17) and the template-side inventory expectation in `tests/revision-3/stream-c/template-registration.test.ts` if the gate has already absorbed deletion of `templates/docs/core/health-check.md`; drop the `{ source: 'docs/core/health-check.md', template: 'templates/docs/core/health-check.md' }` pair from `tests/stream-c/project-templates-mirror.test.ts` (~line 72) | 0.5 | R10-1.0.1 | Dependent |
 
 ### Gate Acceptance Criteria
 
@@ -59,12 +64,13 @@ No code logic outside `src/doctor/structure.ts` is touched. CLI surface, tracker
 | R10-1.A.2 | Mirror R10-1.A.1's edits byte-for-byte into `templates/CLAUDE.md`, `templates/AGENTS.md`, `templates/GEMINI.md`, `templates/QWEN.md`. Final state: all 7 entry-point variants share byte-identical SessionStart / HardRules / ModuleRouting blocks | 0.75 | R10-1.A.1 | Dependent |
 | R10-1.A.3 | Scrub `health-check.md` references from `docs/core/blueprint-structure.md`: remove the `health-check.md` line in the file-tree listing (~line 19) and the `"health-check.md uses this checklist..."` reference paragraph (~line 152) | 0.25 | Gate | Dependent |
 | R10-1.A.4 | Mirror R10-1.A.3's edits byte-for-byte into `templates/docs/core/blueprint-structure.md` | 0.25 | R10-1.A.3 | Dependent |
-| R10-1.A.5 | Delete `docs/core/health-check.md` and `templates/docs/core/health-check.md` | 0.25 | R10-1.A.2, R10-1.A.4 | Dependent |
+| R10-1.A.5 | Delete `docs/core/health-check.md` and delete `templates/docs/core/health-check.md` only if it was not already absorbed by Gate R10-1.0's forward-allocated template cleanup | 0.25 | R10-1.A.2, R10-1.A.4 | Dependent |
 
 ### Stream A Acceptance Criteria
 
 - [ ] No occurrence of the literal `health-check` token anywhere under `templates/` (the shipped scaffold surface).
 - [ ] `docs/core/health-check.md` and `templates/docs/core/health-check.md` are removed from the working tree (confirmed via `git status` + `ls`).
+- [ ] If Gate R10-1.0 already removed `templates/docs/core/health-check.md`, Stream A treats that as satisfied prior work and still removes the remaining live `docs/core/health-check.md` source file.
 - [ ] `<SessionStart>` in every variant now begins at STEP 1 with the project-progress branching that was previously STEP 2; no STEP 2 remains.
 - [ ] `<HardRules>` in every variant contains exactly RULE 1, RULE 2, and RULE 4 — renumbered to RULE 1, RULE 2, RULE 3 (i.e. the former RULE 4 — ASK BEFORE ASSUMING is now RULE 3).
 - [ ] The `<ModuleRouting>` table in every variant contains no row whose left cell is `Check project health`.

@@ -28,7 +28,6 @@ describe('T-3.0.2.1: canonical structure inventory completeness', () => {
       'docs/core/execution.md',
       'docs/core/git-execution-workflow.md',
       'docs/core/git-review-workflow.md',
-      'docs/core/health-check.md',
       'docs/core/hierarchy.md',
       'docs/core/milestone-planning.md',
       'docs/core/orchestrate.md',
@@ -47,7 +46,7 @@ describe('T-3.0.2.1: canonical structure inventory completeness', () => {
     for (const file of expectedCoreFiles) {
       expect(paths).toContain(file)
     }
-    expect(CANONICAL_CORE_FILES).toHaveLength(21)
+    expect(CANONICAL_CORE_FILES).toHaveLength(20)
   })
 
   it('returns managed agent paths for files in manifest selection', () => {
@@ -97,7 +96,6 @@ describe('T-3.0.2.2: editable project docs are excluded from exact content enfor
 
   it('does not mark docs/core files as editable', () => {
     expect(isEditableProjectDoc('docs/core/execution.md')).toBe(false)
-    expect(isEditableProjectDoc('docs/core/health-check.md')).toBe(false)
   })
 
   it('does not mark root agent files as editable', () => {
