@@ -260,7 +260,7 @@ completion.
 ## Anti-Patterns
 
 <AntiPatterns>
-  <AntiPattern name="ANTI-PATTERN: Not Cleaning Up Completed Stream Worktrees">
+  <AntiPattern name="Not Cleaning Up Completed Stream Worktrees">
     <BadExample>Running phase completion after all stream tasks are in DONE — but leaving stream worktrees and branches in place because "cleanup can happen later."</BadExample>
     <Why>By the time phase completion runs, every stream review is complete and every branch has been merged to main. There is no remaining reason for any stream worktree to exist. Worktrees left behind accumulate across phases, fill git worktree list with stale entries, and make it impossible to tell at a glance what is actively in-flight. Cleanup is not optional post-completion bookkeeping — it is part of closing the phase. The reviewer's WorktreeCleanup step in git-review-workflow.md handles this per stream; phase completion should verify no orphaned worktrees remain before declaring the phase done.</Why>
   </AntiPattern>

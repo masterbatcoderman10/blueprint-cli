@@ -299,7 +299,6 @@ phases, just as a milestone does.
 
 ## Anti-Patterns
 
-```xml
 <AntiPatterns>
   <AntiPattern name="Incomplete Impact Analysis">
     <BadExample>Drafting revision phases or executing modification work after checking phase documents but omitting tests, SRS requirement changes, or downstream PRD dependencies.</BadExample>
@@ -314,4 +313,3 @@ phases, just as a milestone does.
     <Why>The revision document defines the revision's scope, impact, phases, dependencies, and success criteria. Phase-level task breakdown belongs in the individual phase plan after the revision is confirmed. Avoid including detailed gate, stream, or task-level implementation breakdowns inside the revision document; doing so duplicates phase planning too early and makes later planning harder to correct.</Why>
   </AntiPattern>
 </AntiPatterns>
-```

@@ -138,7 +138,6 @@ Loaded by review.md at the start of ReviewProcess.
 
 ## Anti-Patterns
 
-```xml
 <AntiPatterns>
   <AntiPattern name="Not Cleaning Up Worktrees After Review">
     <BadExample>Completing a review, moving all tasks to DONE, and merging the branch to main — but leaving the worktree directory and branch in place indefinitely.</BadExample>
@@ -149,4 +148,3 @@ Loaded by review.md at the start of ReviewProcess.
     <Why>The tracker HTTP API is the sole interface for reading and writing tracker state. Direct database access bypasses validation, triggers, and the snapshot engine, producing inconsistent state that the board UI and other agents cannot reconcile. Always use the HTTP recipes in docs/core/tracker.md (e.g., PATCH /tasks/:id for state changes, GET /tasks for lookups).</Why>
   </AntiPattern>
 </AntiPatterns>
-```

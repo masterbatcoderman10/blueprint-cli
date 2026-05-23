@@ -383,7 +383,6 @@ been done yet.
 
 ## Anti-Patterns
 
-```xml
 <AntiPatterns>
   <AntiPattern name="Don't Rush">
     <BadExample>The agent finishes analysis, writes the actual conventions or PRD document to disk, and only afterward asks whether the user approves the current stage.</BadExample>
@@ -392,4 +391,3 @@ been done yet.
     <Why>Writing the actual document before approval turns tentative thinking into project state, which forces later steps to inherit assumptions the user has not accepted. Aggressively pushing to the next flow step also pressures the user to approve momentum instead of the current-stage draft itself. The confirmation loop exists to keep each stage trustworthy: show the current-stage draft, ask for approval, close open questions, then continue.</Why>
   </AntiPattern>
 </AntiPatterns>
-```

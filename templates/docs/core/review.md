@@ -351,11 +351,9 @@ the tracker and either approves it or leaves structured feedback.
 
 ## Anti-Patterns
 
-```xml
 <AntiPatterns>
   <AntiPattern name="Direct Tracker Database Mutation">
     <BadExample>Opening docs/.blueprint/tasks.db with SQLite directly, running raw SQL queries to read or modify task state, or editing the database file with any tool other than the tracker HTTP API.</BadExample>
     <Why>The tracker HTTP API is the sole interface for reading and writing tracker state. Direct database access bypasses validation, triggers, and the snapshot engine, producing inconsistent state that the board UI and other agents cannot reconcile. Always use the HTTP recipes in docs/core/tracker.md (e.g., POST /tasks/:id/approve or reject for reviewer state changes, POST /tasks/:id/start, submit, resume for implementer state changes, POST /tasks/:id/comments for standalone review feedback).</Why>
   </AntiPattern>
 </AntiPatterns>
-```

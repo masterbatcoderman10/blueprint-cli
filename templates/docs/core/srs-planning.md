@@ -714,7 +714,6 @@ alignment, and grows as the project gains clarity.
 
 ## Anti-Patterns
 
-```xml
 <AntiPatterns>
   <AntiPattern name="Flat Requirement Lists">
     <BadExample>The agent takes one MealBoard capability and explodes it into several top-level requirements that are really just parts of the same job.</BadExample>
@@ -741,4 +740,3 @@ alignment, and grows as the project gains clarity.
     <Why>A checklist writer describes what to build next and in what order. Progressive clarification describes enduring product truth first, then lets later planning layers decide implementation steps.</Why>
   </AntiPattern>
 </AntiPatterns>
-```

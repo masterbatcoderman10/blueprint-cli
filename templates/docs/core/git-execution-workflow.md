@@ -125,7 +125,6 @@ referenced again at completion for commit.
 
 ## Anti-Patterns
 
-```xml
 <AntiPatterns>
   <AntiPattern name="Editing Outside a Worktree">
     <BadExample>Running code edits, test executions, or lint passes in the main working directory instead of inside the gate or stream's dedicated worktree directory.</BadExample>
@@ -144,4 +143,3 @@ referenced again at completion for commit.
     <Why>The tracker HTTP API is the sole interface for reading and writing tracker state. Direct database access bypasses validation, triggers, and the snapshot engine, producing inconsistent state that the board UI and other agents cannot reconcile. Always use the HTTP recipes in docs/core/tracker.md (e.g., PATCH /tasks/:id for state changes, GET /tasks for lookups).</Why>
   </AntiPattern>
 </AntiPatterns>
-```

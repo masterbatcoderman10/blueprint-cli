@@ -154,7 +154,6 @@ and parallel streams of tasks.
 
 ## Anti-Patterns
 
-```xml
 <AntiPatterns>
   <AntiPattern name="Skipping Schema Ideation">
     <BadExample>A phase introduces new data concepts but moves straight to API or UI tasks without defining the underlying schema or data model.</BadExample>
@@ -178,7 +177,6 @@ and parallel streams of tasks.
     <Why>The Gate/Stream field in the task table and the task ID prefix already identify where a task belongs. Repeating that context in the title wastes space and creates visual noise in tracker listings and board views. Task titles should describe the work, not its container.</Why>
   </AntiPattern>
 </AntiPatterns>
-```
 
 ---
 
