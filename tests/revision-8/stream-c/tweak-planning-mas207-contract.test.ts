@@ -144,7 +144,7 @@ describe('T-R8-2.C.2: docs/core/tweak-planning.md contains MAS-207 contract (esc
 })
 
 describe('T-R8-2.C.2: docs/core/tweak-planning.md contains MAS-207 contract (Anti-Patterns block)', () => {
-  it('contains an <AntiPatterns> block listing all eight locked entry names', async () => {
+  it('contains an <AntiPatterns> block with exactly the eight locked entries in source order', async () => {
     const content = await readDoc(TWEAK_PLANNING_PATH)
     const block = extractBlock(content, 'AntiPatterns')
     expect(block, '<AntiPatterns> block must be present').not.toBeNull()
@@ -161,9 +161,18 @@ describe('T-R8-2.C.2: docs/core/tweak-planning.md contains MAS-207 contract (Ant
       'Continuing in Tweak Mode After Escalation',
     ]
 
-    for (const name of lockedNames) {
-      expect(blockText, `AntiPatterns block must contain entry named "${name}"`).toContain(`name="${name}"`)
+    // Extract all <AntiPattern name="..."> entries in order
+    const entryNameRegex = /<AntiPattern name="([^"]+)">/g
+    const foundNames: string[] = []
+    let match: RegExpExecArray | null
+    while ((match = entryNameRegex.exec(blockText)) !== null) {
+      foundNames.push(match[1])
     }
+
+    // Exactly 8 entries, no extras or duplicates
+    expect(foundNames, 'AntiPatterns block must contain exactly 8 entries').toHaveLength(lockedNames.length)
+    // Names must match locked list in order
+    expect(foundNames).toEqual(lockedNames)
   })
 })
 
