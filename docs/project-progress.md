@@ -2,9 +2,9 @@
 
 **Project**: blueprint-cli
 **Tracker**: blueprint-cli
-**Current Milestone**: None — all planned revisions complete
-**Current Phase**: None — pending next revision or milestone planning
-**Status**: Revision 10 complete. All phases done.
+**Current Milestone**: Revision 11 — Skill-Based Agent Surface (Phase 1 planned)
+**Current Phase**: Phase 1 — Skill Authorship & Mode-Aware Scaffold (planned, awaiting test plan)
+**Status**: Revision 11 Phase 1 planned. MAS-208 written to SRS as pre-phase repair. Revision scope extended with Phase 6 (Migrate & Alignment-Complete Commands). Phase 1 document committed; test plan pending.
 
 ---
 
@@ -91,6 +91,11 @@
 - 2026-05-23: Revision 10 Phase 1 — Health-Check Bypass completed. All tasks done, DoD satisfied with user-approved overrides for historical `health-check` grep matches and absent repo lint configuration, full test suite green (1078 passed, 2 skipped, 0 failed).
 - 2026-05-23: Phase 2 — Anti-Pattern Shape Unification completed. All tasks done, DoD satisfied, full test suite green (1088 passed, 2 skipped, 0 failed).
 - 2026-05-23: Revision 10 — Health-Check Bypass & Anti-Pattern Shape Unification completed. All phases done.
+- 2026-05-24: R11 npx pathway clarified after deeper vercel-labs/skills research: primary install pathway is `npx skills add masterbatcoderman10/blueprint-cli --skill blueprint` (vercel-labs/skills, defaults to project-local `.claude/skills/blueprint/` which Claude Code discovers natively); fallback is our own bundled `bin/blueprint-skill-install` for users without the vercel CLI. Requires `skills/blueprint/` at repo root. Global install (`-g`) is a known upstream sharp edge (lands in `~/.agents/skills/`, not discovered by Claude Code; vercel-labs/skills issues #693/#744/#851) — we document and recommend project-local install rather than work around it. MAS-210 body updated.
+- 2026-05-24: Identified Revision 11 — Skill-Based Agent Surface. Migrates Blueprint's primary agent entry point from `.md` core modules (loaded via root `CLAUDE.md` / `AGENTS.md` / `GEMINI.md` / `QWEN.md` `<ModuleRouting>` tables) to a single `blueprint` Claude skill installed at canonical `.claude/skills/blueprint/`, with `reference/*.md` 1:1 mirror of `docs/core/*.md`, scripts for context loading, and an `npx blueprint-skill-install` pathway. Dual-source coexistence: skill mode recommended, legacy `.md` mode supported with medium deprecation surface (init prompt + Doctor mode-aware report + suppressible CLI startup banner). `docs/conventions.md` sunsetted; content migrated into `<ProjectConventions>` section of skill-mode agent entry-point variants. Impact: M1 Phases 1–4 touched (init, scaffold, Doctor, release); prior R5/R6/R7/R8/R9/R10 content ported into skill `reference/*` without behavior change. SRS: MAS-208 (Skill-Based Agent Surface), MAS-209 (Dual-Source Deprecation Path), MAS-210 (NPX Skill Install Pathway) to be created (status `approved-pending-implementation`); MAS-200, MAS-201, MAS-202, MAS-203, MAS-204, MAS-205, MAS-207 same-ID elaborated (meaning unchanged). 5 phases planned at outline level. Revision document at `docs/milestones/revision-11-skill-based-agent-surface/revision-11-skill-based-agent-surface.md`.
+- 2026-05-24: SRS pre-phase repair — added MAS-208 (Skill-Based Agent Surface) to `docs/srs.md` (status `approved-pending-implementation`, assigned milestone Revision 11) ahead of Revision 11 Phase 1 planning per the same precedent as R6 Phase 3 MAS-204/MAS-205 repair. Locked Phase 1 sub-detail recorded in the MAS-208 change log: skill structure, file-rename map, verbatim-content + frontmatter authoring style, ironclad-invocation description shape, intent-keyed routing table, canonical-shape-spec-only anti-patterns.md, markdown-brief load-context.mjs, Phase 1 scope limited to `templates/skills/blueprint/**`, minimal one-liner skill-mode entry-point variants, mode prompt UX. MAS-208 transitions to `active` in R11 Phase 2.
+- 2026-05-24: Revision 11 Phase 1 — Skill Authorship & Mode-Aware Scaffold was planned. Gate R11-1.0 (4 tasks, 2.5 units) covers `Mode = 'skill' \| 'legacy'` type plumbing, `templates/skills/blueprint/SKILL.md` authorship (ironclad-invocation frontmatter + setup gate + shared-laws ref + intent-keyed routing table mirroring root `<ModuleRouting>` 1:1), `templates/skills/blueprint/reference/anti-patterns.md` (canonical shape spec only), and the `docs/core/alignment.md` final-step update (+ template mirror) instructing the agent to run the deferred `alignment-complete` command. Stream A (20 tasks, all Independent) authors the 20 `reference/*.md` mirrors with locked file-rename map. Stream B (1 task) authors `scripts/load-context.mjs` (markdown brief to stdout). Stream C (4 tasks, all Independent) authors minimal one-liner skill-mode entry-point stubs at `templates/skill/{CLAUDE,AGENTS,GEMINI,QWEN}.md`. Stream D (4 tasks) adds the mode prompt + scaffold branch + post-scaffold `<!-- blueprint-status: alignment-required -->` marker writer (idempotent) + end-to-end smoke. 32 tasks total; sum-of-work ~12.0 units; wallclock ~4.0 units with parallel fan-out. Phase document at `docs/milestones/revision-11-skill-based-agent-surface/phase-1-skill-authorship-and-mode-aware-scaffold.md`. Ready for test planning.
+- 2026-05-24: Revision 11 scope extended during Phase 1 planning to add Phase 6 — Migrate & Alignment-Complete Commands. Phase 6 implements the deferred `alignment-complete` command (flips the `<!-- blueprint-status: alignment-required -->` marker injected by Phase 1's init step to `<!-- blueprint-status: alignment-complete -->` in every scaffolded agent entry-point file, idempotent) and the related `migrate` command (legacy-mode → skill-mode in-place migration; detailed scope locked at Phase 6 planning time). New SRS requirements (working IDs MAS-211 alignment-complete, MAS-212 migrate) will be created during Phase 6 planning.
 
 ---
 
@@ -148,7 +153,14 @@ R9 — Tracker Workflow QoL
 └── Phase 2 — Tracker Cheatsheet, Board Stop & Worktree-Aware Lifecycle ✓
 R10 — Health-Check Bypass & Anti-Pattern Shape Unification
 ├── Phase 1 — Health-Check Bypass ✓
-└── Phase 2 — Anti-Pattern Shape Unification ✓
+├── Phase 2 — Anti-Pattern Shape Unification ✓
+R11 — Skill-Based Agent Surface
+├── Phase 1 — Skill Authorship & Mode-Aware Scaffold ○ (planned, awaiting test plan)
+├── Phase 2 — Doctor Mode Awareness & Dual-Source Repair ○
+├── Phase 3 — CLI Deprecation Banner & Conventions Sunset ○
+├── Phase 4 — NPX Install Pathway & Release Surface ○
+├── Phase 5 — Dogfood & Cross-Reference Verification ○
+└── Phase 6 — Migrate & Alignment-Complete Commands ○
 M2 — Cross-Project Context (Optional Post-MVP)
 └── Phase 1 — TBD ○
 M3 — Workflow Visibility Enhancements (Optional Future)
@@ -164,4 +176,4 @@ M3 — Workflow Visibility Enhancements (Optional Future)
 
 | Revision | Name | Status | Notes |
 |----------|------|--------|-------|
-| — | — | No pending revisions. | — |
+| R11 | Skill-Based Agent Surface | Phase 1 planned | 6 phases outlined (Phase 6 added during Phase 1 planning for deferred `alignment-complete` + `migrate` commands). Phase 1 awaiting test plan. Docs: `docs/milestones/revision-11-skill-based-agent-surface/revision-11-skill-based-agent-surface.md`, `phase-1-skill-authorship-and-mode-aware-scaffold.md` |

@@ -22,6 +22,7 @@ This SRS exists for blueprint-cli to act as the persistent requirement layer bet
 | MAS-205 | Local Project Board UI | Must | active | Revision 6 |
 | MAS-206 | Standalone Tweak Workflow | Must | superseded | Revision 7 |
 | MAS-207 | Change-First Tweak Workflow | Must | active | Revision 8 |
+| MAS-208 | Skill-Based Agent Surface | Must | approved-pending-implementation | Revision 11 |
 
 ---
 
@@ -112,6 +113,21 @@ The system must provide a **change-first tweak workflow** that replaces the trac
 - **Code-change test gate**: when the tweak touches code (any file outside `docs/**`), `npm test` must be green AND the user must explicitly approve before the post-hoc document is created. Docs-only tweaks are exempt from the test gate but still require user approval.
 - **Escalation hard-stop**: if mid-cycle the work grows beyond a contained change (new feature surface, cross-cutting contract change, multi-phase coordination, formal test plan required, regressive behavior change, multiple distinct concerns), the agent performs a hard stop on Tweak Mode, surfaces the escalation to the user, and waits for the user to decide routing. No automatic rerouting. No partial tweak doc.
 - **Anti-patterns** explicitly forbidden in Tweak Mode: creating tracker/board tasks, writing the tweak doc before the change, loading planning modules, carving the tweak into gates/streams/task-tables, drafting a formal test plan, skipping the confirm step, skipping `npm test` for a code-touching tweak, and continuing in Tweak Mode after escalation criteria are met.
+
+#### MAS-208 - Skill-Based Agent Surface
+
+The system must provide a single `blueprint` Claude skill installed at the canonical `.claude/skills/blueprint/` path as the recommended primary agent surface, alongside the existing `.md` core module mode (which remains supported but is deprecated by MAS-209).
+
+- The skill must consist of `SKILL.md` (frontmatter `name` + ironclad-invocation `description`; setup gate; shared-laws reference; intent-keyed commands/routing table mirroring the root `<ModuleRouting>` 1:1), one `reference/*.md` file per `docs/core/*.md` module (1:1 mapping, with file renames where applicable: `alignment.md` → `align.md`, `phase-planning.md` → `plan-phase.md`, `milestone-planning.md` → `plan-milestone.md`, `prd-planning.md` → `plan-prd.md`, `test-planning.md` → `plan-test.md`, `bug-resolution.md` → `bug.md`, `execution.md` → `execute.md`, `git-execution-workflow.md` → `commit.md`, `git-review-workflow.md` → `commit-review.md`, `phase-completion.md` → `phase-complete.md`, `revision-planning.md` → `revision.md`, `srs-planning.md` → `srs.md`, `tweak-planning.md` → `tweak.md`), plus the new shared `reference/anti-patterns.md` laws file, plus `scripts/load-context.mjs` for project-state context loading.
+- The setup gate must require populated `docs/project-progress.md`, an initialised tracker (`docs/.blueprint/tasks.db` and `docs/.blueprint/` directory present), and must instruct the agent to install `blueprint-cli` (`npm i -g blueprint-agentic-development`) if the tracker is missing.
+- The `SKILL.md` frontmatter `description` must use ironclad-invocation phrasing (superpowers-style mandatory invocation) so that any planning, execution, review, tweak, bug, revision, or commit request inside a Blueprint project auto-activates the skill.
+- The intent-keyed commands/routing table inside `SKILL.md` must mirror the current root `CLAUDE.md` `<ModuleRouting>` table 1:1 — every routable intent in the legacy table maps to the corresponding renamed reference file.
+- `reference/*.md` files must carry verbatim content from the corresponding `docs/core/*.md` module body, prepended with skill-style frontmatter (`name`, `description`). No content rewriting; behaviour parity preserved per Revision 11 §2.3.
+- The shared `reference/anti-patterns.md` file must contain only the canonical `<AntiPatterns>` shape spec established by Revision 10 Phase 2 (canonical shape: `<AntiPatterns>` wrapper, `<AntiPattern name="...">` with bare `name=`, required `<BadExample>` + `<Why>`, optional `<GoodExample>` and domain-prefixed variants). `<AntiPatterns>` blocks within `reference/*.md` must conform to this shape.
+- `scripts/load-context.mjs` must print a markdown brief to stdout summarising current project state (project name, current milestone, current phase, pending revisions, tracker reachability).
+- `blueprint init` must offer a mode choice with `skill` recommended (default) and `legacy` marked "not recommended"; selecting skill mode must emit the skill payload into `<target>/.claude/skills/blueprint/**` and scaffold minimal one-liner skill-mode entry-point variants (CLAUDE.md / AGENTS.md / GEMINI.md / QWEN.md) that point at the skill (no `<SessionStart>` / `<HardRules>` / `<ModuleRouting>` blocks — the skill owns routing); selecting legacy mode must preserve the existing scaffold behaviour unchanged.
+- During Revision 11 Phase 1, the skill payload is shipped from `templates/skills/blueprint/**` only (scaffold source); the repo-root `skills/blueprint/**` payload required for the vercel-labs/skills npx pathway and the byte-identical template-mirror test are deferred to Phase 4.
+- The skill must ship in the published npm tarball under `skills/blueprint/` (Phase 4) and be scaffolded into new projects by `blueprint init` when the user selects skill mode (Phase 1).
 
 ### Should Have
 
@@ -267,6 +283,20 @@ Change log:
 Change log:
 - 2026-05-20 - Created from Revision 8 Phase 2 planning. Locked sub-detail bullets added: Tweak Mode anti-ceremony rules, change-first loop (understand → restate → confirm → change → cycle → verify → post-hoc doc), audit-only post-hoc doc shape (Status / Summary of Change / Files Touched / User Acceptance Note), naming convention `tweak-<n>-<slug>.md`, code-change test gate (npm test green AND user approval required; docs-only tweaks exempt), escalation hard-stop (no auto-routing; user decides), anti-patterns list. Status remains `approved-pending-implementation` until Revision 8 Phase 2 completion.
 - 2026-05-20 - Transitioned to active. Revision 8 Phase 2 complete: tweak-planning.md rewritten end-to-end for the change-first workflow, templates mirrored byte-for-byte, CLAUDE.md routing updated, doc-contract tests locked, R7 and R2 contract tests updated to MAS-207, tweak-5 marked superseded. Full test suite green (1010 tests).
+
+### MAS-208
+- Title: Skill-Based Agent Surface
+- Priority: Must
+- Status: approved-pending-implementation
+- Assigned milestone: Revision 11
+- Source: Revision 11 Skill-Based Agent Surface
+- Introduced by: Revision 11 Phase 1
+- Supersedes: None
+- Superseded by: None
+
+Change log:
+- 2026-05-24 - Created from Revision 11 Phase 1 planning (pre-phase SRS repair). Locked sub-detail bullets recorded: skill structure (`SKILL.md` + 20 renamed `reference/*.md` mirrors + shared `reference/anti-patterns.md` + `scripts/load-context.mjs`), explicit file-rename map (`alignment.md` → `align.md`, `phase-planning.md` → `plan-phase.md`, etc.), verbatim-content + skill-frontmatter authoring style for reference mirrors, ironclad-invocation frontmatter `description` shape, intent-keyed routing table mirroring root `<ModuleRouting>` 1:1, canonical-shape-spec-only contents for `reference/anti-patterns.md`, markdown-brief stdout shape for `scripts/load-context.mjs`, Phase 1 scope limited to `templates/skills/blueprint/**` (repo-root `skills/blueprint/` deferred to Phase 4), minimal one-liner skill-mode entry-point variants (no `<SessionStart>` / `<HardRules>` / `<ModuleRouting>`), `blueprint init` mode prompt (skill default, legacy marked "not recommended"). Status remains `approved-pending-implementation` until Revision 11 Phase 2 activates the requirement.
+- 2026-05-24 - Phase 1 scope extended: `blueprint init` (both modes) writes a hardcoded `<!-- blueprint-status: alignment-required -->` marker into every scaffolded agent entry-point file (CLAUDE / AGENTS / GEMINI / QWEN) after the template copy step; `docs/core/alignment.md` and its template mirror gain a final alignment step instructing the agent to run the deferred `alignment-complete` command which flips the marker to `<!-- blueprint-status: alignment-complete -->`. The `alignment-complete` command itself is deferred to Revision 11 Phase 6 (alongside the planned `migrate` command). Meaning unchanged; ID unchanged.
 
 ---
 
