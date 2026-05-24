@@ -42,6 +42,7 @@ describe('Phase 2 Stream C — Archive and Scaffold Engine', () => {
 
         const options: InitOptions = {
           projectName: 'test-project',
+          mode: 'legacy',
           git: { hasExistingRepository: true, shouldInitialize: false, shouldSetMainBranch: false },
           docs: {
             hasExistingDocsDirectory: true,
@@ -65,6 +66,7 @@ describe('Phase 2 Stream C — Archive and Scaffold Engine', () => {
       it('skips archiving when docs/ does not exist', async () => {
         const options: InitOptions = {
           projectName: 'test-project',
+          mode: 'legacy',
           git: { hasExistingRepository: true, shouldInitialize: false, shouldSetMainBranch: false },
           docs: {
             hasExistingDocsDirectory: false,
@@ -86,6 +88,7 @@ describe('Phase 2 Stream C — Archive and Scaffold Engine', () => {
 
         const options: InitOptions = {
           projectName: 'test-project',
+          mode: 'legacy',
           git: { hasExistingRepository: true, shouldInitialize: false, shouldSetMainBranch: false },
           docs: {
             hasExistingDocsDirectory: true,
@@ -114,6 +117,7 @@ describe('Phase 2 Stream C — Archive and Scaffold Engine', () => {
 
         const options: InitOptions = {
           projectName: 'test-project',
+          mode: 'legacy',
           git: { hasExistingRepository: true, shouldInitialize: false, shouldSetMainBranch: false },
           docs: { hasExistingDocsDirectory: false, shouldArchiveExistingDocs: false, archiveDirectoryName: defaultArchiveDirectoryName },
           markdownMigration: {
@@ -142,6 +146,7 @@ describe('Phase 2 Stream C — Archive and Scaffold Engine', () => {
 
         const options: InitOptions = {
           projectName: 'test-project',
+          mode: 'legacy',
           git: { hasExistingRepository: true, shouldInitialize: false, shouldSetMainBranch: false },
           docs: { hasExistingDocsDirectory: false, shouldArchiveExistingDocs: false, archiveDirectoryName: defaultArchiveDirectoryName },
           markdownMigration: {
@@ -170,6 +175,7 @@ describe('Phase 2 Stream C — Archive and Scaffold Engine', () => {
 
         const options: InitOptions = {
           projectName: 'test-project',
+          mode: 'legacy',
           git: { hasExistingRepository: true, shouldInitialize: false, shouldSetMainBranch: false },
           docs: { hasExistingDocsDirectory: false, shouldArchiveExistingDocs: false, archiveDirectoryName: defaultArchiveDirectoryName },
           markdownMigration: {
@@ -207,6 +213,7 @@ describe('Phase 2 Stream C — Archive and Scaffold Engine', () => {
 
         const options: InitOptions = {
           projectName: 'test-project',
+          mode: 'legacy',
           git: { hasExistingRepository: true, shouldInitialize: false, shouldSetMainBranch: false },
           docs: { hasExistingDocsDirectory: false, shouldArchiveExistingDocs: false, archiveDirectoryName: defaultArchiveDirectoryName },
           markdownMigration: {
@@ -237,6 +244,7 @@ describe('Phase 2 Stream C — Archive and Scaffold Engine', () => {
 
         const options: InitOptions = {
           projectName: 'test-project',
+          mode: 'legacy',
           git: { hasExistingRepository: true, shouldInitialize: false, shouldSetMainBranch: false },
           docs: { hasExistingDocsDirectory: false, shouldArchiveExistingDocs: false, archiveDirectoryName: defaultArchiveDirectoryName },
           markdownMigration: { discoveredMarkdownPaths: [], transferMode: 'skip', selectedPaths: [] },
@@ -258,6 +266,7 @@ describe('Phase 2 Stream C — Archive and Scaffold Engine', () => {
       it('skips archiving when no agent files detected', async () => {
         const options: InitOptions = {
           projectName: 'test-project',
+          mode: 'legacy',
           git: { hasExistingRepository: true, shouldInitialize: false, shouldSetMainBranch: false },
           docs: { hasExistingDocsDirectory: false, shouldArchiveExistingDocs: false, archiveDirectoryName: defaultArchiveDirectoryName },
           markdownMigration: { discoveredMarkdownPaths: [], transferMode: 'skip', selectedPaths: [] },
@@ -280,6 +289,7 @@ describe('Phase 2 Stream C — Archive and Scaffold Engine', () => {
       it('creates docs/, docs/core/, docs/knowledge-base/, docs/milestones/ directories', async () => {
         const options: InitOptions = {
           projectName: 'test-project',
+          mode: 'legacy',
           git: { hasExistingRepository: true, shouldInitialize: false, shouldSetMainBranch: false },
           docs: { hasExistingDocsDirectory: false, shouldArchiveExistingDocs: false, archiveDirectoryName: defaultArchiveDirectoryName },
           markdownMigration: { discoveredMarkdownPaths: [], transferMode: 'skip', selectedPaths: [] },
@@ -301,6 +311,7 @@ describe('Phase 2 Stream C — Archive and Scaffold Engine', () => {
       it('copies all 16 core protocol files from templates', async () => {
         const options: InitOptions = {
           projectName: 'test-project',
+          mode: 'legacy',
           git: { hasExistingRepository: true, shouldInitialize: false, shouldSetMainBranch: false },
           docs: { hasExistingDocsDirectory: false, shouldArchiveExistingDocs: false, archiveDirectoryName: defaultArchiveDirectoryName },
           markdownMigration: { discoveredMarkdownPaths: [], transferMode: 'skip', selectedPaths: [] },
@@ -319,6 +330,7 @@ describe('Phase 2 Stream C — Archive and Scaffold Engine', () => {
       it('core protocol files have non-zero length and start with heading', async () => {
         const options: InitOptions = {
           projectName: 'test-project',
+          mode: 'legacy',
           git: { hasExistingRepository: true, shouldInitialize: false, shouldSetMainBranch: false },
           docs: { hasExistingDocsDirectory: false, shouldArchiveExistingDocs: false, archiveDirectoryName: defaultArchiveDirectoryName },
           markdownMigration: { discoveredMarkdownPaths: [], transferMode: 'skip', selectedPaths: [] },
@@ -387,6 +399,7 @@ describe('Phase 2 Stream C — Archive and Scaffold Engine', () => {
       it('creates only selected agent files at project root', async () => {
         const options: InitOptions = {
           projectName: 'test-project',
+          mode: 'legacy',
           git: { hasExistingRepository: true, shouldInitialize: false, shouldSetMainBranch: false },
           docs: { hasExistingDocsDirectory: false, shouldArchiveExistingDocs: false, archiveDirectoryName: defaultArchiveDirectoryName },
           markdownMigration: { discoveredMarkdownPaths: [], transferMode: 'skip', selectedPaths: [] },
@@ -412,6 +425,7 @@ describe('Phase 2 Stream C — Archive and Scaffold Engine', () => {
       it('creates CLAUDE.md even with empty selection', async () => {
         const options: InitOptions = {
           projectName: 'test-project',
+          mode: 'legacy',
           git: { hasExistingRepository: true, shouldInitialize: false, shouldSetMainBranch: false },
           docs: { hasExistingDocsDirectory: false, shouldArchiveExistingDocs: false, archiveDirectoryName: defaultArchiveDirectoryName },
           markdownMigration: { discoveredMarkdownPaths: [], transferMode: 'skip', selectedPaths: [] },
@@ -436,6 +450,7 @@ describe('Phase 2 Stream C — Archive and Scaffold Engine', () => {
       it('initializes git repository when shouldInitialize is true', async () => {
         const options: InitOptions = {
           projectName: 'test-project',
+          mode: 'legacy',
           git: { hasExistingRepository: false, shouldInitialize: true, shouldSetMainBranch: true },
           docs: { hasExistingDocsDirectory: false, shouldArchiveExistingDocs: false, archiveDirectoryName: defaultArchiveDirectoryName },
           markdownMigration: { discoveredMarkdownPaths: [], transferMode: 'skip', selectedPaths: [] },
@@ -451,6 +466,7 @@ describe('Phase 2 Stream C — Archive and Scaffold Engine', () => {
       it('skips git init when shouldInitialize is false', async () => {
         const options: InitOptions = {
           projectName: 'test-project',
+          mode: 'legacy',
           git: { hasExistingRepository: false, shouldInitialize: false, shouldSetMainBranch: false },
           docs: { hasExistingDocsDirectory: false, shouldArchiveExistingDocs: false, archiveDirectoryName: defaultArchiveDirectoryName },
           markdownMigration: { discoveredMarkdownPaths: [], transferMode: 'skip', selectedPaths: [] },
@@ -468,6 +484,7 @@ describe('Phase 2 Stream C — Archive and Scaffold Engine', () => {
       it('does not create .git when git init is declined', async () => {
         const options: InitOptions = {
           projectName: 'test-project',
+          mode: 'legacy',
           git: { hasExistingRepository: false, shouldInitialize: false, shouldSetMainBranch: false },
           docs: { hasExistingDocsDirectory: false, shouldArchiveExistingDocs: false, archiveDirectoryName: defaultArchiveDirectoryName },
           markdownMigration: { discoveredMarkdownPaths: [], transferMode: 'skip', selectedPaths: [] },

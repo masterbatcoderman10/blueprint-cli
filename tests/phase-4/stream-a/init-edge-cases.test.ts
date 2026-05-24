@@ -14,6 +14,7 @@ import { initCommand } from '../../../src/commands/init'
 function buildInitOptions(projectRoot: string, overrides: Partial<InitOptions> = {}): InitOptions {
   const baseOptions: InitOptions = {
     projectName: 'phase-4-edge',
+    mode: 'legacy',
     git: {
       hasExistingRepository: true,
       shouldInitialize: false,

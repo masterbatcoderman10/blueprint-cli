@@ -35,6 +35,7 @@ describe('Gate 2.0 — Scaffold Infrastructure', () => {
 
     const options: InitOptions = {
       projectName: 'my-project',
+      mode: 'legacy',
       git: {
         hasExistingRepository: false,
         shouldInitialize: true,

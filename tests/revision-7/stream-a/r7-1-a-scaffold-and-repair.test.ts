@@ -35,6 +35,7 @@ describe('Stream A — Scaffold Engine & Doctor Repair', () => {
     it('creates docs/tweaks/ directory and copies README.md from template', async () => {
       const options: InitOptions = {
         projectName: 'test-project',
+        mode: 'legacy',
         git: { hasExistingRepository: true, shouldInitialize: false, shouldSetMainBranch: false },
         docs: { hasExistingDocsDirectory: false, shouldArchiveExistingDocs: false, archiveDirectoryName: defaultArchiveDirectoryName },
         markdownMigration: { discoveredMarkdownPaths: [], transferMode: 'skip', selectedPaths: [] },
@@ -232,6 +233,7 @@ describe('Stream A — Scaffold Engine & Doctor Repair', () => {
     it('executeScaffold includes docs/tweaks/ in createdDirectories and docs/tweaks/README.md in createdFiles', async () => {
       const options: InitOptions = {
         projectName: 'test-project',
+        mode: 'legacy',
         git: { hasExistingRepository: true, shouldInitialize: false, shouldSetMainBranch: false },
         docs: { hasExistingDocsDirectory: false, shouldArchiveExistingDocs: false, archiveDirectoryName: defaultArchiveDirectoryName },
         markdownMigration: { discoveredMarkdownPaths: [], transferMode: 'skip', selectedPaths: [] },

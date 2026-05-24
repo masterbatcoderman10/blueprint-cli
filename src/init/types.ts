@@ -1,3 +1,5 @@
+export type Mode = 'skill' | 'legacy'
+
 export type MarkdownTransferMode = 'move' | 'copy' | 'skip'
 
 export type AgentFileName = 'CLAUDE.md' | 'AGENTS.md' | 'GEMINI.md' | 'QWEN.md'
@@ -7,6 +9,7 @@ export const defaultArchiveDirectoryName = 'docs-archived'
 export interface InitOptions {
   projectName: string
   projectTagline: string
+  mode: Mode
   git: {
     hasExistingRepository: boolean
     shouldInitialize: boolean

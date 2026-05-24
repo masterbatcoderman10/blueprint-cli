@@ -359,6 +359,7 @@ describe('Phase 2 Stream B — Interactive Onboarding Flow', () => {
   it('T-B.6: confirmation summary generator includes planned creates, archives, moves, and git operations', () => {
     const options: InitOptions = {
       projectName: 'my-project',
+      mode: 'legacy',
       git: {
         hasExistingRepository: false,
         shouldInitialize: true,
@@ -399,6 +400,7 @@ describe('Phase 2 Stream B — Interactive Onboarding Flow', () => {
   it('T-B.6.1: confirmation summary enumerates explicit overwrite actions when archival is declined', () => {
     const options: InitOptions = {
       projectName: 'my-project',
+      mode: 'legacy',
       git: {
         hasExistingRepository: false,
         shouldInitialize: false,
@@ -437,6 +439,7 @@ describe('Phase 2 Stream B — Interactive Onboarding Flow', () => {
   it('T-B.6.2: confirmation prompt renders summary via clack note output', async () => {
     const options: InitOptions = {
       projectName: 'my-project',
+      mode: 'legacy',
       git: {
         hasExistingRepository: true,
         shouldInitialize: false,

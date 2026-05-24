@@ -10,6 +10,7 @@ import type { InitOptions } from '../../../src/init/types'
 function createMinimalOptions(projectName: string = 'test-project'): InitOptions {
   return {
     projectName,
+    mode: 'legacy',
     git: {
       hasExistingRepository: false,
       shouldInitialize: false,

@@ -419,6 +419,7 @@ export async function runInitOnboardingFlow(rootDir: string): Promise<InitOnboar
   const options: InitOptions = {
     projectName,
     projectTagline,
+    mode: 'skill',
     git: {
       hasExistingRepository: gitChoice.hasExistingRepository,
       shouldInitialize: gitChoice.shouldInitialize,
