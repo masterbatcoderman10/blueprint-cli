@@ -377,6 +377,18 @@ been done yet.
        current milestone reference, and set current phase to
        "TBD — pending phase planning" unless a phase is obvious
      - This makes the project ACTIVE for future sessions
+
+  7. Finalize alignment status
+     After all alignment artifacts (PRD, SRS, project-progress) are
+     confirmed and committed, run the `alignment-complete` command
+     (deferred to Revision 11 Phase 6) which flips the
+     `<!-- blueprint-status: alignment-required -->` marker in the
+     project's agent entry-point file(s) to
+     `<!-- blueprint-status: alignment-complete -->`. This marker is
+     written by `blueprint init` during scaffold. Until the
+     `alignment-complete` command is available, record that alignment
+     is complete in project-progress.md — the marker flip will be
+     applied when the command ships.
 </DocumentProduction>
 
 ---
