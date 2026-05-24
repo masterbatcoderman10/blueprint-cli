@@ -16,9 +16,10 @@ describe('T-R11-1.0.2 — SKILL.md doc contract', () => {
     const frontmatter = frontmatterMatch![1]
     expect(frontmatter).toContain('name: blueprint')
     // description must be present and one-line (no newline within value)
+    // description must start with "Use when" for ironclad-invocation phrasing
     const descMatch = frontmatter.match(/description:\s*(.+)/)
     expect(descMatch).not.toBeNull()
-    expect(descMatch![1].trim().length).toBeGreaterThan(0)
+    expect(descMatch![1].trim().startsWith('Use when')).toBe(true)
     // description must not contain unescaped newlines (YAML-valid one-liner)
     expect(descMatch![1]).not.toMatch(/\n/)
 

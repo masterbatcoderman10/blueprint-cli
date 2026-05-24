@@ -1,6 +1,6 @@
 ---
 name: blueprint
-description: Use for all Blueprint project work — planning milestones, phases, tests, and revisions, executing gates and streams, reviewing, tweaking, resolving bugs, managing SRS, committing, orchestrating, or modifying docs structure. Invoke before any Blueprint action.
+description: Use when planning milestones, phases, tests, or revisions; executing or orchestrating gates and streams; reviewing; addressing review notes; completing phases; resolving bugs; handling new features; managing SRS; tweaking; committing; or discussing. Invoke before any Blueprint action.
 ---
 
 ## Setup Gate
