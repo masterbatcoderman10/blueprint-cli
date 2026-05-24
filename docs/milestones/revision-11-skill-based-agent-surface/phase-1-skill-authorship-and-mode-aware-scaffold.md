@@ -175,6 +175,101 @@ Gate R11-1.0 (Mode type + SKILL.md + anti-patterns.md) ────────�
 
 ---
 
+## Test Plan
+
+> Generated from task analysis and aligned to existing Blueprint doc-contract and scaffold verification patterns. Every listed task is represented in the plan, with multi-assertion tasks repeated where more than one test is needed. Tests are written before implementation (TDD) during execution. Framework: Vitest (`*.test.ts` under `tests/`, mirroring `src/`). Pure type-plumbing work (`R11-1.0.1`) and the dedicated smoke-verification task (`R11-1.D.4`) are marked not testable because their correctness is exercised by the compile gate and sibling integration tests rather than by standalone behavioral tests.
+
+### Gate R11-1.0 Tests
+
+| Test ID | Task | Type | Description | Expected Result |
+|---------|------|------|-------------|-----------------|
+| — | R11-1.0.1 | — | Not testable: pure TypeScript type-surface plumbing; correctness is enforced by `tsc --noEmit` and the downstream init-flow integration tests in Stream D | — |
+| T-R11-1.0.2.1 | R11-1.0.2 | unit (doc-contract) | Verify `templates/skills/blueprint/SKILL.md` has valid frontmatter (`name: blueprint`, one-line `description`) plus the required setup gate, shared-laws reference, commands/routing table, and routing-rules sections | SKILL file exists with all required sections and valid frontmatter shape |
+| T-R11-1.0.2.2 | R11-1.0.2 | unit (doc-contract) | Verify the SKILL routing table mirrors the live root `<ModuleRouting>` intents 1:1 and every route points at the locked renamed `reference/*.md` target | Every legacy routable intent is present exactly once and maps to the expected renamed file |
+| T-R11-1.0.2.3 | R11-1.0.2 | unit (doc-contract) | Verify the setup gate requires populated `docs/project-progress.md`, requires tracker initialization, and instructs the agent to install `blueprint-cli` if the tracker is missing | Setup gate contains all three required constraints verbatim enough to prevent ambiguity |
+| T-R11-1.0.3.1 | R11-1.0.3 | unit (doc-contract) | Verify `templates/skills/blueprint/reference/anti-patterns.md` contains the canonical `<AntiPatterns>` shape spec only: wrapper, bare `name=`, required `<BadExample>` + `<Why>`, and allowed optional nodes | Shared laws file contains the canonical shape requirements |
+| T-R11-1.0.3.2 | R11-1.0.3 | unit (doc-contract) | Verify `reference/anti-patterns.md` does not introduce a per-module anti-pattern registry or unrelated behavioral guidance | File contains no module registry entries and remains shape-spec-only |
+| T-R11-1.0.4.1 | R11-1.0.4 | unit (doc-contract) | Verify `docs/core/alignment.md` ends with a final step instructing the agent to run the deferred `alignment-complete` command after alignment artifacts are confirmed and committed | Final-step command reference is present in the live doc |
+| T-R11-1.0.4.2 | R11-1.0.4 | unit (doc-contract) | Verify the same alignment step names both marker strings verbatim: `<!-- blueprint-status: alignment-required -->` and `<!-- blueprint-status: alignment-complete -->` | Both marker strings appear exactly as specified |
+| T-R11-1.0.4.3 | R11-1.0.4 | unit (mirror) | Verify `templates/docs/core/alignment.md` remains byte-identical to `docs/core/alignment.md` after the Phase 1 update | Live/template alignment docs match byte-for-byte |
+
+### Stream A Tests
+
+> Stream A mirror checks are parameterized over the locked 20-file rename map. Each task below verifies that the target file exists under `templates/skills/blueprint/reference/`, has valid skill frontmatter (`name` matching the filename and a one-line `description` specific enough to disambiguate routing intent), and that the body after frontmatter is byte-identical to the corresponding `docs/core/*.md` source.
+
+| Test ID | Task | Type | Description | Expected Result |
+|---------|------|------|-------------|-----------------|
+| T-R11-1.A.1.1 | R11-1.A.1 | unit (mirror) | Parameterized over all 20 `reference/*.md` files: verify frontmatter `description` is a single-line summary and specific enough to disambiguate the routed intent from adjacent Blueprint modules | Every reference file has filename-matched `name` and a one-line, route-specific `description` |
+| T-R11-1.A.1.2 | R11-1.A.1 | unit (doc-contract) | Parameterized over every mirrored file whose body contains an `<AntiPatterns>` block: verify the mirrored block conforms to the canonical shape specified in `reference/anti-patterns.md` | Every mirrored `<AntiPatterns>` block uses the canonical wrapper, bare `name=`, and required children shape |
+| T-R11-1.A.1 | R11-1.A.1 | unit (mirror) | Verify `reference/align.md` mirrors `docs/core/alignment.md` with `name: align` frontmatter | File exists; frontmatter valid; body bytes match source |
+| T-R11-1.A.2 | R11-1.A.2 | unit (mirror) | Verify `reference/blueprint-structure.md` mirrors `docs/core/blueprint-structure.md` with filename-matched frontmatter | File exists; frontmatter valid; body bytes match source |
+| T-R11-1.A.3 | R11-1.A.3 | unit (mirror) | Verify `reference/bug.md` mirrors `docs/core/bug-resolution.md` with `name: bug` frontmatter | File exists; frontmatter valid; body bytes match source |
+| T-R11-1.A.4 | R11-1.A.4 | unit (mirror) | Verify `reference/commit.md` mirrors `docs/core/git-execution-workflow.md` with `name: commit` frontmatter | File exists; frontmatter valid; body bytes match source |
+| T-R11-1.A.5 | R11-1.A.5 | unit (mirror) | Verify `reference/commit-review.md` mirrors `docs/core/git-review-workflow.md` with `name: commit-review` frontmatter | File exists; frontmatter valid; body bytes match source |
+| T-R11-1.A.6 | R11-1.A.6 | unit (mirror) | Verify `reference/execute.md` mirrors `docs/core/execution.md` with `name: execute` frontmatter | File exists; frontmatter valid; body bytes match source |
+| T-R11-1.A.7 | R11-1.A.7 | unit (mirror) | Verify `reference/hierarchy.md` mirrors `docs/core/hierarchy.md` with filename-matched frontmatter | File exists; frontmatter valid; body bytes match source |
+| T-R11-1.A.8 | R11-1.A.8 | unit (mirror) | Verify `reference/orchestrate.md` mirrors `docs/core/orchestrate.md` with filename-matched frontmatter | File exists; frontmatter valid; body bytes match source |
+| T-R11-1.A.9 | R11-1.A.9 | unit (mirror) | Verify `reference/phase-complete.md` mirrors `docs/core/phase-completion.md` with `name: phase-complete` frontmatter | File exists; frontmatter valid; body bytes match source |
+| T-R11-1.A.10 | R11-1.A.10 | unit (mirror) | Verify `reference/plan-milestone.md` mirrors `docs/core/milestone-planning.md` with `name: plan-milestone` frontmatter | File exists; frontmatter valid; body bytes match source |
+| T-R11-1.A.11 | R11-1.A.11 | unit (mirror) | Verify `reference/plan-phase.md` mirrors `docs/core/phase-planning.md` with `name: plan-phase` frontmatter | File exists; frontmatter valid; body bytes match source |
+| T-R11-1.A.12 | R11-1.A.12 | unit (mirror) | Verify `reference/plan-prd.md` mirrors `docs/core/prd-planning.md` with `name: plan-prd` frontmatter | File exists; frontmatter valid; body bytes match source |
+| T-R11-1.A.13 | R11-1.A.13 | unit (mirror) | Verify `reference/plan-test.md` mirrors `docs/core/test-planning.md` with `name: plan-test` frontmatter | File exists; frontmatter valid; body bytes match source |
+| T-R11-1.A.14 | R11-1.A.14 | unit (mirror) | Verify `reference/planning.md` mirrors `docs/core/planning.md` with filename-matched frontmatter | File exists; frontmatter valid; body bytes match source |
+| T-R11-1.A.15 | R11-1.A.15 | unit (mirror) | Verify `reference/review.md` mirrors `docs/core/review.md` with filename-matched frontmatter | File exists; frontmatter valid; body bytes match source |
+| T-R11-1.A.16 | R11-1.A.16 | unit (mirror) | Verify `reference/revision.md` mirrors `docs/core/revision-planning.md` with `name: revision` frontmatter | File exists; frontmatter valid; body bytes match source |
+| T-R11-1.A.17 | R11-1.A.17 | unit (mirror) | Verify `reference/scope-change.md` mirrors `docs/core/scope-change.md` with filename-matched frontmatter | File exists; frontmatter valid; body bytes match source |
+| T-R11-1.A.18 | R11-1.A.18 | unit (mirror) | Verify `reference/srs.md` mirrors `docs/core/srs-planning.md` with `name: srs` frontmatter | File exists; frontmatter valid; body bytes match source |
+| T-R11-1.A.19 | R11-1.A.19 | unit (mirror) | Verify `reference/tracker.md` mirrors `docs/core/tracker.md` with filename-matched frontmatter | File exists; frontmatter valid; body bytes match source |
+| T-R11-1.A.20 | R11-1.A.20 | unit (mirror) | Verify `reference/tweak.md` mirrors `docs/core/tweak-planning.md` with `name: tweak` frontmatter | File exists; frontmatter valid; body bytes match source |
+
+### Stream B Tests
+
+| Test ID | Task | Type | Description | Expected Result |
+|---------|------|------|-------------|-----------------|
+| T-R11-1.B.1.1 | R11-1.B.1 | integration | Run `node templates/skills/blueprint/scripts/load-context.mjs` in a populated project fixture and verify the markdown brief prints sections in the required order: `## Project`, `## Current Milestone`, `## Current Phase`, `## Pending Revisions`, `## Tracker` | Exit `0`; stdout contains all five sections in order with populated values |
+| T-R11-1.B.1.2 | R11-1.B.1 | integration | Run the script in a fixture whose `docs/project-progress.md` omits one or more tracked fields/sections | Exit `0`; missing values render as `_not set_` (or the locked equivalent) rather than crashing |
+| T-R11-1.B.1.3 | R11-1.B.1 | integration | Run the script in a fixture with no `docs/.blueprint/` directory | Exit `0`; `## Tracker` reports `unreachable` / `not initialised` rather than throwing |
+| T-R11-1.B.1.4 | R11-1.B.1 | integration | Run the script in a directory with no `docs/project-progress.md` | Exit non-zero; stderr clearly states that `docs/project-progress.md` could not be read |
+| T-R11-1.B.1.5 | R11-1.B.1 | unit | Verify `templates/skills/blueprint/scripts/load-context.mjs` stays pure Node ESM with no external package imports or runtime dependencies beyond Node built-ins | Script uses only ESM syntax and built-in modules; no external dependency resolution required |
+
+### Stream C Tests
+
+> Stream C stub checks are parameterized across `templates/skill/{CLAUDE,AGENTS,GEMINI,QWEN}.md`. Each task verifies the file stays intentionally minimal, references the `blueprint` skill by name, and omits legacy routing blocks.
+
+| Test ID | Task | Type | Description | Expected Result |
+|---------|------|------|-------------|-----------------|
+| T-R11-1.C.1 | R11-1.C.1 | unit (doc-contract) | Verify `templates/skill/CLAUDE.md` exists, is at most 20 lines, references the `blueprint` skill, instructs invocation at session start and on planning/execution/review/tweak/bug/revision/commit intents, and contains none of `<SessionStart>`, `<HardRules>`, or `<ModuleRouting>` | Claude stub is minimal, skill-based, intent-complete, and free of legacy routing blocks |
+| T-R11-1.C.2 | R11-1.C.2 | unit (doc-contract) | Verify `templates/skill/AGENTS.md` exists, is at most 20 lines, references the `blueprint` skill, instructs invocation at session start and on planning/execution/review/tweak/bug/revision/commit intents, and contains none of the forbidden legacy blocks | AGENTS stub is minimal, skill-based, intent-complete, and free of legacy routing blocks |
+| T-R11-1.C.3 | R11-1.C.3 | unit (doc-contract) | Verify `templates/skill/GEMINI.md` exists, is at most 20 lines, references the `blueprint` skill, instructs invocation at session start and on planning/execution/review/tweak/bug/revision/commit intents, and contains none of the forbidden legacy blocks | Gemini stub is minimal, skill-based, intent-complete, and free of legacy routing blocks |
+| T-R11-1.C.4 | R11-1.C.4 | unit (doc-contract) | Verify `templates/skill/QWEN.md` exists, is at most 20 lines, references the `blueprint` skill, instructs invocation at session start and on planning/execution/review/tweak/bug/revision/commit intents, and contains none of the forbidden legacy blocks | Qwen stub is minimal, skill-based, intent-complete, and free of legacy routing blocks |
+
+### Stream D Tests
+
+| Test ID | Task | Type | Description | Expected Result |
+|---------|------|------|-------------|-----------------|
+| T-R11-1.D.1.1 | R11-1.D.1 | integration | Mock the init prompt flow and verify the new "Agent surface mode?" prompt presents `skill (recommended)` and `legacy (.md modules — not recommended)` with return-key defaulting to `skill` | Prompt text and default selection match the Phase 1 contract |
+| T-R11-1.D.1.2 | R11-1.D.1 | integration | Select each option explicitly and verify the chosen value is persisted into init answers as `mode: 'skill' | 'legacy'` | Prompt output is threaded into the answers object with the expected union value |
+| T-R11-1.D.2.1 | R11-1.D.2 | integration | Run `blueprint init` in skill mode and verify scaffold output includes `.claude/skills/blueprint/SKILL.md`, all 20 `reference/*.md` files, `reference/anti-patterns.md`, `scripts/load-context.mjs`, and the chosen root skill-mode entry-point stub, while omitting legacy `docs/core/**` payload | Skill-mode scaffold emits the full skill payload, includes the chosen skill-mode stub per init selection, and omits legacy core-module docs |
+| T-R11-1.D.2.2 | R11-1.D.2 | integration | Run `blueprint init` in legacy mode and verify non-entry-point scaffold output remains byte-identical to the pre-R11 baseline while retaining `templates/docs/core/**` behavior and emitting no `.claude/skills/` tree | Legacy-mode scaffold preserves prior behavior outside the new marker write |
+| T-R11-1.D.2.3 | R11-1.D.2 | integration | Verify the new `templates/skill/` branch logic does not collide with existing top-level template resolution or break archive copy semantics for either mode | Copy pipeline resolves the correct template roots for both modes without path collisions |
+| T-R11-1.D.2.4 | R11-1.D.2 | integration | Parameterized over the supported agent-surface choices: verify the set of root agent entry-point files emitted in skill mode matches current init-selection semantics and never omits the chosen surface's stub | Root entry-point output matches the selected agent surface(s) exactly |
+| T-R11-1.D.3.1 | R11-1.D.3 | integration | After scaffold in either mode, verify every root agent entry-point file that was emitted contains `<!-- blueprint-status: alignment-required -->` exactly once | Marker line is appended to every scaffolded entry-point file and never duplicated on first run |
+| T-R11-1.D.3.2 | R11-1.D.3 | integration | Re-run the post-scaffold marker writer over a project that already contains the marker | Marker remains single-instance per entry-point file; second run is idempotent |
+| — | R11-1.D.4 | — | Not testable: this task is the dedicated end-to-end smoke verification itself; coverage is delivered by the D.1-D.3 integration tests plus the execution-time smoke run | — |
+
+### Test Summary
+
+| Component | Total Tasks | Testable | Not Testable |
+|-----------|-------------|----------|--------------|
+| Gate R11-1.0 | 4 | 3 | 1 |
+| Stream A | 20 | 20 | 0 |
+| Stream B | 1 | 1 | 0 |
+| Stream C | 4 | 4 | 0 |
+| Stream D | 4 | 3 | 1 |
+| **Total** | **33** | **31** | **2** |
+
+---
+
 ## Definition of Done
 
 - [ ] Gate R11-1.0 acceptance criteria pass
@@ -182,6 +277,7 @@ Gate R11-1.0 (Mode type + SKILL.md + anti-patterns.md) ────────�
 - [ ] Stream B acceptance criteria pass (`load-context.mjs` works on populated + missing-tracker projects)
 - [ ] Stream C acceptance criteria pass (all 4 skill-mode entry-point stubs, no `<SessionStart>` / `<HardRules>` / `<ModuleRouting>` content)
 - [ ] Stream D acceptance criteria pass (mode prompt + branched scaffold + alignment-required marker injection + idempotency + end-to-end smoke green for both modes)
+- [ ] All tests in the Test Plan pass
 - [ ] No lint errors in files touched by this phase
 - [ ] Full test suite (`npm test`) green, including any pre-existing tests that depended on init prompt shape
 - [ ] MAS-208 remains at `approved-pending-implementation` (activation deferred to Phase 2 per revision §2.6)
@@ -190,7 +286,7 @@ Gate R11-1.0 (Mode type + SKILL.md + anti-patterns.md) ────────�
 
 ## Test Scenarios
 
-> High-level sketch only. The formal Test Plan is produced separately via `docs/core/test-planning.md`.
+> High-level sketch only. The formal Test Plan appears above; these scenarios remain a lighter execution-oriented checklist.
 
 ### Happy Path
 
