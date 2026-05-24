@@ -1,6 +1,6 @@
 ---
 name: blueprint
-description: Load Blueprint project context, validate setup, and route planning/execution/review/tweak/bug/revision/commit intents to the correct reference module.
+description: Use for all Blueprint project work — planning milestones, phases, tests, and revisions, executing gates and streams, reviewing, tweaking, resolving bugs, managing SRS, committing, orchestrating, or modifying docs structure. Invoke before any Blueprint action.
 ---
 
 ## Setup Gate
