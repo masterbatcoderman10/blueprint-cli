@@ -7,12 +7,16 @@ import {
   type AgentFileName,
   type InitOptions,
   type MarkdownTransferMode,
+  type Mode,
   defaultArchiveDirectoryName,
 } from './types'
 
 export const onboardingIntroMessage = 'Blueprint init'
 export const projectNamePromptMessage = 'Project name'
 export const projectTaglinePromptMessage = 'Project tagline'
+export const modePromptMessage = 'Agent surface mode?'
+export const modeSkillLabel = 'skill (recommended)'
+export const modeLegacyLabel = 'legacy (.md modules — not recommended)'
 export const missingGitRepositoryWarning = 'No .git directory found. Blueprint can initialize git and set the main branch.'
 export const gitInitializationPromptMessage = 'Initialize git repository and set branch to main?'
 export const existingDocsWarningPrefix = 'Existing docs/ directory detected and will be replaced during scaffold.'
@@ -61,6 +65,23 @@ export async function promptForProjectTagline(): Promise<string> {
   }
 
   return response.trim()
+}
+
+export async function promptForMode(): Promise<Mode> {
+  const response = await clackPromptApi.select({
+    message: modePromptMessage,
+    options: [
+      { value: 'skill' as Mode, label: modeSkillLabel },
+      { value: 'legacy' as Mode, label: modeLegacyLabel },
+    ],
+    initialValue: 'skill' as Mode,
+  })
+
+  if (response !== 'skill' && response !== 'legacy') {
+    throw new Error('Initialization cancelled during mode selection.')
+  }
+
+  return response
 }
 
 export async function detectExistingGitRepository(rootDir: string): Promise<boolean> {
@@ -411,6 +432,7 @@ export async function promptConfirmation(options: InitOptions): Promise<boolean>
 export async function runInitOnboardingFlow(rootDir: string): Promise<InitOnboardingFlowResult> {
   const projectName = await promptForProjectName()
   const projectTagline = await promptForProjectTagline()
+  const mode = await promptForMode()
   const gitChoice = await promptGitInitializationChoice(rootDir)
   const docsChoice = await promptDocsArchiveChoice(rootDir)
   const markdownChoice = await promptMarkdownMigrationChoice(rootDir)
@@ -419,7 +441,7 @@ export async function runInitOnboardingFlow(rootDir: string): Promise<InitOnboar
   const options: InitOptions = {
     projectName,
     projectTagline,
-    mode: 'skill',
+    mode,
     git: {
       hasExistingRepository: gitChoice.hasExistingRepository,
       shouldInitialize: gitChoice.shouldInitialize,

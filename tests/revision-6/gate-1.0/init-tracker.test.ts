@@ -28,6 +28,7 @@ async function runInitWithTrackerInputs(root: string): Promise<string> {
   const originalCwd = process.cwd
   const originalIntro = clackPromptApi.intro
   const originalText = clackPromptApi.text
+  const originalSelect = clackPromptApi.select
   const originalMultiselect = clackPromptApi.multiselect
   const originalConfirm = clackPromptApi.confirm
   const originalNote = clackPromptApi.note
@@ -36,6 +37,7 @@ async function runInitWithTrackerInputs(root: string): Promise<string> {
   process.cwd = (() => root) as typeof process.cwd
   clackPromptApi.intro = vi.fn()
   clackPromptApi.text = vi.fn().mockResolvedValueOnce('tracker-project').mockResolvedValueOnce('Tracker tagline')
+  clackPromptApi.select = vi.fn().mockResolvedValue('skill')
   clackPromptApi.multiselect = vi.fn().mockResolvedValue(['CLAUDE.md'])
   clackPromptApi.confirm = vi.fn().mockResolvedValue(true)
   clackPromptApi.note = vi.fn()
@@ -49,6 +51,7 @@ async function runInitWithTrackerInputs(root: string): Promise<string> {
     process.cwd = originalCwd
     clackPromptApi.intro = originalIntro
     clackPromptApi.text = originalText
+    clackPromptApi.select = originalSelect
     clackPromptApi.multiselect = originalMultiselect
     clackPromptApi.confirm = originalConfirm
     clackPromptApi.note = originalNote

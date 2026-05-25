@@ -86,7 +86,7 @@ describe('T-A.2.1: init preserves unselected user-owned markdown files', () => {
 
       clackPromptApi.intro = vi.fn() as typeof clackPromptApi.intro
       clackPromptApi.text = vi.fn().mockResolvedValue('phase-4-edge') as typeof clackPromptApi.text
-      clackPromptApi.select = vi.fn().mockResolvedValueOnce('global').mockResolvedValueOnce('skip') as typeof clackPromptApi.select
+      clackPromptApi.select = vi.fn().mockResolvedValueOnce('legacy').mockResolvedValueOnce('global').mockResolvedValueOnce('skip') as typeof clackPromptApi.select
       clackPromptApi.multiselect = vi.fn().mockResolvedValue(['CLAUDE.md']) as typeof clackPromptApi.multiselect
       clackPromptApi.confirm = vi
         .fn()

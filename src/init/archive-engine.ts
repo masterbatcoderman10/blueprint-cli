@@ -1,7 +1,7 @@
 import { join, resolve, basename, relative, dirname } from 'node:path'
 import { copyFile, mkdir, rename, unlink, stat, readdir, readFile, writeFile } from 'node:fs/promises'
 
-import { type InitOptions, type ScaffoldResult, defaultArchiveDirectoryName } from './types'
+import { type InitOptions, type ScaffoldResult, type AgentFileName, defaultArchiveDirectoryName } from './types'
 import { safeMkdirP, moveFileSafe, copyFileSafe } from './fs-utils'
 import { TEMPLATE_VERSION, writeManifest, getCliVersion } from '../doctor/manifest'
 
@@ -120,19 +120,29 @@ export async function scaffoldBlueprintDirectory(
   options: InitOptions,
 ): Promise<void> {
   const docsDir = join(resolve(rootDir), 'docs')
-  const coreDir = join(docsDir, 'core')
   const knowledgeBaseDir = join(docsDir, 'knowledge-base')
   const milestonesDir = join(docsDir, 'milestones')
   const tweaksDir = join(docsDir, 'tweaks')
 
-  await safeMkdirP(coreDir)
   await safeMkdirP(knowledgeBaseDir)
   await safeMkdirP(milestonesDir)
   await safeMkdirP(tweaksDir)
 
-  await copyCoreTemplates(rootDir, options)
-  await copyTweaksTemplate(rootDir, options)
-  await copyEditableShells(rootDir, options)
+  if (options.mode === 'skill') {
+    // Skill mode: copy .claude/skills/blueprint/** into target
+    const claudeSkillsDir = join(resolve(rootDir), '.claude', 'skills', 'blueprint')
+    await safeMkdirP(claudeSkillsDir)
+    await copySkillPayload(rootDir, options)
+    await copyTweaksTemplate(rootDir, options)
+    await copyEditableShells(rootDir, options)
+  } else {
+    // Legacy mode: copy docs/core/** and top-level agent templates
+    const coreDir = join(docsDir, 'core')
+    await safeMkdirP(coreDir)
+    await copyCoreTemplates(rootDir, options)
+    await copyTweaksTemplate(rootDir, options)
+    await copyEditableShells(rootDir, options)
+  }
 }
 
 export async function copyCoreTemplates(
@@ -201,14 +211,18 @@ export async function generateAgentFiles(
   rootDir: string,
   options: InitOptions,
 ): Promise<void> {
-  const selectedAgents = resolveSelectedAgents(options)
+  if (options.mode === 'skill') {
+    await copySkillModeAgentStubs(rootDir, options)
+  } else {
+    const selectedAgents = resolveSelectedAgents(options)
 
-  for (const fileName of selectedAgents) {
-    const templatePath = join(TEMPLATES_DIR, fileName)
-    const destPath = join(resolve(rootDir), fileName)
+    for (const fileName of selectedAgents) {
+      const templatePath = join(TEMPLATES_DIR, fileName)
+      const destPath = join(resolve(rootDir), fileName)
 
-    if (await fileExists(templatePath)) {
-      await copyFile(templatePath, destPath)
+      if (await fileExists(templatePath)) {
+        await copyFile(templatePath, destPath)
+      }
     }
   }
 }
@@ -254,6 +268,52 @@ export async function initializeGitRepository(
   }
 }
 
+export async function copySkillPayload(
+  rootDir: string,
+  _options: InitOptions,
+): Promise<void> {
+  const skillSourceDir = join(TEMPLATES_DIR, 'skills', 'blueprint')
+  const skillDestDir = join(resolve(rootDir), '.claude', 'skills', 'blueprint')
+
+  await safeMkdirP(skillDestDir)
+
+  // Recursively copy templates/skills/blueprint/** → <target>/.claude/skills/blueprint/**
+  await copyDirectoryRecursive(skillSourceDir, skillDestDir)
+}
+
+export async function copySkillModeAgentStubs(
+  rootDir: string,
+  options: InitOptions,
+): Promise<void> {
+  const selectedAgents = resolveSelectedAgents(options)
+  const skillTemplateDir = join(TEMPLATES_DIR, 'skill')
+
+  for (const fileName of selectedAgents) {
+    const templatePath = join(skillTemplateDir, fileName)
+    const destPath = join(resolve(rootDir), fileName)
+
+    if (await fileExists(templatePath)) {
+      await copyFileSafe(templatePath, destPath)
+    }
+  }
+}
+
+async function copyDirectoryRecursive(sourceDir: string, destDir: string): Promise<void> {
+  const entries = await readdir(sourceDir, { withFileTypes: true })
+
+  for (const entry of entries) {
+    const sourcePath = join(sourceDir, entry.name)
+    const destPath = join(destDir, entry.name)
+
+    if (entry.isDirectory()) {
+      await safeMkdirP(destPath)
+      await copyDirectoryRecursive(sourcePath, destPath)
+    } else if (entry.isFile()) {
+      await copyFileSafe(sourcePath, destPath)
+    }
+  }
+}
+
 export async function executeScaffold(
   rootDir: string,
   options: InitOptions,
@@ -296,7 +356,12 @@ export async function executeScaffold(
   }
 
   await scaffoldBlueprintDirectory(rootDir, options)
-  result.createdDirectories.push('docs/', 'docs/core/', 'docs/knowledge-base/', 'docs/milestones/', 'docs/tweaks/')
+
+  if (options.mode === 'skill') {
+    result.createdDirectories.push('docs/', 'docs/knowledge-base/', 'docs/milestones/', 'docs/tweaks/', '.claude/skills/blueprint/')
+  } else {
+    result.createdDirectories.push('docs/', 'docs/core/', 'docs/knowledge-base/', 'docs/milestones/', 'docs/tweaks/')
+  }
   result.createdFiles.push('docs/tweaks/README.md')
 
   await generateAgentFiles(rootDir, options)

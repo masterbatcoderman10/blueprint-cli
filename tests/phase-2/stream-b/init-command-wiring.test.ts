@@ -21,7 +21,7 @@ describe('Phase 2 Stream B — Init Command Wiring', () => {
 
     const introMock = vi.fn()
     const textMock = vi.fn().mockResolvedValue('my-project')
-    const selectMock = vi.fn().mockResolvedValueOnce('global').mockResolvedValueOnce('move')
+    const selectMock = vi.fn().mockResolvedValueOnce('skill').mockResolvedValueOnce('global').mockResolvedValueOnce('move')
     const multiselectMock = vi.fn().mockResolvedValue(['GEMINI.md'])
     const confirmMock = vi
       .fn()
@@ -53,7 +53,7 @@ describe('Phase 2 Stream B — Init Command Wiring', () => {
       expect(result).toEqual({ exitCode: 0 })
       expect(introMock).toHaveBeenCalledTimes(1)
       expect(textMock).toHaveBeenCalledTimes(2)
-      expect(selectMock).toHaveBeenCalledTimes(2)
+      expect(selectMock).toHaveBeenCalledTimes(3)
       expect(multiselectMock).toHaveBeenCalledTimes(1)
       expect(confirmMock).toHaveBeenCalledTimes(4)
       expect(noteMock).toHaveBeenCalled()

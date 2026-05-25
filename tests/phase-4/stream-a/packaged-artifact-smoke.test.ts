@@ -39,10 +39,11 @@ describe('T-A.4.2: packed artifact includes runtime assets and supports release-
         [
           '"use strict";',
           'Object.defineProperty(exports, "__esModule", { value: true });',
+          'let selectCallCount = 0;',
           'exports.clackPromptApi = {',
           '  intro: () => undefined,',
           '  text: async () => "smoke-project",',
-          '  select: async () => "skip",',
+          '  select: async () => { selectCallCount++; return selectCallCount === 1 ? "legacy" : "skip"; },',
           '  multiselect: async () => ["CLAUDE.md"],',
           '  confirm: async () => true,',
           '  note: () => undefined,',
