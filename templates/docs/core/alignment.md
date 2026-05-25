@@ -47,8 +47,8 @@ been done yet.
         .cursorrules, copilot-instructions.md, or similar). These may
         contain coding conventions, tool preferences, style rules, or
         workflow instructions from a previous setup. Extract any
-        conventions relevant to how the code should be written —
-        these belong in conventions.md.
+        conventions relevant to how the code should be written into the
+        selected project entry-point file's `<ProjectConventions>` section.
         IF any instructions in these files conflict with Blueprint's
         own protocols (e.g., different task management rules, different
         review processes, different file organization):
@@ -186,7 +186,7 @@ been done yet.
 
   ORDER OF CREATION:
 
-  1. docs/conventions.md
+  1. the selected project entry-point file's <ProjectConventions> section
      - IF codebase exists: populate from analysis — tech stack, language,
        framework, database, notable libraries, file organization,
        coding patterns observed in the codebase
@@ -197,10 +197,10 @@ been done yet.
        style rules, and tool preferences into the appropriate sections.
        These are the user's established preferences and should be
        preserved unless they conflict with Blueprint protocols.
-     - Confirm contents with user before finalizing.
-       Do NOT write conventions.md without explicit user approval.
-       The user may have preferences, corrections, or additions
-       that the codebase analysis cannot reveal.
+      - Confirm contents with user before finalizing.
+        Do NOT write the ProjectConventions section without explicit user approval.
+        The user may have preferences, corrections, or additions
+        that the codebase analysis cannot reveal.
 
      STRUCTURE (sections in order):
        ## Tech Stack
@@ -397,7 +397,7 @@ been done yet.
 
 <AntiPatterns>
   <AntiPattern name="Don't Rush">
-    <BadExample>The agent finishes analysis, writes the actual conventions or PRD document to disk, and only afterward asks whether the user approves the current stage.</BadExample>
+    <BadExample>The agent finishes analysis, writes the ProjectConventions section to disk, and only afterward asks whether the user approves the current stage.</BadExample>
     <BadExample>The agent shows a current-stage draft, gets partial feedback, but still proceeds to write the next document in the flow before the user explicitly approves the current one.</BadExample>
     <BadExample>The agent keeps pressing with questions like "Can I move to the next step now?" while the current-stage draft is still unapproved or open questions remain unresolved.</BadExample>
     <Why>Writing the actual document before approval turns tentative thinking into project state, which forces later steps to inherit assumptions the user has not accepted. Aggressively pushing to the next flow step also pressures the user to approve momentum instead of the current-stage draft itself. The confirmation loop exists to keep each stage trustworthy: show the current-stage draft, ask for approval, close open questions, then continue.</Why>
