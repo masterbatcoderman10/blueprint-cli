@@ -1,5 +1,5 @@
 import { execFile, spawn } from 'node:child_process'
-import { access, cp, mkdtemp, mkdir, readFile, rm, writeFile } from 'node:fs/promises'
+import { access, cp, mkdtemp, mkdir, readFile, rm, stat, writeFile } from 'node:fs/promises'
 import { constants, existsSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { dirname, join, resolve } from 'node:path'
@@ -10,6 +10,9 @@ const execFileAsync = promisify(execFile)
 const workspaceRoot = resolve(__dirname, '..', '..')
 const npmExecutable = process.platform === 'win32' ? 'npm.cmd' : 'npm'
 const blueprintExecutable = process.platform === 'win32' ? 'blueprint.cmd' : 'blueprint'
+const packLockDir = join(tmpdir(), `blueprint-pack-${workspaceRoot.replace(/[^a-zA-Z0-9_-]/g, '-')}.lock`)
+const packLockTimeoutMs = 120_000
+const stalePackLockMs = 5 * 60_000
 
 export interface CliExecutionResult {
   exitCode: number
@@ -66,8 +69,10 @@ export async function createIsolatedTempProject(prefix = 'blueprint-test-'): Pro
 export async function installPackedCliFixture(): Promise<PackedCliFixture> {
   const packDir = await mkdtemp(join(tmpdir(), 'blueprint-pack-'))
   const project = await createIsolatedTempProject('blueprint-packed-cli-')
+  let releasePackLock: (() => Promise<void>) | undefined
 
   try {
+    releasePackLock = await acquirePackLock()
     const packOutput = await runCommand(npmExecutable, ['pack', '--json', workspaceRoot], {
       cwd: packDir,
     })
@@ -123,7 +128,50 @@ export async function installPackedCliFixture(): Promise<PackedCliFixture> {
     await project.cleanup()
     await rm(packDir, { recursive: true, force: true })
     throw error
+  } finally {
+    await releasePackLock?.()
   }
+}
+
+async function acquirePackLock(): Promise<() => Promise<void>> {
+  const startedAt = Date.now()
+
+  while (true) {
+    try {
+      await mkdir(packLockDir)
+      return () => rm(packLockDir, { recursive: true, force: true })
+    } catch (error) {
+      const code = (error as { code?: string }).code
+      if (code !== 'EEXIST') {
+        throw error
+      }
+
+      await clearStalePackLock()
+
+      if (Date.now() - startedAt > packLockTimeoutMs) {
+        throw new Error(`Timed out waiting for package fixture lock at ${packLockDir}`)
+      }
+
+      await sleep(50)
+    }
+  }
+}
+
+async function clearStalePackLock(): Promise<void> {
+  try {
+    const lockStats = await stat(packLockDir)
+    if (Date.now() - lockStats.mtimeMs > stalePackLockMs) {
+      await rm(packLockDir, { recursive: true, force: true })
+    }
+  } catch (error) {
+    if ((error as { code?: string }).code !== 'ENOENT') {
+      throw error
+    }
+  }
+}
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolveSleep) => setTimeout(resolveSleep, ms))
 }
 
 async function runInteractiveCommand(

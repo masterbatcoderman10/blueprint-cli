@@ -2721,40 +2721,40 @@
       "id": "BUG-R11-2-001",
       "title": "[BUG] T-C.3.2 — packaged init help exits 1 instead of 0",
       "description": "Discovered during: Phase completion for Phase R11-2 — Doctor Mode Awareness & Dual-Source Repair\nFailing test: T-C.3.2 / installed blueprint renders help for init command\nTest belongs to: Revision 1 Phase 3 Stream C — Regression Coverage & Packaged Help Smoke\nClassification: Regression failure from previous revision\nTest output: tests/revision-1/phase-3-stream-c/documentation-regression-coverage.test.ts:181 expected result.exitCode to be 0, received 1 when running packaged blueprint ['help', 'init'].",
-      "state": "TO-DO",
+      "state": "IN-REVIEW",
       "phase": "R11-2",
       "stream": "bug",
       "author": "Codex",
-      "implementation_notes": null,
+      "implementation_notes": "Root cause: concurrent packaged CLI fixtures invoked npm pack against the same workspace; npm pack runs prepack (tsc) into shared dist while other pack operations may be reading it, producing partial/corrupt packaged artifacts. Fix: serialized installPackedCliFixture package creation with an inter-process filesystem lock in tests/helpers/release.ts. Verification: targeted packaged smoke subset, npm run typecheck, and full npm test pass.",
       "milestone": "R11",
       "created_at": 1779709213547,
-      "updated_at": 1779709213547
+      "updated_at": 1779709505020
     },
     {
       "id": "BUG-R11-2-002",
       "title": "[BUG] T-C.3.2 — packaged doctor help exits 1 instead of 0",
       "description": "Discovered during: Phase completion for Phase R11-2 — Doctor Mode Awareness & Dual-Source Repair\nFailing test: T-C.3.2 / installed blueprint renders help for doctor command\nTest belongs to: Revision 1 Phase 3 Stream C — Regression Coverage & Packaged Help Smoke\nClassification: Regression failure from previous revision\nTest output: tests/revision-1/phase-3-stream-c/documentation-regression-coverage.test.ts:188 expected result.exitCode to be 0, received 1 when running packaged blueprint ['help', 'doctor'].",
-      "state": "TO-DO",
+      "state": "IN-REVIEW",
       "phase": "R11-2",
       "stream": "bug",
       "author": "Codex",
-      "implementation_notes": null,
+      "implementation_notes": "Root cause: concurrent packaged CLI fixtures invoked npm pack against the same workspace; npm pack runs prepack (tsc) into shared dist while other pack operations may be reading it, producing partial/corrupt packaged artifacts. Fix: serialized installPackedCliFixture package creation with an inter-process filesystem lock in tests/helpers/release.ts. Verification: targeted packaged smoke subset, npm run typecheck, and full npm test pass.",
       "milestone": "R11",
       "created_at": 1779709213556,
-      "updated_at": 1779709213556
+      "updated_at": 1779709505114
     },
     {
       "id": "BUG-R11-2-003",
       "title": "[BUG] T-C.3.2 — packaged unknown-command recovery crashes",
       "description": "Discovered during: Phase completion for Phase R11-2 — Doctor Mode Awareness & Dual-Source Repair\nFailing test: T-C.3.2 / installed blueprint unknown command recovery matches source-checkout behavior\nTest belongs to: Revision 1 Phase 3 Stream C — Regression Coverage & Packaged Help Smoke\nClassification: Regression failure from previous revision\nTest output: tests/revision-1/phase-3-stream-c/documentation-regression-coverage.test.ts:214 expected stderr to contain 'Unknown command: ghost', but packaged CLI crashed with TypeError: Cannot read properties of undefined (reading 'name') at dist/runtime/index.js:10 during command registration.",
-      "state": "TO-DO",
+      "state": "IN-REVIEW",
       "phase": "R11-2",
       "stream": "bug",
       "author": "Codex",
-      "implementation_notes": null,
+      "implementation_notes": "Root cause: concurrent packaged CLI fixtures invoked npm pack against the same workspace; npm pack runs prepack (tsc) into shared dist while other pack operations may be reading it, producing partial/corrupt packaged artifacts. Fix: serialized installPackedCliFixture package creation with an inter-process filesystem lock in tests/helpers/release.ts. Verification: targeted packaged smoke subset, npm run typecheck, and full npm test pass.",
       "milestone": "R11",
       "created_at": 1779709213560,
-      "updated_at": 1779709213560
+      "updated_at": 1779709505111
     }
   ],
   "comments": [
@@ -4847,4 +4847,5 @@
     "created_at": 1779080658928,
     "updated_at": 1779080658928
   }
+}
 }
