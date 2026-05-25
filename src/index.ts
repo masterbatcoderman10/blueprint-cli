@@ -4,8 +4,16 @@ import { boardCommand } from './commands/board'
 import { placeholderCommands } from './commands'
 import { parseCommandHelpInvocation, writeCommandHelp } from './help/command'
 import { writeUnknownCommandRecovery } from './help/recovery'
+import { detectProjectMode } from './doctor/structure'
 import { isSupportedRootHelpInvocation, writeRootHelp } from './help/root'
+import { findProjectRoot } from './tracker/project-root'
 import { createCommandRuntime } from './runtime'
+import {
+  consumeDeprecationFlag,
+  emitDeprecationBanner,
+  isDeprecationSuppressed,
+  shouldEmitDeprecationBanner,
+} from './runtime/deprecation-banner'
 
 declare const require:
   | {
@@ -27,9 +35,28 @@ function isDirectExecution(): boolean {
   return require.main === module
 }
 
+async function isLegacyBlueprintProject(): Promise<boolean> {
+  try {
+    findProjectRoot()
+    const mode = await detectProjectMode(process.cwd())
+    return mode.mode === 'legacy'
+  } catch {
+    return false
+  }
+}
+
 export async function runCli(argv: string[]): Promise<number> {
   if (!Array.isArray(argv)) {
     return 1
+  }
+
+  const shouldEmitBanner = await isLegacyBlueprintProject()
+  if (shouldEmitBanner) {
+    const normalizedArgv = consumeDeprecationFlag(argv)
+    if (!isDeprecationSuppressed(argv, process.env) && shouldEmitDeprecationBanner(normalizedArgv)) {
+      emitDeprecationBanner()
+    }
+    argv = normalizedArgv
   }
 
   const runtime = createCommandRuntime({
