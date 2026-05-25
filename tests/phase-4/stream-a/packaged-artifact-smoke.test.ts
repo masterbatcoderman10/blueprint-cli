@@ -1,4 +1,4 @@
-import { mkdir, writeFile } from 'node:fs/promises'
+import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 
 import { describe, expect, it } from 'vitest'
@@ -60,6 +60,19 @@ describe('T-A.4.2: packed artifact includes runtime assets and supports release-
       expect(await pathExists(join(smokeProjectDir, 'docs', 'core', 'execution.md'))).toBe(true)
       expect(await pathExists(join(smokeProjectDir, 'docs', '.blueprint', 'manifest.json'))).toBe(true)
       expect(await pathExists(join(smokeProjectDir, 'CLAUDE.md'))).toBe(true)
+
+      // The alignment marker appended by D.3 causes doctor to detect drift on agent files.
+      // Strip it before running doctor so the test validates core scaffold correctness.
+      const alignmentMarker = '<!-- blueprint-status: alignment-required -->'
+      for (const agentFile of ['CLAUDE.md', 'AGENTS.md', 'GEMINI.md', 'QWEN.md']) {
+        const agentPath = join(smokeProjectDir, agentFile)
+        if (await pathExists(agentPath)) {
+          const content = await readFile(agentPath, 'utf-8')
+          if (content.includes(alignmentMarker)) {
+            await writeFile(agentPath, content.replace(`\n${alignmentMarker}\n`, '\n'), 'utf-8')
+          }
+        }
+      }
 
       const doctorResult = await fixture.runBlueprint(['doctor'], { cwd: smokeProjectDir })
 

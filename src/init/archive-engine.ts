@@ -298,6 +298,33 @@ export async function copySkillModeAgentStubs(
   }
 }
 
+export const ALIGNMENT_MARKER = '<!-- blueprint-status: alignment-required -->'
+
+export async function writeAlignmentMarker(
+  rootDir: string,
+  agentFiles: AgentFileName[],
+): Promise<void> {
+  const normalizedRootDir = resolve(rootDir)
+
+  for (const fileName of agentFiles) {
+    const filePath = join(normalizedRootDir, fileName)
+
+    if (!(await fileExists(filePath))) {
+      continue
+    }
+
+    const content = await readFile(filePath, 'utf-8')
+
+    // Idempotent: skip if marker already present
+    if (content.includes(ALIGNMENT_MARKER)) {
+      continue
+    }
+
+    const trimmed = content.endsWith('\n') ? content : content + '\n'
+    await writeFile(filePath, trimmed + ALIGNMENT_MARKER + '\n', 'utf-8')
+  }
+}
+
 async function copyDirectoryRecursive(sourceDir: string, destDir: string): Promise<void> {
   const entries = await readdir(sourceDir, { withFileTypes: true })
 
@@ -370,6 +397,9 @@ export async function executeScaffold(
     result.createdFiles.push(fileName)
   }
   result.managedAgents = selectedAgents
+
+  // D.3: Write alignment marker to every scaffolded agent entry-point file
+  await writeAlignmentMarker(rootDir, selectedAgents as AgentFileName[])
 
   await generateManifest(rootDir, options)
   result.createdFiles.push('docs/.blueprint/manifest.json')
