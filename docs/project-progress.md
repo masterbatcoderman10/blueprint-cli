@@ -2,9 +2,9 @@
 
 **Project**: blueprint-cli
 **Tracker**: blueprint-cli
-**Current Milestone**: Revision 11 — Skill-Based Agent Surface (Phase 2 in progress)
-**Current Phase**: Revision 11 Phase 2 — Doctor Mode Awareness & Dual-Source Repair
-**Status**: Revision 11 Phase 2 is in progress. Phase document and test plan are committed; execution is now unblocked on the active phase.
+**Current Milestone**: Revision 11 — Skill-Based Agent Surface (Phase 3 pending planning)
+**Current Phase**: Revision 11 Phase 3 — CLI Deprecation Banner & Conventions Sunset (pending planning)
+**Status**: Revision 11 Phase 2 is complete. Revision 11 Phase 3 is next and pending phase planning.
 
 ---
 
@@ -99,6 +99,7 @@
 - 2026-05-24: Revision 11 scope extended during Phase 1 planning to add Phase 6 — Migrate & Alignment-Complete Commands. Phase 6 implements the deferred `alignment-complete` command (flips the `<!-- blueprint-status: alignment-required -->` marker injected by Phase 1's init step to `<!-- blueprint-status: alignment-complete -->` in every scaffolded agent entry-point file, idempotent) and the related `migrate` command (legacy-mode → skill-mode in-place migration; detailed scope locked at Phase 6 planning time). New SRS requirements (working IDs MAS-211 alignment-complete, MAS-212 migrate) will be created during Phase 6 planning.
 - 2026-05-25: Revision 11 Phase 1 — Skill Authorship & Mode-Aware Scaffold completed. All tasks done, DoD satisfied, full test suite green (1193 tests, 159 files).
 - 2026-05-25: Revision 11 Phase 2 — Doctor Mode Awareness & Dual-Source Repair moved from planning to in progress after completing detailed test planning and phase-start bookkeeping.
+- 2026-05-25: Revision 11 Phase 2 — Doctor Mode Awareness & Dual-Source Repair completed. All tasks done (including BUG-R11-2-001..003), DoD satisfied, full test suite green (1220 passed, 2 skipped; 165 files passed, 1 skipped).
 
 ---
 
@@ -159,7 +160,7 @@ R10 — Health-Check Bypass & Anti-Pattern Shape Unification
 ├── Phase 2 — Anti-Pattern Shape Unification ✓
 R11 — Skill-Based Agent Surface
 ├── Phase 1 — Skill Authorship & Mode-Aware Scaffold ✓
-├── Phase 2 — Doctor Mode Awareness & Dual-Source Repair ●
+├── Phase 2 — Doctor Mode Awareness & Dual-Source Repair ✓
 ├── Phase 3 — CLI Deprecation Banner & Conventions Sunset ○
 ├── Phase 4 — NPX Install Pathway & Release Surface ○
 ├── Phase 5 — Dogfood & Cross-Reference Verification ○
@@ -179,4 +180,4 @@ M3 — Workflow Visibility Enhancements (Optional Future)
 
 | Revision | Name | Status | Notes |
 |----------|------|--------|-------|
-| R11 | Skill-Based Agent Surface | Phase 2 in progress | 6 phases outlined (Phase 6 added during Phase 1 planning for deferred `alignment-complete` + `migrate` commands). Phase 1 complete. Phase 2 is now active with its phase doc and test plan committed. Docs: `docs/milestones/revision-11-skill-based-agent-surface/revision-11-skill-based-agent-surface.md`, `phase-2-doctor-mode-awareness-and-dual-source-repair.md` |
+| R11 | Skill-Based Agent Surface | Phase 3 pending planning | 6 phases outlined (Phase 6 added during Phase 1 planning for deferred `alignment-complete` + `migrate` commands). Phases 1 and 2 complete. Next: plan Phase 3 — CLI Deprecation Banner & Conventions Sunset. Docs: `docs/milestones/revision-11-skill-based-agent-surface/revision-11-skill-based-agent-surface.md`, `phase-2-doctor-mode-awareness-and-dual-source-repair.md` |

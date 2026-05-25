@@ -2721,40 +2721,40 @@
       "id": "BUG-R11-2-001",
       "title": "[BUG] T-C.3.2 — packaged init help exits 1 instead of 0",
       "description": "Discovered during: Phase completion for Phase R11-2 — Doctor Mode Awareness & Dual-Source Repair\nFailing test: T-C.3.2 / installed blueprint renders help for init command\nTest belongs to: Revision 1 Phase 3 Stream C — Regression Coverage & Packaged Help Smoke\nClassification: Regression failure from previous revision\nTest output: tests/revision-1/phase-3-stream-c/documentation-regression-coverage.test.ts:181 expected result.exitCode to be 0, received 1 when running packaged blueprint ['help', 'init'].",
-      "state": "IN-REVIEW",
+      "state": "DONE",
       "phase": "R11-2",
       "stream": "bug",
       "author": "Codex",
       "implementation_notes": "Rework diagnosis: the prior lock serialized only installPackedCliFixture npm pack. Full-suite tests also ran workspace npm run build and build + npm pack --json --dry-run outside that lock, so dist could be mutated while another test was packing or reading package artifacts. Fix: added runWorkspaceReleaseCommand in tests/helpers/release.ts using the same filesystem lock for synchronous workspace release commands; tests/setup/npm-scripts.test.ts now builds under that lock; tests/phase-4/stream-c/package-metadata.test.ts now runs build and dry-run pack under one locked critical section; tests/phase-4/stream-a/release-fixtures.test.ts pins this caller routing. Verification: targeted release-fixtures regression red then green, affected setup/package-metadata tests green, npm run typecheck green, full npm test green (1220 passed, 2 skipped).",
       "milestone": "R11",
       "created_at": 1779709213547,
-      "updated_at": 1779709977745
+      "updated_at": 1779710173031
     },
     {
       "id": "BUG-R11-2-002",
       "title": "[BUG] T-C.3.2 — packaged doctor help exits 1 instead of 0",
       "description": "Discovered during: Phase completion for Phase R11-2 — Doctor Mode Awareness & Dual-Source Repair\nFailing test: T-C.3.2 / installed blueprint renders help for doctor command\nTest belongs to: Revision 1 Phase 3 Stream C — Regression Coverage & Packaged Help Smoke\nClassification: Regression failure from previous revision\nTest output: tests/revision-1/phase-3-stream-c/documentation-regression-coverage.test.ts:188 expected result.exitCode to be 0, received 1 when running packaged blueprint ['help', 'doctor'].",
-      "state": "IN-REVIEW",
+      "state": "DONE",
       "phase": "R11-2",
       "stream": "bug",
       "author": "Codex",
       "implementation_notes": "Rework diagnosis: the prior lock serialized only installPackedCliFixture npm pack. Full-suite tests also ran workspace npm run build and build + npm pack --json --dry-run outside that lock, so dist could be mutated while another test was packing or reading package artifacts. Fix: added runWorkspaceReleaseCommand in tests/helpers/release.ts using the same filesystem lock for synchronous workspace release commands; tests/setup/npm-scripts.test.ts now builds under that lock; tests/phase-4/stream-c/package-metadata.test.ts now runs build and dry-run pack under one locked critical section; tests/phase-4/stream-a/release-fixtures.test.ts pins this caller routing. Verification: targeted release-fixtures regression red then green, affected setup/package-metadata tests green, npm run typecheck green, full npm test green (1220 passed, 2 skipped).",
       "milestone": "R11",
       "created_at": 1779709213556,
-      "updated_at": 1779709977763
+      "updated_at": 1779710173050
     },
     {
       "id": "BUG-R11-2-003",
       "title": "[BUG] T-C.3.2 — packaged unknown-command recovery crashes",
       "description": "Discovered during: Phase completion for Phase R11-2 — Doctor Mode Awareness & Dual-Source Repair\nFailing test: T-C.3.2 / installed blueprint unknown command recovery matches source-checkout behavior\nTest belongs to: Revision 1 Phase 3 Stream C — Regression Coverage & Packaged Help Smoke\nClassification: Regression failure from previous revision\nTest output: tests/revision-1/phase-3-stream-c/documentation-regression-coverage.test.ts:214 expected stderr to contain 'Unknown command: ghost', but packaged CLI crashed with TypeError: Cannot read properties of undefined (reading 'name') at dist/runtime/index.js:10 during command registration.",
-      "state": "IN-REVIEW",
+      "state": "DONE",
       "phase": "R11-2",
       "stream": "bug",
       "author": "Codex",
       "implementation_notes": "Rework diagnosis: the prior lock serialized only installPackedCliFixture npm pack. Full-suite tests also ran workspace npm run build and build + npm pack --json --dry-run outside that lock, so dist could be mutated while another test was packing or reading package artifacts. Fix: added runWorkspaceReleaseCommand in tests/helpers/release.ts using the same filesystem lock for synchronous workspace release commands; tests/setup/npm-scripts.test.ts now builds under that lock; tests/phase-4/stream-c/package-metadata.test.ts now runs build and dry-run pack under one locked critical section; tests/phase-4/stream-a/release-fixtures.test.ts pins this caller routing. Verification: targeted release-fixtures regression red then green, affected setup/package-metadata tests green, npm run typecheck green, full npm test green (1220 passed, 2 skipped).",
       "milestone": "R11",
       "created_at": 1779709213560,
-      "updated_at": 1779709977776
+      "updated_at": 1779710173071
     }
   ],
   "comments": [
@@ -4968,6 +4968,105 @@
       "line": null,
       "created_at": 1779709977773,
       "updated_at": 1779709977773
+    },
+    {
+      "id": "2fd778a4-3313-4cf9-8a66-0055796a2c66",
+      "task_id": "BUG-R11-2-001",
+      "parent_id": "b3561f00-e349-4a97-a59a-e279b49e06f4",
+      "severity": "MINOR",
+      "body": "Resolved: verified the shared release lock now covers installPackedCliFixture plus the workspace build and dry-run pack callers that previously raced against it. Targeted release/package tests, typecheck, and full npm test passed on re-review.",
+      "author": "reviewer",
+      "line": null,
+      "created_at": 1779710173031,
+      "updated_at": 1779710173031
+    },
+    {
+      "id": "7a085290-eb62-40cc-9689-6fa598b496ef",
+      "task_id": "BUG-R11-2-001",
+      "parent_id": null,
+      "severity": "MINOR",
+      "body": "Clean on re-review. Approved.",
+      "author": "reviewer",
+      "line": null,
+      "created_at": 1779710173031,
+      "updated_at": 1779710173031
+    },
+    {
+      "id": "a6f2fe91-910c-46fe-b276-984c8f0aa0bd",
+      "task_id": "BUG-R11-2-001",
+      "parent_id": "a2015578-891d-4cb7-baaf-8a2d25bb497f",
+      "severity": "MINOR",
+      "body": "Resolved: canonical REWORK -> IN-PROGRESS -> IN-REVIEW transition was followed before this re-review.",
+      "author": "reviewer",
+      "line": null,
+      "created_at": 1779710173031,
+      "updated_at": 1779710173031
+    },
+    {
+      "id": "3ef25774-c0c7-4e36-957e-505934e6a49b",
+      "task_id": "BUG-R11-2-002",
+      "parent_id": null,
+      "severity": "MINOR",
+      "body": "Clean on re-review. Approved.",
+      "author": "reviewer",
+      "line": null,
+      "created_at": 1779710173050,
+      "updated_at": 1779710173050
+    },
+    {
+      "id": "686f0d83-a89a-41ba-baa4-c6e4f209c95b",
+      "task_id": "BUG-R11-2-002",
+      "parent_id": "2a65e61f-1372-49f2-bc5e-21308db3fd41",
+      "severity": "MINOR",
+      "body": "Resolved: verified the shared release lock now covers installPackedCliFixture plus the workspace build and dry-run pack callers that previously raced against it. Targeted release/package tests, typecheck, and full npm test passed on re-review.",
+      "author": "reviewer",
+      "line": null,
+      "created_at": 1779710173050,
+      "updated_at": 1779710173050
+    },
+    {
+      "id": "aa929c9c-e42e-440e-aa1c-cef1c9af5ce3",
+      "task_id": "BUG-R11-2-002",
+      "parent_id": "c6c84548-0e02-4788-9e70-f4d5ea6c0401",
+      "severity": "MINOR",
+      "body": "Resolved: canonical REWORK -> IN-PROGRESS -> IN-REVIEW transition was followed before this re-review.",
+      "author": "reviewer",
+      "line": null,
+      "created_at": 1779710173050,
+      "updated_at": 1779710173050
+    },
+    {
+      "id": "2f946276-4689-4ad6-85bb-893a8843a4db",
+      "task_id": "BUG-R11-2-003",
+      "parent_id": "3eba6b83-1bf9-47ab-9d79-2360bee3c830",
+      "severity": "MINOR",
+      "body": "Resolved: verified the shared release lock now covers installPackedCliFixture plus the workspace build and dry-run pack callers that previously raced against it. Targeted release/package tests, typecheck, and full npm test passed on re-review.",
+      "author": "reviewer",
+      "line": null,
+      "created_at": 1779710173072,
+      "updated_at": 1779710173072
+    },
+    {
+      "id": "5a12049b-cdae-4a90-8247-d71597e17da5",
+      "task_id": "BUG-R11-2-003",
+      "parent_id": null,
+      "severity": "MINOR",
+      "body": "Clean on re-review. Approved.",
+      "author": "reviewer",
+      "line": null,
+      "created_at": 1779710173072,
+      "updated_at": 1779710173072
+    },
+    {
+      "id": "90da3a6e-997f-4895-8688-40898deb9546",
+      "task_id": "BUG-R11-2-003",
+      "parent_id": "2256f301-c336-42df-9fc3-4842587c9ea7",
+      "severity": "MINOR",
+      "body": "Resolved: canonical REWORK -> IN-PROGRESS -> IN-REVIEW transition was followed before this re-review.",
+      "author": "reviewer",
+      "line": null,
+      "created_at": 1779710173072,
+      "updated_at": 1779710173072
     }
   ],
   "meta": {
