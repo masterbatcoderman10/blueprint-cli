@@ -1,9 +1,4 @@
-# Conventions
-
-**Project:** blueprint-cli
-
----
-
+<ProjectConventions>
 ## Tech Stack
 
 - **Runtime:** Node.js >=18.0.0 (required for the `better-sqlite3` tracker storage backend)
@@ -48,7 +43,7 @@
 ## Anti-Patterns
 
 - Don't couple templates and CLI versions across separate repos
-- Don't add runtime dependencies for simple file I/O tasks
+- Don't add runtime dependencies for simple file/I/O tasks
 - Don't infer linked-project state from anything except Blueprint docs
 - Don't use silent fallback behavior for missing required files
 
@@ -81,7 +76,7 @@ All `<AntiPatterns>` blocks in `docs/core/*.md` use the unfenced canonical XML s
   4. Tag: `git tag v<version>`
   5. Push with tags: `git push origin main --tags`
   6. Verify deployment: `gh run watch <run-id>` — confirm all steps green including **Publish to npm**
-- **Automation:** Pushing a `vMAJOR.MINOR.PATCH` tag triggers the GitHub Actions `publish.yml` workflow, which publishes to npm via OIDC trusted publishing (no token required)
+- **Automation:** Pushing a `vMAJOR.MINOR.PATCH` tag triggers the `publish.yml` workflow, which publishes to npm via OIDC trusted publishing (no token required)
 - **First publish of a new package name:** Must be done manually (`npm publish`) to establish npm ownership before OIDC takes over
 - **OIDC config:** npmjs.com → package Settings → Automated Publishing → repo `masterbatcoderman10/blueprint-cli`, workflow `publish.yml`
 - **Release contract:** `docs/release-contract.md`
@@ -90,3 +85,4 @@ All `<AntiPatterns>` blocks in `docs/core/*.md` use the unfenced canonical XML s
 ## Project-Specific Notes
 
 - `blueprint context` output should prioritize: `docs/prd.md`, `docs/project-progress.md`, then current milestone doc
+</ProjectConventions>
