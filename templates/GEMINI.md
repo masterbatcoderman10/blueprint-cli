@@ -1,5 +1,9 @@
 # AGENTS.md
 
+<DeprecationNote>
+  Legacy mode is deprecated. Consider migrating to skill mode for native Claude Code skill discovery and reduced context overhead. See README install instructions or run `blueprint migrate` (coming in Revision 11 Phase 6).
+</DeprecationNote>
+
 <Blueprint>
   Blueprint is a structured software development system that organizes projects into a
   five-level hierarchy: Project → Milestone → Phase → Gate/Stream → Task.
@@ -20,7 +24,6 @@
   STEP 1: Load docs/project-progress.md. Check if it is populated.
 
   IF project-progress.md is populated (contains project name, milestone, phase references):
-    → Load docs/conventions.md.
     → Load docs/core/tracker.md (provides HTTP API recipes and state-machine context for the built-in task tracker).
     → IF project-progress.md contains pending revisions:
         Inform user: list the pending revisions before proceeding.
