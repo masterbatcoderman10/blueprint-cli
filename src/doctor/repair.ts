@@ -4,7 +4,13 @@ import { join } from 'node:path'
 import type { DoctorFinding } from './findings'
 import { resolveAllCoreTemplatePaths, resolveTemplatePath } from './inventory'
 import { MANIFEST_RELATIVE_PATH, type ManifestData, TEMPLATE_VERSION, getCliVersion } from './manifest'
-import { CANONICAL_CORE_FILES, REQUIRED_CANONICAL_FILES, SUPPORTED_AGENT_FILES } from './structure'
+import {
+  CANONICAL_CORE_FILES,
+  REQUIRED_CANONICAL_FILES,
+  SUPPORTED_AGENT_FILES,
+  getSkillCanonicalFiles,
+  type ProjectMode,
+} from './structure'
 
 async function pathExists(path: string): Promise<boolean> {
   try {
@@ -92,10 +98,19 @@ export const TRACKER_DB_MIGRATION_STEPS: TrackerDbMigrationStep[] = [
  * Creates a repair plan from Doctor findings.
  * Maps each finding to one or more repair actions.
  */
-export async function createRepairPlan(findings: DoctorFinding[], projectDir: string): Promise<RepairPlan> {
+export async function createRepairPlan(
+  findings: DoctorFinding[],
+  projectDir: string,
+  mode: ProjectMode = 'legacy',
+  skillBase?: string,
+): Promise<RepairPlan> {
   const actions: RepairAction[] = []
   let hasBlockingFindings = false
   let blockingReason: string | undefined
+  const reportOnlyDriftPaths =
+    mode === 'skill' && skillBase
+      ? [...getSkillCanonicalFiles(skillBase), ...REQUIRED_CANONICAL_FILES]
+      : [...CANONICAL_CORE_FILES, ...REQUIRED_CANONICAL_FILES]
 
   for (const finding of findings) {
     if (finding.kind === 'manifest-validation-error') {
@@ -125,7 +140,7 @@ export async function createRepairPlan(findings: DoctorFinding[], projectDir: st
 
     if (finding.kind === 'drifted-file') {
       // Canonical structure files are never overwritten; only missing files are restored.
-      if (CANONICAL_CORE_FILES.includes(finding.targetPath) || REQUIRED_CANONICAL_FILES.includes(finding.targetPath)) {
+      if (reportOnlyDriftPaths.includes(finding.targetPath)) {
         continue
       }
 

@@ -23,7 +23,12 @@ export const doctorCommand: CommandDefinition = {
       }
 
       // Step 2: Create repair plan
-      const repairPlan = await createRepairPlan(auditResult.findings, projectDir)
+      const repairPlan = await createRepairPlan(
+        auditResult.findings,
+        projectDir,
+        auditResult.mode,
+        auditResult.skillBase,
+      )
 
       if (repairPlan.hasBlockingFindings) {
         cancel(`Cannot proceed with repairs: ${repairPlan.blockingReason || 'Unknown blocking issue'}`)
