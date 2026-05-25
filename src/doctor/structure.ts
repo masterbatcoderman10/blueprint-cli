@@ -6,7 +6,46 @@
  * and which project docs are user-owned and excluded from exact content enforcement.
  */
 
+import { access } from 'node:fs/promises'
+import { join } from 'node:path'
+
 import { MANIFEST_RELATIVE_PATH } from './manifest'
+
+export type ProjectMode = 'skill' | 'legacy'
+
+export interface ProjectModeDetectionResult {
+  mode: ProjectMode
+  skillBase?: string
+}
+
+export const SKILL_INSTALL_BASES: string[] = [
+  '.claude/skills/blueprint',
+  '.agents/skills/blueprint',
+]
+
+const SKILL_REFERENCE_FILES: string[] = [
+  'align.md',
+  'anti-patterns.md',
+  'blueprint-structure.md',
+  'bug.md',
+  'commit-review.md',
+  'commit.md',
+  'execute.md',
+  'hierarchy.md',
+  'orchestrate.md',
+  'phase-complete.md',
+  'plan-milestone.md',
+  'plan-phase.md',
+  'plan-prd.md',
+  'plan-test.md',
+  'planning.md',
+  'review.md',
+  'revision.md',
+  'scope-change.md',
+  'srs.md',
+  'tracker.md',
+  'tweak.md',
+]
 
 export const CANONICAL_CORE_FILES: string[] = [
   'docs/core/alignment.md',
@@ -78,4 +117,32 @@ export function getManagedAgentPaths(managedFiles: string[]): string[] {
  */
 export function isEditableProjectDoc(relativePath: string): boolean {
   return EDITABLE_PROJECT_DOCS.includes(relativePath)
+}
+
+export function getSkillCanonicalFiles(skillBase: string): string[] {
+  return [
+    `${skillBase}/SKILL.md`,
+    ...SKILL_REFERENCE_FILES.map((fileName) => `${skillBase}/reference/${fileName}`),
+    `${skillBase}/scripts/load-context.mjs`,
+  ]
+}
+
+export function getSkillRequiredDirectories(skillBase: string): string[] {
+  return ['docs', 'docs/tweaks', skillBase]
+}
+
+export async function detectProjectMode(projectDir: string): Promise<ProjectModeDetectionResult> {
+  for (const skillBase of SKILL_INSTALL_BASES) {
+    try {
+      await access(join(projectDir, skillBase, 'SKILL.md'))
+      return { mode: 'skill', skillBase }
+    } catch (error) {
+      const nodeError = error as { code?: string }
+      if (nodeError.code !== 'ENOENT') {
+        throw error
+      }
+    }
+  }
+
+  return { mode: 'legacy' }
 }

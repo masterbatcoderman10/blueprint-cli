@@ -14,7 +14,9 @@ import { type ManifestState, validateManifest, MANIFEST_RELATIVE_PATH } from './
 import {
   CANONICAL_CORE_FILES,
   EDITABLE_PROJECT_DOCS,
+  SKILL_INSTALL_BASES,
   SUPPORTED_AGENT_FILES,
+  getSkillCanonicalFiles,
 } from './structure'
 
 const TEMPLATES_DIR = join(__dirname, '../../templates')
@@ -28,6 +30,13 @@ const TEMPLATES_DIR = join(__dirname, '../../templates')
  *   resolveTemplatePath('CLAUDE.md')                → <templates>/CLAUDE.md
  */
 export function resolveTemplatePath(relativePath: string): string {
+  for (const skillBase of SKILL_INSTALL_BASES) {
+    if (relativePath === skillBase || relativePath.startsWith(`${skillBase}/`)) {
+      const remainder = relativePath.slice(skillBase.length).replace(/^\//, '')
+      return join(TEMPLATES_DIR, 'skills/blueprint', remainder)
+    }
+  }
+
   if (EDITABLE_PROJECT_DOCS.includes(relativePath)) {
     return join(TEMPLATES_DIR, basename(relativePath))
   }
@@ -41,6 +50,13 @@ export function resolveTemplatePath(relativePath: string): string {
  */
 export function resolveAllCoreTemplatePaths(): Array<{ relativePath: string; absolutePath: string }> {
   return CANONICAL_CORE_FILES.map((relativePath) => ({
+    relativePath,
+    absolutePath: resolveTemplatePath(relativePath),
+  }))
+}
+
+export function resolveAllSkillTemplatePaths(skillBase: string): Array<{ relativePath: string; absolutePath: string }> {
+  return getSkillCanonicalFiles(skillBase).map((relativePath) => ({
     relativePath,
     absolutePath: resolveTemplatePath(relativePath),
   }))

@@ -1,3 +1,5 @@
+import type { ProjectMode } from './structure'
+
 export interface MissingStructureFinding {
   kind: 'missing-structure'
   targetPath: string
@@ -65,6 +67,8 @@ export type DoctorFinding =
   | ManifestValidationErrorFinding
 
 export interface DoctorAuditResult {
+  mode: ProjectMode
+  skillBase?: string
   findings: DoctorFinding[]
   isClean: boolean
   hasBlockingFindings: boolean

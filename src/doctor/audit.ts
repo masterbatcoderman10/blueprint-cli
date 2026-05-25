@@ -166,6 +166,7 @@ export async function runDoctorAudit(projectDir: string): Promise<DoctorAuditRes
     if (error instanceof ManifestParseError) {
       findings.push(createManifestValidationErrorFinding(MANIFEST_RELATIVE_PATH, error.message))
       return {
+        mode: 'legacy',
         findings,
         isClean: false,
         hasBlockingFindings: true,
@@ -206,6 +207,7 @@ export async function runDoctorAudit(projectDir: string): Promise<DoctorAuditRes
   }
 
   return {
+    mode: 'legacy',
     findings,
     isClean: findings.length === 0,
     hasBlockingFindings: findings.some(
