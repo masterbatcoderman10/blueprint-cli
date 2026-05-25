@@ -1,6 +1,6 @@
 # Phase 1 — Skill Authorship & Mode-Aware Scaffold Plan
 
-**Status**: Planning
+**Status**: Complete
 **Milestone**: Revision 11 — Skill-Based Agent Surface
 **Phase ID prefix**: R11-1
 

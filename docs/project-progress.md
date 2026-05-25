@@ -2,9 +2,9 @@
 
 **Project**: blueprint-cli
 **Tracker**: blueprint-cli
-**Current Milestone**: Revision 11 — Skill-Based Agent Surface (Phase 1 planned)
-**Current Phase**: Phase 1 — Skill Authorship & Mode-Aware Scaffold (planned, test-planned)
-**Status**: Revision 11 Phase 1 planned and test-planned. MAS-208 written to SRS as pre-phase repair. Revision scope extended with Phase 6 (Migrate & Alignment-Complete Commands). Phase 1 document committed and ready for execution.
+**Current Milestone**: Revision 11 — Skill-Based Agent Surface (Phase 1 complete; Phase 2 pending planning)
+**Current Phase**: TBD — pending phase planning
+**Status**: Revision 11 Phase 1 complete. All 33 R11-1 tasks are DONE, DoD satisfied, full test suite green (1193 tests, 159 files). Next step: plan Phase 2 — Doctor Mode Awareness & Dual-Source Repair.
 
 ---
 
@@ -97,6 +97,7 @@
 - 2026-05-24: Revision 11 Phase 1 — Skill Authorship & Mode-Aware Scaffold was planned. Gate R11-1.0 (4 tasks, 2.5 units) covers `Mode = 'skill' \| 'legacy'` type plumbing, `templates/skills/blueprint/SKILL.md` authorship (ironclad-invocation frontmatter + setup gate + shared-laws ref + intent-keyed routing table mirroring root `<ModuleRouting>` 1:1), `templates/skills/blueprint/reference/anti-patterns.md` (canonical shape spec only), and the `docs/core/alignment.md` final-step update (+ template mirror) instructing the agent to run the deferred `alignment-complete` command. Stream A (20 tasks, all Independent) authors the 20 `reference/*.md` mirrors with locked file-rename map. Stream B (1 task) authors `scripts/load-context.mjs` (markdown brief to stdout). Stream C (4 tasks, all Independent) authors minimal one-liner skill-mode entry-point stubs at `templates/skill/{CLAUDE,AGENTS,GEMINI,QWEN}.md`. Stream D (4 tasks) adds the mode prompt + scaffold branch + post-scaffold `<!-- blueprint-status: alignment-required -->` marker writer (idempotent) + end-to-end smoke. 33 tasks total; sum-of-work ~12.0 units; wallclock ~4.0 units with parallel fan-out. Phase document at `docs/milestones/revision-11-skill-based-agent-surface/phase-1-skill-authorship-and-mode-aware-scaffold.md`. Ready for test planning.
 - 2026-05-24: Revision 11 Phase 1 test plan committed to `docs/milestones/revision-11-skill-based-agent-surface/phase-1-skill-authorship-and-mode-aware-scaffold.md`. 33 tasks represented; 31 testable, 2 not testable (`R11-1.0.1` type-surface plumbing and `R11-1.D.4` dedicated smoke-verification task, both covered by compile/integration verification and sibling execution tests). Phase document ready for execution.
 - 2026-05-24: Revision 11 scope extended during Phase 1 planning to add Phase 6 — Migrate & Alignment-Complete Commands. Phase 6 implements the deferred `alignment-complete` command (flips the `<!-- blueprint-status: alignment-required -->` marker injected by Phase 1's init step to `<!-- blueprint-status: alignment-complete -->` in every scaffolded agent entry-point file, idempotent) and the related `migrate` command (legacy-mode → skill-mode in-place migration; detailed scope locked at Phase 6 planning time). New SRS requirements (working IDs MAS-211 alignment-complete, MAS-212 migrate) will be created during Phase 6 planning.
+- 2026-05-25: Revision 11 Phase 1 — Skill Authorship & Mode-Aware Scaffold completed. All tasks done, DoD satisfied, full test suite green (1193 tests, 159 files).
 
 ---
 
@@ -156,7 +157,7 @@ R10 — Health-Check Bypass & Anti-Pattern Shape Unification
 ├── Phase 1 — Health-Check Bypass ✓
 ├── Phase 2 — Anti-Pattern Shape Unification ✓
 R11 — Skill-Based Agent Surface
-├── Phase 1 — Skill Authorship & Mode-Aware Scaffold ○ (planned, test-planned)
+├── Phase 1 — Skill Authorship & Mode-Aware Scaffold ✓
 ├── Phase 2 — Doctor Mode Awareness & Dual-Source Repair ○
 ├── Phase 3 — CLI Deprecation Banner & Conventions Sunset ○
 ├── Phase 4 — NPX Install Pathway & Release Surface ○
@@ -177,4 +178,4 @@ M3 — Workflow Visibility Enhancements (Optional Future)
 
 | Revision | Name | Status | Notes |
 |----------|------|--------|-------|
-| R11 | Skill-Based Agent Surface | Phase 1 test-planned | 6 phases outlined (Phase 6 added during Phase 1 planning for deferred `alignment-complete` + `migrate` commands). Phase 1 ready for execution. Docs: `docs/milestones/revision-11-skill-based-agent-surface/revision-11-skill-based-agent-surface.md`, `phase-1-skill-authorship-and-mode-aware-scaffold.md` |
+| R11 | Skill-Based Agent Surface | Phase 1 complete; Phase 2 pending planning | 6 phases outlined (Phase 6 added during Phase 1 planning for deferred `alignment-complete` + `migrate` commands). Phase 1 complete. Next step: plan Phase 2 — Doctor Mode Awareness & Dual-Source Repair. Docs: `docs/milestones/revision-11-skill-based-agent-surface/revision-11-skill-based-agent-surface.md`, `phase-1-skill-authorship-and-mode-aware-scaffold.md` |

@@ -21,6 +21,7 @@ pnpm-debug.log*
 # Editor
 .vscode/
 .idea/
+.pi
 
 # Blueprint runtime (mutable, per-machine)
 docs/.blueprint/tasks.db
