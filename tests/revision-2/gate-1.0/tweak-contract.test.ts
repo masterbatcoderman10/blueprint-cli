@@ -206,7 +206,7 @@ describe('T-R7-1.B.7.4: repo-wide guard against reintroducing ## Tweaks', () => 
     const filesWithTweaks = grepResult.trim().split('\n').filter(Boolean)
 
     // Allowlist: hierarchy.md legitimately contains a ## Tweaks heading describing the tweak contract.
-    const allowlist = ['templates/docs/core/hierarchy.md']
+    const allowlist = ['templates/docs/core/hierarchy.md', 'templates/skills/blueprint/reference/hierarchy.md']
     const disallowed = filesWithTweaks.filter(
       (f) => !allowlist.some((a) => f.includes(a)),
     )
