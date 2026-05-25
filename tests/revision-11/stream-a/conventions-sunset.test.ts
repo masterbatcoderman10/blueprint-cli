@@ -4,7 +4,7 @@ import { existsSync, readFileSync } from 'node:fs'
 import { join, resolve } from 'node:path'
 import { tmpdir } from 'node:os'
 
-import { CANONICAL_CORE_FILES } from '../../../src/doctor/structure'
+import { CANONICAL_CORE_FILES, getCanonicalStructurePaths, isEditableProjectDoc } from '../../../src/doctor/structure'
 import { runDoctorAudit } from '../../../src/doctor/audit'
 import { resolveAllSkillTemplatePaths } from '../../../src/doctor/inventory'
 import { MANIFEST_RELATIVE_PATH, TEMPLATE_VERSION } from '../../../src/doctor/manifest'
@@ -250,6 +250,15 @@ describe('R11-3.A.2: drop conventions.md from editable shell scaffolding', () =>
 describe('R11-3.A.3: remove conventions.md from Doctor legacy structure', () => {
   it('T-R11-3.A.3.1: CANONICAL_CORE_FILES excludes docs/conventions.md', () => {
     expect(CANONICAL_CORE_FILES).not.toContain('docs/conventions.md')
+    expect(getCanonicalStructurePaths()).not.toContain('docs/conventions.md')
+    expect(isEditableProjectDoc('docs/conventions.md')).toBe(false)
+  })
+
+  it('T-R11-3.A.3.2: canonical-set helper output excludes docs/conventions.md', () => {
+    const canonicalPaths = getCanonicalStructurePaths()
+
+    expect(canonicalPaths).not.toContain('docs/conventions.md')
+    expect(canonicalPaths).toContain('docs/.blueprint/manifest.json')
   })
 
   it('T-R11-3.A.3.2: legacy audit on a project missing docs/conventions.md is clean', async () => {
