@@ -1,6 +1,6 @@
 # Phase 3 — CLI Deprecation Banner & Conventions Sunset Plan
 
-**Status**: Planning
+**Status**: In Progress
 **Milestone**: Revision 11 — Skill-Based Agent Surface
 **Phase ID prefix**: R11-3
 
@@ -137,12 +137,77 @@ Gate R11-3.0 (banner foundation) ───────────────�
 
 ---
 
+## Test Plan
+
+> Generated from task analysis and aligned to the existing CLI runtime, scaffold, Doctor, and template/doc-contract test families already present under `tests/`. Every task in Gate R11-3.0 and Streams A-C is represented. Tests are written before implementation (TDD) during execution. Framework: Vitest (`*.test.ts` under `tests/`, mirroring `src/`). No tasks are marked not testable in this phase because even the markdown/template sunset work changes shipped scaffold and audit behavior that can be pinned through doc-contract, scaffold, and Doctor integration coverage.
+
+### Gate R11-3.0 Tests
+
+| Test ID | Task | Type | Description | Expected Result |
+|---------|------|------|-------------|-----------------|
+| T-R11-3.0.1.1 | R11-3.0.1 | unit | Verify `isDeprecationSuppressed(argv, env)` returns `true` when `--no-deprecation-banner` appears at the front, middle, or end of argv, when `BLUEPRINT_SUPPRESS_DEPRECATION` is `'1'`, and when both suppression mechanisms are present together | Suppression is enabled only by the documented flag or env var contract and works regardless of argv position |
+| T-R11-3.0.1.2 | R11-3.0.1 | unit | Verify `isDeprecationSuppressed(argv, env)` returns `false` when the env var is unset or set to values other than `'1'`, and verify `consumeDeprecationFlag(argv)` strips every banner flag occurrence while preserving the order of all non-flag argv tokens | Only `'1'` suppresses, and downstream argv is preserved exactly apart from flag removal |
+| T-R11-3.0.2.1 | R11-3.0.2 | unit | Verify `shouldEmitDeprecationBanner(argv)` returns `false` for the four root-help shapes after flag stripping: `[]`, `['--help']`, `['-h']`, and `['help']` | Root help remains the only banner-skip surface |
+| T-R11-3.0.2.2 | R11-3.0.2 | unit | Verify `shouldEmitDeprecationBanner(argv)` returns `true` for `['--version']`, `['doctor']`, `['init']`, `['init', '--help']`, and an unknown-command shape such as `['bogus']` | Version output, command help, normal commands, and other dispatched argv shapes all emit the banner |
+| T-R11-3.0.3.1 | R11-3.0.3 | unit | Verify `emitDeprecationBanner()` writes exactly `[deprecation] consider migrating to skill mode\n` to the provided stream, emits only once per process invocation, and re-emits only after `__resetDeprecationBannerForTesting()` is called | Banner text is exact, single-shot, and resettable for harness reuse |
+| T-R11-3.0.4.1 | R11-3.0.4 | integration | Parameterized over banner-eligible legacy-mode argv shapes `['--version']`, `['doctor']`, and `['init', '--help']`: run `runCli`, spy on the banner emitter and downstream runtime/command parser, and verify the banner is emitted before dispatch for each non-root-help branch | `runCli` proves root help is the only skip by emitting for version, normal dispatched commands, and command-level help in legacy mode |
+| T-R11-3.0.4.2 | R11-3.0.4 | integration | Parameterized over `['--no-deprecation-banner', 'init']` and `['init', '--no-deprecation-banner']` in a legacy-mode fixture: run `runCli`, verify no banner is emitted, and spy on downstream parsing to confirm the received argv has the banner flag removed in both positions | Suppressed command invocations stay silent and never leak `--no-deprecation-banner` into downstream argv parsing |
+| T-R11-3.0.4.3 | R11-3.0.4 | integration | Parameterized over skill-mode, non-project/unknown-cwd, root-help, and env-suppressed legacy invocations: verify `runCli` never calls the banner emitter in any of those skip cases | Banner emission is gated exactly to unsuppressed legacy-mode non-root-help invocations |
+
+### Stream A Tests
+
+| Test ID | Task | Type | Description | Expected Result |
+|---------|------|------|-------------|-----------------|
+| T-R11-3.A.1.1 | R11-3.A.1 | unit (doc-contract) | Verify `docs/conventions.md`, `templates/conventions.md`, and `templates/docs/conventions.md` are absent from the working tree | The sunsetted conventions files are fully removed from live and template surfaces |
+| T-R11-3.A.2.1 | R11-3.A.2 | unit | Verify the `shellFiles` collection in `src/init/archive-engine.ts` no longer includes `conventions.md` while retaining the remaining editable root docs | Scaffold root-doc registration drops only the sunsetted file |
+| T-R11-3.A.2.2 | R11-3.A.2 | integration | Run scaffold/archive-engine coverage for both legacy-mode and skill-mode init flows and verify no generated project contains `docs/conventions.md` while `docs/project-progress.md`, `docs/prd.md`, and `docs/srs.md` still scaffold correctly | Init stops emitting `docs/conventions.md` without regressing the rest of the editable-root-doc surface |
+| T-R11-3.A.3.1 | R11-3.A.3 | unit | Verify `CANONICAL_CORE_FILES` in `src/doctor/structure.ts` no longer contains `docs/conventions.md` | Doctor's legacy canonical-set no longer treats `docs/conventions.md` as required |
+| T-R11-3.A.3.2 | R11-3.A.3 | integration | Run legacy-mode Doctor audit/command coverage against a project missing `docs/conventions.md` and verify no `missing-structure` or repair finding is produced for that file | Legacy-mode Doctor accepts post-sunset projects without a conventions file |
+| T-R11-3.A.3.3 | R11-3.A.3 | integration | Run skill-mode Doctor/structure coverage against a healthy skill-mode fixture after the canonical-set edit and verify the 23-file skill canonical contract remains unchanged and produces no `docs/conventions.md`-related findings | Removing the legacy conventions file does not perturb the skill-mode canonical surface |
+| T-R11-3.A.4.1 | R11-3.A.4 | unit (doc-contract) | Verify `templates/skill/_project-conventions.snippet.md` exists as a single canonical `<ProjectConventions>` block containing the migrated sections: Tech Stack, Libraries & Tools, File Structure, Coding Standards, Testing, Anti-Patterns, Anti-Pattern Block Shape, Agent Tools, Releasing, and Project-Specific Notes | The snippet is the single source of truth and carries the complete migrated conventions structure |
+| T-R11-3.A.4.2 | R11-3.A.4 | unit (snapshot) | Compare the `<ProjectConventions>` snippet body against a locked exact-content snapshot derived from the pre-sunset `docs/conventions.md` content so every migrated section body, list item, and example remains intact | The migrated snippet preserves the full conventions content exactly rather than only the section headings |
+| T-R11-3.A.5.1 | R11-3.A.5 | unit (mirror) | Verify `templates/skill/{CLAUDE,AGENTS,GEMINI,QWEN}.md` each contain a `<ProjectConventions>` block whose bytes match `templates/skill/_project-conventions.snippet.md` exactly | Every skill-mode entry-point template inlines the canonical snippet verbatim |
+| T-R11-3.A.5.2 | R11-3.A.5 | unit (mirror) | Verify the four skill-mode entry-point templates remain byte-identical to each other below the title line after the `<ProjectConventions>` injection | Skill-mode template divergence is prevented across all four variants |
+
+### Stream B Tests
+
+| Test ID | Task | Type | Description | Expected Result |
+|---------|------|------|-------------|-----------------|
+| T-R11-3.B.1.1 | R11-3.B.1 | unit (doc-contract) | Verify `templates/{CLAUDE,AGENTS,GEMINI,QWEN}.md` no longer contain `Load docs/conventions.md.` in `<SessionStart>` STEP 1 while still retaining the `tracker.md` load and `<ModuleRouting>` handoff | Legacy-mode entry-point templates remove only the conventions load and keep the rest of the bootstrap flow intact |
+| T-R11-3.B.2.1 | R11-3.B.2 | unit (doc-contract) | Verify the same four legacy-mode templates prepend the exact `<DeprecationNote>` block immediately after the title line and before `<Blueprint>` | Every legacy-mode entry-point template carries the locked migration advisory in the required position |
+| T-R11-3.B.2.2 | R11-3.B.2 | unit (mirror) | Verify the four legacy-mode entry-point templates remain byte-identical to each other below the title line after the `<DeprecationNote>` addition and `<SessionStart>` edit | Legacy-mode template divergence is prevented across all four variants |
+| T-R11-3.B.3.1 | R11-3.B.3 | unit (test-contract) | Verify the updated legacy block-identity test enumerates only the intended legacy entry-point variants and no longer asserts the skill-mode template files | The existing R10 identity guard is correctly re-scoped to the legacy surface only |
+| T-R11-3.B.3.2 | R11-3.B.3 | integration | Mutate one legacy template body in a temporary copy and run the legacy block-identity test family | The updated legacy identity test fails on legacy drift, proving the re-scoped guard still protects the intended surface |
+
+### Stream C Tests
+
+| Test ID | Task | Type | Description | Expected Result |
+|---------|------|------|-------------|-----------------|
+| T-R11-3.C.1.1 | R11-3.C.1 | unit (doc-contract) | Verify `docs/core/alignment.md` contains zero occurrences of `conventions.md` and rewrites the conventions-gathering instructions to read from and write into the project entry-point file's `<ProjectConventions>` section | Alignment protocol fully sunsets `conventions.md` and points at the new source of truth |
+| T-R11-3.C.1.2 | R11-3.C.1 | unit (doc-contract) | Verify the rewritten alignment protocol still preserves explicit user approval before writing and keeps the anti-pattern guidance against silent entry-point-file edits | The new alignment flow keeps the existing write-discipline and approval contract intact |
+| T-R11-3.C.2.1 | R11-3.C.2 | unit (mirror) | Verify `templates/docs/core/alignment.md` is byte-identical to `docs/core/alignment.md` after the rewrite | Live and template alignment docs remain in lockstep |
+| T-R11-3.C.3.1 | R11-3.C.3 | unit (test-contract) | Run the new skill-mode block-identity test and verify it asserts that `templates/skill/{CLAUDE,AGENTS,GEMINI,QWEN}.md` are byte-identical below the title line and that each contains the canonical `<ProjectConventions>` block from the snippet | The new skill-mode identity guard protects both byte identity and snippet fidelity |
+| T-R11-3.C.3.2 | R11-3.C.3 | integration | Tamper with one skill-mode entry-point template body in a temporary copy and run the new skill-mode block-identity test family | The new test fails on any single-template drift, proving it will catch cross-variant divergence |
+
+### Test Summary
+
+| Component | Total Tasks | Testable | Not Testable |
+|-----------|-------------|----------|--------------|
+| Gate R11-3.0 | 4 | 4 | 0 |
+| Stream A | 5 | 5 | 0 |
+| Stream B | 3 | 3 | 0 |
+| Stream C | 3 | 3 | 0 |
+| **Total** | **15** | **15** | **0** |
+
+---
+
 ## Definition of Done
 
 - [ ] Gate R11-3.0 acceptance criteria pass
 - [ ] Stream A acceptance criteria pass
 - [ ] Stream B acceptance criteria pass
 - [ ] Stream C acceptance criteria pass
+- [ ] All tests in the Test Plan pass
 - [ ] No lint errors in files touched by this phase
 - [ ] Full test suite (`npm test`) green
 - [ ] `docs/conventions.md` and its two template mirrors are absent from the tree
