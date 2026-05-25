@@ -23,6 +23,7 @@ This SRS exists for blueprint-cli to act as the persistent requirement layer bet
 | MAS-206 | Standalone Tweak Workflow | Must | superseded | Revision 7 |
 | MAS-207 | Change-First Tweak Workflow | Must | active | Revision 8 |
 | MAS-208 | Skill-Based Agent Surface | Must | active | Revision 11 |
+| MAS-209 | Dual-Source Deprecation Path | Must | approved-pending-implementation | Revision 11 |
 
 ---
 
@@ -128,6 +129,20 @@ The system must provide a single `blueprint` Claude skill installed at the canon
 - `blueprint init` must offer a mode choice with `skill` recommended (default) and `legacy` marked "not recommended"; selecting skill mode must emit the skill payload into `<target>/.claude/skills/blueprint/**` and scaffold minimal one-liner skill-mode entry-point variants (CLAUDE.md / AGENTS.md / GEMINI.md / QWEN.md) that point at the skill (no `<SessionStart>` / `<HardRules>` / `<ModuleRouting>` blocks — the skill owns routing); selecting legacy mode must preserve the existing scaffold behaviour unchanged.
 - During Revision 11 Phase 1, the skill payload is shipped from `templates/skills/blueprint/**` only (scaffold source); the repo-root `skills/blueprint/**` payload required for the vercel-labs/skills npx pathway and the byte-identical template-mirror test are deferred to Phase 4.
 - The skill must ship in the published npm tarball under `skills/blueprint/` (Phase 4) and be scaffolded into new projects by `blueprint init` when the user selects skill mode (Phase 1).
+
+#### MAS-209 - Dual-Source Deprecation Path
+
+The system must support both skill mode and legacy `.md` core module mode as a transition strategy, with skill mode recommended and legacy mode deprecated but functional. Deprecation must be surfaced consistently through the CLI runtime, the project entry-point files, and the Doctor report, without introducing any forced migration or breaking change for legacy projects.
+
+- Every CLI invocation against a legacy-mode project must emit a one-line deprecation banner to stderr (`[deprecation] consider migrating to skill mode`) before any other output.
+- The banner must be suppressed only on root help invocations (`blueprint`, `blueprint --help`, `blueprint -h`). It must still print on `--version`, per-command help (`blueprint <cmd> --help`), `blueprint doctor`, and every other dispatched command — even if the Doctor report already includes a `Mode:` header line introduced by Revision 11 Phase 2.
+- Suppression must be controllable per-invocation via a `--no-deprecation-banner` flag and persistently via the `BLUEPRINT_SUPPRESS_DEPRECATION=1` environment variable. The flag must be recognised regardless of position in the argv list and must not interfere with command-level argument parsing.
+- Mode detection for banner emission must reuse the canonical `detectProjectMode()` introduced in Revision 11 Phase 2 (`src/doctor/structure.ts`); presence of `.claude/skills/blueprint/SKILL.md` or `.agents/skills/blueprint/SKILL.md` ⇒ skill mode ⇒ no banner.
+- `docs/conventions.md` must be deleted from the source repo and from both template mirrors (`templates/conventions.md`, `templates/docs/conventions.md`). The previously scaffolded `conventions.md` shell must be removed from `src/init/archive-engine.ts` shellFiles emission. Doctor's legacy canonical-set must drop `docs/conventions.md`.
+- Skill-mode entry-point templates (`templates/skill/CLAUDE.md`, `templates/skill/AGENTS.md`, `templates/skill/GEMINI.md`, `templates/skill/QWEN.md`) must carry a byte-identical `<ProjectConventions>` section containing the migrated content from the sunsetted `conventions.md` (Tech Stack, Libraries & Tools, File Structure, Coding Standards, Testing, Anti-Patterns, Anti-Pattern Block Shape, Agent Tools, Releasing, Project-Specific Notes).
+- Legacy-mode entry-point templates (`templates/CLAUDE.md`, `templates/AGENTS.md`, `templates/GEMINI.md`, `templates/QWEN.md`) must drop the `Load docs/conventions.md` line from `<SessionStart>` STEP 1 and must gain a top-of-file one-line `<DeprecationNote>` block recommending migration to skill mode. They must remain byte-identical to each other (per the existing R10 Phase 1 7-variant block-identity contract; this phase reduces that contract to the legacy-mode variants and extends a parallel one to the skill-mode variants).
+- `docs/core/alignment.md` and its template mirror (`templates/docs/core/alignment.md`) must drop every reference to `conventions.md`. The conventions-gathering behaviour must be rewritten to read from and write into the `<ProjectConventions>` section of the project's entry-point file instead of a separate document.
+- No automatic in-place migration. A future `blueprint migrate` command (deferred to Revision 11 Phase 6) is the explicit migration path; this requirement does not introduce it.
 
 ### Should Have
 
@@ -298,6 +313,19 @@ Change log:
 - 2026-05-24 - Created from Revision 11 Phase 1 planning (pre-phase SRS repair). Locked sub-detail bullets recorded: skill structure (`SKILL.md` + 20 renamed `reference/*.md` mirrors + shared `reference/anti-patterns.md` + `scripts/load-context.mjs`), explicit file-rename map (`alignment.md` → `align.md`, `phase-planning.md` → `plan-phase.md`, etc.), verbatim-content + skill-frontmatter authoring style for reference mirrors, ironclad-invocation frontmatter `description` shape, intent-keyed routing table mirroring root `<ModuleRouting>` 1:1, canonical-shape-spec-only contents for `reference/anti-patterns.md`, markdown-brief stdout shape for `scripts/load-context.mjs`, Phase 1 scope limited to `templates/skills/blueprint/**` (repo-root `skills/blueprint/` deferred to Phase 4), minimal one-liner skill-mode entry-point variants (no `<SessionStart>` / `<HardRules>` / `<ModuleRouting>`), `blueprint init` mode prompt (skill default, legacy marked "not recommended"). Status remains `approved-pending-implementation` until Revision 11 Phase 2 activates the requirement.
 - 2026-05-24 - Phase 1 scope extended: `blueprint init` (both modes) writes a hardcoded `<!-- blueprint-status: alignment-required -->` marker into every scaffolded agent entry-point file (CLAUDE / AGENTS / GEMINI / QWEN) after the template copy step; `docs/core/alignment.md` and its template mirror gain a final alignment step instructing the agent to run the deferred `alignment-complete` command which flips the marker to `<!-- blueprint-status: alignment-complete -->`. The `alignment-complete` command itself is deferred to Revision 11 Phase 6 (alongside the planned `migrate` command). Meaning unchanged; ID unchanged.
 - 2026-05-25 - Activated by Revision 11 Phase 2. Doctor mode detection, mode-aware canonical-set enforcement, skill-aware repair, and mode header in report implement the dual-source coexistence surface described in this requirement.
+
+### MAS-209
+- Title: Dual-Source Deprecation Path
+- Priority: Must
+- Status: approved-pending-implementation
+- Assigned milestone: Revision 11
+- Source: Revision 11 Skill-Based Agent Surface
+- Introduced by: Revision 11 Phase 3
+- Supersedes: None
+- Superseded by: None
+
+Change log:
+- 2026-05-25 - Created from Revision 11 Phase 3 planning (pre-phase SRS repair, per user direction to land SRS updates before phase doc commits rather than as in-phase tasks). Locked sub-detail bullets recorded: CLI deprecation banner content (`[deprecation] consider migrating to skill mode`, stderr, single line, emitted before any other output); banner skip rule (root help only — `blueprint`, `blueprint --help`, `blueprint -h`); banner still prints on `--version`, command-level help, `blueprint doctor`, and all other dispatched commands; suppression surface (`--no-deprecation-banner` flag accepted anywhere in argv; `BLUEPRINT_SUPPRESS_DEPRECATION=1` env var for persistence); mode detection reuses Phase 2 `detectProjectMode()` from `src/doctor/structure.ts` (presence of `.claude/skills/blueprint/SKILL.md` or `.agents/skills/blueprint/SKILL.md` ⇒ skill ⇒ no banner); `docs/conventions.md` deletion across source and both template mirrors plus `src/init/archive-engine.ts` shellFiles cleanup and Doctor legacy canonical-set drop; skill-mode entry-point templates gain byte-identical `<ProjectConventions>` section across CLAUDE / AGENTS / GEMINI / QWEN containing the migrated conventions content; legacy-mode entry-point templates drop the `Load docs/conventions.md` SessionStart line and gain a top-of-file `<DeprecationNote>` block; `docs/core/alignment.md` and its template mirror drop all `conventions.md` references and rewrite conventions-gathering to read/write the `<ProjectConventions>` section of the project entry-point file; no automatic in-place migration (deferred to `blueprint migrate` in Phase 6). Status remains `approved-pending-implementation` until Revision 11 Phase 3 completion.
 
 ---
 
