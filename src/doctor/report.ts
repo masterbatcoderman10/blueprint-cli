@@ -41,12 +41,15 @@ export function groupDoctorFindings(findings: DoctorFinding[]): DoctorFindingGro
 }
 
 export function renderDoctorReport(result: DoctorAuditResult): string {
+  const modeHeader =
+    result.mode === 'skill' ? 'Mode: skill' : 'Mode: legacy — consider migrating to skill mode'
+
   if (result.isClean) {
-    return 'Blueprint Doctor: no integrity findings. Project is aligned with bundled templates.'
+    return [modeHeader, 'Blueprint Doctor: no integrity findings. Project is aligned with bundled templates.'].join('\n')
   }
 
   const groups = groupDoctorFindings(result.findings)
-  const lines = ['Blueprint Doctor found integrity issues:']
+  const lines = [modeHeader, 'Blueprint Doctor found integrity issues:']
 
   if (groups.missingStructure.length > 0) {
     lines.push('Missing structure:')
