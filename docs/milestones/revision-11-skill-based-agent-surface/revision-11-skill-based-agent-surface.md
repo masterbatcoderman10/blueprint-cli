@@ -1,6 +1,6 @@
 # Revision 11 — Skill-Based Agent Surface
 
-**Status:** Identified — planning
+**Status:** In Progress
 **Identified:** 2026-05-24
 **Owner milestone bucket:** Revision 11 (post-M1, post-R10)
 **Type:** Hybrid — additive (new skill surface + npx pathway) and modifying (init flow, Doctor canonical-set semantics, conventions.md deletion, agent entry-point variants).

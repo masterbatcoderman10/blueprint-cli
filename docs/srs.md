@@ -22,7 +22,7 @@ This SRS exists for blueprint-cli to act as the persistent requirement layer bet
 | MAS-205 | Local Project Board UI | Must | active | Revision 6 |
 | MAS-206 | Standalone Tweak Workflow | Must | superseded | Revision 7 |
 | MAS-207 | Change-First Tweak Workflow | Must | active | Revision 8 |
-| MAS-208 | Skill-Based Agent Surface | Must | approved-pending-implementation | Revision 11 |
+| MAS-208 | Skill-Based Agent Surface | Must | active | Revision 11 |
 
 ---
 
@@ -287,7 +287,7 @@ Change log:
 ### MAS-208
 - Title: Skill-Based Agent Surface
 - Priority: Must
-- Status: approved-pending-implementation
+- Status: active
 - Assigned milestone: Revision 11
 - Source: Revision 11 Skill-Based Agent Surface
 - Introduced by: Revision 11 Phase 1
@@ -297,6 +297,7 @@ Change log:
 Change log:
 - 2026-05-24 - Created from Revision 11 Phase 1 planning (pre-phase SRS repair). Locked sub-detail bullets recorded: skill structure (`SKILL.md` + 20 renamed `reference/*.md` mirrors + shared `reference/anti-patterns.md` + `scripts/load-context.mjs`), explicit file-rename map (`alignment.md` → `align.md`, `phase-planning.md` → `plan-phase.md`, etc.), verbatim-content + skill-frontmatter authoring style for reference mirrors, ironclad-invocation frontmatter `description` shape, intent-keyed routing table mirroring root `<ModuleRouting>` 1:1, canonical-shape-spec-only contents for `reference/anti-patterns.md`, markdown-brief stdout shape for `scripts/load-context.mjs`, Phase 1 scope limited to `templates/skills/blueprint/**` (repo-root `skills/blueprint/` deferred to Phase 4), minimal one-liner skill-mode entry-point variants (no `<SessionStart>` / `<HardRules>` / `<ModuleRouting>`), `blueprint init` mode prompt (skill default, legacy marked "not recommended"). Status remains `approved-pending-implementation` until Revision 11 Phase 2 activates the requirement.
 - 2026-05-24 - Phase 1 scope extended: `blueprint init` (both modes) writes a hardcoded `<!-- blueprint-status: alignment-required -->` marker into every scaffolded agent entry-point file (CLAUDE / AGENTS / GEMINI / QWEN) after the template copy step; `docs/core/alignment.md` and its template mirror gain a final alignment step instructing the agent to run the deferred `alignment-complete` command which flips the marker to `<!-- blueprint-status: alignment-complete -->`. The `alignment-complete` command itself is deferred to Revision 11 Phase 6 (alongside the planned `migrate` command). Meaning unchanged; ID unchanged.
+- 2026-05-25 - Activated by Revision 11 Phase 2. Doctor mode detection, mode-aware canonical-set enforcement, skill-aware repair, and mode header in report implement the dual-source coexistence surface described in this requirement.
 
 ---
 
