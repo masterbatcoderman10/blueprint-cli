@@ -15,12 +15,20 @@ import {
 } from './findings'
 import { getUserVersion, openDbReadOnly, runIntegrityCheck } from '../tracker/db'
 import { TRACKER_SCHEMA_VERSION } from '../tracker/schema'
-import { loadManifestState, ManifestParseError, resolveAllCoreTemplatePaths, resolveTemplatePath } from './inventory'
+import {
+  loadManifestState,
+  ManifestParseError,
+  resolveAllCoreTemplatePaths,
+  resolveAllSkillTemplatePaths,
+  resolveTemplatePath,
+} from './inventory'
 import { MANIFEST_RELATIVE_PATH, TEMPLATE_VERSION } from './manifest'
 import {
   REQUIRED_BLUEPRINT_DIRECTORIES,
   REQUIRED_CANONICAL_FILES,
+  detectProjectMode,
   getManagedAgentPaths,
+  getSkillRequiredDirectories,
 } from './structure'
 
 async function pathExists(path: string): Promise<boolean> {
@@ -114,8 +122,14 @@ export async function auditTrackerSchema(projectDir: string): Promise<DoctorFind
 export async function runDoctorAudit(projectDir: string): Promise<DoctorAuditResult> {
   const findings: DoctorFinding[] = []
   const repairableEditableSrsPath = 'docs/srs.md'
+  const modeDetection = await detectProjectMode(projectDir)
+  const mode = modeDetection.mode
+  const skillBase = modeDetection.skillBase
 
-  for (const relativePath of REQUIRED_BLUEPRINT_DIRECTORIES) {
+  const requiredDirectories =
+    mode === 'skill' && skillBase ? getSkillRequiredDirectories(skillBase) : REQUIRED_BLUEPRINT_DIRECTORIES
+
+  for (const relativePath of requiredDirectories) {
     if (!(await pathExists(join(projectDir, relativePath)))) {
       findings.push(createMissingStructureFinding(relativePath, 'directory'))
     }
@@ -123,39 +137,55 @@ export async function runDoctorAudit(projectDir: string): Promise<DoctorAuditRes
 
   // Legacy Blueprint projects may predate SRS integration. Missing docs/srs.md
   // is repairable, but once it exists its content remains user-owned.
-  if (!(await pathExists(join(projectDir, repairableEditableSrsPath)))) {
+  if (mode === 'legacy' && !(await pathExists(join(projectDir, repairableEditableSrsPath)))) {
     findings.push(createMissingStructureFinding(repairableEditableSrsPath, 'file'))
   }
 
   findings.push(...(await auditTrackerDb(projectDir)))
   findings.push(...(await auditTrackerSchema(projectDir)))
 
-  for (const relativePath of REQUIRED_CANONICAL_FILES) {
-    const templatePath = resolveTemplatePath(relativePath)
-    const templateContent = await readFile(templatePath, 'utf-8')
-    const comparison = await compareFileContent(join(projectDir, relativePath), templateContent)
+  if (mode === 'legacy') {
+    for (const relativePath of REQUIRED_CANONICAL_FILES) {
+      const templatePath = resolveTemplatePath(relativePath)
+      const templateContent = await readFile(templatePath, 'utf-8')
+      const comparison = await compareFileContent(join(projectDir, relativePath), templateContent)
 
-    if (comparison.state === 'missing') {
-      findings.push(createMissingStructureFinding(relativePath, 'file'))
-      continue
+      if (comparison.state === 'missing') {
+        findings.push(createMissingStructureFinding(relativePath, 'file'))
+        continue
+      }
+
+      if (comparison.state === 'drifted') {
+        findings.push(createDriftedFileFinding(relativePath))
+      }
     }
 
-    if (comparison.state === 'drifted') {
-      findings.push(createDriftedFileFinding(relativePath))
+    for (const { relativePath, absolutePath } of resolveAllCoreTemplatePaths()) {
+      const templateContent = await readFile(absolutePath, 'utf-8')
+      const comparison = await compareFileContent(join(projectDir, relativePath), templateContent)
+
+      if (comparison.state === 'missing') {
+        findings.push(createMissingStructureFinding(relativePath, 'file'))
+        continue
+      }
+
+      if (comparison.state === 'drifted') {
+        findings.push(createDriftedFileFinding(relativePath))
+      }
     }
-  }
+  } else if (skillBase) {
+    for (const { relativePath, absolutePath } of resolveAllSkillTemplatePaths(skillBase)) {
+      const templateContent = await readFile(absolutePath, 'utf-8')
+      const comparison = await compareFileContent(join(projectDir, relativePath), templateContent)
 
-  for (const { relativePath, absolutePath } of resolveAllCoreTemplatePaths()) {
-    const templateContent = await readFile(absolutePath, 'utf-8')
-    const comparison = await compareFileContent(join(projectDir, relativePath), templateContent)
+      if (comparison.state === 'missing') {
+        findings.push(createMissingStructureFinding(relativePath, 'file'))
+        continue
+      }
 
-    if (comparison.state === 'missing') {
-      findings.push(createMissingStructureFinding(relativePath, 'file'))
-      continue
-    }
-
-    if (comparison.state === 'drifted') {
-      findings.push(createDriftedFileFinding(relativePath))
+      if (comparison.state === 'drifted') {
+        findings.push(createDriftedFileFinding(relativePath))
+      }
     }
   }
 
@@ -166,7 +196,8 @@ export async function runDoctorAudit(projectDir: string): Promise<DoctorAuditRes
     if (error instanceof ManifestParseError) {
       findings.push(createManifestValidationErrorFinding(MANIFEST_RELATIVE_PATH, error.message))
       return {
-        mode: 'legacy',
+        mode,
+        ...(skillBase ? { skillBase } : {}),
         findings,
         isClean: false,
         hasBlockingFindings: true,
@@ -207,7 +238,8 @@ export async function runDoctorAudit(projectDir: string): Promise<DoctorAuditRes
   }
 
   return {
-    mode: 'legacy',
+    mode,
+    ...(skillBase ? { skillBase } : {}),
     findings,
     isClean: findings.length === 0,
     hasBlockingFindings: findings.some(
