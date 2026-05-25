@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest'
 import { existsSync, readFileSync } from 'fs'
 import { resolve } from 'path'
 import { execSync } from 'child_process'
+import { runWorkspaceReleaseCommand } from '../helpers/release'
 
 const root = resolve(process.cwd())
 
@@ -41,7 +42,7 @@ describe('T-1.0.4: Core npm scripts', () => {
   })
 
   it('"build" script compiles TypeScript to dist/', () => {
-    execSync('npm run build', { cwd: root, stdio: 'pipe' })
+    runWorkspaceReleaseCommand('npm run build')
     expect(existsSync(resolve(root, 'dist'))).toBe(true)
   })
 })

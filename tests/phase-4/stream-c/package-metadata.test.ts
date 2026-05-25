@@ -1,7 +1,7 @@
-import { execSync } from 'child_process'
 import { readFileSync } from 'fs'
 import { resolve } from 'path'
 import { describe, expect, it } from 'vitest'
+import { runWorkspaceReleaseCommand } from '../../helpers/release'
 
 const root = resolve(process.cwd())
 const packageJsonPath = resolve(root, 'package.json')
@@ -19,16 +19,7 @@ function readPackageJson(): Record<string, unknown> {
 }
 
 function readPackPaths(): string[] {
-  execSync('npm run build', {
-    cwd: root,
-    stdio: 'pipe',
-    encoding: 'utf-8',
-  })
-  const raw = execSync('npm pack --json --dry-run', {
-    cwd: root,
-    stdio: 'pipe',
-    encoding: 'utf-8',
-  })
+  const [, raw] = runWorkspaceReleaseCommand(['npm run build', 'npm pack --json --dry-run'])
   const results = JSON.parse(raw) as PackResult[]
   const files = Array.isArray(results) && Array.isArray(results[0]?.files) ? results[0].files : []
   return files.map((entry) => entry.path)

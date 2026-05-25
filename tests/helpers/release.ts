@@ -1,6 +1,6 @@
-import { execFile, spawn } from 'node:child_process'
+import { execFile, execSync, spawn } from 'node:child_process'
 import { access, cp, mkdtemp, mkdir, readFile, rm, stat, writeFile } from 'node:fs/promises'
-import { constants, existsSync } from 'node:fs'
+import { constants, existsSync, mkdirSync, rmSync, statSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { dirname, join, resolve } from 'node:path'
 import { promisify } from 'node:util'
@@ -133,6 +133,27 @@ export async function installPackedCliFixture(): Promise<PackedCliFixture> {
   }
 }
 
+export function runWorkspaceReleaseCommand(command: string): string
+export function runWorkspaceReleaseCommand(command: string[]): string[]
+export function runWorkspaceReleaseCommand(command: string | string[]): string | string[] {
+  const releasePackLock = acquirePackLockSync()
+  const commands = Array.isArray(command) ? command : [command]
+
+  try {
+    const outputs = commands.map((releaseCommand) =>
+      execSync(releaseCommand, {
+        cwd: workspaceRoot,
+        stdio: 'pipe',
+        encoding: 'utf-8',
+      }),
+    )
+
+    return Array.isArray(command) ? outputs : outputs[0]
+  } finally {
+    releasePackLock()
+  }
+}
+
 async function acquirePackLock(): Promise<() => Promise<void>> {
   const startedAt = Date.now()
 
@@ -157,6 +178,30 @@ async function acquirePackLock(): Promise<() => Promise<void>> {
   }
 }
 
+function acquirePackLockSync(): () => void {
+  const startedAt = Date.now()
+
+  while (true) {
+    try {
+      mkdirSync(packLockDir)
+      return () => rmSync(packLockDir, { recursive: true, force: true })
+    } catch (error) {
+      const code = (error as { code?: string }).code
+      if (code !== 'EEXIST') {
+        throw error
+      }
+
+      clearStalePackLockSync()
+
+      if (Date.now() - startedAt > packLockTimeoutMs) {
+        throw new Error(`Timed out waiting for package fixture lock at ${packLockDir}`)
+      }
+
+      sleepSync(50)
+    }
+  }
+}
+
 async function clearStalePackLock(): Promise<void> {
   try {
     const lockStats = await stat(packLockDir)
@@ -170,8 +215,28 @@ async function clearStalePackLock(): Promise<void> {
   }
 }
 
+function clearStalePackLockSync(): void {
+  try {
+    const lockStats = statSync(packLockDir)
+    if (Date.now() - lockStats.mtimeMs > stalePackLockMs) {
+      rmSync(packLockDir, { recursive: true, force: true })
+    }
+  } catch (error) {
+    if ((error as { code?: string }).code !== 'ENOENT') {
+      throw error
+    }
+  }
+}
+
 function sleep(ms: number): Promise<void> {
   return new Promise((resolveSleep) => setTimeout(resolveSleep, ms))
+}
+
+function sleepSync(ms: number): void {
+  const end = Date.now() + ms
+  while (Date.now() < end) {
+    Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, Math.min(ms, end - Date.now()))
+  }
 }
 
 async function runInteractiveCommand(

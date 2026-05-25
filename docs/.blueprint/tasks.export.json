@@ -2725,10 +2725,10 @@
       "phase": "R11-2",
       "stream": "bug",
       "author": "Codex",
-      "implementation_notes": "Root cause: concurrent packaged CLI fixtures invoked npm pack against the same workspace; npm pack runs prepack (tsc) into shared dist while other pack operations may be reading it, producing partial/corrupt packaged artifacts. Fix: serialized installPackedCliFixture package creation with an inter-process filesystem lock in tests/helpers/release.ts. Verification: targeted packaged smoke subset, npm run typecheck, and full npm test pass.",
+      "implementation_notes": "Rework diagnosis: the prior lock serialized only installPackedCliFixture npm pack. Full-suite tests also ran workspace npm run build and build + npm pack --json --dry-run outside that lock, so dist could be mutated while another test was packing or reading package artifacts. Fix: added runWorkspaceReleaseCommand in tests/helpers/release.ts using the same filesystem lock for synchronous workspace release commands; tests/setup/npm-scripts.test.ts now builds under that lock; tests/phase-4/stream-c/package-metadata.test.ts now runs build and dry-run pack under one locked critical section; tests/phase-4/stream-a/release-fixtures.test.ts pins this caller routing. Verification: targeted release-fixtures regression red then green, affected setup/package-metadata tests green, npm run typecheck green, full npm test green (1220 passed, 2 skipped).",
       "milestone": "R11",
       "created_at": 1779709213547,
-      "updated_at": 1779709505020
+      "updated_at": 1779709977745
     },
     {
       "id": "BUG-R11-2-002",
@@ -2738,10 +2738,10 @@
       "phase": "R11-2",
       "stream": "bug",
       "author": "Codex",
-      "implementation_notes": "Root cause: concurrent packaged CLI fixtures invoked npm pack against the same workspace; npm pack runs prepack (tsc) into shared dist while other pack operations may be reading it, producing partial/corrupt packaged artifacts. Fix: serialized installPackedCliFixture package creation with an inter-process filesystem lock in tests/helpers/release.ts. Verification: targeted packaged smoke subset, npm run typecheck, and full npm test pass.",
+      "implementation_notes": "Rework diagnosis: the prior lock serialized only installPackedCliFixture npm pack. Full-suite tests also ran workspace npm run build and build + npm pack --json --dry-run outside that lock, so dist could be mutated while another test was packing or reading package artifacts. Fix: added runWorkspaceReleaseCommand in tests/helpers/release.ts using the same filesystem lock for synchronous workspace release commands; tests/setup/npm-scripts.test.ts now builds under that lock; tests/phase-4/stream-c/package-metadata.test.ts now runs build and dry-run pack under one locked critical section; tests/phase-4/stream-a/release-fixtures.test.ts pins this caller routing. Verification: targeted release-fixtures regression red then green, affected setup/package-metadata tests green, npm run typecheck green, full npm test green (1220 passed, 2 skipped).",
       "milestone": "R11",
       "created_at": 1779709213556,
-      "updated_at": 1779709505114
+      "updated_at": 1779709977763
     },
     {
       "id": "BUG-R11-2-003",
@@ -2751,10 +2751,10 @@
       "phase": "R11-2",
       "stream": "bug",
       "author": "Codex",
-      "implementation_notes": "Root cause: concurrent packaged CLI fixtures invoked npm pack against the same workspace; npm pack runs prepack (tsc) into shared dist while other pack operations may be reading it, producing partial/corrupt packaged artifacts. Fix: serialized installPackedCliFixture package creation with an inter-process filesystem lock in tests/helpers/release.ts. Verification: targeted packaged smoke subset, npm run typecheck, and full npm test pass.",
+      "implementation_notes": "Rework diagnosis: the prior lock serialized only installPackedCliFixture npm pack. Full-suite tests also ran workspace npm run build and build + npm pack --json --dry-run outside that lock, so dist could be mutated while another test was packing or reading package artifacts. Fix: added runWorkspaceReleaseCommand in tests/helpers/release.ts using the same filesystem lock for synchronous workspace release commands; tests/setup/npm-scripts.test.ts now builds under that lock; tests/phase-4/stream-c/package-metadata.test.ts now runs build and dry-run pack under one locked critical section; tests/phase-4/stream-a/release-fixtures.test.ts pins this caller routing. Verification: targeted release-fixtures regression red then green, affected setup/package-metadata tests green, npm run typecheck green, full npm test green (1220 passed, 2 skipped).",
       "milestone": "R11",
       "created_at": 1779709213560,
-      "updated_at": 1779709505111
+      "updated_at": 1779709977776
     }
   ],
   "comments": [
@@ -4836,6 +4836,138 @@
       "line": null,
       "created_at": 1779709055846,
       "updated_at": 1779709055846
+    },
+    {
+      "id": "30eddc74-1fa7-4ed3-8bd8-d9ceed6d57b8",
+      "task_id": "BUG-R11-2-002",
+      "parent_id": null,
+      "severity": "MAJOR",
+      "body": "Full-suite verification is not clean. `npm test` failed in `tests/phase-4/stream-a/release-fixtures.test.ts:28` during `installPackedCliFixture()` with `npm pack --json ...` reporting `npm error code EOF` on `dist/release/package-artifact.js.map`. This reproduces the same race class the bug fix claims to resolve, so the implementation cannot be approved for the packaged doctor-help regression yet. Evidence points to incomplete lock coverage: `tests/helpers/release.ts:75` only serializes callers of `installPackedCliFixture()`, while other full-suite tests still invoke workspace `npm run build` / `npm pack --dry-run` outside that lock, e.g. `tests/setup/npm-scripts.test.ts:44` and `tests/phase-4/stream-c/package-metadata.test.ts:22`/`:27`.",
+      "author": "reviewer",
+      "line": null,
+      "created_at": 1779709668083,
+      "updated_at": 1779709668083
+    },
+    {
+      "id": "3e465c7b-d692-4182-b33e-618a0e418281",
+      "task_id": "BUG-R11-2-002",
+      "parent_id": null,
+      "severity": "MAJOR",
+      "body": "Task moved to REWORK. After corrections, the agent must follow the canonical REWORK → IN-PROGRESS → IN-REVIEW transition per docs/core/tracker.md before this task can reach DONE.",
+      "author": "reviewer",
+      "line": null,
+      "created_at": 1779709668083,
+      "updated_at": 1779709668083
+    },
+    {
+      "id": "a205fea8-9fbd-4e8f-a5f1-d953cba31914",
+      "task_id": "BUG-R11-2-001",
+      "parent_id": null,
+      "severity": "MAJOR",
+      "body": "Task moved to REWORK. After corrections, the agent must follow the canonical REWORK → IN-PROGRESS → IN-REVIEW transition per docs/core/tracker.md before this task can reach DONE.",
+      "author": "reviewer",
+      "line": null,
+      "created_at": 1779709668088,
+      "updated_at": 1779709668088
+    },
+    {
+      "id": "e257fe64-4ad4-4d40-9cfd-acee55855b73",
+      "task_id": "BUG-R11-2-001",
+      "parent_id": null,
+      "severity": "MAJOR",
+      "body": "Full-suite verification is not clean. `npm test` failed in `tests/phase-4/stream-a/release-fixtures.test.ts:28` during `installPackedCliFixture()` with `npm pack --json ...` reporting `npm error code EOF` on `dist/release/package-artifact.js.map`. This reproduces the same race class the bug fix claims to resolve, so the implementation cannot be approved for the packaged init-help regression yet. Evidence points to incomplete lock coverage: `tests/helpers/release.ts:75` only serializes callers of `installPackedCliFixture()`, while other full-suite tests still invoke workspace `npm run build` / `npm pack --dry-run` outside that lock, e.g. `tests/setup/npm-scripts.test.ts:44` and `tests/phase-4/stream-c/package-metadata.test.ts:22`/`:27`.",
+      "author": "reviewer",
+      "line": null,
+      "created_at": 1779709668088,
+      "updated_at": 1779709668088
+    },
+    {
+      "id": "3311f237-0083-4996-bfee-0b49e761c909",
+      "task_id": "BUG-R11-2-003",
+      "parent_id": null,
+      "severity": "MAJOR",
+      "body": "Full-suite verification is not clean. `npm test` failed in `tests/phase-4/stream-a/release-fixtures.test.ts:28` during `installPackedCliFixture()` with `npm pack --json ...` reporting `npm error code EOF` on `dist/release/package-artifact.js.map`. This reproduces the same race class the bug fix claims to resolve, so the implementation cannot be approved for the packaged unknown-command recovery regression yet. Evidence points to incomplete lock coverage: `tests/helpers/release.ts:75` only serializes callers of `installPackedCliFixture()`, while other full-suite tests still invoke workspace `npm run build` / `npm pack --dry-run` outside that lock, e.g. `tests/setup/npm-scripts.test.ts:44` and `tests/phase-4/stream-c/package-metadata.test.ts:22`/`:27`.",
+      "author": "reviewer",
+      "line": null,
+      "created_at": 1779709668162,
+      "updated_at": 1779709668162
+    },
+    {
+      "id": "d34ef351-5f67-4ae3-80c9-f1b8ad6593de",
+      "task_id": "BUG-R11-2-003",
+      "parent_id": null,
+      "severity": "MAJOR",
+      "body": "Task moved to REWORK. After corrections, the agent must follow the canonical REWORK → IN-PROGRESS → IN-REVIEW transition per docs/core/tracker.md before this task can reach DONE.",
+      "author": "reviewer",
+      "line": null,
+      "created_at": 1779709668162,
+      "updated_at": 1779709668162
+    },
+    {
+      "id": "b3561f00-e349-4a97-a59a-e279b49e06f4",
+      "task_id": "BUG-R11-2-001",
+      "parent_id": "e257fe64-4ad4-4d40-9cfd-acee55855b73",
+      "severity": "MAJOR",
+      "body": "Extended the lock coverage from installPackedCliFixture-only to the shared package artifact boundary. npm-scripts build and package-metadata build+dry-run pack now use the same release lock; the package-metadata build and pack run under one critical section. Full npm test is green.",
+      "author": "Codex",
+      "line": null,
+      "created_at": 1779709977736,
+      "updated_at": 1779709977736
+    },
+    {
+      "id": "a2015578-891d-4cb7-baaf-8a2d25bb497f",
+      "task_id": "BUG-R11-2-001",
+      "parent_id": "a205fea8-9fbd-4e8f-a5f1-d953cba31914",
+      "severity": "MAJOR",
+      "body": "Followed the required transition: REWORK -> IN-PROGRESS via /resume. This reply is posted before resubmitting the task to IN-REVIEW.",
+      "author": "Codex",
+      "line": null,
+      "created_at": 1779709977741,
+      "updated_at": 1779709977741
+    },
+    {
+      "id": "2a65e61f-1372-49f2-bc5e-21308db3fd41",
+      "task_id": "BUG-R11-2-002",
+      "parent_id": "30eddc74-1fa7-4ed3-8bd8-d9ceed6d57b8",
+      "severity": "MAJOR",
+      "body": "Extended the lock coverage from installPackedCliFixture-only to the shared package artifact boundary. npm-scripts build and package-metadata build+dry-run pack now use the same release lock; the package-metadata build and pack run under one critical section. Full npm test is green.",
+      "author": "Codex",
+      "line": null,
+      "created_at": 1779709977754,
+      "updated_at": 1779709977754
+    },
+    {
+      "id": "c6c84548-0e02-4788-9e70-f4d5ea6c0401",
+      "task_id": "BUG-R11-2-002",
+      "parent_id": "3e465c7b-d692-4182-b33e-618a0e418281",
+      "severity": "MAJOR",
+      "body": "Followed the required transition: REWORK -> IN-PROGRESS via /resume. This reply is posted before resubmitting the task to IN-REVIEW.",
+      "author": "Codex",
+      "line": null,
+      "created_at": 1779709977759,
+      "updated_at": 1779709977759
+    },
+    {
+      "id": "3eba6b83-1bf9-47ab-9d79-2360bee3c830",
+      "task_id": "BUG-R11-2-003",
+      "parent_id": "3311f237-0083-4996-bfee-0b49e761c909",
+      "severity": "MAJOR",
+      "body": "Extended the lock coverage from installPackedCliFixture-only to the shared package artifact boundary. npm-scripts build and package-metadata build+dry-run pack now use the same release lock; the package-metadata build and pack run under one critical section. Full npm test is green.",
+      "author": "Codex",
+      "line": null,
+      "created_at": 1779709977770,
+      "updated_at": 1779709977770
+    },
+    {
+      "id": "2256f301-c336-42df-9fc3-4842587c9ea7",
+      "task_id": "BUG-R11-2-003",
+      "parent_id": "d34ef351-5f67-4ae3-80c9-f1b8ad6593de",
+      "severity": "MAJOR",
+      "body": "Followed the required transition: REWORK -> IN-PROGRESS via /resume. This reply is posted before resubmitting the task to IN-REVIEW.",
+      "author": "Codex",
+      "line": null,
+      "created_at": 1779709977773,
+      "updated_at": 1779709977773
     }
   ],
   "meta": {
@@ -4847,5 +4979,4 @@
     "created_at": 1779080658928,
     "updated_at": 1779080658928
   }
-}
 }

@@ -1,4 +1,6 @@
 import { describe, expect, it } from 'vitest'
+import { readFile } from 'node:fs/promises'
+import { resolve } from 'node:path'
 
 import { createIsolatedTempProject, installPackedCliFixture, pathExists } from '../../helpers/release'
 
@@ -41,4 +43,21 @@ describe('T-A.1.2: packed tarball fixture setup', () => {
 
     expect(await pathExists(fixture.rootDir)).toBe(false)
   }, 120_000)
+})
+
+describe('packaged release workspace lock coverage', () => {
+  it('routes workspace build and pack test callers through the shared release lock', async () => {
+    const callerPaths = [
+      'tests/setup/npm-scripts.test.ts',
+      'tests/phase-4/stream-c/package-metadata.test.ts',
+    ]
+
+    for (const callerPath of callerPaths) {
+      const source = await readFile(resolve(process.cwd(), callerPath), 'utf-8')
+
+      expect(source).not.toMatch(/execSync\('npm run build'/)
+      expect(source).not.toMatch(/execSync\('npm pack --json --dry-run'/)
+      expect(source).toContain('runWorkspaceReleaseCommand')
+    }
+  })
 })
