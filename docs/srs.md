@@ -317,7 +317,7 @@ Change log:
 ### MAS-209
 - Title: Dual-Source Deprecation Path
 - Priority: Must
-- Status: approved-pending-implementation
+- Status: active
 - Assigned milestone: Revision 11
 - Source: Revision 11 Skill-Based Agent Surface
 - Introduced by: Revision 11 Phase 3
@@ -326,6 +326,7 @@ Change log:
 
 Change log:
 - 2026-05-25 - Created from Revision 11 Phase 3 planning (pre-phase SRS repair, per user direction to land SRS updates before phase doc commits rather than as in-phase tasks). Locked sub-detail bullets recorded: CLI deprecation banner content (`[deprecation] consider migrating to skill mode`, stderr, single line, emitted before any other output); banner skip rule (root help only — `blueprint`, `blueprint --help`, `blueprint -h`); banner still prints on `--version`, command-level help, `blueprint doctor`, and all other dispatched commands; suppression surface (`--no-deprecation-banner` flag accepted anywhere in argv; `BLUEPRINT_SUPPRESS_DEPRECATION=1` env var for persistence); mode detection reuses Phase 2 `detectProjectMode()` from `src/doctor/structure.ts` (presence of `.claude/skills/blueprint/SKILL.md` or `.agents/skills/blueprint/SKILL.md` ⇒ skill ⇒ no banner); `docs/conventions.md` deletion across source and both template mirrors plus `src/init/archive-engine.ts` shellFiles cleanup and Doctor legacy canonical-set drop; skill-mode entry-point templates gain byte-identical `<ProjectConventions>` section across CLAUDE / AGENTS / GEMINI / QWEN containing the migrated conventions content; legacy-mode entry-point templates drop the `Load docs/conventions.md` SessionStart line and gain a top-of-file `<DeprecationNote>` block; `docs/core/alignment.md` and its template mirror drop all `conventions.md` references and rewrite conventions-gathering to read/write the `<ProjectConventions>` section of the project entry-point file; no automatic in-place migration (deferred to `blueprint migrate` in Phase 6). Status remains `approved-pending-implementation` until Revision 11 Phase 3 completion.
+- 2026-05-26 - Transitioned to active. Revision 11 Phase 3 complete: CLI deprecation banner behavior, conventions sunset, legacy entry-point deprecation notes, skill-mode `<ProjectConventions>` injection, and alignment rewrite were implemented and verified.
 
 ---
 
