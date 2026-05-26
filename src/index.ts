@@ -50,14 +50,7 @@ export async function runCli(argv: string[]): Promise<number> {
     return 1
   }
 
-  const shouldEmitBanner = await isLegacyBlueprintProject()
-  if (shouldEmitBanner) {
-    const normalizedArgv = consumeDeprecationFlag(argv)
-    if (!isDeprecationSuppressed(argv, process.env) && shouldEmitDeprecationBanner(normalizedArgv)) {
-      emitDeprecationBanner()
-    }
-    argv = normalizedArgv
-  }
+  const normalizedArgv = consumeDeprecationFlag(argv)
 
   const runtime = createCommandRuntime({
     isRootHelpInvocation: isSupportedRootHelpInvocation,
@@ -66,10 +59,29 @@ export async function runCli(argv: string[]): Promise<number> {
       return { exitCode: 0 }
     },
   })
+
   for (const command of placeholderCommands) {
     runtime.register(command)
   }
   runtime.register(boardCommand)
+
+  if (isSupportedRootHelpInvocation(normalizedArgv)) {
+    const result = await runtime.dispatch(normalizedArgv)
+    if (result.reason === 'unknown-command' && result.commandName) {
+      writeUnknownCommandRecovery(result.commandName)
+    }
+
+    return result.exitCode
+  }
+
+  const shouldEmitBanner = await isLegacyBlueprintProject()
+  if (shouldEmitBanner) {
+    if (!isDeprecationSuppressed(argv, process.env) && shouldEmitDeprecationBanner(normalizedArgv)) {
+      emitDeprecationBanner()
+    }
+  }
+
+  argv = normalizedArgv
 
   const commandHelpRequest = parseCommandHelpInvocation(argv)
   if (commandHelpRequest) {
