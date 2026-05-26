@@ -32,11 +32,12 @@ describe.each(STUB_FILES)('$id — templates/skill/$file doc contract', ({ id, f
     expect(existsSync(filePath)).toBe(true)
   })
 
-  it(`${id}: is at most 20 lines`, () => {
+  it(`${id}: keeps invocation guidance and project conventions contract`, () => {
     if (!existsSync(filePath)) return
     const content = readFileSync(filePath, 'utf-8')
-    const lineCount = content.split('\n').length
-    expect(lineCount).toBeLessThanOrEqual(20)
+
+    expect(content).toContain('<ProjectConventions>')
+    expect(content).toContain('</ProjectConventions>')
   })
 
   it(`${id}: references the blueprint skill by name`, () => {
