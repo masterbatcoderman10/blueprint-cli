@@ -20,13 +20,56 @@ function waitForSigint(): Promise<void> {
   })
 }
 
-async function closeServer(server: ReturnType<typeof createHttpServer>): Promise<void> {
-  await new Promise<void>((resolve, reject) => {
-    server.close((error) => {
-      if (error) reject(error)
-      else resolve()
-    })
+type CloseableServer = ReturnType<typeof createHttpServer> & {
+  closeAllConnections?: () => void
+  closeIdleConnections?: () => void
+}
+
+function closeServerNow(server: CloseableServer): Promise<void> {
+  return new Promise((resolve) => {
+    try {
+      server.close(() => {
+        resolve()
+      })
+    } catch {
+      resolve()
+    }
   })
+}
+
+function forceCloseServerConnections(server: CloseableServer): void {
+  if (typeof server.closeAllConnections === 'function') {
+    server.closeAllConnections()
+  }
+  if (typeof server.closeIdleConnections === 'function') {
+    server.closeIdleConnections()
+  }
+}
+
+async function closeServer(server: CloseableServer): Promise<void> {
+  if (!server.listening) {
+    return
+  }
+
+  forceCloseServerConnections(server)
+  await Promise.race([
+    closeServerNow(server),
+    new Promise<void>((resolve) => {
+      setTimeout(resolve, 250)
+    }),
+  ])
+
+  if (!server.listening) {
+    return
+  }
+
+  forceCloseServerConnections(server)
+  await Promise.race([
+    closeServerNow(server),
+    new Promise<void>((resolve) => {
+      setTimeout(resolve, 250)
+    }),
+  ])
 }
 
 function isNoFreePortError(error: unknown): boolean {
