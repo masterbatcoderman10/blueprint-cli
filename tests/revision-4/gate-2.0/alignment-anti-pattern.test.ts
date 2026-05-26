@@ -19,7 +19,7 @@ describe(`T-R4-2.0.1.1: docs/core/alignment.md contains the "Don't Rush" anti-pa
     expect(liveContent).toContain('<AntiPatterns>')
     expect(liveContent).toContain(`<AntiPattern name="Don't Rush">`)
     expect(liveContent).toContain(
-      'The agent finishes analysis, writes the actual conventions or PRD document to disk, and only afterward asks whether the user approves the current stage.',
+      'The agent finishes analysis, writes the ProjectConventions section to disk, and only afterward asks whether the user approves the current stage.',
     )
     expect(liveContent).toContain(
       'The agent shows a current-stage draft, gets partial feedback, but still proceeds to write the next document in the flow before the user explicitly approves the current one.',
