@@ -80,8 +80,6 @@ describe('R6-3.C: Project + Templates Mirror', () => {
       { source: 'docs/core/srs-planning.md', template: 'templates/docs/core/srs-planning.md' },
       // C.6
       { source: 'docs/core/tracker.md', template: 'templates/docs/core/tracker.md' },
-      // C.7
-      { source: 'docs/conventions.md', template: 'templates/docs/conventions.md' },
     ]
 
     it.each(mirrorPairs)('$source ↔ $template', ({ source, template }) => {
@@ -93,7 +91,7 @@ describe('R6-3.C: Project + Templates Mirror', () => {
     })
   })
 
-  describe('C.8: All 4 agent entry points have tracker wording on line 8', () => {
+  describe('C.8: All 4 agent entry points have built-in tracker wording', () => {
     const agentFiles = [
       'templates/CLAUDE.md',
       'templates/AGENTS.md',
@@ -101,12 +99,12 @@ describe('R6-3.C: Project + Templates Mirror', () => {
       'templates/QWEN.md',
     ]
 
-    it.each(agentFiles)('%s line 8 contains built-in tracker wording', async (file) => {
+    it.each(agentFiles)('%s contains built-in tracker wording', async (file) => {
       const content = await readFile(join(ROOT_DIR, file), 'utf-8')
-      const lines = content.split('\n')
-      const line8 = lines[7] ?? ''
-      expect(line8).toContain('built-in')
-      expect(line8).not.toContain('kanban board')
+      expect(content).toContain('work is managed through the built-in')
+      expect(content).toContain('task tracker')
+      expect(content).toContain('built-in')
+      expect(content).not.toContain('kanban board')
     })
   })
 

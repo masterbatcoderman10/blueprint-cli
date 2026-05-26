@@ -371,7 +371,7 @@ describe('Phase 2 Stream C — Archive and Scaffold Engine', () => {
         expect(content).not.toContain('{{project-name}}')
       })
 
-      it('replaces {{project-name}} in prd.md and conventions.md', async () => {
+      it('replaces {{project-name}} in editable shells', async () => {
         const options: InitOptions = {
           projectName: 'another-project',
           git: { hasExistingRepository: true, shouldInitialize: false, shouldSetMainBranch: false },
@@ -384,12 +384,12 @@ describe('Phase 2 Stream C — Archive and Scaffold Engine', () => {
         await scaffoldBlueprintDirectory(tempDir, options)
 
         const prdContent = await readFile(join(tempDir, 'docs', 'prd.md'), 'utf-8')
-        const conventionsContent = await readFile(join(tempDir, 'docs', 'conventions.md'), 'utf-8')
-        
+        const srsContent = await readFile(join(tempDir, 'docs', 'srs.md'), 'utf-8')
+
         expect(prdContent).toContain('another-project')
-        expect(conventionsContent).toContain('another-project')
+        expect(srsContent).toContain('another-project')
         expect(prdContent).not.toContain('{{project-name}}')
-        expect(conventionsContent).not.toContain('{{project-name}}')
+        expect(srsContent).not.toContain('{{project-name}}')
       })
     })
   })
@@ -605,16 +605,13 @@ describe('Phase 2 Stream C — Archive and Scaffold Engine', () => {
 
         const projectProgressContent = await readFile(join(tempDir, 'docs', 'project-progress.md'), 'utf-8')
         const prdContent = await readFile(join(tempDir, 'docs', 'prd.md'), 'utf-8')
-        const conventionsContent = await readFile(join(tempDir, 'docs', 'conventions.md'), 'utf-8')
         const srsContent = await readFile(join(tempDir, 'docs', 'srs.md'), 'utf-8')
 
         expect(projectProgressContent).toContain('my-awesome-project')
         expect(prdContent).toContain('my-awesome-project')
-        expect(conventionsContent).toContain('my-awesome-project')
         expect(srsContent).toContain('my-awesome-project')
         expect(projectProgressContent).not.toContain('{{project-name}}')
         expect(prdContent).not.toContain('{{project-name}}')
-        expect(conventionsContent).not.toContain('{{project-name}}')
         expect(srsContent).not.toContain('{{project-name}}')
       })
     })

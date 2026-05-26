@@ -86,10 +86,6 @@ describe('T-3.0.2.2: editable project docs are excluded from exact content enfor
     expect(isEditableProjectDoc('docs/project-progress.md')).toBe(true)
   })
 
-  it('marks docs/conventions.md as a user-owned editable doc', () => {
-    expect(isEditableProjectDoc('docs/conventions.md')).toBe(true)
-  })
-
   it('marks docs/srs.md as a user-owned editable doc', () => {
     expect(isEditableProjectDoc('docs/srs.md')).toBe(true)
   })
@@ -103,11 +99,10 @@ describe('T-3.0.2.2: editable project docs are excluded from exact content enfor
     expect(isEditableProjectDoc('AGENTS.md')).toBe(false)
   })
 
-  it('EDITABLE_PROJECT_DOCS contains exactly the four user-owned docs', () => {
+  it('EDITABLE_PROJECT_DOCS contains exactly the three user-owned docs', () => {
     expect(EDITABLE_PROJECT_DOCS).toContain('docs/prd.md')
     expect(EDITABLE_PROJECT_DOCS).toContain('docs/project-progress.md')
-    expect(EDITABLE_PROJECT_DOCS).toContain('docs/conventions.md')
     expect(EDITABLE_PROJECT_DOCS).toContain('docs/srs.md')
-    expect(EDITABLE_PROJECT_DOCS).toHaveLength(4)
+    expect(EDITABLE_PROJECT_DOCS).toHaveLength(3)
   })
 })

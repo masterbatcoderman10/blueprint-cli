@@ -7,7 +7,6 @@ const TEMPLATES_DIR = resolve(__dirname, '../../templates')
 const TEMPLATE_FILES = [
   'project-progress.md',
   'prd.md',
-  'conventions.md',
   'srs.md',
 ] as const
 
