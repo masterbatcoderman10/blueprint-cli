@@ -47,6 +47,18 @@ function readDoc(relativePath: string): string {
   return readFileSync(resolve(ROOT_DIR, relativePath), 'utf-8')
 }
 
+function readRequirementSection(content: string, requirementId: string): string {
+  const heading = `### ${requirementId}`
+  const startIndex = content.indexOf(heading)
+  expect(startIndex).toBeGreaterThanOrEqual(0)
+
+  const section = content.slice(startIndex)
+  const endIndex = section.indexOf('\n---\n\n## Data Schema')
+  expect(endIndex).toBeGreaterThanOrEqual(0)
+
+  return section.slice(0, endIndex)
+}
+
 function hasNegationCue(prefix: string): boolean {
   return NEGATION_CUES.some((pattern) => pattern.test(prefix))
 }
@@ -99,6 +111,22 @@ describe('T-R11-4.D.2 — repo-wide fallback install audit', () => {
     expect(auditedDocs).toContain('docs/srs.md')
     expect(auditedDocs).toContain(
       'docs/milestones/revision-11-skill-based-agent-surface/phase-4-npx-install-pathway-and-release-surface.md',
+    )
+  })
+})
+
+describe('T-R11-4.D.3 — MAS-210 activation boundary', () => {
+  it('T-R11-4.D.3.1: activates MAS-210 and preserves its change log with the manual-smoke completion entry', () => {
+    const srs = readDoc('docs/srs.md')
+    const mas210 = readRequirementSection(srs, 'MAS-210')
+
+    expect(srs).toContain('| MAS-210 | NPX Skill Install Pathway | Must | active | Revision 11 |')
+    expect(mas210).toContain('- Status: active')
+    expect(mas210).toContain(
+      '2026-06-09 - Created from Revision 11 Phase 4 planning (pre-phase SRS repair, per user direction to land SRS updates before phase doc commits rather than as in-phase tasks). Locked sub-detail bullets recorded: single supported Phase 4 install path is `npx skills add masterbatcoderman10/blueprint-cli --skill blueprint`; `vercel-labs/skills` discovery surface is repo-root `skills/blueprint/**`; `templates/skills/blueprint/**` remains authoritative while `skills/blueprint/**` is a byte-identical mirror; the mirrored payload includes 23 files (`SKILL.md`, 20 renamed `reference/*.md`, shared `reference/anti-patterns.md`, `scripts/load-context.mjs`); the npm tarball must ship `skills/blueprint/**` and release verification must enforce it; README and release docs must recommend project-local install and document the current `-g` sharp edge; no bundled fallback installer is included in Phase 4; real GitHub install verification is manual smoke only. Status remains `approved-pending-implementation` until Revision 11 Phase 4 completion.',
+    )
+    expect(mas210).toContain(
+      '2026-06-09 - Transitioned to active after manual smoke against public ref `r11-4-phase4-smoke` at commit `98e36d81dde09b6ce46693899aed6e43b6216c7d` using `npx skills add masterbatcoderman10/blueprint-cli#r11-4-phase4-smoke --skill blueprint -y --copy`; verified project-local `.claude/skills/blueprint/` and no unrelated scaffold.',
     )
   })
 })

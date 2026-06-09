@@ -24,7 +24,7 @@ This SRS exists for blueprint-cli to act as the persistent requirement layer bet
 | MAS-207 | Change-First Tweak Workflow | Must | active | Revision 8 |
 | MAS-208 | Skill-Based Agent Surface | Must | active | Revision 11 |
 | MAS-209 | Dual-Source Deprecation Path | Must | active | Revision 11 |
-| MAS-210 | NPX Skill Install Pathway | Must | approved-pending-implementation | Revision 11 |
+| MAS-210 | NPX Skill Install Pathway | Must | active | Revision 11 |
 
 ---
 
@@ -346,7 +346,7 @@ Change log:
 ### MAS-210
 - Title: NPX Skill Install Pathway
 - Priority: Must
-- Status: approved-pending-implementation
+- Status: active
 - Assigned milestone: Revision 11
 - Source: Revision 11 Skill-Based Agent Surface
 - Introduced by: Revision 11 Phase 4
@@ -355,6 +355,7 @@ Change log:
 
 Change log:
 - 2026-06-09 - Created from Revision 11 Phase 4 planning (pre-phase SRS repair, per user direction to land SRS updates before phase doc commits rather than as in-phase tasks). Locked sub-detail bullets recorded: single supported Phase 4 install path is `npx skills add masterbatcoderman10/blueprint-cli --skill blueprint`; `vercel-labs/skills` discovery surface is repo-root `skills/blueprint/**`; `templates/skills/blueprint/**` remains authoritative while `skills/blueprint/**` is a byte-identical mirror; the mirrored payload includes 23 files (`SKILL.md`, 20 renamed `reference/*.md`, shared `reference/anti-patterns.md`, `scripts/load-context.mjs`); the npm tarball must ship `skills/blueprint/**` and release verification must enforce it; README and release docs must recommend project-local install and document the current `-g` sharp edge; no bundled fallback installer is included in Phase 4; real GitHub install verification is manual smoke only. Status remains `approved-pending-implementation` until Revision 11 Phase 4 completion.
+- 2026-06-09 - Transitioned to active after manual smoke against public ref `r11-4-phase4-smoke` at commit `98e36d81dde09b6ce46693899aed6e43b6216c7d` using `npx skills add masterbatcoderman10/blueprint-cli#r11-4-phase4-smoke --skill blueprint -y --copy`; verified project-local `.claude/skills/blueprint/` and no unrelated scaffold.
 
 ---
 
