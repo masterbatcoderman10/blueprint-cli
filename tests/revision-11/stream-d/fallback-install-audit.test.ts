@@ -6,11 +6,6 @@ import { describe, expect, it } from 'vitest'
 
 const ROOT_DIR = resolve(process.cwd())
 
-const HISTORICAL_DOC_ALLOWLIST = [
-  'docs/srs.md',
-  'docs/milestones/revision-11-skill-based-agent-surface/phase-4-npx-install-pathway-and-release-surface.md',
-] as const
-
 const STALE_PROMISE_PATTERNS = [
   { label: 'blueprint-skill-install', pattern: /blueprint-skill-install/ },
   { label: 'bundled fallback installer', pattern: /bundled fallback installer/i },
@@ -23,6 +18,20 @@ const STALE_PROMISE_PATTERNS = [
 
 const FUTURE_INSTALL_PATTERN = /first-party CLI install option/i
 const PHASE_6_PATTERN = /Revision 11 Phase 6/
+const NEGATION_CUES = [
+  /\bno\b/i,
+  /\bnot\b/i,
+  /\bwithout\b/i,
+  /\bdoes not\b/i,
+  /\bdon't\b/i,
+  /\bdoesn't\b/i,
+  /\bis not\b/i,
+  /\bare not\b/i,
+  /\bdeferred\b/i,
+  /\bout of scope\b/i,
+  /\bremove\b/i,
+  /\bnot part of this phase\b/i,
+] as const
 
 function readTrackedMarkdownFiles(): string[] {
   return execFileSync('git', ['ls-files', '*.md'], {
@@ -38,41 +47,58 @@ function readDoc(relativePath: string): string {
   return readFileSync(resolve(ROOT_DIR, relativePath), 'utf-8')
 }
 
+function hasNegationCue(prefix: string): boolean {
+  return NEGATION_CUES.some((pattern) => pattern.test(prefix))
+}
+
+function collectStalePromiseFindings(relativePath: string, content: string): string[] {
+  return content.split(/\r?\n/).flatMap((line, lineIndex) => {
+    return STALE_PROMISE_PATTERNS.flatMap(({ label, pattern }) => {
+      const matchIndex = line.search(pattern)
+      if (matchIndex === -1) {
+        return []
+      }
+
+      const prefix = line.slice(0, matchIndex)
+      if (hasNegationCue(prefix)) {
+        return []
+      }
+
+      return [`${relativePath}:${lineIndex + 1}: ${label}`]
+    })
+  })
+}
+
 describe('T-R11-4.D.2 — repo-wide fallback install audit', () => {
-  const auditedDocs = readTrackedMarkdownFiles().filter(
-    (relativePath) => !HISTORICAL_DOC_ALLOWLIST.includes(relativePath as (typeof HISTORICAL_DOC_ALLOWLIST)[number]),
-  )
+  const auditedDocs = readTrackedMarkdownFiles()
 
   it('T-R11-4.D.2.1: finds no stale Phase 4 fallback installer promises in audited docs', () => {
-    const findings = auditedDocs.flatMap((relativePath) => {
-      const content = readDoc(relativePath)
-
-      return STALE_PROMISE_PATTERNS.filter(({ pattern }) => pattern.test(content)).map(
-        ({ label }) => `${relativePath}: ${label}`,
-      )
-    })
+    const findings = auditedDocs.flatMap((relativePath) => collectStalePromiseFindings(relativePath, readDoc(relativePath)))
 
     expect(findings).toEqual([])
   })
 
   it('T-R11-4.D.2.2: keeps future first-party install references explicitly tied to Revision 11 Phase 6', () => {
-    const offenders = auditedDocs.filter((relativePath) => {
+    const offenders = auditedDocs.flatMap((relativePath) => {
       const content = readDoc(relativePath)
-      return FUTURE_INSTALL_PATTERN.test(content) && !PHASE_6_PATTERN.test(content)
+
+      return content.split(/\r?\n/).flatMap((line, lineIndex) => {
+        if (!FUTURE_INSTALL_PATTERN.test(line) || PHASE_6_PATTERN.test(line)) {
+          return []
+        }
+
+        return [`${relativePath}:${lineIndex + 1}`]
+      })
     })
 
     expect(offenders).toEqual([])
   })
 
-  it('T-R11-4.D.2.3: excludes only historical planning context from the audit', () => {
-    expect(HISTORICAL_DOC_ALLOWLIST).toContain(
-      'docs/srs.md',
-    )
-    expect(HISTORICAL_DOC_ALLOWLIST).toContain(
+  it('T-R11-4.D.2.3: includes active Phase 4 planning and SRS docs in the repo-wide audit surface', () => {
+    expect(auditedDocs).toContain('docs/project-progress.md')
+    expect(auditedDocs).toContain('docs/srs.md')
+    expect(auditedDocs).toContain(
       'docs/milestones/revision-11-skill-based-agent-surface/phase-4-npx-install-pathway-and-release-surface.md',
     )
-    expect(HISTORICAL_DOC_ALLOWLIST).not.toContain('README.md')
-    expect(HISTORICAL_DOC_ALLOWLIST).not.toContain('docs/release-contract.md')
-    expect(HISTORICAL_DOC_ALLOWLIST).not.toContain('docs/releasing.md')
   })
 })

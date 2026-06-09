@@ -110,7 +110,7 @@
 | Task ID | Task | Duration | Dependencies | Type |
 |---------|------|----------|--------------|------|
 | R11-4.D.1 | Perform a manual smoke in a fresh temporary directory using `npx skills add masterbatcoderman10/blueprint-cli --skill blueprint` against a public GitHub ref that contains the Phase 4 repo-root `skills/blueprint/**` payload. If the installer supports a branch/ref selector, run it after pushing the Phase 4 branch and record the exact ref. If the installer only reads the default branch, treat this as post-merge/pre-release verification and record the default-branch commit SHA in the phase-completion notes before tagging or publishing. Verify the install succeeds, creates `.claude/skills/blueprint/**` with the expected 23-file payload, and does not scaffold unrelated Blueprint project docs or tracker state. | 0.5 | R11-4.A.2, R11-4.B.3, R11-4.C.1, R11-4.C.2, R11-4.C.3 | Dependent |
-| R11-4.D.2 | Run a repo-wide cross-reference audit for stale fallback-installer promises (`blueprint-skill-install`, bundled fallback, npm-bin fallback wording) and clear or rewrite every remaining Phase 4 reference so the final repo-wide story is consistent with the primary-only contract. Future-looking references to a first-party CLI install option are allowed only when they explicitly point to Revision 11 Phase 6. | 0.5 | R11-4.C.1, R11-4.C.2, R11-4.C.3 | Dependent |
+| R11-4.D.2 | Run a repo-wide cross-reference audit for stale fallback-installer promises in the active docs and release contracts, and clear or rewrite every remaining Phase 4 reference so the final repo-wide story is consistent with the primary-only contract. Future-looking references to a first-party CLI install option are allowed only when they explicitly point to Revision 11 Phase 6. | 0.5 | R11-4.C.1, R11-4.C.2, R11-4.C.3 | Dependent |
 | R11-4.D.3 | Transition MAS-210 in `docs/srs.md` from `approved-pending-implementation` to `active` after the Phase 4 package, docs, audit, and manual-smoke boundary are satisfied. Preserve the existing MAS-210 change log and add a completion entry that records the exact install-smoke ref or the post-merge/pre-release verification boundary used. | 0.25 | R11-4.D.1, R11-4.D.2 | Dependent |
 
 ### Stream D Acceptance Criteria
@@ -118,7 +118,7 @@
 - [ ] One real GitHub-backed manual smoke has been executed successfully with `npx skills add masterbatcoderman10/blueprint-cli --skill blueprint`.
 - [ ] The manual smoke proves the install lands project-locally at `.claude/skills/blueprint/**`.
 - [ ] Repo-wide docs and contracts no longer contradict the primary-only install pathway.
-- [ ] Any forward reference to a first-party CLI install option is clearly marked as future Phase 6 scope, not a Phase 4 deliverable.
+- [ ] Any forward reference to a first-party CLI install option is clearly marked as future Revision 11 Phase 6 scope, not a Phase 4 deliverable.
 - [ ] MAS-210 is active in `docs/srs.md`, with completion notes preserving the install-smoke ref or the post-merge/pre-release verification boundary.
 
 ---
@@ -173,7 +173,7 @@ Gate R11-4.0 (shared inventory) ────────────────
 | Test ID | Task | Type | Description | Expected Result |
 |---------|------|------|-------------|-----------------|
 | T-R11-4.B.1.1 | R11-4.B.1 | unit | Verify `package.json` includes `skills` in the published `files` array while retaining `dist` and `templates` | The npm package surface ships the repo-root skill payload without regressing existing published surfaces |
-| T-R11-4.B.1.2 | R11-4.B.1 | unit | Verify `package.json` does not add a Phase 4 fallback-installer `bin` entry such as `blueprint-skill-install` | Phase 4 package metadata does not expose the deferred first-party installer surface |
+| T-R11-4.B.1.2 | R11-4.B.1 | unit | Verify `package.json` does not add the deferred first-party installer `bin` entry | Phase 4 package metadata does not expose the deferred first-party installer surface |
 | T-R11-4.B.2.1 | R11-4.B.2 | unit | Verify `src/release/package-artifact.ts` builds its required skill package entries from the shared skill-payload inventory and normalizes entries to npm-pack tarball paths | Release verification uses the same payload contract as the mirror test and compares against packed artifact paths correctly |
 | T-R11-4.B.2.2 | R11-4.B.2 | integration | Feed `verify-package-artifact` a representative `npm pack --json --dry-run` file list containing `dist/`, `templates/`, and every `skills/blueprint/**` inventory file | Verification succeeds when all existing package surfaces and the complete repo-root skill payload are present |
 | T-R11-4.B.2.3 | R11-4.B.2 | integration | Feed `verify-package-artifact` a package file list that keeps `dist/` and `templates/` intact but omits the entire `skills/` surface | Verification fails with a missing-skill-payload diagnostic |
@@ -198,9 +198,9 @@ Gate R11-4.0 (shared inventory) ────────────────
 | Test ID | Task | Type | Description | Expected Result |
 |---------|------|------|-------------|-----------------|
 | — | R11-4.D.1 | — | Not testable as automated coverage: the required smoke uses the public GitHub repository and external `vercel-labs/skills` installer, so it must be executed manually in a fresh temporary directory against a public ref containing the Phase 4 payload and recorded in phase-completion notes. If the installer cannot target a branch/ref, this becomes post-merge/pre-release verification against the default-branch commit before tagging or publishing. | — |
-| T-R11-4.D.2.1 | R11-4.D.2 | unit (doc-contract) | Run a repo-wide grep-style audit for stale Phase 4 fallback promises: `blueprint-skill-install`, bundled fallback installer wording, postinstall hook wording, and npm-bin fallback wording | No Phase 4 doc or release contract still promises a fallback installer |
-| T-R11-4.D.2.2 | R11-4.D.2 | unit (doc-contract) | Verify any remaining future-looking first-party install references explicitly mention Revision 11 Phase 6 and are not phrased as Phase 4 deliverables | Forward references are allowed only when clearly scoped to future Phase 6 work |
-| T-R11-4.D.2.3 | R11-4.D.2 | unit (doc-contract) | Verify stale fallback references in historical progress or revision context are either rewritten for current truth or excluded by an explicit historical-context allowlist that cannot match README/release docs | The cross-reference audit prevents active docs from contradicting the primary-only Phase 4 contract while preserving intentional history where needed |
+| T-R11-4.D.2.1 | R11-4.D.2 | unit (doc-contract) | Run a repo-wide grep-style audit for stale Phase 4 fallback promises in the active docs and release contracts | No Phase 4 doc or release contract still promises a fallback installer |
+| T-R11-4.D.2.2 | R11-4.D.2 | unit (doc-contract) | Verify any remaining future-looking first-party install references explicitly mention Revision 11 Phase 6 and are not phrased as Phase 4 deliverables | Forward references are allowed only when clearly scoped to Revision 11 Phase 6 work |
+| T-R11-4.D.2.3 | R11-4.D.2 | unit (doc-contract) | Verify the audit surface includes the active Phase 4 planning doc and docs/srs.md so no active docs are exempted | The cross-reference audit prevents active docs from contradicting the primary-only Phase 4 contract while preserving intentional history where needed |
 | T-R11-4.D.3.1 | R11-4.D.3 | unit (doc-contract) | Verify MAS-210 in `docs/srs.md` has status `active`, preserves its existing change-log entries, and contains a Phase 4 completion entry recording the manual-smoke ref or post-merge/pre-release verification boundary | SRS state cannot remain `approved-pending-implementation` after Phase 4 completion |
 
 ### Test Summary
