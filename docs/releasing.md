@@ -22,6 +22,14 @@ Underlying script entrypoints:
 - `tsx src/release/run-release-check.ts`
 - `tsx src/release/run-publish-preflight.ts`
 
+## Skill Install Contract
+
+- `skills/blueprint/**` must ship in the published tarball
+- `npx skills add masterbatcoderman10/blueprint-cli --skill blueprint` is the only Phase 4 skill install pathway
+- Project-local install is the recommended path because it lands in `.claude/skills/blueprint/` where Claude Code discovers the skill natively
+- Avoid `-g` for the skill install path; that is the current Claude Code discovery sharp edge because global installs land outside the project-local discovery path
+- No fallback-installer workflow is promised in Phase 4; any first-party CLI install option remains deferred to Revision 11 Phase 6
+
 ## Release Tag Contract
 
 - Only stable semver tags in the format `vMAJOR.MINOR.PATCH` are eligible for publish
@@ -46,7 +54,7 @@ npm ci
 npm run release:check
 ```
 
-`npm run release:check` currently centralizes install, typecheck, tests, build, `npm pack`, and packaged artifact verification. CI and publish automation should call the same shared path through `npm run release:check:ci` and `npm run release:check:publish`.
+`npm run release:check` currently centralizes install, typecheck, tests, build, `npm pack --json --dry-run`, and packaged artifact verification for `dist/`, `templates/`, and `skills/blueprint/**`. CI and publish automation should call the same shared path through `npm run release:check:ci` and `npm run release:check:publish`.
 
 ## Publish Prerequisites
 

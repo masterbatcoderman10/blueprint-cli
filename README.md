@@ -6,10 +6,27 @@
 
 ## Get Started
 
+### Install the Blueprint CLI
+
+Use the global CLI install when you want to run `blueprint init` or `blueprint doctor`:
+
 ```bash
 npm install -g blueprint-agentic-development
 blueprint init
+blueprint doctor
 ```
+
+### Install the Blueprint skill
+
+Use the project-local skill install for Claude Code:
+
+```bash
+npx skills add masterbatcoderman10/blueprint-cli --skill blueprint
+```
+
+This installs the Blueprint skill into your project-local `.claude/skills/blueprint/` directory so Claude Code can discover it automatically. Avoid `-g` for the skill install path; that is the current Claude Code discovery sharp edge.
+
+**Requirements:** Node.js `>=20.0.0`
 
 ---
 
@@ -58,33 +75,6 @@ These mechanisms prevent context rot. Agents work on large phases without overfl
 For detailed workflows and command reference, see the [comprehensive guide](docs/core/) in the docs.
 
 ---
-
-## Quick Start
-
-```bash
-blueprint init
-```
-
-Scaffolds docs (PRD, phase templates, test contracts), conventions file, and managed agent entry points so you and your AI tools share a foundation from the start.
-
-```bash
-blueprint doctor
-```
-
-Audits your project structure and repairs drift—run at any time to validate everything is in sync.
-
-For detailed guides and command reference, see the [core documentation](docs/core/).
-
----
-
-## Installation
-
-```bash
-npm install -g blueprint-agentic-development
-```
-
-**Requirements:** Node.js `>=20.0.0`
-
 ---
 
 ## Commands

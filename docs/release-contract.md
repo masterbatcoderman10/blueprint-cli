@@ -23,9 +23,16 @@ This document is the Phase 4 source of truth for the public M1 release baseline.
   2. `npm run typecheck`
   3. `npm test`
   4. `npm run build`
-  5. `npm pack --json`
+  5. `npm pack --json --dry-run`
   6. `npm run release:pack:verify`
-- The baseline package verification step confirms the packed artifact still includes compiled `dist/` output and bundled `templates/`
+- The baseline package verification step confirms the packed artifact still includes compiled `dist/` output, bundled `templates/`, and the repo-root `skills/blueprint/**` payload
+
+## Skill Install Contract
+
+- The public GitHub repository must ship the repo-root `skills/blueprint/**` mirror in the tarball so `npx skills add masterbatcoderman10/blueprint-cli --skill blueprint` can install the Blueprint skill
+- Project-local install is the recommended path because it lands in `.claude/skills/blueprint/` where Claude Code discovers the skill natively
+- Avoid `-g` for the skill install path; that is the current Claude Code discovery sharp edge because global skill installs land outside the project-local discovery path
+- Real GitHub install verification is a manual smoke only; automated release checks stop at the tarball contract and do not replace a fresh public-repository install test
 
 ## Publish Prerequisites
 
