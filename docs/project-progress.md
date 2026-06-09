@@ -2,9 +2,9 @@
 
 **Project**: blueprint-cli
 **Tracker**: blueprint-cli
-**Current Milestone**: Revision 11 — Skill-Based Agent Surface (Phase 4 pending planning)
+**Current Milestone**: Revision 11 — Skill-Based Agent Surface (Phase 5 pending planning)
 **Current Phase**: TBD — pending phase planning
-**Status**: Revision 11 Phase 3 — CLI Deprecation Banner & Conventions Sunset is complete. Next step: plan Revision 11 Phase 4 — NPX Install Pathway & Release Surface.
+**Status**: Revision 11 Phase 4 — NPX Install Pathway & Release Surface is complete. Next step: plan Revision 11 Phase 5 — Dogfood & Cross-Reference Verification.
 
 ---
 
@@ -102,6 +102,7 @@
 - 2026-05-25: Revision 11 Phase 2 — Doctor Mode Awareness & Dual-Source Repair completed. All tasks done (including BUG-R11-2-001..003), DoD satisfied, full test suite green (1220 passed, 2 skipped; 165 files passed, 1 skipped).
 - 2026-05-26: Revision 11 Phase 3 — CLI Deprecation Banner & Conventions Sunset moved from planning to in progress after completing detailed test planning and phase-start bookkeeping.
 - 2026-05-26: Revision 11 Phase 3 — CLI Deprecation Banner & Conventions Sunset completed. All tasks done (including BUG-R11-3-001..022), DoD satisfied, full test suite green (1245 passed, 2 skipped; 170 files passed, 1 skipped).
+- 2026-06-09: Revision 11 Phase 4 — NPX Install Pathway & Release Surface completed. All tasks done, DoD satisfied, full test suite green (1289 passed, 2 skipped; 176 files passed, 1 skipped). Public GitHub-backed skill install smoke passed against `r11-4-phase4-smoke` at `98e36d81dde09b6ce46693899aed6e43b6216c7d` using `npx skills add masterbatcoderman10/blueprint-cli#r11-4-phase4-smoke --skill blueprint --agent claude-code -y --copy`.
 
 ---
 
@@ -164,7 +165,7 @@ R11 — Skill-Based Agent Surface
 ├── Phase 1 — Skill Authorship & Mode-Aware Scaffold ✓
 ├── Phase 2 — Doctor Mode Awareness & Dual-Source Repair ✓
 ├── Phase 3 — CLI Deprecation Banner & Conventions Sunset ✓
-├── Phase 4 — NPX Install Pathway & Release Surface ○
+├── Phase 4 — NPX Install Pathway & Release Surface ✓
 ├── Phase 5 — Dogfood & Cross-Reference Verification ○
 └── Phase 6 — Migrate & Alignment-Complete Commands ○
 M2 — Cross-Project Context (Optional Post-MVP)
@@ -182,4 +183,4 @@ M3 — Workflow Visibility Enhancements (Optional Future)
 
 | Revision | Name | Status | Notes |
 |----------|------|--------|-------|
-| R11 | Skill-Based Agent Surface | Phase 4 pending planning | 6 phases outlined (Phase 6 added during Phase 1 planning for deferred `alignment-complete` + `migrate` commands). Phases 1, 2, and 3 complete. Next: Phase 4 — NPX Install Pathway & Release Surface (not yet planned). Docs: `docs/milestones/revision-11-skill-based-agent-surface/revision-11-skill-based-agent-surface.md`, `phase-3-cli-deprecation-banner-and-conventions-sunset.md` |
+| R11 | Skill-Based Agent Surface | Phase 5 pending planning | 6 phases outlined (Phase 6 added during Phase 1 planning for deferred `alignment-complete` + `migrate` commands). Phases 1, 2, 3, and 4 complete. Next: Phase 5 — Dogfood & Cross-Reference Verification (not yet planned). Docs: `docs/milestones/revision-11-skill-based-agent-surface/revision-11-skill-based-agent-surface.md`, `phase-4-npx-install-pathway-and-release-surface.md` |
