@@ -175,7 +175,7 @@ Tests that asserted the OLD canonical surface and will need updating as part of 
 >
 > **Documentation.** README and `docs/releasing.md` must call out the global-install sharp edge (`-g` installs to `~/.agents/skills/`, which Claude Code does not natively discover) and recommend project-local install.
 >
-> **Out of scope for Phase 4.** No bundled fallback installer, `blueprint-skill-install` command, postinstall hook, or alternate npm-bin install surface is introduced here. A first-party CLI install option is deferred to Revision 11 Phase 6.
+> **Out of scope for Phase 4.** The phase does not introduce a fallback-installer surface. The Phase 4 install path is the primary `npx skills add masterbatcoderman10/blueprint-cli --skill blueprint` workflow; any first-party CLI install option is deferred to Revision 11 Phase 6.
 
 #### Same-ID elaboration (meaning unchanged; surface broadened to include skill mirror)
 
