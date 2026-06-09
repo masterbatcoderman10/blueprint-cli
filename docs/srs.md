@@ -23,7 +23,8 @@ This SRS exists for blueprint-cli to act as the persistent requirement layer bet
 | MAS-206 | Standalone Tweak Workflow | Must | superseded | Revision 7 |
 | MAS-207 | Change-First Tweak Workflow | Must | active | Revision 8 |
 | MAS-208 | Skill-Based Agent Surface | Must | active | Revision 11 |
-| MAS-209 | Dual-Source Deprecation Path | Must | approved-pending-implementation | Revision 11 |
+| MAS-209 | Dual-Source Deprecation Path | Must | active | Revision 11 |
+| MAS-210 | NPX Skill Install Pathway | Must | approved-pending-implementation | Revision 11 |
 
 ---
 
@@ -143,6 +144,20 @@ The system must support both skill mode and legacy `.md` core module mode as a t
 - Legacy-mode entry-point templates (`templates/CLAUDE.md`, `templates/AGENTS.md`, `templates/GEMINI.md`, `templates/QWEN.md`) must drop the `Load docs/conventions.md` line from `<SessionStart>` STEP 1 and must gain a top-of-file one-line `<DeprecationNote>` block recommending migration to skill mode. They must remain byte-identical to each other (per the existing R10 Phase 1 7-variant block-identity contract; this phase reduces that contract to the legacy-mode variants and extends a parallel one to the skill-mode variants).
 - `docs/core/alignment.md` and its template mirror (`templates/docs/core/alignment.md`) must drop every reference to `conventions.md`. The conventions-gathering behaviour must be rewritten to read from and write into the `<ProjectConventions>` section of the project's entry-point file instead of a separate document.
 - No automatic in-place migration. A future `blueprint migrate` command (deferred to Revision 11 Phase 6) is the explicit migration path; this requirement does not introduce it.
+
+#### MAS-210 - NPX Skill Install Pathway
+
+The system must support a single primary NPX install pathway for the `blueprint` skill using `vercel-labs/skills`, targeting the canonical project-local `.claude/skills/blueprint/` directory.
+
+- Users must be able to install the skill into a project by running `npx skills add masterbatcoderman10/blueprint-cli --skill blueprint`.
+- The public GitHub repository must expose the skill payload at repo-root `skills/blueprint/**` so `vercel-labs/skills` can discover it without Blueprint-specific install code.
+- `templates/skills/blueprint/**` remains the authoritative scaffold and Doctor source. The repo-root `skills/blueprint/**` payload must be a byte-identical mirror of that authoritative template surface.
+- The mirrored repo-root skill payload must include the full 23-file skill surface: `SKILL.md`, 20 renamed `reference/*.md` mirrors, shared `reference/anti-patterns.md`, and `scripts/load-context.mjs`.
+- The published npm tarball must include `skills/blueprint/**` in addition to the existing `dist/` and `templates/` surfaces, and release-artifact verification must fail if the repo-root skill payload is absent or incomplete.
+- README, `docs/release-contract.md`, and `docs/releasing.md` must document `npx skills add masterbatcoderman10/blueprint-cli --skill blueprint` as the recommended project-local skill install path.
+- Documentation must explicitly call out the current `-g` global-install sharp edge in `vercel-labs/skills` and recommend project-local install for Claude Code discovery.
+- No bundled fallback installer, `blueprint-skill-install` command, postinstall hook, or alternate npm-bin install surface is introduced in this requirement. A first-party CLI install option is deferred to Revision 11 Phase 6.
+- Real GitHub-backed verification of `npx skills add masterbatcoderman10/blueprint-cli --skill blueprint` is required as a manual smoke during Phase 4 completion, but it is not part of deterministic automated test coverage.
 
 ### Should Have
 
@@ -327,6 +342,19 @@ Change log:
 Change log:
 - 2026-05-25 - Created from Revision 11 Phase 3 planning (pre-phase SRS repair, per user direction to land SRS updates before phase doc commits rather than as in-phase tasks). Locked sub-detail bullets recorded: CLI deprecation banner content (`[deprecation] consider migrating to skill mode`, stderr, single line, emitted before any other output); banner skip rule (root help only — `blueprint`, `blueprint --help`, `blueprint -h`); banner still prints on `--version`, command-level help, `blueprint doctor`, and all other dispatched commands; suppression surface (`--no-deprecation-banner` flag accepted anywhere in argv; `BLUEPRINT_SUPPRESS_DEPRECATION=1` env var for persistence); mode detection reuses Phase 2 `detectProjectMode()` from `src/doctor/structure.ts` (presence of `.claude/skills/blueprint/SKILL.md` or `.agents/skills/blueprint/SKILL.md` ⇒ skill ⇒ no banner); `docs/conventions.md` deletion across source and both template mirrors plus `src/init/archive-engine.ts` shellFiles cleanup and Doctor legacy canonical-set drop; skill-mode entry-point templates gain byte-identical `<ProjectConventions>` section across CLAUDE / AGENTS / GEMINI / QWEN containing the migrated conventions content; legacy-mode entry-point templates drop the `Load docs/conventions.md` SessionStart line and gain a top-of-file `<DeprecationNote>` block; `docs/core/alignment.md` and its template mirror drop all `conventions.md` references and rewrite conventions-gathering to read/write the `<ProjectConventions>` section of the project entry-point file; no automatic in-place migration (deferred to `blueprint migrate` in Phase 6). Status remains `approved-pending-implementation` until Revision 11 Phase 3 completion.
 - 2026-05-26 - Transitioned to active. Revision 11 Phase 3 complete: CLI deprecation banner behavior, conventions sunset, legacy entry-point deprecation notes, skill-mode `<ProjectConventions>` injection, and alignment rewrite were implemented and verified.
+
+### MAS-210
+- Title: NPX Skill Install Pathway
+- Priority: Must
+- Status: approved-pending-implementation
+- Assigned milestone: Revision 11
+- Source: Revision 11 Skill-Based Agent Surface
+- Introduced by: Revision 11 Phase 4
+- Supersedes: None
+- Superseded by: None
+
+Change log:
+- 2026-06-09 - Created from Revision 11 Phase 4 planning (pre-phase SRS repair, per user direction to land SRS updates before phase doc commits rather than as in-phase tasks). Locked sub-detail bullets recorded: single supported Phase 4 install path is `npx skills add masterbatcoderman10/blueprint-cli --skill blueprint`; `vercel-labs/skills` discovery surface is repo-root `skills/blueprint/**`; `templates/skills/blueprint/**` remains authoritative while `skills/blueprint/**` is a byte-identical mirror; the mirrored payload includes 23 files (`SKILL.md`, 20 renamed `reference/*.md`, shared `reference/anti-patterns.md`, `scripts/load-context.mjs`); the npm tarball must ship `skills/blueprint/**` and release verification must enforce it; README and release docs must recommend project-local install and document the current `-g` sharp edge; no bundled fallback installer is included in Phase 4; real GitHub install verification is manual smoke only. Status remains `approved-pending-implementation` until Revision 11 Phase 4 completion.
 
 ---
 
