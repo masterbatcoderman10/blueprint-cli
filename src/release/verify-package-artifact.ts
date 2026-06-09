@@ -1,3 +1,7 @@
 import { verifyPackageArtifact } from './package-artifact'
 
-verifyPackageArtifact()
+function main(): void {
+  verifyPackageArtifact()
+}
+
+main()
