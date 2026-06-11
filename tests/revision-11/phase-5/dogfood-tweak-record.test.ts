@@ -13,7 +13,10 @@ describe('R11-5.C.2 dogfood tweak audit record', () => {
       .filter((file) => /^tweak-\d+-.*\.md$/.test(file))
       .sort((left, right) => getTweakNumber(left) - getTweakNumber(right))
 
-    expect(tweakFiles).toEqual([
+    const dogfoodIndex = tweakFiles.indexOf('tweak-6-skill-mode-tweak-example.md')
+
+    expect(dogfoodIndex).toBe(5)
+    expect(tweakFiles.slice(0, dogfoodIndex + 1)).toEqual([
       'tweak-1-orchestrator-delegation-discipline.md',
       'tweak-2-tracker-workflow-contract-hardening.md',
       'tweak-3-task-detail-default-open.md',
@@ -21,6 +24,7 @@ describe('R11-5.C.2 dogfood tweak audit record', () => {
       'tweak-5-pre-task-tweak-confirmation-gate.md',
       'tweak-6-skill-mode-tweak-example.md',
     ])
+    expect(tweakFiles.slice(0, dogfoodIndex + 1).map(getTweakNumber)).toEqual([1, 2, 3, 4, 5, 6])
 
     const content = await readFile(DOGFOOD_TWEAK_PATH, 'utf-8')
 
