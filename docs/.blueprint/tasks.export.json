@@ -8,10 +8,10 @@
       "phase": "R11-5",
       "stream": "B",
       "author": "Codex",
-      "implementation_notes": "Copied templates/skills/blueprint into .claude/skills/blueprint. Verified the installed payload with tests/revision-11/phase-5/helpers.test.ts and tests/revision-11/stream-b/local-skill-install.test.ts, then ran node .claude/skills/blueprint/scripts/load-context.mjs from the repository root and confirmed the brief reports blueprint-cli, Revision 11, Phase 5 pending planning, and tracker presence at docs/.blueprint/tasks.db.",
+      "implementation_notes": "Made the Blueprint skill payload a tracked dogfood exception under .claude/skills/blueprint/** by updating .gitignore to ignore other .claude state while explicitly re-including the Blueprint skill subtree. The checked-in payload remains byte-identical to templates/skills/blueprint and keeps the local install reproducible after a clean checkout or merge/cleanup.",
       "milestone": "R11",
       "created_at": 1781160986636,
-      "updated_at": 1781161258547
+      "updated_at": 1781162517066
     },
     {
       "id": "R11-5.B.2",
@@ -21,10 +21,10 @@
       "phase": "R11-5",
       "stream": "B",
       "author": "Codex",
-      "implementation_notes": "Added shared local-install mirror helpers in tests/revision-11/phase-5/helpers.ts and contract coverage in tests/revision-11/stream-b/local-skill-install.test.ts. The new tests verify the 23-file .claude payload, byte identity with templates/skills/blueprint, and negative missing/drift/extra fixture cases.",
+      "implementation_notes": "Kept the local-install mirror contract focused on the tracked .claude/skills/blueprint payload and verified it against templates/skills/blueprint with the Stream B mirror helper and local-skill-install test. The new repo state passes from clean tracked checkout because the skill payload itself is now part of the reviewed branch content, not only ignored local state.",
       "milestone": "R11",
       "created_at": 1781160986641,
-      "updated_at": 1781161281592
+      "updated_at": 1781162517074
     },
     {
       "id": "R11-5.B.3",
@@ -34,12 +34,145 @@
       "phase": "R11-5",
       "stream": "B",
       "author": "Codex",
-      "implementation_notes": "Ran node .claude/skills/blueprint/scripts/load-context.mjs from the repository root after installing the local skill payload. The brief printed blueprint-cli, Revision 11 — Skill-Based Agent Surface, Phase 5 pending planning, and tracker presence at docs/.blueprint/tasks.db with exit code 0; no script adjustment was needed.",
+      "implementation_notes": "Verified node .claude/skills/blueprint/scripts/load-context.mjs from the repository root against the now-tracked skill payload. The script still prints a current markdown context brief for blueprint-cli, Revision 11, Phase 5 pending planning, and tracker presence at docs/.blueprint/tasks.db with exit code 0.",
       "milestone": "R11",
       "created_at": 1781160986643,
-      "updated_at": 1781161299268
+      "updated_at": 1781162517163
     }
   ],
-  "comments": [],
+  "comments": [
+    {
+      "id": "65378c83-f42e-442a-8238-cf66d33f6684",
+      "task_id": "R11-5.B.2",
+      "parent_id": null,
+      "severity": "MAJOR",
+      "body": "The new coverage hard-codes `.claude/skills/blueprint` as a repo fixture (`LOCAL_ROOT`) and even seeds the negative cases by copying from that local tree. Because `.claude/` is ignored, the tests only pass in a worktree where someone has manually installed the skill. In a tracked-only export of commit `960f8f7`, `vitest run tests/revision-11/stream-b/local-skill-install.test.ts` fails 4/4 with ENOENT / MODULE_NOT_FOUND because `.claude/skills/blueprint/**` is absent.\nWhy: regression coverage has to run from tracked repository state so CI, fresh checkouts, and downstream worktrees see the same result as the author machine.",
+      "author": "reviewer",
+      "line": null,
+      "created_at": 1781161925360,
+      "updated_at": 1781161925360
+    },
+    {
+      "id": "805c5d5b-8312-4a7a-ae42-e5681ac5e4f3",
+      "task_id": "R11-5.B.2",
+      "parent_id": null,
+      "severity": "MINOR",
+      "body": "Task moved to REWORK. After corrections, the agent must follow the canonical REWORK -> IN-PROGRESS -> IN-REVIEW transition per docs/core/tracker.md before this task can reach DONE.",
+      "author": "reviewer",
+      "line": null,
+      "created_at": 1781161925360,
+      "updated_at": 1781161925360
+    },
+    {
+      "id": "69897fa6-21eb-493b-9163-f910b6268262",
+      "task_id": "R11-5.B.3",
+      "parent_id": null,
+      "severity": "MINOR",
+      "body": "Task moved to REWORK. After corrections, the agent must follow the canonical REWORK -> IN-PROGRESS -> IN-REVIEW transition per docs/core/tracker.md before this task can reach DONE.",
+      "author": "reviewer",
+      "line": null,
+      "created_at": 1781161925368,
+      "updated_at": 1781161925368
+    },
+    {
+      "id": "d7f42614-10b2-4831-85a1-3b8815e73d2c",
+      "task_id": "R11-5.B.3",
+      "parent_id": null,
+      "severity": "MAJOR",
+      "body": "The load-context verification is not reproducible from the reviewed branch state because it executes `.claude/skills/blueprint/scripts/load-context.mjs`, but `.claude/` is ignored and absent from tracked checkout content. In the same tracked-only export of commit `960f8f7`, the verification fails with MODULE_NOT_FOUND for that script path.\nWhy: installed-skill verification has to survive a clean checkout and post-review merge/cleanup, otherwise Stream B only proves a local machine setup rather than repository-level behavior.",
+      "author": "reviewer",
+      "line": null,
+      "created_at": 1781161925368,
+      "updated_at": 1781161925368
+    },
+    {
+      "id": "0719f5f7-40b3-4f80-9275-89d2d5dc249f",
+      "task_id": "R11-5.B.1",
+      "parent_id": null,
+      "severity": "MAJOR",
+      "body": "The installed .claude payload is only present as ignored local state, not as tracked branch content. `.gitignore` ignores `.claude/` (line 32), `git ls-tree -r HEAD .claude/skills/blueprint` is empty, and `git diff main...HEAD` only adds the helper/test files. That means merge + worktree cleanup would leave main without `.claude/skills/blueprint/**`, so the task does not satisfy the Stream B acceptance criteria in a durable way or unblock downstream worktrees.\nWhy: the local dogfood install must be reproducible from the reviewed branch state, not only from ignored filesystem state.",
+      "author": "reviewer",
+      "line": null,
+      "created_at": 1781161934352,
+      "updated_at": 1781161934352
+    },
+    {
+      "id": "fde88f8d-fbb5-4fd8-a69e-e9fe9e82334c",
+      "task_id": "R11-5.B.1",
+      "parent_id": null,
+      "severity": "MINOR",
+      "body": "Task moved to REWORK. After corrections, the agent must follow the canonical REWORK -> IN-PROGRESS -> IN-REVIEW transition per docs/core/tracker.md before this task can reach DONE.",
+      "author": "reviewer",
+      "line": null,
+      "created_at": 1781161934352,
+      "updated_at": 1781161934352
+    },
+    {
+      "id": "7954c18f-e45c-47b2-9f96-be7ddbfce25c",
+      "task_id": "R11-5.B.1",
+      "parent_id": "fde88f8d-fbb5-4fd8-a69e-e9fe9e82334c",
+      "severity": "MINOR",
+      "body": "Rework is complete and the task is back through IN-PROGRESS with the checked-in dogfood payload verified by the Stream B tests; I kept the original review note intact and addressed it by making the install part of the reviewed branch state.",
+      "author": "Codex",
+      "line": null,
+      "created_at": 1781162476896,
+      "updated_at": 1781162476896
+    },
+    {
+      "id": "b74bb22c-cdc4-4408-b77d-e5e5c36ec025",
+      "task_id": "R11-5.B.1",
+      "parent_id": "0719f5f7-40b3-4f80-9275-89d2d5dc249f",
+      "severity": "MINOR",
+      "body": "Reworked the task through the canonical review loop and kept the payload reproducible in branch state; the skill subtree is now the tracked dogfood exception under .claude/skills/blueprint/**, while the rest of .claude remains ignored.",
+      "author": "Codex",
+      "line": null,
+      "created_at": 1781162476911,
+      "updated_at": 1781162476911
+    },
+    {
+      "id": "a56b72b3-2cba-490c-8a7b-0548c5821410",
+      "task_id": "R11-5.B.2",
+      "parent_id": "65378c83-f42e-442a-8238-cf66d33f6684",
+      "severity": "MINOR",
+      "body": "The mirror coverage now runs against the tracked .claude/skills/blueprint payload, so a clean checkout sees the same 23-file install and byte identity as the author worktree.",
+      "author": "Codex",
+      "line": null,
+      "created_at": 1781162476913,
+      "updated_at": 1781162476913
+    },
+    {
+      "id": "a19ad6ee-e8f5-46f6-a55a-db0affabe82f",
+      "task_id": "R11-5.B.2",
+      "parent_id": "805c5d5b-8312-4a7a-ae42-e5681ac5e4f3",
+      "severity": "MINOR",
+      "body": "The task is back through the canonical review loop after the tracked-payload fix; the Stream B tests now pass from the reviewed branch state rather than from a hand-installed local-only copy.",
+      "author": "Codex",
+      "line": null,
+      "created_at": 1781162476914,
+      "updated_at": 1781162476914
+    },
+    {
+      "id": "4b775345-b067-41ab-a68a-fbb0d13b85e6",
+      "task_id": "R11-5.B.3",
+      "parent_id": "d7f42614-10b2-4831-85a1-3b8815e73d2c",
+      "severity": "MINOR",
+      "body": "`load-context.mjs` now resolves from the checked-in dogfood payload under .claude/skills/blueprint/, so the script path survives clean checkout and merge/cleanup just like the reviewer requested.",
+      "author": "Codex",
+      "line": null,
+      "created_at": 1781162476920,
+      "updated_at": 1781162476920
+    },
+    {
+      "id": "f25170e5-6acc-4034-af40-856b1fe62453",
+      "task_id": "R11-5.B.3",
+      "parent_id": "69897fa6-21eb-493b-9163-f910b6268262",
+      "severity": "MINOR",
+      "body": "Rework complete: the installed context-loader is part of the reviewed branch state now, and the Stream B smoke still prints the current Blueprint context brief from the repository root.",
+      "author": "Codex",
+      "line": null,
+      "created_at": 1781162476945,
+      "updated_at": 1781162476945
+    }
+  ],
   "meta": null
 }

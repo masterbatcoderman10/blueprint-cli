@@ -29,7 +29,11 @@ docs/.blueprint/tasks.db
 # Agent / AI tooling (local only)
 .agents/
 .antigravitycli/
-.claude/
+.claude/*
+!.claude/skills/
+.claude/skills/*
+!.claude/skills/blueprint/
+!.claude/skills/blueprint/**
 .codex/
 .kimi/
 
