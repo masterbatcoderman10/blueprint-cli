@@ -180,6 +180,11 @@ describe('Phase 2 Stream B — Interactive Onboarding Flow', () => {
       await mkdir(join(rootDir, 'node_modules', 'pkg'), { recursive: true })
       await mkdir(join(rootDir, 'dist'), { recursive: true })
       await mkdir(join(rootDir, '.git'), { recursive: true })
+      await mkdir(join(rootDir, '.agents', 'skills', 'blueprint'), { recursive: true })
+      await mkdir(join(rootDir, '.claude', 'skills', 'blueprint'), { recursive: true })
+      await mkdir(join(rootDir, '.codex', 'skills', 'blueprint'), { recursive: true })
+      await mkdir(join(rootDir, '.cursor', 'rules'), { recursive: true })
+      await mkdir(join(rootDir, '.opencode', 'skills', 'blueprint'), { recursive: true })
 
       await writeFile(join(rootDir, 'README.md'), '# root')
       await writeFile(join(rootDir, 'notes', 'design.md'), '# notes')
@@ -188,6 +193,11 @@ describe('Phase 2 Stream B — Interactive Onboarding Flow', () => {
       await writeFile(join(rootDir, 'node_modules', 'pkg', 'ignored.md'), '# ignored')
       await writeFile(join(rootDir, 'dist', 'bundle.md'), '# ignored')
       await writeFile(join(rootDir, '.git', 'history.md'), '# ignored')
+      await writeFile(join(rootDir, '.agents', 'skills', 'blueprint', 'SKILL.md'), '# ignored')
+      await writeFile(join(rootDir, '.claude', 'skills', 'blueprint', 'SKILL.md'), '# ignored')
+      await writeFile(join(rootDir, '.codex', 'skills', 'blueprint', 'SKILL.md'), '# ignored')
+      await writeFile(join(rootDir, '.cursor', 'rules', 'blueprint.md'), '# ignored')
+      await writeFile(join(rootDir, '.opencode', 'skills', 'blueprint', 'SKILL.md'), '# ignored')
 
       await expect(discoverMarkdownFilesForMigration(rootDir)).resolves.toEqual([
         join(rootDir, 'README.md'),
