@@ -17,7 +17,7 @@ A phase cannot begin execution without a completed Test Plan section.
   PRECONDITIONS:
   - The phase document exists and is complete (goals, gate, streams,
     tasks, acceptance criteria, and Definition of Done are all present)
-  - docs/conventions.md is loaded (tech stack, testing framework,
+  - the active <ProjectConventions> block is available (tech stack, testing framework,
     test file conventions)
 
   FLOW:
@@ -211,9 +211,9 @@ A phase cannot begin execution without a completed Test Plan section.
     alternative naming schemes.
   - The user must confirm the test plan before it is written to
     the phase document.
-  - If conventions.md does not specify a testing framework, flag
+  - If the active <ProjectConventions> block does not specify a testing framework, flag
     this to the user before proceeding. A testing framework must
-    be chosen and recorded in conventions.md before test planning
+    be chosen and recorded in <ProjectConventions> before test planning
     can produce meaningful results.
   - During execution, tests are written BEFORE implementation (TDD)
     for all tasks marked as testable. The test plan provides the

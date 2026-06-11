@@ -12,7 +12,6 @@ AGENTS.md                                    # Repo root — entry point for all
 docs/
 ├── project-progress.md                      # Project state: milestone, phase, tracker id
 ├── prd.md                                   # Full product requirements document
-├── conventions.md                           # Tech stack, coding standards, project conventions
 ├── srs.md                                   # Software Requirements Specification
 ├── core/                                    # Protocol and reference modules (read-only during execution)
 │   ├── blueprint-structure.md               # This file — defines the layout
@@ -56,9 +55,12 @@ docs/
 
 ### docs/ Root
 
-- ONLY four files live at docs/ root: `project-progress.md`, `prd.md`, `conventions.md`, and `srs.md`.
-- All four are REQUIRED. A Blueprint project is not valid without them.
+- ONLY three files live at docs/ root: `project-progress.md`, `prd.md`, and `srs.md`.
+- All three are REQUIRED. A Blueprint project is not valid without them.
 - No other files may be placed at docs/ root.
+
+Project conventions live in the active agent entry point's
+`<ProjectConventions>` block, not in a standalone docs-root file.
 
 ### AGENTS.md
 
@@ -122,7 +124,7 @@ docs/
 | Agent instructions | Repo root (`AGENTS.md`) | CLI |
 | Project state | `docs/project-progress.md` | CLI |
 | Product requirements | `docs/prd.md` | CLI / user |
-| Project conventions | `docs/conventions.md` | CLI / user |
+| Project conventions | `<ProjectConventions>` in the agent entry point | CLI / user |
 | Protocol modules | `docs/core/` | CLI |
 | Milestone definitions | `docs/milestones/milestone-<n>-<n>/` | milestone-planning.md |
 | Phase plans | `docs/milestones/milestone-<n>-<n>/` | phase-planning.md |
@@ -140,10 +142,9 @@ A valid Blueprint project has ALL of the following:
 - [ ] `AGENTS.md` exists at repo root
 - [ ] `docs/project-progress.md` exists and contains a tracker project id
 - [ ] `docs/prd.md` exists
-- [ ] `docs/conventions.md` exists
 - [ ] `docs/srs.md` exists
 - [ ] `docs/core/` exists and contains `blueprint-structure.md` at minimum
 - [ ] `docs/core/srs-planning.md` exists
-- [ ] No files at docs/ root other than `project-progress.md`, `prd.md`, `conventions.md`, and `srs.md`
+- [ ] No files at docs/ root other than `project-progress.md`, `prd.md`, and `srs.md`
 - [ ] `docs/tweaks/` exists and contains at minimum a `README.md`
 - [ ] Every phase doc is inside a milestone subfolder under `docs/milestones/`

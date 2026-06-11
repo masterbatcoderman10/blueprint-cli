@@ -53,7 +53,7 @@ and applying review notes after a review cycle.
 
   PRECONDITIONS:
   - Phase document is loaded and contains a Test Plan section
-  - docs/conventions.md is loaded (tech stack, coding standards, patterns)
+  - the active <ProjectConventions> block is available (tech stack, coding standards, patterns)
   - Local tracker server is reachable
   - User has specified which gate or stream to start
 
@@ -265,7 +265,7 @@ and applying review notes after a review cycle.
 
   PRECONDITIONS:
   - Phase document is loaded
-  - docs/conventions.md is loaded (tech stack, coding standards, patterns)
+  - the active <ProjectConventions> block is available (tech stack, coding standards, patterns)
   - Local tracker server is reachable
   - The specified gate or stream has been through at least one
     review cycle

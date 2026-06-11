@@ -38,7 +38,7 @@ specified.
     - Unexpected behavior is observed during development or production (Path B)
 
   PRECONDITIONS:
-  - docs/conventions.md is loaded (tech stack, available tools, patterns)
+  - the active <ProjectConventions> block is available (tech stack, available tools, patterns)
   - Local tracker server is reachable
   - Phase document for the current phase is loaded (if one is active)
   - `docs/core/tracker.md` is referenced for tracker API recipes
@@ -80,7 +80,7 @@ specified.
   STEP 2 — REPRODUCE THE PROBLEM (Path B only)
     Reproduction confirms the bug exists and provides a concrete
     trace to work from. Use whatever tools and methods are
-    available in the project as defined in conventions.md.
+    available in the project as defined in the active <ProjectConventions> block.
 
     Reproduction methods (use whichever apply to the project):
       - Run the relevant test suite to see if a test captures it
@@ -123,7 +123,7 @@ specified.
 
     However, the agent SHOULD use available project context:
       - Phase documents describe what the code was intended to do
-      - conventions.md defines the patterns the code should follow
+      - <ProjectConventions> defines the patterns the code should follow
       - Implementation notes on tracker tasks (if accessible) record
         what decisions were made during development
 

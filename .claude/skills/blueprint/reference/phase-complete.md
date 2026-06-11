@@ -40,7 +40,7 @@ completion.
 
   PRECONDITIONS:
   - docs/project-progress.md is loaded
-  - docs/conventions.md is loaded (testing framework, test commands)
+  - the active <ProjectConventions> block is available (testing framework, test commands)
   - docs/core/tracker.md is loaded (task queries, API recipes)
   - Local tracker server is reachable
   - The phase document for the current phase is loaded
@@ -100,7 +100,7 @@ completion.
     phase and milestone that has been completed, plus the current
     phase's tests.
 
-    Use the test execution command defined in conventions.md.
+    Use the test execution command defined in <ProjectConventions>.
 
     IF all tests pass:
       → Continue to STEP 5.

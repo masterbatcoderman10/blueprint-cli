@@ -163,7 +163,7 @@ The tweak remains a top-level contract.
 |----------------------|----------|----------|
 | Product vision and features | `prd.md` | `docs/` root |
 | Current project state | `project-progress.md` | `docs/` root |
-| Project conventions | `conventions.md` | `docs/` root |
+| Project conventions | `<ProjectConventions>` | Active agent entry point |
 | Major product goal / version | `milestone-<n>-<name>.md` | `docs/milestones/milestone-<n>-<name>/` |
 | Feature area / delivery increment | `phase-<n>-<name>.md` | `docs/milestones/milestone-<n>-<name>/` |
 | Agent behaviour | `AGENTS.md` | Repo root |

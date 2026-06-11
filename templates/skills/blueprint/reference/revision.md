@@ -33,7 +33,7 @@ phases, just as a milestone does.
   PRECONDITIONS:
   - docs/prd.md is available
   - docs/srs.md is available
-  - docs/conventions.md is loaded
+  - the active <ProjectConventions> block is available
   - Milestone and phase documents exist for the affected areas
 
   STEP 1 — UNDERSTAND THE CHANGE

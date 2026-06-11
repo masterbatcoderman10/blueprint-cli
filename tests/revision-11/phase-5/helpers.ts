@@ -24,6 +24,22 @@ const ACTIVE_CROSS_REFERENCE_DIRECTORIES = [
   LOCAL_SKILL_PAYLOAD_ROOT,
 ] as const
 
+export const CROSS_REFERENCE_CATEGORIES = [
+  'deleted-conventions',
+  'legacy-primary-routing',
+  'conflicting-install-guidance',
+  'docs-core-only-protocols',
+] as const
+
+export type CrossReferenceCategory = (typeof CROSS_REFERENCE_CATEGORIES)[number]
+
+export interface CrossReferenceFinding {
+  category: CrossReferenceCategory
+  file: string
+  line: number
+  excerpt: string
+}
+
 export interface RootEntryPointTemplatePair {
   fileName: (typeof ROOT_ENTRY_POINT_FILES)[number]
   rootPath: string
@@ -66,7 +82,7 @@ async function listFilesIfPresent(root: string, relativeDir: string): Promise<st
   const absoluteDir = resolve(root, relativeDir)
 
   try {
-    return listRelativeFiles(root, absoluteDir)
+    return await listRelativeFiles(root, absoluteDir)
   } catch (error) {
     const nodeError = error as { code?: string }
     if (nodeError.code === 'ENOENT') {
@@ -131,6 +147,152 @@ export async function getActiveCrossReferenceFiles(root = resolve(process.cwd())
   return [...staticFiles.flat(), ...directoryFiles.flat()]
     .filter((file) => !file.startsWith('docs/milestones/'))
     .sort()
+}
+
+export async function auditActiveCrossReferences(root = resolve(process.cwd())): Promise<CrossReferenceFinding[]> {
+  const files = await getActiveCrossReferenceFiles(root)
+  const findings = await Promise.all(
+    files.map(async (file) => {
+      const content = await readFile(resolve(root, file), 'utf-8')
+      return auditCrossReferenceContent(file, content)
+    }),
+  )
+
+  return findings.flat()
+}
+
+export function auditCrossReferenceContent(file: string, content: string): CrossReferenceFinding[] {
+  return content
+    .split('\n')
+    .flatMap((line, index) => auditCrossReferenceLine(file, index + 1, line))
+}
+
+function auditCrossReferenceLine(file: string, lineNumber: number, line: string): CrossReferenceFinding[] {
+  const findings: CrossReferenceFinding[] = []
+  const normalized = line.toLowerCase()
+
+  if (referencesDeletedConventions(normalized) && !isAllowedDeletedConventionsReference(file, normalized)) {
+    findings.push(createFinding('deleted-conventions', file, lineNumber, line))
+  }
+
+  if (referencesLegacyPrimaryRouting(file, normalized) && !isAllowedLegacyRoutingReference(normalized)) {
+    findings.push(createFinding('legacy-primary-routing', file, lineNumber, line))
+  }
+
+  if (referencesConflictingInstallGuidance(file, normalized)) {
+    findings.push(createFinding('conflicting-install-guidance', file, lineNumber, line))
+  }
+
+  if (referencesDocsCoreOnlyProtocols(file, normalized)) {
+    findings.push(createFinding('docs-core-only-protocols', file, lineNumber, line))
+  }
+
+  return findings
+}
+
+function createFinding(
+  category: CrossReferenceCategory,
+  file: string,
+  line: number,
+  excerpt: string,
+): CrossReferenceFinding {
+  return {
+    category,
+    file,
+    line,
+    excerpt: excerpt.trim(),
+  }
+}
+
+function referencesDeletedConventions(normalizedLine: string): boolean {
+  return normalizedLine.includes('docs/conventions.md') || normalizedLine.includes('conventions.md')
+}
+
+function isAllowedDeletedConventionsReference(file: string, normalizedLine: string): boolean {
+  if (file === 'CHANGELOG.md' || file === 'docs/project-progress.md') {
+    return true
+  }
+
+  if (file === 'docs/srs.md') {
+    return [
+      'deleted',
+      'sunset',
+      'drop',
+      'migrated',
+      'legacy-mode',
+      'doctor',
+      'must be',
+      'deletion',
+    ].some((allowed) => normalizedLine.includes(allowed))
+  }
+
+  return false
+}
+
+function referencesLegacyPrimaryRouting(file: string, normalizedLine: string): boolean {
+  return isSkillModeSurface(file) && normalizedLine.includes('modulerouting')
+}
+
+function isAllowedLegacyRoutingReference(normalizedLine: string): boolean {
+  return [
+    'does not',
+    'do not',
+    'must not',
+    'no re-routing',
+    'without',
+    'rather than',
+    'not by falling back',
+  ].some((allowed) => normalizedLine.includes(allowed))
+}
+
+function referencesConflictingInstallGuidance(file: string, normalizedLine: string): boolean {
+  if (!normalizedLine.includes('skill') && !normalizedLine.includes('skills')) {
+    return false
+  }
+
+  if (
+    (file === 'docs/project-progress.md' || file === 'docs/srs.md') &&
+    normalizedLine.includes('smoke') &&
+    normalizedLine.includes('npx skills add')
+  ) {
+    return false
+  }
+
+  const mentionsInstall = ['install', 'add', 'installer'].some((token) => normalizedLine.includes(token))
+  if (!mentionsInstall) {
+    return false
+  }
+
+  const isRecommendedNpxPath = normalizedLine.includes(
+    'npx skills add masterbatcoderman10/blueprint-cli --skill blueprint',
+  )
+  const isDeferredFirstPartyScope =
+    normalizedLine.includes('first-party') && normalizedLine.includes('defer')
+
+  return (
+    (normalizedLine.includes('npm install -g') && normalizedLine.includes('skill')) ||
+    (normalizedLine.includes('blueprint install') && normalizedLine.includes('skill')) ||
+    (normalizedLine.includes('first-party') && normalizedLine.includes('install') && !isDeferredFirstPartyScope) ||
+    (normalizedLine.includes('skills add') && !isRecommendedNpxPath)
+  )
+}
+
+function referencesDocsCoreOnlyProtocols(file: string, normalizedLine: string): boolean {
+  return (
+    isSkillModeSurface(file) &&
+    normalizedLine.includes('blueprint protocol') &&
+    normalizedLine.includes('under `docs/core')
+  )
+}
+
+function isSkillModeSurface(file: string): boolean {
+  return (
+    ROOT_ENTRY_POINT_FILES.includes(file as (typeof ROOT_ENTRY_POINT_FILES)[number]) ||
+    file.startsWith('templates/skill/') ||
+    file.startsWith('templates/skills/blueprint/') ||
+    file.startsWith('skills/blueprint/') ||
+    file.startsWith(`${LOCAL_SKILL_PAYLOAD_ROOT}/`)
+  )
 }
 
 export async function assertLocalSkillPayloadMirror(templateDir: string, localDir: string): Promise<void> {

@@ -20,7 +20,7 @@ the tracker and either approves it or leaves structured feedback.
 
   PRECONDITIONS:
   - Phase document is loaded (including its Test Plan section)
-  - docs/conventions.md is loaded (tech stack, coding standards, patterns)
+  - the active <ProjectConventions> block is available (tech stack, coding standards, patterns)
   - docs/core/tracker.md is loaded (state machine, API recipes)
   - Local tracker server is reachable
   - User has specified which gate, stream, or agent's work to review
@@ -246,7 +246,7 @@ the tracker and either approves it or leaves structured feedback.
     - Are edge cases handled appropriately?
 
   CONVENTIONS
-    - Does the code follow the patterns defined in conventions.md?
+    - Does the code follow the patterns defined in <ProjectConventions>?
     - Are naming conventions, file organization, and code style
       consistent with the rest of the project?
 

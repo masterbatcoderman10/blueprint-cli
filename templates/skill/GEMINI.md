@@ -29,7 +29,7 @@ The skill handles routing and workflow guidance for every phase.
 - `src/commands/` for command handlers (`init`, `link`, `context`)
 - `templates/` stores Blueprint scaffold files copied by `init`
 - `templates/docs/core/` is copied verbatim
-- Root-level docs (`docs/project-progress.md`, `docs/prd.md`, `docs/conventions.md`) are scaffolded as editable shells
+- Root-level docs (`docs/project-progress.md`, `docs/prd.md`, `docs/srs.md`) are scaffolded as editable shells
 
 ## Coding Standards
 
@@ -68,7 +68,7 @@ All `<AntiPatterns>` blocks in `docs/core/*.md` use the unfenced canonical XML s
 
 ## Agent Tools
 
-- **Blueprint protocol docs** under `docs/core/`
+- **Blueprint skill references** under `.claude/skills/blueprint/reference/` (mirrored from `docs/core/`)
 - **Built-in tracker:** per-project task tracker (SQLite backend + local Svelte SPA) provisioned by the CLI
 - **Skills:** use only when explicitly requested or clearly applicable
 

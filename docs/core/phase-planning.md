@@ -34,7 +34,7 @@ and parallel streams of tasks.
   PRECONDITIONS:
   - The milestone document for the target milestone is loaded
     (the phase must map to a milestone's feature area)
-  - docs/conventions.md is loaded (tech stack informs task design)
+  - the active <ProjectConventions> block is available (tech stack informs task design)
   - docs/srs.md is loaded — specifically the requirement slice
     assigned to this phase by milestone planning. The milestone
     document identifies which SRS requirements map to this phase.
