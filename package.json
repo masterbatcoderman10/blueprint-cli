@@ -1,6 +1,6 @@
 {
   "name": "blueprint-agentic-development",
-  "version": "0.2.11",
+  "version": "1.0.0",
   "description": "Plan in detail. Execute in parallel. Blueprint is the agentic development framework that gives Claude Code, Codex & Cursor autonomous, structured execution across milestones, phases, and parallel streams.",
   "license": "MIT",
   "repository": {

@@ -1,14 +1,24 @@
 # Blueprint
 
-**Software engineering discipline for AI-aided development.** Blueprint structures planning and execution so you stay in control: phases decompose into testable tasks, agents run in parallel without conflict, and scope changes don't break your plan. Write tests first. Review code before shipping. Track progress in your repo.
+**Skill-first development discipline for AI coding agents.** Blueprint gives Claude Code, Codex, Cursor, and human maintainers a shared operating loop: repo-local instructions, a Blueprint skill, structured planning docs, a task tracker, and release gates that survive across sessions.
 
-[![npm version](https://img.shields.io/npm/v/blueprint-agentic-development)](https://www.npmjs.com/package/blueprint-agentic-development) [![Node.js >= 20.0.0](https://img.shields.io/badge/Node.js-%3E%3D20.0.0-brightgreen)](https://nodejs.org/) [![MIT License](https://img.shields.io/badge/License-MIT-blue)](#license)
+[![npm version](https://img.shields.io/npm/v/blueprint-agentic-development)](https://www.npmjs.com/package/blueprint-agentic-development) [![Node.js >= 18.0.0](https://img.shields.io/badge/Node.js-%3E%3D18.0.0-brightgreen)](https://nodejs.org/) [![MIT License](https://img.shields.io/badge/License-MIT-blue)](#license)
 
-## Get Started
+Version `1.0.0` marks Blueprint's skill era: the CLI still scaffolds and repairs projects, but day-to-day agent work is now routed through the Blueprint skill so each session loads the right workflow guidance at the right time.
 
-### Install the Blueprint CLI
+## Why Blueprint
 
-Use the global CLI install when you want to run `blueprint init` or `blueprint doctor`:
+AI agents can write code faster than a project can absorb it. The usual failure is not typing speed; it is drift. One session plans, another executes with stale context, tests become optional, review notes disappear into chat history, and nobody can tell which document represents the current truth.
+
+Blueprint moves that operating context into the repository. The skill tells an agent which workflow module to load, the tracker stores task state, the docs capture phase and tweak contracts, and git records the handoff. Agents do not have to reconstruct the project from memory; they can resume from the repo.
+
+## Install
+
+Blueprint has two installation surfaces. Use both when you want the full workflow.
+
+### 1. Install the Blueprint CLI
+
+The Blueprint CLI scaffolds projects, audits project structure, and runs the local tracker board.
 
 ```bash
 npm install -g blueprint-agentic-development
@@ -16,91 +26,137 @@ blueprint init
 blueprint doctor
 ```
 
-### Install the Blueprint skill
+Requirements: Node.js `>=18.0.0` and npm.
 
-Use the project-local skill install for Claude Code:
+### 2. Install the Blueprint Skill
+
+Install the skill inside each project where you want Claude Code to discover Blueprint natively:
 
 ```bash
 npx skills add masterbatcoderman10/blueprint-cli --skill blueprint
 ```
 
-This installs the Blueprint skill into your project-local `.claude/skills/blueprint/` directory so Claude Code can discover it automatically. Avoid `-g` for the skill install path; that is the current Claude Code discovery sharp edge.
+This is the recommended project-local install path. It writes the Blueprint skill into `.claude/skills/blueprint/`, where Claude Code discovery can find it for that repo. Avoid `-g` for the skill install path; global skill installs currently land outside the project-local discovery path that Claude Code uses most reliably.
 
-**Requirements:** Node.js `>=20.0.0`
+The global CLI and the project-local Blueprint skill do different jobs. The CLI creates and checks the project. The skill tells the agent how to plan, execute, review, tweak, and commit work.
 
----
+## Start A Project
 
-## Recent Updates
+```bash
+mkdir my-project
+cd my-project
+git init
+npm install -g blueprint-agentic-development
+blueprint init
+npx skills add masterbatcoderman10/blueprint-cli --skill blueprint
+```
 
-- **v0.2.6** — Renamed to `blueprint-agentic-development`. Unscoped npm package for better discoverability. Trusted publishing via GitHub Actions OIDC.
-- **v0.2.4** — R8 Phase 2 complete: Tweak Planning Flow Rewrite. Parallel agent execution hardened. Tweak workflow elevated to first-class planning mode.
-- **v0.2.3** — R7 Standalone Tweak Workflow. Tweaks are now top-level first-class quick-change workflow with dedicated plans, acceptance criteria, and verification.
-- **v0.2.0** — Built-in task tracker (SQLite + Svelte SPA). Kanban board for phases and streams. Removed external `vibe-kanban` dependency.
+`blueprint init` creates the project docs, root agent entry points, Blueprint templates, and the tracker database at `docs/.blueprint/tasks.db`. After that, run `blueprint doctor` whenever you want to audit or repair the Blueprint structure.
 
-[See full changelog →](CHANGELOG.md)
+Open the tracker board when you want a visual task surface:
 
----
+```bash
+blueprint board
+blueprint board status
+blueprint board stop
+```
 
-## What is Blueprint?
+![Blueprint task tracker](docs/images/task-tracker.png)
 
-AI agents are fast. That speed is also the problem. Without structure, agents sprint in the wrong direction, duplicate work across parallel sessions, and lose coherence the moment scope shifts. Plans written in plain chat drift the second a new session starts. This is **context rot** — and it compounds silently until your codebase is ahead of your docs, your docs are ahead of your tests, and nobody's sure what's actually done.
+## The Skill Usage Loop
 
-Blueprint gives agents a stable foundation to work from: a five-level hierarchy of milestones, phases, streams, and tasks — each scoped tightly, documented progressively, and tracked in a built-in Kanban board that lives in your repo.
+At the start of a session, invoke the Blueprint skill. In Codex, Claude Code, or another agent surface, that usually means the project root instructions say to use Blueprint, or you say it directly:
 
-Blueprint solves this through five mechanisms:
+```text
+Invoke the blueprint skill. Plan the next phase.
+Invoke the blueprint skill. Execute stream R11-6.A.
+Invoke the blueprint skill. Review this worktree.
+Invoke the blueprint skill. Treat this as a tweak: tighten the README install section.
+```
 
-1. **Bounded tasks** — Each task is one deliverable with acceptance criteria and tests. Small scope means full context fits in an agent's budget.
+The skill starts with a setup gate:
 
-2. **External memory** — Task state, progress, blockers, and implementation notes live in a visual UI-based tracker. Agents don't need to hold project state in context.
+1. Verify `docs/project-progress.md` exists and is populated.
+2. Verify `docs/.blueprint/tasks.db` exists.
+3. Run `.claude/skills/blueprint/scripts/load-context.mjs` to load the current project state.
 
-3. **Test contracts** — Every task ships with a test. Tests become specs: future agents know exactly what "DONE" means without re-reading docs.
+Then it routes the agent to only the workflow guidance needed for the request:
 
-4. **Progressive documentation** — Plans are written only as detailed as needed. Once a phase is planned, it doesn't change unless scope shifts formally. Agents work from stable specs.
+| Intent | What The Skill Loads |
+|--------|----------------------|
+| Plan a milestone or phase | Planning guidance plus the specific milestone or phase module |
+| Execute work | Execution guidance, tracker rules, worktree discipline, and test-first expectations |
+| Review work | Review guidance, acceptance checks, and note handling |
+| Address review notes | Execution guidance for rework and re-review |
+| Handle a tweak | Tweak classification, restatement, confirmation, change, verification, and post-hoc tweak record |
+| Commit or release | Git workflow guidance and release discipline |
 
-5. **Git as audit trail** — Commit messages, test files, and review notes explain every change. Sessions can end cleanly and resume later with full context from git history.
+The important part is that the agent does not load every protocol at once. Blueprint keeps context narrow, makes the current workflow explicit, and leaves an audit trail in docs, tracker state, tests, and commits.
 
-These mechanisms prevent context rot. Agents work on large phases without overflow, hand off work cleanly, and parallel sessions coordinate through the tracker instead of chaos.
+## Daily Workflow
 
----
-
-## How It Works
-
-1. **Plan your phase in detail** → Decompose into Gate (blocking foundation) + Streams (parallel tracks), write acceptance criteria and test plan
-2. **Execute a stream** → Create tasks, set up worktree, write test (should fail), implement until it passes, move to IN-REVIEW
-3. **Review the work** → Verify against spec, mark clean tasks DONE, leave structured notes on issues
-4. **Address notes** → Fix each issue, respond inline, commit, return to review
-5. **Resolve regressions** → Run full test suite at phase close, surface failing tests as bug tasks, fix and verify before shipping
-6. **Ship the phase** → All tasks DONE, Definition of Done satisfied, full suite green, phase marked complete
-
-For detailed workflows and command reference, see the [comprehensive guide](docs/core/) in the docs.
-
----
----
+1. Shape the product in `docs/prd.md` and `docs/srs.md`.
+2. Plan a milestone, then plan one phase in enough detail to execute.
+3. Break the phase into a Gate and parallel Streams.
+4. Execute work from tracker tasks. Write or update tests before implementation.
+5. Move completed work to review, address notes, and preserve review history.
+6. Use the tweak loop for small contained changes that do not need a formal plan.
+7. Close the phase only after tasks are done, verification is green, and progress docs are updated.
 
 ## Commands
 
-| Command | Purpose |
-|---------|---------|
-| `blueprint init` | Scaffold a Blueprint project with full docs and templates |
-| `blueprint doctor` | Audit and repair project structure |
-| `blueprint board` | Open the task tracker in your browser |
-| `blueprint link` | Cross-project linking *(coming soon)* |
-| `blueprint context` | Cross-project context surfacing *(coming soon)* |
+| Command | Status | Purpose |
+|---------|--------|---------|
+| `blueprint init` | Implemented | Scaffold Blueprint docs, templates, root agent files, and tracker storage |
+| `blueprint doctor` | Implemented | Audit and repair Blueprint project structure |
+| `blueprint board` | Implemented | Run the local tracker board |
+| `blueprint board status` | Implemented | Show the active board server, if one is running |
+| `blueprint board stop` | Implemented | Stop the active board server |
+| `blueprint link` | Reserved | Cross-project linking surface planned for later work |
+| `blueprint context` | Reserved | Cross-project context surface planned for later work |
 
----
+Runtime help currently guides users through `init` and `doctor`; the board commands are operational utilities for initialized Blueprint projects.
+
+## Repository Anatomy
+
+| Path | Purpose |
+|------|---------|
+| `docs/project-progress.md` | Current milestone, phase, status, and project log |
+| `docs/prd.md` | Product requirements and product-level decisions |
+| `docs/srs.md` | System requirements and locked implementation constraints |
+| `docs/core/` | Human-readable Blueprint workflow documentation |
+| `docs/milestones/` | Milestone and phase plans |
+| `docs/tweaks/` | Post-hoc audit records for small contained changes |
+| `docs/.blueprint/tasks.db` | Local tracker database |
+| `.claude/skills/blueprint/` | Project-local Blueprint skill install |
+| `skills/blueprint/` | Repo-root skill payload shipped in the npm package |
+| `templates/` | Files copied or repaired by `blueprint init` and `blueprint doctor` |
+
+## Releasing
+
+Maintainers publish from stable semver tags:
+
+```bash
+npm run release:check
+git tag v1.0.0
+git push origin main --tags
+```
+
+`npm run release:check` runs install, typecheck, tests, build, package creation, and package artifact verification. Pushing a tag in the `vMAJOR.MINOR.PATCH` format triggers the GitHub Actions publish workflow.
+
+See [docs/release-contract.md](docs/release-contract.md) and [docs/releasing.md](docs/releasing.md) for the maintainer contract.
 
 ## Learn More
 
-- **[Context & Sessions](docs/core/context-and-sessions.md)** — Preventing context rot, managing parallel work, session best practices
-- **[Orchestration](docs/core/orchestrate.md)** — Multi-stream coordination, parallel execution, orchestrator responsibilities
-- **[Core Workflows](docs/core/)** — Phase planning, execution, review, and troubleshooting
-- **[PRD & Planning](docs/prd.md)** — Product requirements and project structure
-- **[Release Notes](https://github.com/splitwireml/blueprint/releases)** — What's new in each version
-
----
+- [Core workflow docs](docs/core/) for planning, execution, review, tweaks, bugs, and phase completion
+- [Release contract](docs/release-contract.md) for package identity, tag rules, and publish checks
+- [Maintainer release guide](docs/releasing.md) for release operations
+- [Changelog](CHANGELOG.md) for historical release notes
 
 ## Contributing
 
-Blueprint is open source. Found a bug? Want to contribute? [Open an issue →](https://github.com/splitwireml/blueprint/issues)
+Blueprint is open source. Found a bug or sharp edge? Open an issue in [masterbatcoderman10/blueprint-cli](https://github.com/masterbatcoderman10/blueprint-cli/issues).
 
-**License:** MIT — see [LICENSE](LICENSE) for details.
+## License
+
+MIT. See [LICENSE](LICENSE) for details.
