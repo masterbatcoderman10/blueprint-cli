@@ -17,7 +17,57 @@ const execFileAsync = promisify(execFile)
 const ROOT_DIR = resolve(process.cwd())
 const TEMPLATE_ROOT = join(ROOT_DIR, 'templates', 'skills', 'blueprint')
 const LOCAL_ROOT = join(ROOT_DIR, '.claude', 'skills', 'blueprint')
-const LOAD_CONTEXT_SCRIPT = join(LOCAL_ROOT, 'scripts', 'load-context.mjs')
+const PORTABLE_PROGRESS = `# Project Progress
+
+**Project**: blueprint-cli
+**Tracker**: blueprint-cli
+**Current Milestone**: Revision 11 — Skill-Based Agent Surface (Phase 5 pending planning)
+**Current Phase**: TBD — pending phase planning
+**Status**: Revision 11 Phase 4 complete. Next: Phase 5 — Dogfood & Cross-Reference Verification.
+
+---
+
+## Decisions
+
+No decisions yet.
+
+---
+
+## Pending Revisions
+
+| Revision | Name | Status | Notes |
+|----------|------|--------|-------|
+| R11 | Skill-Based Agent Surface | Phase 5 pending planning | Next: Phase 5 — Dogfood & Cross-Reference Verification |
+`
+
+async function writePortableProgress(fixtureRoot: string): Promise<void> {
+  await mkdir(join(fixtureRoot, 'docs'), { recursive: true })
+  await writeFile(join(fixtureRoot, 'docs', 'project-progress.md'), PORTABLE_PROGRESS, 'utf-8')
+}
+
+async function writeTrackerDb(fixtureRoot: string): Promise<void> {
+  await mkdir(join(fixtureRoot, 'docs', '.blueprint'), { recursive: true })
+  await writeFile(join(fixtureRoot, 'docs', '.blueprint', 'tasks.db'), 'fake-db-content', 'utf-8')
+}
+
+async function createLoadContextFixture(withTrackerDb: boolean): Promise<{ root: string; script: string; cleanup: () => Promise<void> }> {
+  const fixtureRoot = await mkdtemp(join(tmpdir(), 'blueprint-load-context-'))
+  const fixtureSkillRoot = join(fixtureRoot, '.claude', 'skills', 'blueprint')
+  const script = join(fixtureSkillRoot, 'scripts', 'load-context.mjs')
+
+  await mkdir(join(fixtureRoot, '.claude', 'skills'), { recursive: true })
+  await cp(LOCAL_ROOT, fixtureSkillRoot, { recursive: true })
+  await writePortableProgress(fixtureRoot)
+  if (withTrackerDb) {
+    await writeTrackerDb(fixtureRoot)
+  }
+
+  return {
+    root: fixtureRoot,
+    script,
+    cleanup: () => rm(fixtureRoot, { recursive: true, force: true }),
+  }
+}
 
 describe('R11-5.B local skill install contract', () => {
   it('T-R11-5.B.1.1/T-R11-5.B.1.2 materializes exactly the expected 23-file .claude install', async () => {
@@ -67,17 +117,37 @@ describe('R11-5.B local skill install contract', () => {
     }
   })
 
-  it('T-R11-5.B.3.1 runs the installed load-context script from the repository root', async () => {
-    const { stdout, stderr } = await execFileAsync('node', [LOAD_CONTEXT_SCRIPT], {
-      cwd: ROOT_DIR,
-    })
+  it('T-R11-5.B.3.1 runs the installed load-context script from portable fixtures with and without tracker state', async () => {
+    const noTrackerFixture = await createLoadContextFixture(false)
+    const trackerFixture = await createLoadContextFixture(true)
 
-    expect(stderr).toBe('')
-    expect(stdout).toContain('## Project')
-    expect(stdout).toContain('blueprint-cli')
-    expect(stdout).toContain('Revision 11')
-    expect(stdout).toContain('Phase 5 pending planning')
-    expect(stdout).toContain('## Tracker')
-    expect(stdout).toContain('initialised at docs/.blueprint/tasks.db')
+    try {
+      const [{ stdout: noTrackerStdout, stderr: noTrackerStderr }, { stdout: trackerStdout, stderr: trackerStderr }] =
+        await Promise.all([
+          execFileAsync('node', [noTrackerFixture.script], {
+            cwd: noTrackerFixture.root,
+          }),
+          execFileAsync('node', [trackerFixture.script], {
+            cwd: trackerFixture.root,
+          }),
+        ])
+
+      for (const [stdout, stderr] of [
+        [noTrackerStdout, noTrackerStderr],
+        [trackerStdout, trackerStderr],
+      ]) {
+        expect(stderr).toBe('')
+        expect(stdout).toContain('## Project')
+        expect(stdout).toContain('blueprint-cli')
+        expect(stdout).toContain('Revision 11')
+        expect(stdout).toContain('Phase 5 pending planning')
+        expect(stdout).toContain('## Tracker')
+      }
+
+      expect(noTrackerStdout).toContain('not initialised — run blueprint init')
+      expect(trackerStdout).toContain('initialised at docs/.blueprint/tasks.db')
+    } finally {
+      await Promise.all([noTrackerFixture.cleanup(), trackerFixture.cleanup()])
+    }
   })
 })

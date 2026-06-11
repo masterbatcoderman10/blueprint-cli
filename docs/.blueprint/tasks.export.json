@@ -4,27 +4,27 @@
       "id": "R11-5.B.1",
       "title": "[R11-5.B.1] Create .claude/skills/blueprint/** from templates/skills/blueprint/**",
       "description": "Phase: Revision 11 — Skill-Based Agent Surface\nGate/Stream: Stream B — Local Skill Installation\nDuration: 0.75\nDependencies: Gate\n\nDetail:\nCreate .claude/skills/blueprint/** by copying the authoritative local payload from templates/skills/blueprint/**. The installed tree must include SKILL.md, all 20 reference/*.md module mirrors, reference/anti-patterns.md, and scripts/load-context.mjs.",
-      "state": "IN-REVIEW",
+      "state": "DONE",
       "phase": "R11-5",
       "stream": "B",
       "author": "Codex",
       "implementation_notes": "Made the Blueprint skill payload a tracked dogfood exception under .claude/skills/blueprint/** by updating .gitignore to ignore other .claude state while explicitly re-including the Blueprint skill subtree. The checked-in payload remains byte-identical to templates/skills/blueprint and keeps the local install reproducible after a clean checkout or merge/cleanup.",
       "milestone": "R11",
       "created_at": 1781160986636,
-      "updated_at": 1781162517066
+      "updated_at": 1781162787077
     },
     {
       "id": "R11-5.B.2",
       "title": "[R11-5.B.2] Add local-install mirror coverage for the installed .claude skill payload",
       "description": "Phase: Revision 11 — Skill-Based Agent Surface\nGate/Stream: Stream B — Local Skill Installation\nDuration: 0.75\nDependencies: R11-5.B.1\n\nDetail:\nAdd local-install mirror coverage asserting .claude/skills/blueprint/** exists, contains exactly the expected 23-file payload, and is byte-identical to templates/skills/blueprint/**. The repo-root skills/blueprint/** mirror remains covered by Phase 4 tests; this phase adds the dogfood install location.",
-      "state": "IN-REVIEW",
+      "state": "DONE",
       "phase": "R11-5",
       "stream": "B",
       "author": "Codex",
       "implementation_notes": "Kept the local-install mirror contract focused on the tracked .claude/skills/blueprint payload and verified it against templates/skills/blueprint with the Stream B mirror helper and local-skill-install test. The new repo state passes from clean tracked checkout because the skill payload itself is now part of the reviewed branch content, not only ignored local state.",
       "milestone": "R11",
       "created_at": 1781160986641,
-      "updated_at": 1781162517074
+      "updated_at": 1781162787157
     },
     {
       "id": "R11-5.B.3",
@@ -34,10 +34,10 @@
       "phase": "R11-5",
       "stream": "B",
       "author": "Codex",
-      "implementation_notes": "Verified node .claude/skills/blueprint/scripts/load-context.mjs from the repository root against the now-tracked skill payload. The script still prints a current markdown context brief for blueprint-cli, Revision 11, Phase 5 pending planning, and tracker presence at docs/.blueprint/tasks.db with exit code 0.",
+      "implementation_notes": "Changed the Stream B loader verification to run from portable temp fixtures instead of the repo root. The test now seeds the tracked .claude/skills/blueprint payload into each fixture, checks the no-tracker brief (`not initialised — run blueprint init`) for clean tracked-checkout parity, and separately checks the initialized brief (`initialised at docs/.blueprint/tasks.db`) when the fixture includes a tracker DB file.",
       "milestone": "R11",
       "created_at": 1781160986643,
-      "updated_at": 1781162517163
+      "updated_at": 1781163022530
     }
   ],
   "comments": [
@@ -172,6 +172,94 @@
       "line": null,
       "created_at": 1781162476945,
       "updated_at": 1781162476945
+    },
+    {
+      "id": "6107c6d4-d5bd-4b56-8f15-9b2287ef27f3",
+      "task_id": "R11-5.B.1",
+      "parent_id": null,
+      "severity": "MINOR",
+      "body": "Clean on rereview.",
+      "author": "reviewer",
+      "line": null,
+      "created_at": 1781162787078,
+      "updated_at": 1781162787078
+    },
+    {
+      "id": "6ce68cfc-d814-4610-a4e5-094df7e5492e",
+      "task_id": "R11-5.B.1",
+      "parent_id": "b74bb22c-cdc4-4408-b77d-e5e5c36ec025",
+      "severity": "MINOR",
+      "body": "Resolved: the reviewed branch now carries the .claude/skills/blueprint payload as tracked content, so the previous local-only install finding is closed.",
+      "author": "reviewer",
+      "line": null,
+      "created_at": 1781162787078,
+      "updated_at": 1781162787078
+    },
+    {
+      "id": "433b24c6-0052-41a0-af2c-5bc99dd4d651",
+      "task_id": "R11-5.B.2",
+      "parent_id": null,
+      "severity": "MINOR",
+      "body": "Clean on rereview.",
+      "author": "reviewer",
+      "line": null,
+      "created_at": 1781162787157,
+      "updated_at": 1781162787157
+    },
+    {
+      "id": "ffc97f06-18d2-4464-ab2e-a27ac5803848",
+      "task_id": "R11-5.B.2",
+      "parent_id": "a56b72b3-2cba-490c-8a7b-0548c5821410",
+      "severity": "MINOR",
+      "body": "Resolved: the mirror coverage now runs from tracked repository state, and the clean-checkout export no longer fails on missing .claude skill payload files.",
+      "author": "reviewer",
+      "line": null,
+      "created_at": 1781162787157,
+      "updated_at": 1781162787157
+    },
+    {
+      "id": "224e0f0a-ec50-41c5-a8a3-8ca38b5211a8",
+      "task_id": "R11-5.B.3",
+      "parent_id": null,
+      "severity": "MAJOR",
+      "body": "The installed load-context script now exists in tracked branch state, but the automated verification is still tied to ignored local tracker state. `tests/revision-11/stream-b/local-skill-install.test.ts:81` requires stdout to contain `initialised at docs/.blueprint/tasks.db`. In a tracked-only export of commit `6a01613`, the script exits 0 and prints `## Tracker\nnot initialised — run blueprint init`, then the test fails 1/4 because `docs/.blueprint/tasks.db` is intentionally untracked.\nWhy: the B.3 verification should pass from tracked repository state, either by seeding tracker state in the fixture/export path or by asserting the broader tracker/project-state contract from the phase doc instead of a machine-local initialized message.",
+      "author": "reviewer",
+      "line": null,
+      "created_at": 1781162787408,
+      "updated_at": 1781162787408
+    },
+    {
+      "id": "e43ba16f-f031-421a-a172-7eefafae66df",
+      "task_id": "R11-5.B.3",
+      "parent_id": null,
+      "severity": "MINOR",
+      "body": "Task moved to REWORK. After corrections, the agent must follow the canonical REWORK -> IN-PROGRESS -> IN-REVIEW transition per docs/core/tracker.md before this task can reach DONE.",
+      "author": "reviewer",
+      "line": null,
+      "created_at": 1781162787408,
+      "updated_at": 1781162787408
+    },
+    {
+      "id": "3ae1bff6-28f6-416d-89ee-9b47ab19fa65",
+      "task_id": "R11-5.B.3",
+      "parent_id": "224e0f0a-ec50-41c5-a8a3-8ca38b5211a8",
+      "severity": "MINOR",
+      "body": "Updated the verification to use portable fixtures. The test now covers both the clean tracked-checkout case (`not initialised — run blueprint init`) and the initialized case when a temp fixture includes `docs/.blueprint/tasks.db`, so it no longer depends on ignored repo-root tracker state.",
+      "author": "Codex",
+      "line": null,
+      "created_at": 1781163006715,
+      "updated_at": 1781163006715
+    },
+    {
+      "id": "37299837-f289-4e43-a874-acb31ff9c940",
+      "task_id": "R11-5.B.3",
+      "parent_id": "e43ba16f-f031-421a-a172-7eefafae66df",
+      "severity": "MINOR",
+      "body": "The task is back through the canonical review loop after the portable-fixture fix; the Stream B loader smoke now passes in both states from tracked branch content alone.",
+      "author": "Codex",
+      "line": null,
+      "created_at": 1781163006799,
+      "updated_at": 1781163006799
     }
   ],
   "meta": null
