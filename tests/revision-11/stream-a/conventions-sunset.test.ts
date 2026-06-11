@@ -18,6 +18,14 @@ const TEMPLATES_DIR = resolve(ROOT_DIR, 'templates')
 const SNIPPET_PATH = resolve(TEMPLATES_DIR, 'skill', '_project-conventions.snippet.md')
 const AGENT_SKILL_FILES = ['CLAUDE.md', 'AGENTS.md', 'GEMINI.md', 'QWEN.md'] as const
 
+const EXPECTED_SKILL_STUB = `This project uses the Blueprint development system.
+
+Invoke the \`blueprint\` skill at session start and before any planning,
+execution, review, tweak, bug, revision, or commit action.
+
+The skill handles routing and workflow guidance for every phase.
+`
+
 function makeInitOptions(mode: Mode): InitOptions {
   return {
     projectName: 'test-project',
@@ -48,15 +56,6 @@ function makeInitOptions(mode: Mode): InitOptions {
       confirmed: true,
     },
   }
-}
-
-function extractConventionsBlock(content: string): string {
-  const start = content.indexOf('<ProjectConventions>')
-  const end = content.indexOf('</ProjectConventions>')
-  if (start === -1 || end === -1) {
-    return ''
-  }
-  return content.slice(start, end + '</ProjectConventions>'.length)
 }
 
 function bodyAfterFirstLine(content: string): string {
@@ -303,27 +302,18 @@ describe('R11-3.A.4: create canonical skill ProjectConventions snippet', () => {
   })
 })
 
-describe('R11-3.A.5: inline ProjectConventions into skill templates', () => {
-  it('T-R11-3.A.5.1: each skill template body includes canonical block verbatim', async () => {
-    const snippet = (await readFile(SNIPPET_PATH, 'utf-8')).trim()
-    const expectedBodies = new Set<string>()
-
+describe('R11-3.A.5: keep skill templates generic after conventions sunset', () => {
+  it('T-R11-3.A.5.1: each skill template is the minimal generic invocation stub', async () => {
     for (const fileName of AGENT_SKILL_FILES) {
       const content = await readFile(join(TEMPLATES_DIR, 'skill', fileName), 'utf-8')
-      const block = extractConventionsBlock(content).trim()
-    const body = bodyAfterFirstLine(content).trim()
-      expect(block).toBe(snippet)
-      expect(block).toContain('## File Structure')
-      expectedBodies.add(block)
-      expect(body.includes('<ProjectConventions>')).toBe(true)
-      expect(body).toMatch(/<ProjectConventions>[\s\S]*<\/ProjectConventions>/)
-      expect(content.trimStart().startsWith('This project uses the Blueprint development system.')).toBe(true)
+      expect(content).toBe(EXPECTED_SKILL_STUB)
+      expect(content).not.toContain('<ProjectConventions>')
+      expect(content).not.toContain('Node.js >=18.0.0')
+      expect(content).not.toContain('blueprint-agentic-development')
     }
-
-    expect(expectedBodies.size).toBe(1)
   })
 
-  it('T-R11-3.A.5.2: skill template bodies below title line are byte-identical', async () => {
+  it('T-R11-3.A.5.2: skill templates share one byte-identical body', async () => {
     const referenceBody = bodyAfterFirstLine(await readFile(join(TEMPLATES_DIR, 'skill', AGENT_SKILL_FILES[0]), 'utf-8'))
     const bodyBodies = new Set<string>()
 

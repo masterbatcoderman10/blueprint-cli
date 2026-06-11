@@ -16,7 +16,28 @@ const REQUIRED_INTENTS = [
   'commit',
 ]
 
-const FORBIDDEN_BLOCKS = ['<SessionStart>', '<HardRules>', '<ModuleRouting>']
+const EXPECTED_SKILL_STUB = `This project uses the Blueprint development system.
+
+Invoke the \`blueprint\` skill at session start and before any planning,
+execution, review, tweak, bug, revision, or commit action.
+
+The skill handles routing and workflow guidance for every phase.
+`
+
+const FORBIDDEN_BLOCKS = [
+  '<SessionStart>',
+  '<HardRules>',
+  '<ModuleRouting>',
+  '<ProjectConventions>',
+  '</ProjectConventions>',
+]
+
+const FORBIDDEN_BLUEPRINT_CLI_DETAILS = [
+  'Node.js >=18.0.0',
+  'blueprint-agentic-development',
+  'templates/docs/core/',
+  'npm run release:check',
+]
 
 const STUB_FILES = [
   { id: 'T-R11-1.C.1', task: 'R11-1.C.1', file: 'CLAUDE.md', platform: 'Claude Code' },
@@ -32,12 +53,11 @@ describe.each(STUB_FILES)('$id — templates/skill/$file doc contract', ({ id, f
     expect(existsSync(filePath)).toBe(true)
   })
 
-  it(`${id}: keeps invocation guidance and project conventions contract`, () => {
+  it(`${id}: is the minimal skill invocation stub`, () => {
     if (!existsSync(filePath)) return
     const content = readFileSync(filePath, 'utf-8')
 
-    expect(content).toContain('<ProjectConventions>')
-    expect(content).toContain('</ProjectConventions>')
+    expect(content).toBe(EXPECTED_SKILL_STUB)
   })
 
   it(`${id}: references the blueprint skill by name`, () => {
@@ -59,6 +79,14 @@ describe.each(STUB_FILES)('$id — templates/skill/$file doc contract', ({ id, f
     const content = readFileSync(filePath, 'utf-8')
     for (const block of FORBIDDEN_BLOCKS) {
       expect(content, `should not contain "${block}"`).not.toContain(block)
+    }
+  })
+
+  it(`${id}: does not leak blueprint-cli project conventions into initialized projects`, () => {
+    if (!existsSync(filePath)) return
+    const content = readFileSync(filePath, 'utf-8')
+    for (const detail of FORBIDDEN_BLUEPRINT_CLI_DETAILS) {
+      expect(content, `should not contain blueprint-cli detail "${detail}"`).not.toContain(detail)
     }
   })
 })

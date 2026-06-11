@@ -13,6 +13,13 @@ import {
 import type { InitOptions, Mode } from '../../../src/init/types'
 
 const TEMPLATES_DIR = join(__dirname, '../../../templates')
+const EXPECTED_SKILL_STUB = `This project uses the Blueprint development system.
+
+Invoke the \`blueprint\` skill at session start and before any planning,
+execution, review, tweak, bug, revision, or commit action.
+
+The skill handles routing and workflow guidance for every phase.
+`
 
 function makeInitOptions(overrides: Partial<InitOptions> = {}): InitOptions {
   return {
@@ -130,7 +137,13 @@ describe('T-R11-1.D.2 — Scaffold engine branched on Mode', () => {
 
       // Each selected agent file should exist at project root
       for (const agentFile of options.agents.selected) {
-        expect(await fileExists(join(tmpDir, agentFile))).toBe(true)
+        const scaffoldedPath = join(tmpDir, agentFile)
+        expect(await fileExists(scaffoldedPath)).toBe(true)
+
+        const content = await readFile(scaffoldedPath, 'utf-8')
+        expect(content).toBe(EXPECTED_SKILL_STUB)
+        expect(content).not.toContain('<ProjectConventions>')
+        expect(content).not.toContain('blueprint-agentic-development')
       }
     })
 

@@ -12,14 +12,30 @@ import {
   getRootEntryPointTemplatePairs,
 } from './helpers'
 
+const EXPECTED_SKILL_STUB = `This project uses the Blueprint development system.
+
+Invoke the \`blueprint\` skill at session start and before any planning,
+execution, review, tweak, bug, revision, or commit action.
+
+The skill handles routing and workflow guidance for every phase.
+`
+
 describe('R11-5.A root entry-point skill-mode contract', () => {
   it('T-R11-5.A.1.1 verifies root entry points are skill-mode files with no legacy routing blocks', async () => {
     await assertRootEntryPointSkillModeContract()
   })
 
-  it('T-R11-5.A.1.2 keeps each root entry point byte-identical to its skill-mode template', async () => {
+  it('T-R11-5.A.1.2 keeps scaffold templates generic while root entry points keep project conventions', async () => {
     for (const { fileName, rootPath, templatePath } of getRootEntryPointTemplatePairs()) {
-      await expect(readFile(rootPath, 'utf-8'), fileName).resolves.toBe(await readFile(templatePath, 'utf-8'))
+      const [rootContent, templateContent] = await Promise.all([
+        readFile(rootPath, 'utf-8'),
+        readFile(templatePath, 'utf-8'),
+      ])
+
+      expect(templateContent, `templates/skill/${fileName}`).toBe(EXPECTED_SKILL_STUB)
+      expect(templateContent, `templates/skill/${fileName}`).not.toContain('<ProjectConventions>')
+      expect(rootContent, fileName).toContain('<ProjectConventions>')
+      expect(rootContent, fileName).not.toBe(templateContent)
     }
   })
 
@@ -43,7 +59,7 @@ describe('R11-5.A root entry-point skill-mode contract', () => {
 
     try {
       for (const block of FORBIDDEN_ROOT_LEGACY_BLOCKS) {
-        await writeFile(join(fixtureRoot, 'AGENTS.md'), `${await readFile(join(fixtureRoot, 'templates/skill/AGENTS.md'), 'utf-8')}\n${block}\n`, 'utf-8')
+        await writeFile(join(fixtureRoot, 'AGENTS.md'), `${await createFixtureRootEntryPointContent()}\n${block}\n`, 'utf-8')
 
         await expect(assertRootEntryPointSkillModeContract(fixtureRoot)).rejects.toThrow(
           `AGENTS.md must not contain legacy routing block ${block}`,
@@ -62,9 +78,10 @@ async function createSkillModeRootFixture(): Promise<string> {
   await Promise.all(
     ROOT_ENTRY_POINT_FILES.map(async (fileName) => {
       const sourceContent = await readFile(join(process.cwd(), 'templates/skill', fileName), 'utf-8')
+      const rootContent = await createFixtureRootEntryPointContent()
 
       await Promise.all([
-        writeFile(join(fixtureRoot, fileName), sourceContent, 'utf-8'),
+        writeFile(join(fixtureRoot, fileName), rootContent, 'utf-8'),
         writeFile(join(fixtureRoot, 'templates/skill', fileName), sourceContent, 'utf-8'),
       ])
     }),
@@ -77,6 +94,11 @@ async function createSkillModeRootFixture(): Promise<string> {
   )
 
   return fixtureRoot
+}
+
+async function createFixtureRootEntryPointContent(): Promise<string> {
+  const snippet = await readFile(join(process.cwd(), 'templates/skill/_project-conventions.snippet.md'), 'utf-8')
+  return `${EXPECTED_SKILL_STUB}\n${snippet}`
 }
 
 async function mkdtempInTmp(prefix: string): Promise<string> {

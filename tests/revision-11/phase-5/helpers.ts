@@ -338,11 +338,8 @@ export async function assertRootEntryPointSkillModeContract(root = resolve(proce
   const canonicalSnippet = await readFile(resolve(root, 'templates/skill/_project-conventions.snippet.md'), 'utf-8')
 
   await Promise.all(
-    pairs.map(async ({ fileName, rootPath, templatePath }) => {
-      const [rootContent, templateContent] = await Promise.all([
-        readFile(rootPath, 'utf-8'),
-        readFile(templatePath, 'utf-8'),
-      ])
+    pairs.map(async ({ fileName, rootPath }) => {
+      const rootContent = await readFile(rootPath, 'utf-8')
 
       if (!rootContent.toLowerCase().includes('blueprint')) {
         throw new Error(`${fileName} must invoke the blueprint skill`)
@@ -356,10 +353,6 @@ export async function assertRootEntryPointSkillModeContract(root = resolve(proce
         if (rootContent.includes(block)) {
           throw new Error(`${fileName} must not contain legacy routing block ${block}`)
         }
-      }
-
-      if (rootContent !== templateContent) {
-        throw new Error(`${fileName} must match templates/skill/${fileName}`)
       }
 
       const conventionsBlock = extractProjectConventionsBlock(rootContent)

@@ -7,33 +7,19 @@ import { tmpdir } from 'node:os'
 const ROOT_DIR = resolve(__dirname, '../../../')
 const ALIGNMENT_PATH = join(ROOT_DIR, 'docs', 'core', 'alignment.md')
 const TEMPLATES_ALIGNMENT_PATH = join(ROOT_DIR, 'templates', 'docs', 'core', 'alignment.md')
-const SNIPPET_PATH = join(ROOT_DIR, 'templates', 'skill', '_project-conventions.snippet.md')
 
 const SKILL_TEMPLATE_FILES = ['CLAUDE.md', 'AGENTS.md', 'GEMINI.md', 'QWEN.md'] as const
 
-function bodyAfterFirstLine(content: string): string {
-  const lineFeed = content.indexOf('\n')
-  return lineFeed === -1 ? '' : content.slice(lineFeed + 1)
-}
+const EXPECTED_SKILL_STUB = `This project uses the Blueprint development system.
 
-function normalizeConventionBlock(content: string): string {
-  const normalized = content.replace(/\r\n/g, '\n')
-  return normalized.endsWith('\n') ? normalized : `${normalized}\n`
-}
+Invoke the \`blueprint\` skill at session start and before any planning,
+execution, review, tweak, bug, revision, or commit action.
 
-function extractProjectConventionsBlock(content: string): string {
-  const start = content.indexOf('<ProjectConventions>')
-  const end = content.indexOf('</ProjectConventions>')
-
-  if (start === -1 || end === -1) {
-    return ''
-  }
-
-  return normalizeConventionBlock(content.slice(start, end + '</ProjectConventions>'.length))
-}
+The skill handles routing and workflow guidance for every phase.
+`
 
 function readTemplateBodies(root = ROOT_DIR): string[] {
-  return SKILL_TEMPLATE_FILES.map((fileName) => bodyAfterFirstLine(readFileSync(join(root, 'templates', 'skill', fileName), 'utf-8')))
+  return SKILL_TEMPLATE_FILES.map((fileName) => readFileSync(join(root, 'templates', 'skill', fileName), 'utf-8'))
 }
 
 function assertSkillTemplateBodiesMatch(root = ROOT_DIR): void {
@@ -75,13 +61,12 @@ describe('T-R11-3.C.2: template/documents alignment mirror', () => {
 })
 
 describe('T-R11-3.C.3: skill-mode entry-point block-identity contract', () => {
-  it('T-R11-3.C.3.1: skill-mode templates include canonical snippet and stay byte-identical below title', () => {
-    const snippet = readFileSync(SNIPPET_PATH, 'utf-8')
+  it('T-R11-3.C.3.1: skill-mode templates stay minimal and byte-identical', () => {
     const skillTemplateBodies = readTemplateBodies()
 
     for (const [index, body] of skillTemplateBodies.entries()) {
-      const extracted = extractProjectConventionsBlock(body)
-      expect(extracted, `templates/skill/${SKILL_TEMPLATE_FILES[index]}`).toBe(snippet)
+      expect(body, `templates/skill/${SKILL_TEMPLATE_FILES[index]}`).toBe(EXPECTED_SKILL_STUB)
+      expect(body, `templates/skill/${SKILL_TEMPLATE_FILES[index]}`).not.toContain('<ProjectConventions>')
     }
 
     assertSkillTemplateBodiesMatch()
