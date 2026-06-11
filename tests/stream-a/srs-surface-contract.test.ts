@@ -19,9 +19,10 @@ describe('T-A.4: SRS protocol surfaces are represented in the live and template 
       ])
 
       for (const content of [liveContent, templateContent]) {
+        expect(content).toContain('`AGENTS.md` exists at repo root')
         expect(content).toContain('docs/srs.md')
         expect(content).toContain('docs/core/srs-planning.md')
-        expect(content).toContain('All four are REQUIRED')
+        expect(content).toContain('canonical module for the SRS layer')
       }
     }
   })

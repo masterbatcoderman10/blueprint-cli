@@ -13,11 +13,12 @@ async function readDoc(pathSegments: string[]): Promise<string> {
 /*  T-R8-1.A.1  —  Session-start tracker.md guidance                  */
 /* ------------------------------------------------------------------ */
 
-describe('T-R8-1.A.1: Session-start tracker.md guidance', () => {
-  it('AGENTS.md SessionStart loads docs/core/tracker.md for populated projects', async () => {
+describe('T-R8-1.A.1: tracker guidance remains on the legacy entry-point surface', () => {
+  it('AGENTS.md delegates setup to the blueprint skill instead of carrying SessionStart tracker guidance', async () => {
     const content = await readDoc(['AGENTS.md'])
-    expect(content).toContain('docs/core/tracker.md')
-    expect(content).toMatch(/Load docs\/core\/tracker\.md.*HTTP API recipes/i)
+    expect(content).toContain('Invoke the `blueprint` skill')
+    expect(content).not.toContain('docs/core/tracker.md')
+    expect(content).not.toContain('<SessionStart>')
   })
 
   it('templates/AGENTS.md mirrors tracker.md loading step', async () => {

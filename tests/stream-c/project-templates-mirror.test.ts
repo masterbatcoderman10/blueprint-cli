@@ -108,61 +108,42 @@ describe('R6-3.C: Project + Templates Mirror', () => {
     })
   })
 
-  describe('C.4: Root agent routing tables route tweak intent to tweak-planning.md', () => {
-    const rootAgentFiles = ['AGENTS.md', 'CLAUDE.md', 'GEMINI.md', 'QWEN.md']
+  describe('C.4: Legacy template agent routing tables route tweak intent to tweak-planning.md', () => {
+    const legacyTemplateAgentFiles = ['templates/AGENTS.md', 'templates/CLAUDE.md', 'templates/GEMINI.md', 'templates/QWEN.md']
 
-    it.each(rootAgentFiles)('%s routes tweak intent to docs/core/tweak-planning.md', async (file) => {
+    it.each(legacyTemplateAgentFiles)('%s routes tweak intent to docs/core/tweak-planning.md', async (file) => {
       const content = await readFile(join(ROOT_DIR, file), 'utf-8')
       expect(content).toContain('docs/core/tweak-planning.md')
       expect(content).not.toContain('Correct completed tasks')
       expect(content).toContain('Quick change / tweak')
     })
 
-    it.each(rootAgentFiles)('%s contains tweak intent classification clause', async (file) => {
+    it.each(legacyTemplateAgentFiles)('%s contains tweak intent classification clause', async (file) => {
       const content = await readFile(join(ROOT_DIR, file), 'utf-8')
       expect(content).toContain('TWEAK INTENT CLASSIFICATION')
       expect(content).toContain('proactively route to tweak planning')
     })
   })
 
-  describe('T-R8-2.B.2: Root CLAUDE.md and templates/CLAUDE.md describe tweak intent in change-first terms', () => {
-    const agentPairs = [
-      { root: 'CLAUDE.md', template: 'templates/CLAUDE.md' },
-    ]
+  describe('T-R8-2.B.2: Legacy and skill routing surfaces describe tweak intent in change-first terms', () => {
+    const changeFirstFiles = ['templates/CLAUDE.md', 'templates/skills/blueprint/SKILL.md'] as const
 
-    it.each(agentPairs)('%s describes tweak intent using Tweak Mode and change-first loop language', async ({ root }) => {
-      const content = await readFile(join(ROOT_DIR, root), 'utf-8')
+    it.each(changeFirstFiles)('%s describes tweak intent using Tweak Mode and change-first loop language', async (file) => {
+      const content = await readFile(join(ROOT_DIR, file), 'utf-8')
       expect(content).toContain('Tweak Mode')
       expect(content).toContain('change-first')
     })
 
-    it.each(agentPairs)('%s (template) describes tweak intent using Tweak Mode and change-first loop language', async ({ template }) => {
-      const content = await readFile(join(ROOT_DIR, template), 'utf-8')
-      expect(content).toContain('Tweak Mode')
-      expect(content).toContain('change-first')
-    })
-
-    it.each(agentPairs)('%s contains no pre-task board-planning language for tweak intent', async ({ root }) => {
-      const content = await readFile(join(ROOT_DIR, root), 'utf-8')
+    it.each(changeFirstFiles)('%s contains no pre-task board-planning language for tweak intent', async (file) => {
+      const content = await readFile(join(ROOT_DIR, file), 'utf-8')
       // "pre-task board planning" language that implied tracker/board tasks before the change-first workflow
-      expect(content).not.toContain('pre-task board planning')
-      expect(content).not.toContain('board task')
-    })
-
-    it.each(agentPairs)('%s (template) contains no pre-task board-planning language for tweak intent', async ({ template }) => {
-      const content = await readFile(join(ROOT_DIR, template), 'utf-8')
       expect(content).not.toContain('pre-task board planning')
       expect(content).not.toContain('board task')
     })
   })
 
-  describe('C.5: Template agent files mirror root routing region byte-for-byte', () => {
-    const agentPairs = [
-      { root: 'AGENTS.md', template: 'templates/AGENTS.md' },
-      { root: 'CLAUDE.md', template: 'templates/CLAUDE.md' },
-      { root: 'GEMINI.md', template: 'templates/GEMINI.md' },
-      { root: 'QWEN.md', template: 'templates/QWEN.md' },
-    ]
+  describe('C.5: Legacy template agent files share one routing region byte-for-byte', () => {
+    const legacyTemplateFiles = ['templates/AGENTS.md', 'templates/CLAUDE.md', 'templates/GEMINI.md', 'templates/QWEN.md'] as const
 
     function extractRoutingRegion(content: string): string {
       const start = content.indexOf('<ModuleRouting>')
@@ -171,12 +152,14 @@ describe('R6-3.C: Project + Templates Mirror', () => {
       return content.slice(start, end)
     }
 
-    it.each(agentPairs)('$root routing region ↔ $template routing region', ({ root, template }) => {
-      const rootContent = readFileSync(join(ROOT_DIR, root), 'utf-8')
-      const templateContent = readFileSync(join(ROOT_DIR, template), 'utf-8')
-      const rootRouting = extractRoutingRegion(rootContent)
-      const templateRouting = extractRoutingRegion(templateContent)
-      expect(templateRouting).toBe(rootRouting)
+    it('all legacy template routing regions match exactly', () => {
+      const routings = legacyTemplateFiles.map((file) => extractRoutingRegion(readFileSync(join(ROOT_DIR, file), 'utf-8')))
+      const [expected, ...rest] = routings
+
+      expect(expected).not.toBe('')
+      for (const routing of rest) {
+        expect(routing).toBe(expected)
+      }
     })
   })
 })

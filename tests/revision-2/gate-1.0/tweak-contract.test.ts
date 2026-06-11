@@ -259,16 +259,17 @@ describe('T-R7-1.B.7.3 (retained): Doctor repair restores tweak-planning.md', ()
   })
 })
 
-// Retained from R2: live root agent files contain tweak routing
-describe('T-R7-1.B.7.3 (retained): live root agent files contain tweak routing row', () => {
+// Forward-updated in R11-5: live root agent files are skill-mode entry points
+describe('T-R11-5.A.1.1 (forward-update): live root agent files route tweak intent through the blueprint skill', () => {
   const liveAgentFiles = ['AGENTS.md', 'GEMINI.md', 'QWEN.md', 'CLAUDE.md']
 
   for (const agentFile of liveAgentFiles) {
-    it(`${agentFile} at project root contains tweak-planning.md reference`, async () => {
+    it(`${agentFile} at project root invokes the blueprint skill for tweak intent`, async () => {
       const filePath = join(REPO_ROOT, agentFile)
       const content = await readFile(filePath, 'utf-8')
-      expect(content).toContain('tweak-planning.md')
+      expect(content).toContain('Invoke the `blueprint` skill')
       expect(content).toContain('tweak')
+      expect(content).not.toContain('<ModuleRouting>')
     })
   }
 })
