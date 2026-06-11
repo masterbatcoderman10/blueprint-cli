@@ -51,33 +51,58 @@ describe('R11-5.D active cross-reference audit', () => {
     }
   })
 
-  it(`T-R11-5.D.3.1 includes ${LOCAL_SKILL_PAYLOAD_ROOT}/** through the shared active surface helper`, async () => {
+  it(`T-R11-5.D.3.1 includes ${LOCAL_SKILL_PAYLOAD_ROOT}/** and release docs through the shared active surface helper`, async () => {
     const activeFiles = await getActiveCrossReferenceFiles()
 
     expect(activeFiles.some((file) => file.startsWith(`${LOCAL_SKILL_PAYLOAD_ROOT}/`))).toBe(true)
+    expect(activeFiles).toContain('docs/release-contract.md')
+    expect(activeFiles).toContain('docs/releasing.md')
   })
 
-  it.each(CROSS_REFERENCE_CATEGORIES)(
-    'T-R11-5.D.3.2 reports %s with an actionable file diagnostic in active fixtures',
-    async (category) => {
+  it.each([
+    {
+      category: 'deleted-conventions',
+      file: 'docs/release-contract.md',
+      injectedLine: 'Load docs/conventions.md before execution.',
+    },
+    {
+      category: 'legacy-primary-routing',
+      file: 'CLAUDE.md',
+      injectedLine: 'Use <ModuleRouting> as the primary workflow.',
+    },
+    {
+      category: 'conflicting-install-guidance',
+      file: 'docs/release-contract.md',
+      injectedLine: 'Run blueprint install skill for this repository.',
+    },
+    {
+      category: 'conflicting-install-guidance',
+      file: 'docs/releasing.md',
+      injectedLine: 'Run blueprint install skill for this repository.',
+    },
+    {
+      category: 'docs-core-only-protocols',
+      file: 'CLAUDE.md',
+      injectedLine: '- **Blueprint protocol docs** under `docs/core/`',
+    },
+  ] satisfies Array<{
+    category: (typeof CROSS_REFERENCE_CATEGORIES)[number]
+    file: string
+    injectedLine: string
+  }>)(
+    'T-R11-5.D.3.2 reports $category in $file with an actionable file diagnostic in active fixtures',
+    async ({ category, file, injectedLine }) => {
       const fixtureRoot = await createAuditFixture()
 
       try {
-        const injectedLine = {
-          'deleted-conventions': 'Load docs/conventions.md before execution.',
-          'legacy-primary-routing': 'Use <ModuleRouting> as the primary workflow.',
-          'conflicting-install-guidance': 'Run blueprint install skill for this repository.',
-          'docs-core-only-protocols': '- **Blueprint protocol docs** under `docs/core/`',
-        }[category]
-
-        await writeFile(join(fixtureRoot, 'CLAUDE.md'), `${injectedLine}\n`, 'utf-8')
+        await writeFile(join(fixtureRoot, file), `${injectedLine}\n`, 'utf-8')
 
         const findings = await auditActiveCrossReferences(fixtureRoot)
 
         expect(findings).toContainEqual(
           expect.objectContaining({
             category,
-            file: 'CLAUDE.md',
+            file,
             line: 1,
           }),
         )
@@ -106,6 +131,16 @@ async function createAuditFixture(): Promise<string> {
   await Promise.all([
     writeFile(join(fixtureRoot, 'CLAUDE.md'), 'Invoke the blueprint skill.\n', 'utf-8'),
     writeFile(join(fixtureRoot, 'docs/core/execution.md'), 'Active execution doc.\n', 'utf-8'),
+    writeFile(
+      join(fixtureRoot, 'docs/release-contract.md'),
+      'Use npx skills add masterbatcoderman10/blueprint-cli --skill blueprint.\n',
+      'utf-8',
+    ),
+    writeFile(
+      join(fixtureRoot, 'docs/releasing.md'),
+      'Use npx skills add masterbatcoderman10/blueprint-cli --skill blueprint.\n',
+      'utf-8',
+    ),
     writeFile(join(fixtureRoot, 'templates/skill/CLAUDE.md'), 'Invoke the blueprint skill.\n', 'utf-8'),
     writeFile(join(fixtureRoot, LOCAL_SKILL_PAYLOAD_ROOT, 'SKILL.md'), 'Use reference modules.\n', 'utf-8'),
   ])

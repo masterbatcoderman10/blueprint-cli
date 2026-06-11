@@ -60,6 +60,8 @@ describe('R11-5.0.2 Phase 5 shared helpers', () => {
       writeFile(join(fixtureRoot, 'README.md'), '# readme\n', 'utf-8'),
       writeFile(join(fixtureRoot, 'docs/core/execute.md'), '# active\n', 'utf-8'),
       writeFile(join(fixtureRoot, 'docs/project-progress.md'), '# progress\n', 'utf-8'),
+      writeFile(join(fixtureRoot, 'docs/release-contract.md'), '# release contract\n', 'utf-8'),
+      writeFile(join(fixtureRoot, 'docs/releasing.md'), '# releasing\n', 'utf-8'),
       writeFile(join(fixtureRoot, 'docs/milestones/revision-11/phase-history.md'), '# archival\n', 'utf-8'),
       writeFile(join(fixtureRoot, 'templates/docs/core/execute.md'), '# template\n', 'utf-8'),
       writeFile(join(fixtureRoot, 'templates/skill/CLAUDE.md'), '# template\n', 'utf-8'),
@@ -71,12 +73,16 @@ describe('R11-5.0.2 Phase 5 shared helpers', () => {
     const activeFiles = await getActiveCrossReferenceFiles(fixtureRoot)
 
     expect(ACTIVE_CROSS_REFERENCE_STATIC_FILES).toContain('README.md')
+    expect(ACTIVE_CROSS_REFERENCE_STATIC_FILES).toContain('docs/release-contract.md')
+    expect(ACTIVE_CROSS_REFERENCE_STATIC_FILES).toContain('docs/releasing.md')
     expect(activeFiles).toEqual([
       '.claude/skills/blueprint/reference/execute.md',
       'CLAUDE.md',
       'README.md',
       'docs/core/execute.md',
       'docs/project-progress.md',
+      'docs/release-contract.md',
+      'docs/releasing.md',
       'skills/blueprint/reference/execute.md',
       'templates/docs/core/execute.md',
       'templates/skill/CLAUDE.md',

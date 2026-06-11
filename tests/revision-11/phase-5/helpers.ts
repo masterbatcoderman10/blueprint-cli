@@ -13,6 +13,8 @@ export const ACTIVE_CROSS_REFERENCE_STATIC_FILES = [
   'CHANGELOG.md',
   'docs/project-progress.md',
   'docs/prd.md',
+  'docs/release-contract.md',
+  'docs/releasing.md',
   'docs/srs.md',
   'package.json',
 ] as const
