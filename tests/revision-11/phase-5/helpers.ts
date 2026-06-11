@@ -1,0 +1,117 @@
+import { readdir } from 'node:fs/promises'
+import { join, relative, resolve, sep } from 'node:path'
+
+import { SKILL_PAYLOAD_INVENTORY } from '../../../src/release/skill-payload-inventory'
+
+export const ROOT_ENTRY_POINT_FILES = ['CLAUDE.md', 'AGENTS.md', 'GEMINI.md', 'QWEN.md'] as const
+
+export const LOCAL_SKILL_PAYLOAD_ROOT = '.claude/skills/blueprint'
+
+export const ACTIVE_CROSS_REFERENCE_STATIC_FILES = [
+  ...ROOT_ENTRY_POINT_FILES,
+  'README.md',
+  'CHANGELOG.md',
+  'docs/project-progress.md',
+  'docs/prd.md',
+  'docs/srs.md',
+  'package.json',
+] as const
+
+const ACTIVE_CROSS_REFERENCE_DIRECTORIES = [
+  'docs/core',
+  'templates',
+  'skills/blueprint',
+  LOCAL_SKILL_PAYLOAD_ROOT,
+] as const
+
+export interface RootEntryPointTemplatePair {
+  fileName: (typeof ROOT_ENTRY_POINT_FILES)[number]
+  rootPath: string
+  templatePath: string
+}
+
+export interface LocalSkillPayloadEntry {
+  templatePath: string
+  localInstallPath: string
+  relativePath: string
+}
+
+export function getRootEntryPointTemplatePairs(root = resolve(process.cwd())): RootEntryPointTemplatePair[] {
+  return ROOT_ENTRY_POINT_FILES.map((fileName) => ({
+    fileName,
+    rootPath: resolve(root, fileName),
+    templatePath: resolve(root, 'templates/skill', fileName),
+  }))
+}
+
+export function getLocalSkillPayloadInventory(root = resolve(process.cwd())): LocalSkillPayloadEntry[] {
+  return SKILL_PAYLOAD_INVENTORY.map((entry) => {
+    const relativePath = entry.templatePath.replace('templates/skills/blueprint/', '')
+
+    return {
+      templatePath: resolve(root, entry.templatePath),
+      localInstallPath: resolve(root, LOCAL_SKILL_PAYLOAD_ROOT, relativePath),
+      relativePath,
+    }
+  })
+}
+
+async function listFilesIfPresent(root: string, relativeDir: string): Promise<string[]> {
+  const absoluteDir = resolve(root, relativeDir)
+
+  try {
+    return listRelativeFiles(root, absoluteDir)
+  } catch (error) {
+    const nodeError = error as { code?: string }
+    if (nodeError.code === 'ENOENT') {
+      return []
+    }
+    throw error
+  }
+}
+
+async function listRelativeFiles(root: string, currentDir: string): Promise<string[]> {
+  const entries = await readdir(currentDir, { withFileTypes: true })
+  const files = await Promise.all(
+    entries.map((entry) => {
+      const entryPath = join(currentDir, entry.name)
+      if (entry.isDirectory()) {
+        return listRelativeFiles(root, entryPath)
+      }
+
+      return Promise.resolve([toPosixPath(relative(root, entryPath))])
+    }),
+  )
+
+  return files.flat()
+}
+
+function toPosixPath(path: string): string {
+  return path.split(sep).join('/')
+}
+
+async function staticFileIfPresent(root: string, relativePath: string): Promise<string[]> {
+  try {
+    const parent = resolve(root, relativePath, '..')
+    const entries = await readdir(parent, { withFileTypes: true })
+    const fileName = relativePath.split('/').at(-1)
+    return entries.some((entry) => entry.isFile() && entry.name === fileName) ? [relativePath] : []
+  } catch (error) {
+    const nodeError = error as { code?: string }
+    if (nodeError.code === 'ENOENT') {
+      return []
+    }
+    throw error
+  }
+}
+
+export async function getActiveCrossReferenceFiles(root = resolve(process.cwd())): Promise<string[]> {
+  const [staticFiles, directoryFiles] = await Promise.all([
+    Promise.all(ACTIVE_CROSS_REFERENCE_STATIC_FILES.map((file) => staticFileIfPresent(root, file))),
+    Promise.all(ACTIVE_CROSS_REFERENCE_DIRECTORIES.map((dir) => listFilesIfPresent(root, dir))),
+  ])
+
+  return [...staticFiles.flat(), ...directoryFiles.flat()]
+    .filter((file) => !file.startsWith('docs/milestones/'))
+    .sort()
+}
