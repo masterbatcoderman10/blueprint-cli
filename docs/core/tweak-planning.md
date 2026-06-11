@@ -51,9 +51,10 @@ after the user approves. No tracker tasks, no planning artifacts, no ceremony.
   - **Add a single anti-pattern to a core module.** A reviewer notices a
     recurring foot-gun missing from `docs/core/execution.md`'s
     anti-patterns block; the tweak appends one new entry.
-  - **Lock a previously vague convention.** `docs/conventions.md` says
-    "use kebab-case file names" but does not specify how to handle
-    acronyms; the tweak adds one clarifying bullet plus an example.
+  - **Lock a previously vague convention.** An agent entry point's
+    `<ProjectConventions>` section says "Use strict TypeScript settings"
+    but does not point to the existing type-check command; the tweak adds
+    one clarifying bullet plus an example.
   - **Tighten an error message.** An existing CLI error reads "Error:
     failed"; the tweak rewrites it to name the file and the failing
     operation. One assertion in the existing test file is updated.
@@ -464,10 +465,10 @@ after the user approves. No tracker tasks, no planning artifacts, no ceremony.
 
   ### Scenario
 
-  A developer notices that `docs/conventions.md` says "use kebab-case
-  file names" but does not specify how to handle acronyms (e.g., should
-  `APIClient` become `api-client.ts` or `apiclient.ts`?). The fix is
-  to add one clarifying bullet with an example.
+  A developer notices that `AGENTS.md`'s `<ProjectConventions>` section
+  says "Use strict TypeScript settings" but does not point to the existing
+  type-check command. The fix is to add one clarifying bullet with an
+  example.
 
   This is a positive-example tweak: small, contained, single concern,
   docs-only, no formal test plan needed.
@@ -475,20 +476,20 @@ after the user approves. No tracker tasks, no planning artifacts, no ceremony.
   ### Step-by-step trace
 
   **STEP 1 — UNDERSTAND**
-  Agent reads `docs/conventions.md`. The kebab-case rule is in the File
-  Naming section. No example for acronyms. Single file, single section.
+  Agent reads `AGENTS.md`. The TypeScript rule is in the
+  `<ProjectConventions>` section. No command example is present. Single
+  file, single section.
 
   **STEP 2 — RESTATE**
-  > "I'll add one clarifying bullet to the File Naming section of
-  > `docs/conventions.md` specifying that acronyms are lowercased in
-  > kebab-case names (e.g., `api-client.ts`, not `APIClient.ts`). No
-  > other changes."
+  > "I'll add one clarifying bullet to the `<ProjectConventions>` section
+  > of `AGENTS.md` specifying that strict TypeScript checks run through
+  > `npm run typecheck`. No other changes."
 
   **STEP 3 — CONFIRM**
   User: "Yes, go ahead."
 
   **STEP 4 — CHANGE**
-  Agent appends the clarifying bullet to `docs/conventions.md`.
+  Agent appends the clarifying bullet to `AGENTS.md`.
 
   **STEP 5 — CYCLE**
   Agent shows the diff. User: "Looks good — accepted."
@@ -498,7 +499,7 @@ after the user approves. No tracker tasks, no planning artifacts, no ceremony.
   skipped. User approval already given in STEP 5.
 
   **STEP 7 — DOCUMENT (post-hoc)**
-  Agent creates `docs/tweaks/tweak-6-conventions-acronym-casing.md`:
+  Agent creates `docs/tweaks/tweak-6-project-conventions-typecheck.md`:
 
   ---
 
@@ -516,16 +517,16 @@ after the user approves. No tracker tasks, no planning artifacts, no ceremony.
 
   ## Summary of Change
 
-  Added a clarifying bullet to the File Naming section of
-  `docs/conventions.md` specifying that acronyms are lowercased in
-  kebab-case names (e.g., `api-client.ts`, not `APIClient.ts`).
-  Change requested after the existing rule was found ambiguous in code review.
+  Added a clarifying bullet to the `<ProjectConventions>` section of
+  `AGENTS.md` specifying that strict TypeScript checks run through
+  `npm run typecheck`. Change requested after the existing rule was found
+  ambiguous in code review.
 
   ---
 
   ## Files Touched
 
-  - `docs/conventions.md`
+  - `AGENTS.md`
 
   ---
 
@@ -537,7 +538,7 @@ after the user approves. No tracker tasks, no planning artifacts, no ceremony.
   ### Why this example qualifies
 
   - **Small.** One file, one section, one new bullet.
-  - **Contained.** Localized to `docs/conventions.md`'s File Naming
+  - **Contained.** Localized to `AGENTS.md`'s `<ProjectConventions>`
     section.
   - **Single concern.** One ambiguity resolved.
   - **Non-feature.** Documentation clarification only.
