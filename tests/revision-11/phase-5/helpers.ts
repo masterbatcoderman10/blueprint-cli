@@ -1,4 +1,4 @@
-import { readdir } from 'node:fs/promises'
+import { readFile, readdir } from 'node:fs/promises'
 import { join, relative, resolve, sep } from 'node:path'
 
 import { SKILL_PAYLOAD_INVENTORY } from '../../../src/release/skill-payload-inventory'
@@ -35,6 +35,8 @@ export interface LocalSkillPayloadEntry {
   localInstallPath: string
   relativePath: string
 }
+
+export const FORBIDDEN_ROOT_LEGACY_BLOCKS = ['<SessionStart>', '<HardRules>', '<ModuleRouting>'] as const
 
 export function getRootEntryPointTemplatePairs(root = resolve(process.cwd())): RootEntryPointTemplatePair[] {
   return ROOT_ENTRY_POINT_FILES.map((fileName) => ({
@@ -114,4 +116,53 @@ export async function getActiveCrossReferenceFiles(root = resolve(process.cwd())
   return [...staticFiles.flat(), ...directoryFiles.flat()]
     .filter((file) => !file.startsWith('docs/milestones/'))
     .sort()
+}
+
+export function extractProjectConventionsBlock(content: string): string {
+  const start = content.indexOf('<ProjectConventions>')
+  const end = content.indexOf('</ProjectConventions>')
+
+  if (start === -1 || end === -1) {
+    return ''
+  }
+
+  const block = content.slice(start, end + '</ProjectConventions>'.length)
+  return block.endsWith('\n') ? block : `${block}\n`
+}
+
+export async function assertRootEntryPointSkillModeContract(root = resolve(process.cwd())): Promise<void> {
+  const pairs = getRootEntryPointTemplatePairs(root)
+  const canonicalSnippet = await readFile(resolve(root, 'templates/skill/_project-conventions.snippet.md'), 'utf-8')
+
+  await Promise.all(
+    pairs.map(async ({ fileName, rootPath, templatePath }) => {
+      const [rootContent, templateContent] = await Promise.all([
+        readFile(rootPath, 'utf-8'),
+        readFile(templatePath, 'utf-8'),
+      ])
+
+      if (!rootContent.toLowerCase().includes('blueprint')) {
+        throw new Error(`${fileName} must invoke the blueprint skill`)
+      }
+
+      if (!rootContent.includes('<ProjectConventions>') || !rootContent.includes('</ProjectConventions>')) {
+        throw new Error(`${fileName} must contain <ProjectConventions>`)
+      }
+
+      for (const block of FORBIDDEN_ROOT_LEGACY_BLOCKS) {
+        if (rootContent.includes(block)) {
+          throw new Error(`${fileName} must not contain legacy routing block ${block}`)
+        }
+      }
+
+      if (rootContent !== templateContent) {
+        throw new Error(`${fileName} must match templates/skill/${fileName}`)
+      }
+
+      const conventionsBlock = extractProjectConventionsBlock(rootContent)
+      if (conventionsBlock !== canonicalSnippet) {
+        throw new Error(`${fileName} must use the canonical ProjectConventions snippet`)
+      }
+    }),
+  )
 }

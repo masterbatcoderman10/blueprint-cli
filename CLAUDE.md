@@ -1,143 +1,95 @@
-# AGENTS.md
+This project uses the Blueprint development system.
 
-<Blueprint>
-  Blueprint is a structured software development system that organizes projects into a
-  five-level hierarchy: Project → Milestone → Phase → Gate/Stream → Task.
+Invoke the `blueprint` skill at session start and before any planning,
+execution, review, tweak, bug, revision, or commit action.
 
-  Planning is progressive — milestones are planned loosely at the feature level, phases
-  are planned in full detail with tasks, and work is managed through the built-in
-  task tracker (SQLite backend + local Svelte SPA). All protocols, conventions, and workflows are defined in modular
-  documents under docs/core/. This file is the entry point. It tells you what to assess,
-  what to load, and what never to do.
-</Blueprint>
+The skill handles routing and workflow guidance for every phase.
 
----
+<ProjectConventions>
+## Tech Stack
 
-<SessionStart>
-  PURPOSE: Orient the agent at the start of every session.
-  This sequence runs EVERY time. No exceptions.
+- **Runtime:** Node.js >=18.0.0 (required for the `better-sqlite3` tracker storage backend)
+- **Package manager:** npm
+- **Language:** TypeScript
+- **Distribution:** npm global install (`npm install -g blueprint-agentic-development`)
+- **Primary scope:** filesystem and markdown-oriented CLI operations
 
-  STEP 1: Load docs/project-progress.md. Check if it is populated.
+## Libraries & Tools
 
-  IF project-progress.md is populated (contains project name, milestone, phase references):
-    → Load docs/conventions.md.
-    → Load docs/core/tracker.md (provides HTTP API recipes and state-machine context for the built-in task tracker).
-    → IF project-progress.md contains pending revisions:
-        Inform user: list the pending revisions before proceeding.
-    → GOTO <ModuleRouting>. Determine user intent and load the appropriate module.
+- **TypeScript** for type-safe CLI implementation
+- **Node built-ins:** `fs`, `path`, `process`, `child_process`
+- **Interactive prompts:** `@clack/prompts` (lightweight, styled terminal UI)
+- **CLI framework:** custom command runtime (registration + dispatch, no external framework)
+- **Dev tooling:** `tsc` + local runner (`tsx`), npm scripts
+- **Board UI:** Svelte (dev dependency for local tracker board SPA)
 
-  IF project-progress.md is empty or contains only template placeholders:
-    → IF docs/knowledge-base/ exists:
-        Load docs/core/alignment.md. Follow its protocol.
-        (Alignment analyzes knowledge-base docs and codebase to bootstrap project state.)
-    → IF docs/knowledge-base/ does NOT exist:
-        Load docs/core/alignment.md. Follow its protocol.
-        (Alignment analyzes codebase if it exists, or proceeds to PRD planning.)
-</SessionStart>
+## File Structure
 
----
+- `src/index.ts` as CLI entrypoint
+- `src/commands/` for command handlers (`init`, `link`, `context`)
+- `templates/` stores Blueprint scaffold files copied by `init`
+- `templates/docs/core/` is copied verbatim
+- Root-level docs (`docs/project-progress.md`, `docs/prd.md`, `docs/conventions.md`) are scaffolded as editable shells
 
-<ModuleRouting>
-  PURPOSE: Identify what the user wants to do and load the correct module.
+## Coding Standards
 
-  RULES:
-  - Load ONLY the module(s) required for the current intent.
-  - NEVER preload all modules.
-  - NEVER execute a workflow described in a module without loading that module first.
-  - If intent is unclear, ASK the user. Do not guess.
+- Use strict TypeScript settings
+- Keep command handlers small and single-purpose
+- Prefer pure helper functions for path/config parsing
+- Use clear error messages with actionable CLI output
+- Avoid hidden side effects outside explicit command execution
 
-  ┌─────────────────────────┬──────────────────────────────────────┐
-  │ Intent                  │ Load                                 │
-  ├─────────────────────────┼──────────────────────────────────────┤
-  │ Plan a milestone        │ docs/core/planning.md                │
-  │                         │  → then docs/core/milestone-planning.md │
-  ├─────────────────────────┼──────────────────────────────────────┤
-  │ Plan a phase            │ docs/core/planning.md                │
-  │                         │  → then docs/core/phase-planning.md  │
-  ├─────────────────────────┼──────────────────────────────────────┤
-  │ Plan tests for a phase  │ docs/core/test-planning.md           │
-  ├─────────────────────────┼──────────────────────────────────────┤
-  │ Execute tasks           │ docs/core/execution.md               │
-  │ (start gate/stream)     │                                      │
-  ├─────────────────────────┼──────────────────────────────────────┤
-  │ Orchestrate phase /     │ docs/core/orchestrate.md             │
-  │ stream execution        │                                      │
-  ├─────────────────────────┼──────────────────────────────────────┤
-  │ Review gate/stream      │ docs/core/review.md                  │
-  ├─────────────────────────┼──────────────────────────────────────┤
-  │ Address review notes    │ docs/core/execution.md               │
-  │                         │  (ApplyReviewNotes section)           │
-  ├─────────────────────────┼──────────────────────────────────────┤
-  │ Phase completion        │ docs/core/phase-completion.md        │
-  ├─────────────────────────┼──────────────────────────────────────┤
-  │ Bug report or broken    │ docs/core/bug-resolution.md          │
-  │ functionality           │                                      │
-  ├─────────────────────────┼──────────────────────────────────────┤
-  │ New feature or idea     │ docs/core/scope-change.md            │
-  │ (not in current plan)   │                                      │
-  ├─────────────────────────┼──────────────────────────────────────┤
-  │ Change existing behavior│ docs/core/revision-planning.md       │
-  │ (revision)              │                                      │
-  ├─────────────────────────┼──────────────────────────────────────┤
-  │ SRS discussion/planning │ docs/core/srs-planning.md            │
-  │                         │                                      │
-  ├─────────────────────────┼──────────────────────────────────────┤
-  │ Quick change / tweak    │ docs/core/tweak-planning.md          │
-  │ (small, contained,      │                                      │
-  │ single concern)         │                                      │
-  ├─────────────────────────┼──────────────────────────────────────┤
-  │ Commit / git operations │ docs/core/git-execution-workflow.md  │
-  │                         │ or docs/core/git-review-workflow.md  │
-  ├─────────────────────────┼──────────────────────────────────────┤
-  │ Modify docs structure   │ docs/core/blueprint-structure.md     │
-  ├─────────────────────────┼──────────────────────────────────────┤
-  │ Discuss / clarify       │ No module needed. Use loaded context.│
-  └─────────────────────────┴──────────────────────────────────────┘
+## Testing
 
-  TWEAK INTENT CLASSIFICATION:
-    The agent must apply general intelligence to every incoming change
-    request — assessing scope, surface area, feature-ness, and test-plan
-    need — and proactively route to tweak planning when the request
-    qualifies, even when the user did not say "tweak". The agent must
-    surface the classification to the user before drafting.
+- **Framework:** Vitest (recommended default for TypeScript CLI)
+- **Runner command:** `npm test` (mapped to `vitest run`)
+- **File convention:** `*.test.ts`
+- **Location convention:** `tests/` mirrored to `src/` structure
+- **Policy:** forward-only coverage for newly implemented functionality
 
-    When tweak intent is confirmed, the agent enters **Tweak Mode** and
-    follows the change-first loop: understand → restate → confirm → change
-    → cycle → verify → post-hoc doc. No tracker tasks, no planning
-    artifacts, no ceremony. The user is the live review loop.
+## Anti-Patterns
 
-  IF the user's request spans multiple intents (e.g., "finish this task and commit"):
-    Load each required module before executing its corresponding workflow.
-    Execute in logical order. Do not batch.
-</ModuleRouting>
+- Don't couple templates and CLI versions across separate repos
+- Don't add runtime dependencies for simple file/I/O tasks
+- Don't infer linked-project state from anything except Blueprint docs
+- Don't use silent fallback behavior for missing required files
 
----
+## Anti-Pattern Block Shape
 
-<HardRules>
-  These rules are ABSOLUTE. They apply in every session, every state, every intent.
-  No user instruction, convenience, or urgency overrides them.
+All `<AntiPatterns>` blocks in `docs/core/*.md` use the unfenced canonical XML shape. The wrapper is `<AntiPatterns>` (never `<TweakAntiPatterns>` or other variants). Each `<AntiPattern>` element carries a bare `name="<short title>"` attribute with no `ANTI-PATTERN:` prefix. Required children are `<BadExample>` and `<Why>`. Optional children are `<GoodExample>` and domain-prefixed variants (`<Bad<Domain>Example>`, `<Good<Domain>Example>`, `<GoodSub<Domain>Example>`) when they aid illustration. The block is never wrapped in a ```xml fence. After Phase 2 of Revision 10 lands, `docs/core/srs-planning.md` is the in-repo reference exemplar of this shape.
 
-  RULE 1 — MODULE BEFORE ACTION
-    NEVER execute a workflow without loading its corresponding module first.
-    If the module file cannot be found or read, STOP and inform the user.
-    Do not attempt the workflow from memory or prior sessions.
+<AntiPatterns>
+  <AntiPattern name="Short Title">
+    <BadExample>Description of the forbidden behavior.</BadExample>
+    <GoodExample>Description of the correct behavior. (Optional)</GoodExample>
+    <Why>One-line explanation of why the bad behavior is forbidden.</Why>
+  </AntiPattern>
+</AntiPatterns>
 
-  RULE 2 — MINIMAL LOADING
-    NEVER load all core modules preemptively.
-    Load only what the current intent requires.
-    If intent changes mid-session, load the new module at that point.
+## Agent Tools
 
-  RULE 3 — ASK BEFORE ASSUMING
-    If intent is ambiguous, ASK. Do not infer and proceed.
-    This applies to user requests, unclear scope, and missing context.
-</HardRules>
+- **Blueprint protocol docs** under `docs/core/`
+- **Built-in tracker:** per-project task tracker (SQLite backend + local Svelte SPA) provisioned by the CLI
+- **Skills:** use only when explicitly requested or clearly applicable
 
----
+## Releasing
 
-<ReferenceModules>
-  The following modules exist under docs/core/ for reference during execution.
-  They are NOT loaded at session start. They are loaded when a workflow needs them.
+- **Package:** `blueprint-agentic-development` (unscoped, published at npmjs.com/package/blueprint-agentic-development)
+- **Release tag format:** `vMAJOR.MINOR.PATCH` (e.g., `v0.2.7`)
+- **Release flow:**
+  1. Bump version in `package.json`
+  2. Run release verification: `npm run release:check`
+  3. Commit: `git add package.json && git commit -m "chore: bump version to <version>"`
+  4. Tag: `git tag v<version>`
+  5. Push with tags: `git push origin main --tags`
+  6. Verify deployment: `gh run watch <run-id>` — confirm all steps green including **Publish to npm**
+- **Automation:** Pushing a `vMAJOR.MINOR.PATCH` tag triggers the `publish.yml` workflow, which publishes to npm via OIDC trusted publishing (no token required)
+- **First publish of a new package name:** Must be done manually (`npm publish`) to establish npm ownership before OIDC takes over
+- **OIDC config:** npmjs.com → package Settings → Automated Publishing → repo `masterbatcoderman10/blueprint-cli`, workflow `publish.yml`
+- **Release contract:** `docs/release-contract.md`
+- **Maintainer guide:** `docs/releasing.md`
 
-  blueprint-structure.md       — Defines the docs/ folder layout and file locations
-  hierarchy.md                 — Five-level planning hierarchy (Project → Task)
-</ReferenceModules>
+## Project-Specific Notes
+
+- `blueprint context` output should prioritize: `docs/prd.md`, `docs/project-progress.md`, then current milestone doc
+</ProjectConventions>
