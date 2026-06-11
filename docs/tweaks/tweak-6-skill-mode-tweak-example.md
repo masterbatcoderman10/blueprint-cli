@@ -17,6 +17,11 @@ cross-reference audit for Stream D. Selected target: the tweak workflow's
 positive example, step-by-step worked example, and sample post-hoc record.
 Changed mirror surfaces: live core doc, template core doc, authoritative skill
 template, repo-root skill mirror, and local `.claude` installed skill mirror.
+Owning surface set: `docs/core/tweak-planning.md`,
+`templates/docs/core/tweak-planning.md`,
+`templates/skills/blueprint/reference/tweak.md`,
+`skills/blueprint/reference/tweak.md`, and
+`.claude/skills/blueprint/reference/tweak.md`.
 Verification commands/results: `rg` found zero remaining stale worked-example
 tokens in the touched tweak surfaces; `diff -q` passed for live/template docs
 and for template/repo-root/local skill mirrors. The workflow was routed through
