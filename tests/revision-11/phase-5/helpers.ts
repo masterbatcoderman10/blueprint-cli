@@ -58,6 +58,10 @@ export function getLocalSkillPayloadInventory(root = resolve(process.cwd())): Lo
   })
 }
 
+export function getLocalSkillPayloadRelativePaths(): string[] {
+  return SKILL_PAYLOAD_INVENTORY.map((entry) => entry.templatePath.replace('templates/skills/blueprint/', ''))
+}
+
 async function listFilesIfPresent(root: string, relativeDir: string): Promise<string[]> {
   const absoluteDir = resolve(root, relativeDir)
 
@@ -72,7 +76,7 @@ async function listFilesIfPresent(root: string, relativeDir: string): Promise<st
   }
 }
 
-async function listRelativeFiles(root: string, currentDir: string): Promise<string[]> {
+export async function listRelativeFiles(root: string, currentDir = root): Promise<string[]> {
   const entries = await readdir(currentDir, { withFileTypes: true })
   const files = await Promise.all(
     entries.map((entry) => {
@@ -86,6 +90,17 @@ async function listRelativeFiles(root: string, currentDir: string): Promise<stri
   )
 
   return files.flat()
+}
+
+function assertExactRelativeFiles(actualFiles: string[], expectedFiles: string[], label: string): void {
+  const isExactMatch =
+    actualFiles.length === expectedFiles.length && actualFiles.every((file, index) => file === expectedFiles[index])
+
+  if (!isExactMatch) {
+    throw new Error(
+      `${label} must contain exactly the expected skill payload files.\nExpected: ${expectedFiles.join(', ')}\nActual: ${actualFiles.join(', ')}`,
+    )
+  }
 }
 
 function toPosixPath(path: string): string {
@@ -116,6 +131,30 @@ export async function getActiveCrossReferenceFiles(root = resolve(process.cwd())
   return [...staticFiles.flat(), ...directoryFiles.flat()]
     .filter((file) => !file.startsWith('docs/milestones/'))
     .sort()
+}
+
+export async function assertLocalSkillPayloadMirror(templateDir: string, localDir: string): Promise<void> {
+  const expectedFiles = getLocalSkillPayloadRelativePaths().sort()
+  const [templateFiles, localFiles] = await Promise.all([
+    listRelativeFiles(templateDir).then((files) => files.sort()),
+    listRelativeFiles(localDir).then((files) => files.sort()),
+  ])
+
+  assertExactRelativeFiles(templateFiles, expectedFiles, `templates/skills/blueprint at ${templateDir}`)
+  assertExactRelativeFiles(localFiles, expectedFiles, `.claude/skills/blueprint at ${localDir}`)
+
+  await Promise.all(
+    expectedFiles.map(async (relativePath) => {
+      const [templateBytes, localBytes] = await Promise.all([
+        readFile(resolve(templateDir, relativePath)),
+        readFile(resolve(localDir, relativePath)),
+      ])
+
+      if (Buffer.compare(templateBytes, localBytes) !== 0) {
+        throw new Error(`${relativePath} must be byte-identical between ${templateDir} and ${localDir}`)
+      }
+    }),
+  )
 }
 
 export function extractProjectConventionsBlock(content: string): string {
