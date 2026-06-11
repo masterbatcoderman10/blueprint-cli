@@ -399,9 +399,9 @@ describe('Phase 2 Stream B — Interactive Onboarding Flow', () => {
     const summary = buildConfirmationSummaryLines(options)
 
     expect(summary).toContain('Create: Blueprint docs scaffold for "my-project"')
-    expect(summary).toContain('Archive: docs/ -> knowledge-base/docs-archived')
-    expect(summary).toContain('Archive: AGENTS.md -> knowledge-base/AGENTS.md')
-    expect(summary).toContain('Move: README.md -> knowledge-base/README.md')
+    expect(summary).toContain('Archive: docs/ -> docs/knowledge-base/docs-archived')
+    expect(summary).toContain('Archive: AGENTS.md -> docs/knowledge-base/AGENTS.md')
+    expect(summary).toContain('Move: README.md -> docs/knowledge-base/README.md')
     expect(summary).toContain('Skip: markdown file not selected -> notes/spec.md')
     expect(summary).toContain('Git: run `git init`')
     expect(summary).toContain('Git: run `git branch -M main`')

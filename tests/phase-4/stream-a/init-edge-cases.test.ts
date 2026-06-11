@@ -112,14 +112,14 @@ describe('T-A.2.1: init preserves unselected user-owned markdown files', () => {
         process.chdir(originalCwd)
       }
 
-      expect(await pathExists(join(project.rootDir, 'knowledge-base', 'docs-archived', 'core', 'execution.md'))).toBe(true)
-      expect(await pathExists(join(project.rootDir, 'knowledge-base', 'CLAUDE.md'))).toBe(true)
-      expect(await project.readFile('knowledge-base/docs-archived/core/execution.md')).toBe('# Existing Blueprint Docs\n')
-      expect(await project.readFile('knowledge-base/CLAUDE.md')).toBe('# Existing Agent\n')
+      expect(await pathExists(join(project.rootDir, 'docs', 'knowledge-base', 'docs-archived', 'core', 'execution.md'))).toBe(true)
+      expect(await pathExists(join(project.rootDir, 'docs', 'knowledge-base', 'CLAUDE.md'))).toBe(true)
+      expect(await project.readFile('docs/knowledge-base/docs-archived/core/execution.md')).toBe('# Existing Blueprint Docs\n')
+      expect(await project.readFile('docs/knowledge-base/CLAUDE.md')).toBe('# Existing Agent\n')
       expect(await pathExists(join(project.rootDir, 'docs', 'core', 'execution.md'))).toBe(true)
       expect(await pathExists(join(project.rootDir, 'CLAUDE.md'))).toBe(true)
       expect(await project.readFile('notes/private.md')).toBe('# keep\n')
-      expect(await pathExists(join(project.rootDir, 'knowledge-base', 'notes', 'private.md'))).toBe(false)
+      expect(await pathExists(join(project.rootDir, 'docs', 'knowledge-base', 'notes', 'private.md'))).toBe(false)
     } finally {
       clackPromptApi.intro = originalIntro
       clackPromptApi.text = originalText
@@ -134,11 +134,11 @@ describe('T-A.2.1: init preserves unselected user-owned markdown files', () => {
 })
 
 describe('T-A.2.2: init markdown discovery respects archive boundaries', () => {
-  it('ignores markdown already stored under knowledge-base while still finding active project files', async () => {
+  it('ignores markdown already stored under docs/knowledge-base while still finding active project files', async () => {
     const project = await createIsolatedTempProject('blueprint-init-edge-')
 
     try {
-      await project.writeFile('knowledge-base/docs-archived/legacy.md', '# archived\n')
+      await project.writeFile('docs/knowledge-base/docs-archived/legacy.md', '# archived\n')
       await project.writeFile('notes/spec.md', '# active\n')
       await project.writeFile('README.md', '# root\n')
 

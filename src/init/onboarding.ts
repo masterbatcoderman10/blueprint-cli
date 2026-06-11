@@ -141,7 +141,7 @@ export interface DocsArchiveChoice {
 }
 
 export function buildDocsReplacementWarningMessage(archiveDirectoryName: string): string {
-  return `${existingDocsWarningPrefix} Archive destination: knowledge-base/${archiveDirectoryName}.`
+  return `${existingDocsWarningPrefix} Archive destination: docs/knowledge-base/${archiveDirectoryName}.`
 }
 
 export async function promptDocsArchiveChoice(
@@ -162,7 +162,7 @@ export async function promptDocsArchiveChoice(
   clackPromptApi.note(warningMessage, 'Docs Setup')
 
   const confirmation = await clackPromptApi.confirm({
-    message: `Archive existing docs/ to knowledge-base/${archiveDirectoryName} before scaffold?`,
+    message: `Archive existing docs/ to docs/knowledge-base/${archiveDirectoryName} before scaffold?`,
     initialValue: true,
   })
 
@@ -225,8 +225,8 @@ export async function promptMarkdownMigrationChoice(rootDir: string): Promise<Ma
   const transferModeResponse = await clackPromptApi.select({
     message: markdownTransferModePromptMessage,
     options: [
-      { value: 'move', label: 'Move to knowledge-base (preferred)' },
-      { value: 'copy', label: 'Copy to knowledge-base' },
+      { value: 'move', label: 'Move to docs/knowledge-base (preferred)' },
+      { value: 'copy', label: 'Copy to docs/knowledge-base' },
       { value: 'skip', label: 'Do not migrate markdown files' },
     ],
     initialValue: 'move',
@@ -300,7 +300,7 @@ export function normalizeSelectedAgentFiles(selection: AgentFileName[]): AgentFi
 
 export function buildAgentArchivePromptMessage(detectedExisting: AgentFileName[]): string {
   const fileList = detectedExisting.join(', ')
-  return `Archive detected agent files (${fileList}) to knowledge-base/ before overwrite?`
+  return `Archive detected agent files (${fileList}) to docs/knowledge-base/ before overwrite?`
 }
 
 export interface AgentSelectionChoice {
@@ -360,14 +360,14 @@ export function buildConfirmationSummaryLines(options: InitOptions): string[] {
   summaryLines.push(`Create: agent entry files -> ${selectedAgentFiles.join(', ')}`)
 
   if (options.docs.hasExistingDocsDirectory && options.docs.shouldArchiveExistingDocs) {
-    summaryLines.push(`Archive: docs/ -> knowledge-base/${options.docs.archiveDirectoryName}`)
+    summaryLines.push(`Archive: docs/ -> docs/knowledge-base/${options.docs.archiveDirectoryName}`)
   } else if (options.docs.hasExistingDocsDirectory) {
     summaryLines.push('Overwrite: existing docs/ will be replaced (no archive)')
   }
 
   if (options.agents.shouldArchiveExistingAgentFiles && options.agents.detectedExisting.length > 0) {
     for (const fileName of options.agents.detectedExisting) {
-      summaryLines.push(`Archive: ${fileName} -> knowledge-base/${fileName}`)
+      summaryLines.push(`Archive: ${fileName} -> docs/knowledge-base/${fileName}`)
     }
   } else if (options.agents.detectedExisting.length > 0) {
     for (const fileName of options.agents.detectedExisting) {
@@ -379,7 +379,7 @@ export function buildConfirmationSummaryLines(options: InitOptions): string[] {
   if (options.markdownMigration.transferMode === 'move' || options.markdownMigration.transferMode === 'copy') {
     const verb = options.markdownMigration.transferMode === 'move' ? 'Move' : 'Copy'
     for (const selectedPath of options.markdownMigration.selectedPaths) {
-      summaryLines.push(`${verb}: ${selectedPath} -> knowledge-base/${basename(selectedPath)}`)
+      summaryLines.push(`${verb}: ${selectedPath} -> docs/knowledge-base/${basename(selectedPath)}`)
     }
 
     for (const discoveredPath of options.markdownMigration.discoveredMarkdownPaths) {

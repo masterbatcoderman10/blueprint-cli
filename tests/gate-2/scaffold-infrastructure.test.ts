@@ -71,8 +71,8 @@ describe('Gate 2.0 — Scaffold Infrastructure', () => {
     const result: ScaffoldResult = {
       createdDirectories: ['docs', 'docs/core', 'docs/knowledge-base', 'docs/milestones'],
       createdFiles: ['docs/project-progress.md'],
-      archivedPaths: ['knowledge-base/docs-archived'],
-      movedPaths: ['knowledge-base/README.md'],
+      archivedPaths: ['docs/knowledge-base/docs-archived'],
+      movedPaths: ['docs/knowledge-base/README.md'],
       copiedPaths: [],
       gitInitialized: true,
       mainBranchConfigured: true,

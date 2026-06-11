@@ -93,7 +93,7 @@ describe('T-C.2: Repair Executor', () => {
       expect(content).toBe(templateContent)
 
       // Verify no archive was created
-      const archivePath = join(projectDir, 'knowledge-base', 'CLAUDE.md')
+      const archivePath = join(projectDir, 'docs', 'knowledge-base', 'CLAUDE.md')
       await expect(readFile(archivePath, 'utf-8')).rejects.toThrow()
     })
   })

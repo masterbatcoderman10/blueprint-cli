@@ -8,6 +8,7 @@ const defaultIgnoredDirectories = new Set([
   'build',
   'coverage',
   'knowledge-base',
+  '.blueprint-init-staging',
   '.agents',
   '.claude',
   '.codex',
@@ -23,7 +24,9 @@ async function walkForMarkdown(rootDir: string, currentDir: string, collected: s
 
   for (const entry of entries) {
     if (entry.isDirectory()) {
-      if (defaultIgnoredDirectories.has(entry.name)) {
+      const isDocsKnowledgeBase = currentDir === join(rootDir, 'docs') && entry.name === 'knowledge-base'
+
+      if (defaultIgnoredDirectories.has(entry.name) || isDocsKnowledgeBase) {
         continue
       }
 

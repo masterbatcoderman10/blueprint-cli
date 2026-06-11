@@ -32,7 +32,7 @@ describe('Phase 2 Stream C — Archive and Scaffold Engine', () => {
   })
 
   describe('Archive Engine', () => {
-    describe('T-C.1.1: Archive engine moves existing docs/ to knowledge-base/docs-archived', () => {
+    describe('T-C.1.1: Archive engine moves existing docs/ to docs/knowledge-base/docs-archived', () => {
       it('archives docs/ directory when it exists and shouldArchiveExistingDocs is true', async () => {
         const docsDir = join(tempDir, 'docs')
         const docsContentFile = join(docsDir, 'existing-doc.md')
@@ -56,7 +56,7 @@ describe('Phase 2 Stream C — Archive and Scaffold Engine', () => {
 
         await archiveDocsDirectory(tempDir, options)
 
-        const archivedDir = join(tempDir, 'knowledge-base', defaultArchiveDirectoryName)
+        const archivedDir = join(tempDir, '.blueprint-init-staging', 'knowledge-base', defaultArchiveDirectoryName)
         const archivedFile = join(archivedDir, 'existing-doc.md')
         
         await expect(access(archivedFile)).resolves.toBeUndefined()
@@ -106,7 +106,7 @@ describe('Phase 2 Stream C — Archive and Scaffold Engine', () => {
       })
     })
 
-    describe('T-C.1.2: Archive engine moves scattered .md files to knowledge-base/', () => {
+    describe('T-C.1.2: Archive engine moves scattered .md files to docs/knowledge-base/', () => {
       it('moves selected markdown files preserving relative path structure', async () => {
         const mdFile = join(tempDir, 'README.md')
         await writeFile(mdFile, '# README')
@@ -131,8 +131,8 @@ describe('Phase 2 Stream C — Archive and Scaffold Engine', () => {
 
         await moveMarkdownFiles(tempDir, options)
 
-        const movedFile = join(tempDir, 'knowledge-base', 'README.md')
-        const movedNestedFile = join(tempDir, 'knowledge-base', 'docs', 'nested.md')
+        const movedFile = join(tempDir, '.blueprint-init-staging', 'knowledge-base', 'README.md')
+        const movedNestedFile = join(tempDir, '.blueprint-init-staging', 'knowledge-base', 'docs', 'nested.md')
         
         await expect(access(movedFile)).resolves.toBeUndefined()
         await expect(access(movedNestedFile)).resolves.toBeUndefined()
@@ -161,7 +161,7 @@ describe('Phase 2 Stream C — Archive and Scaffold Engine', () => {
         await moveMarkdownFiles(tempDir, options)
 
         await expect(access(mdFile)).resolves.toBeUndefined()
-        await expect(access(join(tempDir, 'knowledge-base', 'README.md'))).rejects.toThrow()
+        await expect(access(join(tempDir, '.blueprint-init-staging', 'knowledge-base', 'README.md'))).rejects.toThrow()
       })
 
       it('preserves files with same name from different directories without collision', async () => {
@@ -189,8 +189,8 @@ describe('Phase 2 Stream C — Archive and Scaffold Engine', () => {
 
         await moveMarkdownFiles(tempDir, options)
 
-        const movedFile1 = join(tempDir, 'knowledge-base', 'src', 'README.md')
-        const movedFile2 = join(tempDir, 'knowledge-base', 'lib', 'README.md')
+        const movedFile1 = join(tempDir, '.blueprint-init-staging', 'knowledge-base', 'src', 'README.md')
+        const movedFile2 = join(tempDir, '.blueprint-init-staging', 'knowledge-base', 'lib', 'README.md')
         
         await expect(access(movedFile1)).resolves.toBeUndefined()
         await expect(access(movedFile2)).resolves.toBeUndefined()
@@ -227,8 +227,8 @@ describe('Phase 2 Stream C — Archive and Scaffold Engine', () => {
 
         await copyMarkdownFiles(tempDir, options)
 
-        const copiedFile = join(tempDir, 'knowledge-base', 'README.md')
-        const copiedNestedFile = join(tempDir, 'knowledge-base', 'docs', 'nested.md')
+        const copiedFile = join(tempDir, '.blueprint-init-staging', 'knowledge-base', 'README.md')
+        const copiedNestedFile = join(tempDir, '.blueprint-init-staging', 'knowledge-base', 'docs', 'nested.md')
         
         await expect(access(copiedFile)).resolves.toBeUndefined()
         await expect(access(copiedNestedFile)).resolves.toBeUndefined()
@@ -237,7 +237,7 @@ describe('Phase 2 Stream C — Archive and Scaffold Engine', () => {
       })
     })
 
-    describe('T-C.1.3: Archive engine moves existing agent files to knowledge-base/', () => {
+    describe('T-C.1.3: Archive engine moves existing agent files to docs/knowledge-base/', () => {
       it('archives detected agent files when shouldArchiveExistingAgentFiles is true', async () => {
         const agentFile = join(tempDir, 'CLAUDE.md')
         await writeFile(agentFile, '# Existing CLAUDE.md')
@@ -259,7 +259,7 @@ describe('Phase 2 Stream C — Archive and Scaffold Engine', () => {
 
         await archiveAgentFiles(tempDir, options)
 
-        const archivedFile = join(tempDir, 'knowledge-base', 'CLAUDE.md')
+        const archivedFile = join(tempDir, '.blueprint-init-staging', 'knowledge-base', 'CLAUDE.md')
         await expect(access(archivedFile)).resolves.toBeUndefined()
       })
 
@@ -579,16 +579,16 @@ describe('Phase 2 Stream C — Archive and Scaffold Engine', () => {
         const result = await executeScaffold(tempDir, options)
 
         // Verify archive
-        await expect(access(join(tempDir, 'knowledge-base', defaultArchiveDirectoryName, 'existing.md'))).resolves.toBeUndefined()
-        await expect(access(join(tempDir, 'knowledge-base', 'CLAUDE.md'))).resolves.toBeUndefined()
+        await expect(access(join(tempDir, 'docs', 'knowledge-base', defaultArchiveDirectoryName, 'existing.md'))).resolves.toBeUndefined()
+        await expect(access(join(tempDir, 'docs', 'knowledge-base', 'CLAUDE.md'))).resolves.toBeUndefined()
         
         // Verify new scaffold
         await expect(access(join(tempDir, 'docs', 'project-progress.md'))).resolves.toBeUndefined()
         await expect(access(join(tempDir, 'CLAUDE.md'))).resolves.toBeUndefined()
 
         // Verify result tracking
-        expect(result.archivedPaths).toContain(`docs/ -> knowledge-base/${defaultArchiveDirectoryName}`)
-        expect(result.archivedPaths).toContain('CLAUDE.md -> knowledge-base/CLAUDE.md')
+        expect(result.archivedPaths).toContain(`docs/ -> docs/knowledge-base/${defaultArchiveDirectoryName}`)
+        expect(result.archivedPaths).toContain('CLAUDE.md -> docs/knowledge-base/CLAUDE.md')
       })
 
       it('executeScaffold interpolates project name in editable shells', async () => {

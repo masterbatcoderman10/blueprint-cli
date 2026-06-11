@@ -1,11 +1,26 @@
 import { join, resolve, basename, relative, dirname } from 'node:path'
-import { copyFile, mkdir, rename, unlink, stat, readdir, readFile, writeFile } from 'node:fs/promises'
+import { copyFile, rename, unlink, stat, readdir, readFile, writeFile, rm } from 'node:fs/promises'
 
 import { type InitOptions, type ScaffoldResult, type AgentFileName, defaultArchiveDirectoryName } from './types'
 import { safeMkdirP, moveFileSafe, copyFileSafe } from './fs-utils'
 import { TEMPLATE_VERSION, writeManifest, getCliVersion } from '../doctor/manifest'
+import { SKILL_INSTALL_BASES } from '../doctor/structure'
 
 const TEMPLATES_DIR = join(__dirname, '../../templates')
+const KNOWLEDGE_BASE_DIRECTORY_NAME = 'knowledge-base'
+const KNOWLEDGE_BASE_STAGING_DIRECTORY_NAME = '.blueprint-init-staging'
+
+function resolveKnowledgeBaseDir(rootDir: string): string {
+  return join(resolve(rootDir), 'docs', KNOWLEDGE_BASE_DIRECTORY_NAME)
+}
+
+function resolveKnowledgeBaseStagingDir(rootDir: string): string {
+  return join(resolve(rootDir), KNOWLEDGE_BASE_STAGING_DIRECTORY_NAME, KNOWLEDGE_BASE_DIRECTORY_NAME)
+}
+
+function resolveKnowledgeBaseStagingRoot(rootDir: string): string {
+  return join(resolve(rootDir), KNOWLEDGE_BASE_STAGING_DIRECTORY_NAME)
+}
 
 export function resolveSelectedAgents(options: InitOptions): string[] {
   const selectedAgents = [...options.agents.selected]
@@ -42,10 +57,10 @@ export async function archiveDocsDirectory(
   }
 
   const docsDir = join(resolve(rootDir), 'docs')
-  const archiveDest = join(resolve(rootDir), 'knowledge-base', options.docs.archiveDirectoryName)
+  const archiveDest = join(resolveKnowledgeBaseStagingDir(rootDir), options.docs.archiveDirectoryName)
 
   if (await directoryExists(docsDir)) {
-    await safeMkdirP(join(resolve(rootDir), 'knowledge-base'))
+    await safeMkdirP(dirname(archiveDest))
     await moveFileSafe(docsDir, archiveDest)
   }
 }
@@ -58,7 +73,7 @@ export async function archiveAgentFiles(
     return
   }
 
-  const knowledgeBaseDir = join(resolve(rootDir), 'knowledge-base')
+  const knowledgeBaseDir = resolveKnowledgeBaseStagingDir(rootDir)
   await safeMkdirP(knowledgeBaseDir)
 
   for (const fileName of options.agents.detectedExisting) {
@@ -79,7 +94,7 @@ export async function moveMarkdownFiles(
     return
   }
 
-  const knowledgeBaseDir = join(resolve(rootDir), 'knowledge-base')
+  const knowledgeBaseDir = resolveKnowledgeBaseStagingDir(rootDir)
   const normalizedRootDir = resolve(rootDir)
 
   for (const mdPath of options.markdownMigration.selectedPaths) {
@@ -101,7 +116,7 @@ export async function copyMarkdownFiles(
     return
   }
 
-  const knowledgeBaseDir = join(resolve(rootDir), 'knowledge-base')
+  const knowledgeBaseDir = resolveKnowledgeBaseStagingDir(rootDir)
   const normalizedRootDir = resolve(rootDir)
 
   for (const mdPath of options.markdownMigration.selectedPaths) {
@@ -120,7 +135,7 @@ export async function scaffoldBlueprintDirectory(
   options: InitOptions,
 ): Promise<void> {
   const docsDir = join(resolve(rootDir), 'docs')
-  const knowledgeBaseDir = join(docsDir, 'knowledge-base')
+  const knowledgeBaseDir = resolveKnowledgeBaseDir(rootDir)
   const milestonesDir = join(docsDir, 'milestones')
   const tweaksDir = join(docsDir, 'tweaks')
 
@@ -129,9 +144,6 @@ export async function scaffoldBlueprintDirectory(
   await safeMkdirP(tweaksDir)
 
   if (options.mode === 'skill') {
-    // Skill mode: copy .claude/skills/blueprint/** into target
-    const claudeSkillsDir = join(resolve(rootDir), '.claude', 'skills', 'blueprint')
-    await safeMkdirP(claudeSkillsDir)
     await copySkillPayload(rootDir, options)
     await copyTweaksTemplate(rootDir, options)
     await copyEditableShells(rootDir, options)
@@ -273,12 +285,13 @@ export async function copySkillPayload(
   _options: InitOptions,
 ): Promise<void> {
   const skillSourceDir = join(TEMPLATES_DIR, 'skills', 'blueprint')
-  const skillDestDir = join(resolve(rootDir), '.claude', 'skills', 'blueprint')
 
-  await safeMkdirP(skillDestDir)
+  for (const skillBase of SKILL_INSTALL_BASES) {
+    const skillDestDir = join(resolve(rootDir), skillBase)
 
-  // Recursively copy templates/skills/blueprint/** → <target>/.claude/skills/blueprint/**
-  await copyDirectoryRecursive(skillSourceDir, skillDestDir)
+    await safeMkdirP(skillDestDir)
+    await copyDirectoryRecursive(skillSourceDir, skillDestDir)
+  }
 }
 
 export async function copySkillModeAgentStubs(
@@ -341,6 +354,38 @@ async function copyDirectoryRecursive(sourceDir: string, destDir: string): Promi
   }
 }
 
+async function mergeDirectoryContents(sourceDir: string, destDir: string): Promise<void> {
+  const entries = await readdir(sourceDir, { withFileTypes: true })
+
+  for (const entry of entries) {
+    const sourcePath = join(sourceDir, entry.name)
+    const destPath = join(destDir, entry.name)
+
+    if (entry.isDirectory()) {
+      await safeMkdirP(destPath)
+      await mergeDirectoryContents(sourcePath, destPath)
+      await rm(sourcePath, { recursive: true, force: true })
+      continue
+    }
+
+    if (entry.isFile()) {
+      await moveFileSafe(sourcePath, destPath)
+    }
+  }
+}
+
+async function finalizeKnowledgeBase(rootDir: string): Promise<void> {
+  const knowledgeBaseStagingDir = resolveKnowledgeBaseStagingDir(rootDir)
+  if (!(await directoryExists(knowledgeBaseStagingDir))) {
+    return
+  }
+
+  const knowledgeBaseDir = resolveKnowledgeBaseDir(rootDir)
+  await safeMkdirP(knowledgeBaseDir)
+  await mergeDirectoryContents(knowledgeBaseStagingDir, knowledgeBaseDir)
+  await rm(resolveKnowledgeBaseStagingRoot(rootDir), { recursive: true, force: true })
+}
+
 export async function executeScaffold(
   rootDir: string,
   options: InitOptions,
@@ -356,15 +401,17 @@ export async function executeScaffold(
     managedAgents: [],
   }
 
+  await rm(resolveKnowledgeBaseStagingRoot(rootDir), { recursive: true, force: true })
+
   if (options.docs.hasExistingDocsDirectory && options.docs.shouldArchiveExistingDocs) {
     await archiveDocsDirectory(rootDir, options)
-    result.archivedPaths.push(`docs/ -> knowledge-base/${options.docs.archiveDirectoryName}`)
+    result.archivedPaths.push(`docs/ -> docs/knowledge-base/${options.docs.archiveDirectoryName}`)
   }
 
   if (options.agents.shouldArchiveExistingAgentFiles && options.agents.detectedExisting.length > 0) {
     await archiveAgentFiles(rootDir, options)
     for (const fileName of options.agents.detectedExisting) {
-      result.archivedPaths.push(`${fileName} -> knowledge-base/${fileName}`)
+      result.archivedPaths.push(`${fileName} -> docs/knowledge-base/${fileName}`)
     }
   }
 
@@ -372,20 +419,27 @@ export async function executeScaffold(
     await moveMarkdownFiles(rootDir, options)
     for (const mdPath of options.markdownMigration.selectedPaths) {
       const relativePath = relative(resolve(rootDir), mdPath)
-      result.movedPaths.push(`${mdPath} -> knowledge-base/${relativePath}`)
+      result.movedPaths.push(`${mdPath} -> docs/knowledge-base/${relativePath}`)
     }
   } else if (options.markdownMigration.transferMode === 'copy') {
     await copyMarkdownFiles(rootDir, options)
     for (const mdPath of options.markdownMigration.selectedPaths) {
       const relativePath = relative(resolve(rootDir), mdPath)
-      result.copiedPaths.push(`${mdPath} -> knowledge-base/${relativePath}`)
+      result.copiedPaths.push(`${mdPath} -> docs/knowledge-base/${relativePath}`)
     }
   }
 
   await scaffoldBlueprintDirectory(rootDir, options)
+  await finalizeKnowledgeBase(rootDir)
 
   if (options.mode === 'skill') {
-    result.createdDirectories.push('docs/', 'docs/knowledge-base/', 'docs/milestones/', 'docs/tweaks/', '.claude/skills/blueprint/')
+    result.createdDirectories.push(
+      'docs/',
+      'docs/knowledge-base/',
+      'docs/milestones/',
+      'docs/tweaks/',
+      ...SKILL_INSTALL_BASES.map((skillBase) => `${skillBase}/`),
+    )
   } else {
     result.createdDirectories.push('docs/', 'docs/core/', 'docs/knowledge-base/', 'docs/milestones/', 'docs/tweaks/')
   }

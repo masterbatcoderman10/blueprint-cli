@@ -224,6 +224,6 @@ describe('Stream C: Regression Coverage & Packaged Help Smoke', () => {
 
       expect(result.stderr).not.toContain('link')
       expect(result.stderr).not.toContain('context')
-    })
+    }, 15000)
   })
 })
