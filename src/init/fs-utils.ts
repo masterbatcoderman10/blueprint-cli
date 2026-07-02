@@ -19,8 +19,24 @@ const defaultIgnoredDirectories = new Set([
   'out',
 ])
 
+function shouldSkipMarkdownScanError(error: unknown): boolean {
+  const nodeError = error as NodeJS.ErrnoException
+
+  return nodeError.code === 'EACCES' || nodeError.code === 'ENOENT' || nodeError.code === 'EPERM'
+}
+
 async function walkForMarkdown(rootDir: string, currentDir: string, collected: string[]): Promise<void> {
-  const entries = await readdir(currentDir, { withFileTypes: true })
+  let entries
+
+  try {
+    entries = await readdir(currentDir, { withFileTypes: true })
+  } catch (error) {
+    if (shouldSkipMarkdownScanError(error)) {
+      return
+    }
+
+    throw error
+  }
 
   for (const entry of entries) {
     if (entry.isDirectory()) {
