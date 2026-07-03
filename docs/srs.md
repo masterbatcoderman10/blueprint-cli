@@ -25,6 +25,8 @@ This SRS exists for blueprint-cli to act as the persistent requirement layer bet
 | MAS-208 | Skill-Based Agent Surface | Must | active | Revision 11 |
 | MAS-209 | Dual-Source Deprecation Path | Must | active | Revision 11 |
 | MAS-210 | NPX Skill Install Pathway | Must | active | Revision 11 |
+| MAS-211 | Alignment-Complete Command | Must | approved-pending-implementation | Revision 11 |
+| MAS-212 | In-Place Skill Migration Command | Must | approved-pending-implementation | Revision 11 |
 
 ---
 
@@ -158,6 +160,30 @@ The system must support a single primary NPX install pathway for the `blueprint`
 - Documentation must explicitly call out the current `-g` global-install sharp edge in `vercel-labs/skills` and recommend project-local install for Claude Code discovery.
 - No bundled fallback installer, `blueprint-skill-install` command, postinstall hook, or alternate npm-bin install surface is introduced in this requirement. A first-party CLI install option is deferred to Revision 11 Phase 6.
 - Real GitHub-backed verification of `npx skills add masterbatcoderman10/blueprint-cli --skill blueprint` is required as a manual smoke during Phase 4 completion, but it is not part of deterministic automated test coverage.
+
+#### MAS-211 - Alignment-Complete Command
+
+The system must provide a direct `blueprint alignment-complete` CLI command that records completion of Blueprint alignment by updating alignment-status markers in supported root agent entry-point files.
+
+- The command must scan the supported root agent files that exist in the target project (`CLAUDE.md`, `AGENTS.md`, `GEMINI.md`, `QWEN.md`).
+- For each existing supported file, the command must replace `<!-- blueprint-status: alignment-required -->` with `<!-- blueprint-status: alignment-complete -->`.
+- The command must be idempotent: files already containing `<!-- blueprint-status: alignment-complete -->` are reported as already complete and left unchanged.
+- Files with neither supported marker must be reported as missing an alignment marker, not silently changed.
+- Missing supported root agent files must be skipped without error.
+- The command must fail clearly when run outside a Blueprint project.
+
+#### MAS-212 - In-Place Skill Migration Command
+
+The system must provide a direct `blueprint migrate` CLI command that converts an existing Blueprint project from legacy core-module mode to skill mode in place.
+
+- The command must work on Blueprint projects regardless of their current detected mode and must be safe to rerun.
+- The command must install the bundled Blueprint skill payload into the supported project-local skill roots (`.claude/skills/blueprint/**` and `.agents/skills/blueprint/**`), matching the authoritative `templates/skills/blueprint/**` payload.
+- The command must convert every supported root agent entry-point file that exists in the target codebase (`CLAUDE.md`, `AGENTS.md`, `GEMINI.md`, `QWEN.md`) to the corresponding skill-mode template from `templates/skill/**`.
+- Conversion must preserve an existing alignment marker state per file when one exists. When no marker exists, the converted file must receive `<!-- blueprint-status: alignment-required -->` so post-migration alignment status is explicit.
+- The command must delete the legacy `docs/core/**` tree outright after the skill payload and root entry points are in place. It must not archive `docs/core/**`.
+- The command must update or bootstrap `docs/.blueprint/manifest.json` so `managedFiles` matches the supported root agent files that exist in the codebase after migration.
+- After migration, Doctor mode detection must report skill mode and the legacy deprecation banner must no longer emit.
+- The command must fail clearly when run outside a Blueprint project.
 
 ### Should Have
 
@@ -356,6 +382,32 @@ Change log:
 Change log:
 - 2026-06-09 - Created from Revision 11 Phase 4 planning (pre-phase SRS repair, per user direction to land SRS updates before phase doc commits rather than as in-phase tasks). Locked sub-detail bullets recorded: single supported Phase 4 install path is `npx skills add masterbatcoderman10/blueprint-cli --skill blueprint`; `vercel-labs/skills` discovery surface is repo-root `skills/blueprint/**`; `templates/skills/blueprint/**` remains authoritative while `skills/blueprint/**` is a byte-identical mirror; the mirrored payload includes 23 files (`SKILL.md`, 20 renamed `reference/*.md`, shared `reference/anti-patterns.md`, `scripts/load-context.mjs`); the npm tarball must ship `skills/blueprint/**` and release verification must enforce it; README and release docs must recommend project-local install and document the current `-g` sharp edge; no bundled fallback installer is included in Phase 4; real GitHub install verification is manual smoke only. Status remains `approved-pending-implementation` until Revision 11 Phase 4 completion.
 - 2026-06-09 - Transitioned to active after manual smoke against public ref `r11-4-phase4-smoke` at commit `98e36d81dde09b6ce46693899aed6e43b6216c7d` using `npx skills add masterbatcoderman10/blueprint-cli#r11-4-phase4-smoke --skill blueprint --agent claude-code -y --copy`; verified project-local `.claude/skills/blueprint/` and no unrelated scaffold.
+
+### MAS-211
+- Title: Alignment-Complete Command
+- Priority: Must
+- Status: approved-pending-implementation
+- Assigned milestone: Revision 11
+- Source: Revision 11 Skill-Based Agent Surface
+- Introduced by: Revision 11 Phase 6
+- Supersedes: None
+- Superseded by: None
+
+Change log:
+- 2026-07-03 - Created from Revision 11 Phase 6 planning. Locked sub-detail bullets recorded: direct `blueprint alignment-complete` command; scans existing supported root agent files (`CLAUDE.md`, `AGENTS.md`, `GEMINI.md`, `QWEN.md`); replaces `<!-- blueprint-status: alignment-required -->` with `<!-- blueprint-status: alignment-complete -->`; already-complete files are idempotent no-ops; missing-marker files are reported rather than silently changed; missing supported files are skipped; command fails clearly outside a Blueprint project. Status remains `approved-pending-implementation` until Phase 6 execution activates it.
+
+### MAS-212
+- Title: In-Place Skill Migration Command
+- Priority: Must
+- Status: approved-pending-implementation
+- Assigned milestone: Revision 11
+- Source: Revision 11 Skill-Based Agent Surface
+- Introduced by: Revision 11 Phase 6
+- Supersedes: None
+- Superseded by: None
+
+Change log:
+- 2026-07-03 - Created from Revision 11 Phase 6 planning. Locked sub-detail bullets recorded: direct `blueprint migrate` command; works from legacy or skill mode and is safe to rerun; installs bundled skill payload into both `.claude/skills/blueprint/**` and `.agents/skills/blueprint/**`; converts every supported root agent file that exists in the target codebase to its skill-mode template; preserves existing alignment marker state and adds `<!-- blueprint-status: alignment-required -->` when a converted file has no marker; deletes `docs/core/**` outright with no archive; updates or bootstraps `docs/.blueprint/manifest.json` so `managedFiles` matches existing supported root files; post-migration Doctor detects skill mode and the legacy deprecation banner stops; command fails clearly outside a Blueprint project. Status remains `approved-pending-implementation` until Phase 6 execution activates it.
 
 ---
 
