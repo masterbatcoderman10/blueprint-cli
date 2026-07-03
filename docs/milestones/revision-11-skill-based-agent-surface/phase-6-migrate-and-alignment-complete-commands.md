@@ -159,6 +159,77 @@ Gate R11-6.0 (command foundation) ───────────────�
 
 ---
 
+## Test Plan
+
+> Generated from task analysis. Each testable task has one or more tests mapped to it. Tests are written before implementation (TDD) during task execution. Framework: Vitest (`*.test.ts` under `tests/`, mirroring `src/`). `docs/conventions.md` has been sunset in this revision, so the testing convention source is the root `<ProjectConventions>` block and `package.json`.
+
+### Gate R11-6.0 Tests
+
+| Test ID | Task | Type | Description | Expected Result |
+|---------|------|------|-------------|-----------------|
+| T-R11-6.0.1.1 | R11-6.0.1 | unit | Verify supported-agent-file discovery returns only existing root `CLAUDE.md`, `AGENTS.md`, `GEMINI.md`, and `QWEN.md` files in deterministic order | Existing supported files are returned; absent supported files and unsupported files are ignored |
+| T-R11-6.0.1.2 | R11-6.0.1 | unit | Verify alignment-marker parsing distinguishes required, complete, missing marker, and absent file states | Each supported file state is reported explicitly without conflating missing markers with absent files |
+| T-R11-6.0.2.1 | R11-6.0.2 | integration | Run the migration helper against a legacy fixture with `docs/core/**`, root agent files, no local skill installs, and no `docs/.blueprint/manifest.json` | Both skill roots receive the bundled skill payload, root files are converted from `templates/skill/**`, `docs/core/**` is deleted, and the manifest is bootstrapped with `managedFiles` matching existing supported root agent files |
+| T-R11-6.0.2.2 | R11-6.0.2 | integration | Run the migration helper against fixtures with required, complete, and missing alignment markers | Existing marker states are preserved; markerless converted files receive `alignment-required` |
+| T-R11-6.0.3 | R11-6.0.3 | unit | Verify `alignment-complete` and `migrate` are exported, registered with the runtime, and listed in implemented-command help metadata | Both commands dispatch through the existing runtime and appear in root/command help without changing unrelated commands |
+| T-R11-6.0.4 | R11-6.0.4 | unit | Verify the test-helper utilities can create legacy-mode, skill-mode, marker-state, manifest, and `docs/core/**` combinations | Phase 6 tests can compose representative project fixtures without duplicating full scaffold setup |
+
+### Stream A Tests
+
+| Test ID | Task | Type | Description | Expected Result |
+|---------|------|------|-------------|-----------------|
+| T-R11-6.A.1.1 | R11-6.A.1 | integration | Run `blueprint alignment-complete` in a fixture where all four supported root agent files contain `alignment-required` | All existing supported files are rewritten to `alignment-complete` and the command exits 0 |
+| T-R11-6.A.1.2 | R11-6.A.1 | integration | Rerun `blueprint alignment-complete` in an already-complete fixture | The command exits 0, reports already-complete files, and does not rewrite file contents |
+| T-R11-6.A.1.3 | R11-6.A.1 | integration | Run `blueprint alignment-complete` with absent supported files, markerless supported files, and outside-project cwd fixtures | Absent files are skipped, markerless files are reported and unchanged, and outside-project execution fails with an actionable message |
+| T-R11-6.A.2.1 | R11-6.A.2 | unit | Verify command output text covers changed, already-complete, missing-marker, skipped, and outside-project outcomes | Each outcome is summarized concisely with enough file context for the user to act |
+| T-R11-6.A.2.2 | R11-6.A.2 | unit | Verify the help contract for `alignment-complete` documents purpose, usage, and marker-state behavior | Help text names the command behavior without stale deferred-command language |
+| T-R11-6.A.3 | R11-6.A.3 | unit | Verify the alignment-complete test contract includes positive, idempotent, missing-marker, absent-file, and outside-project cases | The planned MAS-211 behavior is protected by focused command coverage |
+
+### Stream B Tests
+
+| Test ID | Task | Type | Description | Expected Result |
+|---------|------|------|-------------|-----------------|
+| T-R11-6.B.1.1 | R11-6.B.1 | integration | Run `blueprint migrate` in a legacy Blueprint fixture and in an already skill-mode fixture | Legacy projects proceed to migration; skill-mode projects exit successfully without destructive changes |
+| T-R11-6.B.1.2 | R11-6.B.1 | integration | Run `blueprint migrate` outside a Blueprint project | The command exits nonzero with an actionable project-root error |
+| T-R11-6.B.2 | R11-6.B.2 | unit | Compare stale or partial existing `.claude/skills/blueprint/**` and `.agents/skills/blueprint/**` roots after migration against `templates/skills/blueprint/**` | Both installed skill roots are refreshed to byte-identical bundled template payloads with no missing, extra, or stale files |
+| T-R11-6.B.3 | R11-6.B.3 | integration | Migrate fixtures containing each supported root agent file with required, complete, and missing markers | Existing files are converted to the corresponding skill-mode template while preserving required/complete markers and adding required markers when absent |
+| T-R11-6.B.4.1 | R11-6.B.4 | integration | Migrate fixtures with legacy `docs/core/**` and existing or missing manifests | `docs/core/**` is removed with no archive directory, and `docs/.blueprint/manifest.json` exists with `managedFiles` matching existing supported root agent files |
+| T-R11-6.B.4.2 | R11-6.B.4 | integration | Run Doctor after migration | Doctor detects skill mode and the legacy deprecation banner no longer emits for migrated projects |
+| T-R11-6.B.5 | R11-6.B.5 | unit | Verify the migration test contract covers legacy-to-skill conversion, already-skill rerun, both skill roots, root conversion, marker preservation/addition, `docs/core/**` deletion, manifest update, Doctor mode, and deprecation suppression | The MAS-212 test suite protects every migration acceptance criterion |
+
+### Stream C Tests
+
+| Test ID | Task | Type | Description | Expected Result |
+|---------|------|------|-------------|-----------------|
+| T-R11-6.C.1.1 | R11-6.C.1 | unit | Verify the active command doc contract describes `blueprint alignment-complete` and `blueprint migrate` as available commands | README, help surfaces, and active docs no longer describe these commands as deferred Phase 6 work |
+| T-R11-6.C.1.2 | R11-6.C.1 | unit | Verify the alignment and migration doc contract states marker reporting, both local skill install roots, root entry-point conversion, and `docs/core/**` deletion | User-facing guidance matches implemented command behavior |
+| T-R11-6.C.1.3 | R11-6.C.1 | unit | Verify applicable skill/reference mirrors stay byte-identical to their source/template surfaces after documentation updates | Mirror-required command guidance cannot drift between active docs, templates, and skill payloads |
+| T-R11-6.C.2.1 | R11-6.C.2 | unit | Run the active-surface doc-contract audit for stale "coming in Phase 6" language, obsolete `docs/core/**` primary-routing instructions, and contradictory migrate/install guidance | Active operational surfaces have no stale deferred-command, legacy-primary, or contradictory install guidance |
+| T-R11-6.C.2.2 | R11-6.C.2 | integration | Inject each stale-reference category into a temporary active-surface negative fixture and run the audit helper | The audit fails with diagnostics identifying the stale category and file |
+| T-R11-6.C.3 | R11-6.C.3 | unit | Verify doc-contract coverage allows historical milestone/phase references only as archival history while rejecting active stale guidance | Future docs can preserve history without reintroducing stale current instructions |
+
+### Stream D Tests
+
+| Test ID | Task | Type | Description | Expected Result |
+|---------|------|------|-------------|-----------------|
+| — | R11-6.D.1 | — | Not testable as separate automated coverage: this task is the required execution of targeted Phase 6 tests and `npm test`. Results are recorded as phase completion evidence, and Phase 6 failures are fixed before completion. | — |
+| — | R11-6.D.2 | — | Not testable as separate automated coverage: this task is the required execution of `npm run release:pack:verify`. The command result or blocking reason is recorded as phase completion evidence. | — |
+| T-R11-6.D.3.1 | R11-6.D.3 | unit | Verify the SRS doc contract activates MAS-211 and MAS-212 only after implementation and verification evidence is present | SRS status changes are tied to completed Phase 6 command behavior and verification |
+| T-R11-6.D.3.2 | R11-6.D.3 | unit | Verify the project-progress doc contract records Revision 11 Phase 6 completion, final Revision 11 status, command behavior, and verification commands/results | Project progress accurately closes Phase 6 and the revision |
+
+### Test Summary
+
+| Component | Total Tasks | Testable | Not Testable |
+|-----------|-------------|----------|--------------|
+| Gate R11-6.0 | 4 | 4 | 0 |
+| Stream A | 3 | 3 | 0 |
+| Stream B | 5 | 5 | 0 |
+| Stream C | 3 | 3 | 0 |
+| Stream D | 3 | 1 | 2 |
+| **Total** | **18** | **16** | **2** |
+
+---
+
 ## Definition of Done
 
 - [ ] Gate R11-6.0 acceptance criteria pass
@@ -166,27 +237,11 @@ Gate R11-6.0 (command foundation) ───────────────�
 - [ ] Stream B acceptance criteria pass
 - [ ] Stream C acceptance criteria pass
 - [ ] Stream D acceptance criteria pass
+- [ ] All tests in the Test Plan pass
 - [ ] `blueprint alignment-complete` is implemented, help-documented, idempotent, and tested
 - [ ] `blueprint migrate` is implemented, help-documented, idempotent, deletes `docs/core/**`, and is tested
 - [ ] Doctor detects migrated projects as skill mode
 - [ ] Active docs no longer describe these commands as deferred Phase 6 work
 - [ ] MAS-211 and MAS-212 are active after implementation
-
----
-
-## Test Scenarios
-
-### Happy Path
-- [ ] A project with all four root agent files containing `alignment-required` runs `blueprint alignment-complete`, and all four files contain `alignment-complete`.
-- [ ] A legacy project with `docs/core/**` runs `blueprint migrate`, receives both local skill installs, converted root agent files, no `docs/core/**`, and a manifest matching existing supported root files.
-- [ ] Running Doctor after migration reports skill mode with no legacy deprecation recommendation.
-
-### Edge Cases
-- [ ] `alignment-complete` reruns against already-complete files without changing them.
-- [ ] `alignment-complete` reports root agent files that lack any supported marker.
-- [ ] `migrate` preserves complete and required marker states when converting root files.
-- [ ] `migrate` adds `alignment-required` to converted files that had no marker.
-- [ ] `migrate` reruns on an already migrated skill-mode project without recreating `docs/core/**`.
-- [ ] Both commands fail clearly outside a Blueprint project.
 
 ---
