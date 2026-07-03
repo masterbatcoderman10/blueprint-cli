@@ -5,7 +5,8 @@ import { type AgentFileName } from '../init/types'
 import { copyFileSafe } from '../init/fs-utils'
 import { getCliVersion, TEMPLATE_VERSION, writeManifest } from '../doctor/manifest'
 import { resolveTemplatePath } from '../doctor/inventory'
-import { getSkillCanonicalFiles, SKILL_INSTALL_BASES, SUPPORTED_AGENT_FILES } from '../doctor/structure'
+import { detectProjectMode, getSkillCanonicalFiles, SKILL_INSTALL_BASES, SUPPORTED_AGENT_FILES } from '../doctor/structure'
+import { findProjectRoot } from '../tracker/project-root'
 import type { CommandDefinition } from '../runtime'
 
 export const ALIGNMENT_REQUIRED_MARKER = '<!-- blueprint-status: alignment-required -->'
@@ -23,6 +24,7 @@ export interface SupportedRootAgentFileInspection extends SupportedRootAgentFile
 }
 
 export interface SkillModeMigrationResult {
+  projectMode: 'skill' | 'legacy'
   installedSkillRoots: string[]
   convertedRootFiles: AgentFileName[]
   manifestManagedFiles: AgentFileName[]
@@ -150,6 +152,16 @@ export async function updateOrBootstrapSkillModeManifest(
 }
 
 export async function migrateBlueprintProject(projectRoot: string): Promise<SkillModeMigrationResult> {
+  const modeDetection = await detectProjectMode(projectRoot)
+  if (modeDetection.mode === 'skill') {
+    return {
+      projectMode: 'skill',
+      installedSkillRoots: [],
+      convertedRootFiles: [],
+      manifestManagedFiles: [],
+    }
+  }
+
   const existingFiles = await listExistingSupportedRootAgentFiles(projectRoot)
   const installedSkillRoots = await installBlueprintSkillPayloadRoots(projectRoot)
   const convertedRootFiles = await convertExistingSupportedRootAgentFiles(projectRoot)
@@ -161,6 +173,7 @@ export async function migrateBlueprintProject(projectRoot: string): Promise<Skil
   )
 
   return {
+    projectMode: 'legacy',
     installedSkillRoots,
     convertedRootFiles,
     manifestManagedFiles: existingFiles.map((entry) => entry.fileName),
@@ -174,5 +187,24 @@ export const alignmentCompleteCommand: CommandDefinition = {
 
 export const migrateCommand: CommandDefinition = {
   name: 'migrate',
-  handler: async () => ({ exitCode: 0 }),
+  handler: async () => {
+    try {
+      const projectRoot = findProjectRoot(process.cwd())
+      const result = await migrateBlueprintProject(projectRoot)
+
+      if (result.projectMode === 'skill') {
+        console.log('Blueprint project is already in skill mode.')
+        return { exitCode: 0 }
+      }
+
+      console.log('Migrated Blueprint project to skill mode.')
+      console.log(
+        `Installed ${result.installedSkillRoots.length} skill roots, converted ${result.convertedRootFiles.length} root files, removed docs/core, and updated the manifest.`,
+      )
+      return { exitCode: 0 }
+    } catch (error) {
+      console.error(error instanceof Error ? error.message : String(error))
+      return { exitCode: 1 }
+    }
+  },
 }
