@@ -115,6 +115,9 @@ describe('R11-6.0.3 command registration and help summaries', () => {
     )
     expect(renderRootHelp()).toContain('alignment-complete')
     expect(renderRootHelp()).toContain('migrate')
+    expect(renderRootHelp()).toContain(
+      '  alignment-complete  Mark supported root agent files as alignment-complete.',
+    )
     expect(renderCommandHelp('alignment-complete')).toContain('alignment-complete')
     expect(renderCommandHelp('migrate')).toContain('migrate')
     expect(rootHelp.stdout).toContain('alignment-complete')

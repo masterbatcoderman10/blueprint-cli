@@ -8,7 +8,7 @@ export function isSupportedRootHelpInvocation(argv: string[]): boolean {
 
 export function renderRootHelp(): string {
   const commandLines = implementedCommands.map(
-    (command) => `  ${command.name.padEnd(8, ' ')}${command.summary}`,
+    (command) => `  ${command.name.padEnd(20, ' ')}${command.summary}`,
   )
 
   return ['Usage: blueprint <command>', '', 'Commands:', ...commandLines].join('\n')
