@@ -93,3 +93,15 @@ All `<AntiPatterns>` blocks in `docs/core/*.md` use the unfenced canonical XML s
 
 - `blueprint context` output should prioritize: `docs/prd.md`, `docs/project-progress.md`, then current milestone doc
 </ProjectConventions>
+
+## Execution Skill Invokation
+
+- All development subagents must use /ponytail and develop following its principles.
+
+## Orchestration Subagent Model
+
+- **Execution** :
+  - Use gpt-5.4-mini xhigh for primary execution.
+  - Prompt to gpt-5.5 high if the same stream has failed the same sort of review 2 times in a row.
+- **Review** :
+  - Use gpt-5.5 xhigh for review and for completion
