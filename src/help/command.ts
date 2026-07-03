@@ -61,7 +61,7 @@ export function renderCommandHelp(commandName: string): string {
       'Migrate a legacy Blueprint project to skill mode.',
       '',
       'Installs the bundled skill payload, converts existing root agent files,',
-      'and refreshes the manifest for the migrated project.',
+      'deletes `docs/core/**`, and refreshes the manifest for the migrated project.',
     ].join('\n')
   }
 

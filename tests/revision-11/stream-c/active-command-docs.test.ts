@@ -38,16 +38,23 @@ describe('R11-6.C active command doc contract', () => {
   it('describes alignment-complete and migrate as available on active surfaces without Phase 6 deferral language', () => {
     const readme = readDoc('README.md')
     const releaseGuide = readDoc('docs/releasing.md')
+    const migrateHelp = readDoc('src/help/command.ts')
     const templateAgents = TEMPLATE_AGENT_PATHS.map(readDoc)
     const alignmentDocs = ALIGNMENT_DOC_PATHS.map(readDoc)
 
     expect(readme).toContain('blueprint alignment-complete')
     expect(readme).toContain('blueprint migrate')
     expect(readme).toContain('Runtime help currently guides users through `init`, `doctor`, `alignment-complete`, and `migrate`')
+    expect(readme).toContain('deletes `docs/core/**`')
     expect(readme).not.toContain('Revision 11 Phase 6')
 
     expect(releaseGuide).toContain('blueprint migrate')
+    expect(releaseGuide).toContain('deletes `docs/core/**`')
     expect(releaseGuide).not.toContain('Revision 11 Phase 6')
+
+    expect(migrateHelp).toContain('Usage: blueprint migrate')
+    expect(migrateHelp).toContain('deletes `docs/core/**`')
+    expect(migrateHelp).not.toContain('Revision 11 Phase 6')
 
     for (const content of templateAgents) {
       expect(content).toContain('blueprint migrate')

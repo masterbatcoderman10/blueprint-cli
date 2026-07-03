@@ -33,7 +33,7 @@ const LEGACY_ENTRYPOINT_SKILL_FILES = [
 ] as const
 
 const EXPECTED_DEPRECATION_NOTE = `<DeprecationNote>
-  Legacy mode is deprecated. Consider migrating to skill mode for native Claude Code skill discovery and reduced context overhead. See README install instructions or run \`blueprint migrate\` (coming in Revision 11 Phase 6).
+  Legacy mode is deprecated. Consider migrating to skill mode for native Claude Code skill discovery and reduced context overhead. See README install instructions or run \`blueprint migrate\` to convert the project in place.
 </DeprecationNote>`
 
 function bodyAfterTitleLine(content: string): string {

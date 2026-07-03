@@ -29,7 +29,7 @@ Underlying script entrypoints:
 - Project-local install is the recommended path because it lands in `.claude/skills/blueprint/` where Claude Code discovers the skill natively
 - Avoid `-g` for the skill install path; that is the current Claude Code discovery sharp edge because global installs land outside the project-local discovery path
 - No fallback-installer workflow is promised in Phase 4
-- If a legacy Blueprint project needs in-place conversion, use `blueprint migrate` after install
+- If a legacy Blueprint project needs in-place conversion, use `blueprint migrate` after install; it deletes `docs/core/**`
 
 ## Release Tag Contract
 
