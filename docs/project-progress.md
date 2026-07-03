@@ -2,9 +2,9 @@
 
 **Project**: blueprint-cli
 **Tracker**: blueprint-cli
-**Current Milestone**: Revision 11 — Skill-Based Agent Surface (Phase 6 pending planning)
-**Current Phase**: TBD — pending phase planning
-**Status**: Revision 11 Phase 5 — Dogfood & Cross-Reference Verification is complete. Next step: plan Revision 11 Phase 6 — Migrate & Alignment-Complete Commands.
+**Current Milestone**: Revision 11 — Skill-Based Agent Surface (complete)
+**Current Phase**: Complete — all planned Revision 11 phases done
+**Status**: Revision 11 Phase 6 — Migrate & Alignment-Complete Commands is complete. Revision 11 — Skill-Based Agent Surface is complete.
 
 ---
 
@@ -104,6 +104,7 @@
 - 2026-05-26: Revision 11 Phase 3 — CLI Deprecation Banner & Conventions Sunset completed. All tasks done (including BUG-R11-3-001..022), DoD satisfied, full test suite green (1245 passed, 2 skipped; 170 files passed, 1 skipped).
 - 2026-06-09: Revision 11 Phase 4 — NPX Install Pathway & Release Surface completed. All tasks done, DoD satisfied, full test suite green (1289 passed, 2 skipped; 176 files passed, 1 skipped). Public GitHub-backed skill install smoke passed against `r11-4-phase4-smoke` at `98e36d81dde09b6ce46693899aed6e43b6216c7d` using `npx skills add masterbatcoderman10/blueprint-cli#r11-4-phase4-smoke --skill blueprint --agent claude-code -y --copy`.
 - 2026-06-11: Revision 11 Phase 5 — Dogfood & Cross-Reference Verification completed. All tasks done, DoD satisfied, full test suite green (1314 passed, 2 skipped; 182 files passed, 1 skipped). Dogfood evidence: the installed setup gate passed with populated `docs/project-progress.md`, initialized `docs/.blueprint/tasks.db`, and successful `.claude/skills/blueprint/scripts/load-context.mjs` output; the real tweak run was recorded in `docs/tweaks/tweak-6-skill-mode-tweak-example.md`; the active-surface cross-reference audit stayed clean; `npm test -- tests/revision-11/phase-5`, `npm test`, and `npm run release:pack:verify` all passed.
+- 2026-07-03: Revision 11 Phase 6 — Migrate & Alignment-Complete Commands completed. Targeted Phase 6 command and doc-contract tests passed; `npm test` passed (1314 passed, 2 skipped; 182 files passed, 1 skipped); `npm run release:pack:verify` passed. MAS-211 and MAS-212 were activated in `docs/srs.md`, and the final Revision 11 status was recorded here.
 
 ---
 
@@ -162,13 +163,13 @@ R9 — Tracker Workflow QoL
 R10 — Health-Check Bypass & Anti-Pattern Shape Unification
 ├── Phase 1 — Health-Check Bypass ✓
 ├── Phase 2 — Anti-Pattern Shape Unification ✓
-R11 — Skill-Based Agent Surface
+ R11 — Skill-Based Agent Surface ✓
 ├── Phase 1 — Skill Authorship & Mode-Aware Scaffold ✓
 ├── Phase 2 — Doctor Mode Awareness & Dual-Source Repair ✓
 ├── Phase 3 — CLI Deprecation Banner & Conventions Sunset ✓
 ├── Phase 4 — NPX Install Pathway & Release Surface ✓
 ├── Phase 5 — Dogfood & Cross-Reference Verification ✓
-└── Phase 6 — Migrate & Alignment-Complete Commands ○
+└── Phase 6 — Migrate & Alignment-Complete Commands ✓
 M2 — Cross-Project Context (Optional Post-MVP)
 └── Phase 1 — TBD ○
 M3 — Workflow Visibility Enhancements (Optional Future)
@@ -179,9 +180,4 @@ M3 — Workflow Visibility Enhancements (Optional Future)
 
 ## Pending Revisions
 
-> Track revisions that have been identified but not yet executed.
-> The agent should surface these at session start.
-
-| Revision | Name | Status | Notes |
-|----------|------|--------|-------|
-| R11 | Skill-Based Agent Surface | Phase 6 pending planning | 6 phases outlined (Phase 6 added during Phase 1 planning for deferred `alignment-complete` + `migrate` commands). Phases 1, 2, 3, 4, and 5 complete. Next: Phase 6 — Migrate & Alignment-Complete Commands (not yet planned). Docs: `docs/milestones/revision-11-skill-based-agent-surface/revision-11-skill-based-agent-surface.md`, `phase-5-dogfood-and-cross-reference-verification.md` |
+_None._
