@@ -9,7 +9,7 @@ Before routing any intent, verify the project is ready:
 
 1. **Project progress** — `docs/project-progress.md` must exist and be populated (not a blank template). If missing or empty, inform the user that Blueprint has not been initialized and they should run `blueprint init`.
 2. **Tracker** — `docs/.blueprint/tasks.db` must exist (tracker initialized). If missing, instruct the user to install `blueprint-cli` and run `blueprint init` to provision the tracker database and project scaffold.
-3. **Context brief** — Run `node .claude/skills/blueprint/scripts/load-context.mjs` to load current project state into context.
+3. **Context brief** — From this installed skill directory, run `node scripts/load-context.mjs` to load current project state into context.
 
 If any prerequisite fails, STOP and inform the user. Do not proceed with routing.
 

@@ -2,17 +2,19 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest'
 import { join, resolve } from 'node:path'
 import { mkdtemp, rm, readFile, readdir, stat, existsSync, writeFile, mkdir } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
-import { copyFileSafe, safeMkdirP } from '../../../src/init/fs-utils'
+import { copyFileSafe } from '../../../src/init/fs-utils'
 import {
   scaffoldBlueprintDirectory,
   generateAgentFiles,
   copyCoreTemplates,
   copySkillPayload,
   copySkillModeAgentStubs,
+  executeScaffold,
 } from '../../../src/init/archive-engine'
 import type { InitOptions, Mode } from '../../../src/init/types'
 
 const TEMPLATES_DIR = join(__dirname, '../../../templates')
+const EXPECTED_SKILL_INSTALL_BASES = ['.claude/skills/blueprint', '.agents/skills/blueprint'] as const
 const EXPECTED_SKILL_STUB = `This project uses the Blueprint development system.
 
 Invoke the \`blueprint\` skill at session start and before any planning,
@@ -106,20 +108,16 @@ describe('T-R11-1.D.2 — Scaffold engine branched on Mode', () => {
   })
 
   describe('T-R11-1.D.2.1: skill mode scaffold', () => {
-    it('produces .claude/skills/blueprint/SKILL.md and reference files and scripts', async () => {
+    it('produces .claude and .agents skill payloads with SKILL.md, references, and scripts', async () => {
       const options = makeInitOptions({ mode: 'skill' })
-
-      // Create .claude/skills/blueprint structure in target
-      const skillDir = join(tmpDir, '.claude', 'skills', 'blueprint')
-      await safeMkdirP(skillDir)
 
       await copySkillPayload(tmpDir, options)
 
-      // SKILL.md should exist
-      expect(await fileExists(join(tmpDir, '.claude', 'skills', 'blueprint', 'SKILL.md'))).toBe(true)
-
-      // anti-patterns.md should exist
-      expect(await fileExists(join(tmpDir, '.claude', 'skills', 'blueprint', 'reference', 'anti-patterns.md'))).toBe(true)
+      for (const skillBase of EXPECTED_SKILL_INSTALL_BASES) {
+        expect(await fileExists(join(tmpDir, skillBase, 'SKILL.md'))).toBe(true)
+        expect(await fileExists(join(tmpDir, skillBase, 'reference', 'anti-patterns.md'))).toBe(true)
+        expect(await fileExists(join(tmpDir, skillBase, 'scripts', 'load-context.mjs'))).toBe(true)
+      }
     })
 
     it('produces skill-mode agent entry-point stubs from templates/skill/', async () => {
@@ -154,6 +152,23 @@ describe('T-R11-1.D.2 — Scaffold engine branched on Mode', () => {
 
       // docs/core should not exist in skill mode
       expect(await dirExists(join(tmpDir, 'docs', 'core'))).toBe(false)
+    })
+
+    it('reports both supported skill install directories in skill mode', async () => {
+      const options = makeInitOptions({ mode: 'skill' })
+
+      const result = await executeScaffold(tmpDir, options)
+
+      expect(result.createdDirectories).toEqual(
+        expect.arrayContaining([
+          'docs/',
+          'docs/knowledge-base/',
+          'docs/milestones/',
+          'docs/tweaks/',
+          '.claude/skills/blueprint/',
+          '.agents/skills/blueprint/',
+        ]),
+      )
     })
   })
 

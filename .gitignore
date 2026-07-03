@@ -27,7 +27,11 @@ pnpm-debug.log*
 docs/.blueprint/tasks.db
 
 # Agent / AI tooling (local only)
-.agents/
+.agents/*
+!.agents/skills/
+.agents/skills/*
+!.agents/skills/blueprint/
+!.agents/skills/blueprint/**
 .antigravitycli/
 .claude/*
 !.claude/skills/

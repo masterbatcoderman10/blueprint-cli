@@ -61,6 +61,14 @@ describe('R11-4.A skill payload mirror contract', () => {
     await assertSkillPayloadMirror(templateRoot, repoRoot)
   })
 
+  it('keeps setup-gate script instructions relative to the installed skill directory', async () => {
+    const skillReadme = await readFile(join(templateRoot, 'SKILL.md'), 'utf-8')
+
+    expect(skillReadme).toContain('node scripts/load-context.mjs')
+    expect(skillReadme).not.toContain('.claude/skills/blueprint')
+    expect(skillReadme).not.toContain('.agents/skills/blueprint')
+  })
+
   it('T-R11-4.A.2.1/T-R11-4.A.2.2 rejects missing, drifted, and extra files when validating a mirrored payload', async () => {
     const tempDir = await mkdtemp(join(tmpdir(), 'blueprint-skill-mirror-'))
     const tempTemplateRoot = join(tempDir, 'templates/skills/blueprint')
