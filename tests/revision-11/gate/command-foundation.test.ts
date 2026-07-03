@@ -1,4 +1,4 @@
-import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises'
+import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
 
@@ -24,6 +24,17 @@ async function makeProjectDir(prefix = 'blueprint-r11-6-command-'): Promise<stri
   const dir = await mkdtemp(join(tmpdir(), prefix))
   tempDirs.push(dir)
   return dir
+}
+
+async function runCliInProject(projectDir: string, argv: string[]) {
+  const originalCwd = process.cwd()
+  process.chdir(projectDir)
+
+  try {
+    return await invokeCli(argv)
+  } finally {
+    process.chdir(originalCwd)
+  }
 }
 
 afterEach(async () => {
@@ -99,11 +110,14 @@ describe('R11-6.0.2 skill-mode migration helpers', () => {
 
 describe('R11-6.0.3 command registration and help summaries', () => {
   it('exports alignment-complete and migrate through runtime registration and help metadata', async () => {
-    const rootHelp = await invokeCli([])
-    const alignmentHelp = await invokeCli(['alignment-complete', '--help'])
-    const migrateHelp = await invokeCli(['migrate', '--help'])
-    const alignmentRun = await invokeCli(['alignment-complete'])
-    const migrateRun = await invokeCli(['migrate'])
+    const projectDir = await makeProjectDir()
+    await mkdir(join(projectDir, 'docs', '.blueprint'), { recursive: true })
+
+    const rootHelp = await runCliInProject(projectDir, [])
+    const alignmentHelp = await runCliInProject(projectDir, ['alignment-complete', '--help'])
+    const migrateHelp = await runCliInProject(projectDir, ['migrate', '--help'])
+    const alignmentRun = await runCliInProject(projectDir, ['alignment-complete'])
+    const migrateRun = await runCliInProject(projectDir, ['migrate'])
 
     expect(alignmentCompleteCommand.name).toBe('alignment-complete')
     expect(migrateCommand.name).toBe('migrate')
