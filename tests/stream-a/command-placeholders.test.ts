@@ -3,12 +3,14 @@ import { describe, expect, it } from 'vitest'
 import { contextCommand, initCommand, linkCommand, placeholderCommands } from '../../src/commands'
 
 describe('T-A.3: Placeholder command boundaries', () => {
-  it('exports init, link, context, and doctor command boundaries', () => {
+  it('exports init, link, context, doctor, alignment-complete, and migrate command boundaries', () => {
     expect(placeholderCommands.map((command) => command.name)).toEqual([
       'init',
       'link',
       'context',
       'doctor',
+      'alignment-complete',
+      'migrate',
     ])
   })
 

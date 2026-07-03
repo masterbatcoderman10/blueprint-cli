@@ -396,7 +396,7 @@ Change log:
 
 Change log:
 - 2026-07-03 - Created from Revision 11 Phase 6 planning. Locked sub-detail bullets recorded: direct `blueprint alignment-complete` command; scans existing supported root agent files (`CLAUDE.md`, `AGENTS.md`, `GEMINI.md`, `QWEN.md`); replaces `<!-- blueprint-status: alignment-required -->` with `<!-- blueprint-status: alignment-complete -->`; already-complete files are idempotent no-ops; missing-marker files are reported rather than silently changed; missing supported files are skipped; command fails clearly outside a Blueprint project. Status remains `approved-pending-implementation` until Phase 6 execution activates it.
-- 2026-07-03 - Transitioned to active after Revision 11 Phase 6 completion and verification. `blueprint alignment-complete` now ships as the direct marker-flip command for supported root agent files; targeted Phase 6 command/doc-contract tests and `npm test` passed before activation.
+- 2026-07-03 - Phase 6 review fix applied. `blueprint alignment-complete` now ships as the direct marker-flip command for supported root agent files; targeted Phase 6 command/doc-contract tests pass, but full `npm test` still fails on unrelated pre-existing regressions outside Stream D, so closeout remains blocked for now.
 
 ### MAS-212
 - Title: In-Place Skill Migration Command
@@ -410,7 +410,7 @@ Change log:
 
 Change log:
 - 2026-07-03 - Created from Revision 11 Phase 6 planning. Locked sub-detail bullets recorded: direct `blueprint migrate` command; works from legacy or skill mode and is safe to rerun; installs bundled skill payload into both `.claude/skills/blueprint/**` and `.agents/skills/blueprint/**`; converts every supported root agent file that exists in the target codebase to its skill-mode template; preserves existing alignment marker state and adds `<!-- blueprint-status: alignment-required -->` when a converted file has no marker; deletes `docs/core/**` outright with no archive; updates or bootstraps `docs/.blueprint/manifest.json` so `managedFiles` matches existing supported root files; post-migration Doctor detects skill mode and the legacy deprecation banner stops; command fails clearly outside a Blueprint project. Status remains `approved-pending-implementation` until Phase 6 execution activates it.
-- 2026-07-03 - Transitioned to active after Revision 11 Phase 6 completion and verification. `blueprint migrate` now ships as the in-place legacy-to-skill conversion command; targeted Phase 6 command/doc-contract tests and `npm run release:pack:verify` passed before activation.
+- 2026-07-03 - Phase 6 review fix applied. `blueprint migrate` now ships as the in-place legacy-to-skill conversion command; targeted Phase 6 command/doc-contract tests pass and `npm run release:pack:verify` remains passing, but closeout is blocked until the unrelated full-suite regressions outside Stream D are repaired.
 
 ---
 

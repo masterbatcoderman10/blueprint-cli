@@ -4,15 +4,21 @@ import { isImplementedCommand, implementedCommands } from '../../../src/help/imp
 import { invokeCli } from '../../helpers/cli'
 
 describe('T-B.1.1: Command-help metadata for implemented commands', () => {
-  it('command-help metadata exists for init and doctor', () => {
-    expect(implementedCommands).toHaveLength(2)
-    expect(implementedCommands.map((c) => c.name)).toContain('init')
-    expect(implementedCommands.map((c) => c.name)).toContain('doctor')
+  it('command-help metadata exists for init, doctor, alignment-complete, and migrate', () => {
+    expect(implementedCommands).toHaveLength(4)
+    expect(implementedCommands.map((c) => c.name)).toEqual([
+      'init',
+      'doctor',
+      'alignment-complete',
+      'migrate',
+    ])
   })
 
   it('command-help metadata stays separate from placeholder command definitions', () => {
     expect(isImplementedCommand('init')).toBe(true)
     expect(isImplementedCommand('doctor')).toBe(true)
+    expect(isImplementedCommand('alignment-complete')).toBe(true)
+    expect(isImplementedCommand('migrate')).toBe(true)
     expect(isImplementedCommand('link')).toBe(false)
     expect(isImplementedCommand('context')).toBe(false)
   })
@@ -25,6 +31,14 @@ describe('T-B.1.1: Command-help metadata for implemented commands', () => {
     const doctorResult = await invokeCli(['help', 'doctor'])
     expect(doctorResult.exitCode).toBe(0)
     expect(doctorResult.stdout).toContain('doctor')
+
+    const alignmentResult = await invokeCli(['help', 'alignment-complete'])
+    expect(alignmentResult.exitCode).toBe(0)
+    expect(alignmentResult.stdout).toContain('alignment-complete')
+
+    const migrateResult = await invokeCli(['help', 'migrate'])
+    expect(migrateResult.exitCode).toBe(0)
+    expect(migrateResult.stdout).toContain('migrate')
 
     const linkResult = await invokeCli(['help', 'link'])
     expect(linkResult.exitCode).toBe(1)
