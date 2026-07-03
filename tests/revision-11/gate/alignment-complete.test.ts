@@ -13,8 +13,10 @@ describe('T-R11-1.0.4 — alignment.md alignment-complete step', () => {
     // Must reference the alignment-complete command
     expect(content).toContain('alignment-complete')
 
-    // Must indicate it is deferred to Revision 11 Phase 6
-    expect(content).toMatch(/Revision 11 Phase 6|deferred/)
+    // Must describe current command behavior, not old deferral copy
+    expect(content).toContain('flips the `<!-- blueprint-status: alignment-required -->`')
+    expect(content).toContain('already-complete, missing-marker, and absent-file cases')
+    expect(content).not.toMatch(/Revision 11 Phase 6|deferred/)
 
     // Must indicate it runs after alignment artifacts are confirmed and committed
     expect(content.toLowerCase()).toMatch(/confirmed.*committed|committed.*confirmed/)
