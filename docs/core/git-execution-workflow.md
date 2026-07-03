@@ -37,14 +37,28 @@ referenced again at completion for commit.
   PURPOSE: Create an isolated working directory for the gate
   or stream before any task execution begins.
 
-  STEP 1 — CHECK FOR EXISTING WORKTREE
+  STEP 1 — UPDATE PRIMARY BRANCH (TOP-LEVEL ONLY)
+    Only the top-level agent coordinating the gate, stream, or phase
+    runs this step, once before it creates or reuses worktrees or
+    dispatches execution sub-agents. Delegated execution sub-agents
+    skip this step; they do not run git pull.
+
+    From the main working directory:
+      git checkout main
+      git pull --ff-only
+
+    If the project uses a different primary branch, use that branch
+    instead of main. If the pull fails, STOP and report the git error
+    before checking worktrees or starting execution.
+
+  STEP 2 — CHECK FOR EXISTING WORKTREE
     Run: git worktree list
     IF the worktree for this gate or stream already exists
     (e.g., resuming after an interrupted session):
       → Navigate to it. Do not recreate.
       → Continue to task execution.
 
-  STEP 2 — VERIFY DEPENDENCIES (dependent streams only)
+  STEP 3 — VERIFY DEPENDENCIES (dependent streams only)
     IF the gate or stream has dependencies on other streams:
       a. Check the tracker — all dependency streams' tasks
          must be in DONE. This confirms review passed and the
@@ -59,14 +73,14 @@ referenced again at completion for commit.
       → STOP. Inform user: "Stream <X> depends on <Y>, but
         <Y> has not been merged to main yet."
 
-  STEP 3 — CREATE THE WORKTREE
+  STEP 4 — CREATE THE WORKTREE
     git worktree add worktrees/<n> -b <n>
 
     This branches from main (or the project's primary branch).
     For dependent streams, main already includes the merged work
     of all dependencies.
 
-  STEP 4 — NAVIGATE
+  STEP 5 — NAVIGATE
     cd worktrees/<n>/
     All task execution happens inside this directory.
 </WorktreeCreation>
@@ -81,6 +95,9 @@ referenced again at completion for commit.
     the main working directory during execution.
   - Worktrees branch from main. Dependent streams branch from
     main AFTER their dependencies have been merged.
+  - The primary-branch pull is a top-level coordination step.
+    Delegated execution sub-agents must not run git pull; they
+    use the worktree and branch state prepared after the top-level pull.
   - If a session is interrupted and resumed, the agent checks
     for existing worktrees before creating new ones.
   - Sub-agents for parallel streams each work in their own
