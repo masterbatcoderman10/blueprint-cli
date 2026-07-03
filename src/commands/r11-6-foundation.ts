@@ -6,7 +6,7 @@ import { copyFileSafe } from '../init/fs-utils'
 import { getCliVersion, TEMPLATE_VERSION, writeManifest } from '../doctor/manifest'
 import { resolveTemplatePath } from '../doctor/inventory'
 import { detectProjectMode, getSkillCanonicalFiles, SKILL_INSTALL_BASES, SUPPORTED_AGENT_FILES } from '../doctor/structure'
-import { findProjectRoot } from '../tracker/project-root'
+import { findProjectRoot, projectRootErrorMessage } from '../tracker/project-root'
 import type { CommandDefinition } from '../runtime'
 
 export const ALIGNMENT_REQUIRED_MARKER = '<!-- blueprint-status: alignment-required -->'
@@ -30,6 +30,13 @@ export interface SkillModeMigrationResult {
   manifestManagedFiles: AgentFileName[]
 }
 
+export interface AlignmentCompleteResult {
+  changed: AgentFileName[]
+  alreadyComplete: AgentFileName[]
+  missingMarker: AgentFileName[]
+  skipped: AgentFileName[]
+}
+
 function skillTemplatePath(fileName: AgentFileName): string {
   return join(__dirname, '../../templates/skill', fileName)
 }
@@ -50,6 +57,52 @@ async function appendAlignmentMarker(filePath: string, marker: string): Promise<
 
 async function copyRootAgentTemplate(projectRoot: string, fileName: AgentFileName): Promise<void> {
   await copyFileSafe(skillTemplatePath(fileName), join(projectRoot, fileName))
+}
+
+function renderAlignmentCompleteSummary(result: AlignmentCompleteResult): string {
+  const sections = [
+    result.changed.length > 0 ? `Changed: ${result.changed.join(', ')}` : null,
+    result.alreadyComplete.length > 0 ? `Already complete: ${result.alreadyComplete.join(', ')}` : null,
+    result.missingMarker.length > 0 ? `Missing marker: ${result.missingMarker.join(', ')}` : null,
+    result.skipped.length > 0 ? `Skipped absent: ${result.skipped.join(', ')}` : null,
+  ].filter((line): line is string => line !== null)
+
+  return sections.join('\n')
+}
+
+async function completeAlignmentMarkers(projectRoot: string): Promise<AlignmentCompleteResult> {
+  const inspected = await inspectSupportedRootAgentFiles(projectRoot)
+  const result: AlignmentCompleteResult = {
+    changed: [],
+    alreadyComplete: [],
+    missingMarker: [],
+    skipped: [],
+  }
+
+  for (const entry of inspected) {
+    switch (entry.state) {
+      case 'required': {
+        const content = await readFile(entry.path, 'utf-8')
+        const updated = content.replaceAll(ALIGNMENT_REQUIRED_MARKER, ALIGNMENT_COMPLETE_MARKER)
+        if (updated !== content) {
+          await writeFile(entry.path, updated, 'utf-8')
+        }
+        result.changed.push(entry.fileName)
+        break
+      }
+      case 'complete':
+        result.alreadyComplete.push(entry.fileName)
+        break
+      case 'missing-marker':
+        result.missingMarker.push(entry.fileName)
+        break
+      case 'absent':
+        result.skipped.push(entry.fileName)
+        break
+    }
+  }
+
+  return result
 }
 
 export async function readAlignmentMarkerState(filePath: string): Promise<AlignmentMarkerState> {
@@ -102,6 +155,8 @@ export async function installBlueprintSkillPayloadRoots(projectRoot: string): Pr
   const normalizedRoot = resolve(projectRoot)
 
   for (const skillBase of SKILL_INSTALL_BASES) {
+    await rm(join(normalizedRoot, skillBase), { force: true, recursive: true })
+
     for (const relativePath of getSkillCanonicalFiles(skillBase)) {
       await copyFileSafe(resolveTemplatePath(relativePath), join(normalizedRoot, relativePath))
     }
@@ -153,17 +208,18 @@ export async function updateOrBootstrapSkillModeManifest(
 
 export async function migrateBlueprintProject(projectRoot: string): Promise<SkillModeMigrationResult> {
   const modeDetection = await detectProjectMode(projectRoot)
+  const installedSkillRoots = await installBlueprintSkillPayloadRoots(projectRoot)
+
   if (modeDetection.mode === 'skill') {
     return {
       projectMode: 'skill',
-      installedSkillRoots: [],
+      installedSkillRoots,
       convertedRootFiles: [],
       manifestManagedFiles: [],
     }
   }
 
   const existingFiles = await listExistingSupportedRootAgentFiles(projectRoot)
-  const installedSkillRoots = await installBlueprintSkillPayloadRoots(projectRoot)
   const convertedRootFiles = await convertExistingSupportedRootAgentFiles(projectRoot)
 
   await removeDocsCoreDirectory(projectRoot)
@@ -182,7 +238,23 @@ export async function migrateBlueprintProject(projectRoot: string): Promise<Skil
 
 export const alignmentCompleteCommand: CommandDefinition = {
   name: 'alignment-complete',
-  handler: async () => ({ exitCode: 0 }),
+  handler: async () => {
+    try {
+      const projectRoot = findProjectRoot(process.cwd())
+      const result = await completeAlignmentMarkers(projectRoot)
+      const summary = renderAlignmentCompleteSummary(result)
+
+      if (summary.length > 0) {
+        process.stdout.write(`${summary}\n`)
+      }
+
+      return { exitCode: 0 }
+    } catch (error) {
+      const message = error instanceof Error ? error.message : projectRootErrorMessage
+      process.stderr.write(`Blueprint alignment-complete failed: ${message}\n`)
+      return { exitCode: 1 }
+    }
+  },
 }
 
 export const migrateCommand: CommandDefinition = {

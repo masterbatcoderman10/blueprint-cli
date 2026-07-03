@@ -48,7 +48,9 @@ export function renderCommandHelp(commandName: string): string {
       '',
       'Mark supported root agent files as alignment-complete.',
       '',
-      'Checks CLAUDE.md, AGENTS.md, GEMINI.md, and QWEN.md in the project root.',
+      'Rewrites alignment-required markers to alignment-complete, reports already-complete',
+      'and missing-marker files, skips absent files, and fails outside a Blueprint project',
+      'with the project-root error.',
     ].join('\n')
   }
 

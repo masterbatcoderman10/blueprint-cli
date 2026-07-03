@@ -45,6 +45,19 @@ async function appendMarker(projectDir: string, fileName: (typeof rootFiles)[num
   await writeFile(filePath, `${normalized}${marker}\n`, 'utf-8')
 }
 
+async function seedStaleSkillPayloadRoots(projectDir: string): Promise<void> {
+  const claudeSkillRoot = join(projectDir, '.claude', 'skills', 'blueprint')
+  const agentsSkillRoot = join(projectDir, '.agents', 'skills', 'blueprint')
+
+  await rm(join(claudeSkillRoot, 'reference', 'align.md'), { force: true })
+  await writeFile(join(claudeSkillRoot, 'reference', 'stale.md'), '# stale\n', 'utf-8')
+  await writeFile(join(claudeSkillRoot, 'SKILL.md'), '# stale skill root\n', 'utf-8')
+
+  await rm(join(agentsSkillRoot, 'scripts', 'load-context.mjs'), { force: true })
+  await writeFile(join(agentsSkillRoot, 'reference', 'review.md'), '# drifted\n', 'utf-8')
+  await writeFile(join(agentsSkillRoot, 'reference', 'extra.md'), '# extra\n', 'utf-8')
+}
+
 beforeEach(() => {
   __resetDeprecationBannerForTesting()
   logSpy = vi.spyOn(console, 'log').mockImplementation(() => undefined)
@@ -154,6 +167,27 @@ describe('T-R11-6.B.1/B.2/B.3/B.4/B.5 migrate command', () => {
     }
   })
 
+  it('refreshes stale skill-mode payload roots on migrate rerun and restores the canonical payload', async () => {
+    const project = await createGateProject()
+
+    try {
+      await writeSkillModeProject(project.rootDir, { managedFiles: [...rootFiles] })
+      await seedStaleSkillPayloadRoots(project.rootDir)
+
+      const migrateResult = await withCwd(project.rootDir, async () =>
+        migrateCommand.handler({ commandName: 'migrate', args: [], rawArgv: ['migrate'] }),
+      )
+
+      expect(migrateResult).toEqual({ exitCode: 0 })
+      for (const skillBase of skillInstallRoots) {
+        await assertLocalSkillPayloadMirror(skillPayloadTemplateRoot, join(project.rootDir, skillBase))
+      }
+      expect(await pathExists(join(project.rootDir, 'docs', 'core'))).toBe(false)
+    } finally {
+      await project.cleanup()
+    }
+  })
+
   it('fails outside a Blueprint project with an actionable root error', async () => {
     const projectDir = await makeProjectDir()
 
@@ -161,7 +195,7 @@ describe('T-R11-6.B.1/B.2/B.3/B.4/B.5 migrate command', () => {
       migrateCommand.handler({ commandName: 'migrate', args: [], rawArgv: ['migrate'] }),
     )
 
-      expect(result).toEqual({ exitCode: 1 })
-      expect(errorSpy).toHaveBeenCalledWith('not in a Blueprint project — run `blueprint init` here first')
-    })
+    expect(result).toEqual({ exitCode: 1 })
+    expect(errorSpy).toHaveBeenCalledWith('not in a Blueprint project — run `blueprint init` here first')
+  })
 })
