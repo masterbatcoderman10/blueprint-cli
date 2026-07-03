@@ -12,6 +12,14 @@ export const implementedCommands: ImplementedCommand[] = [
     name: 'doctor',
     summary: 'Audit and repair the current Blueprint project.',
   },
+  {
+    name: 'alignment-complete',
+    summary: 'Mark supported root agent files as alignment-complete.',
+  },
+  {
+    name: 'migrate',
+    summary: 'Migrate a Blueprint project to skill mode.',
+  },
 ]
 
 const implementedCommandNames = new Set(implementedCommands.map((c) => c.name))

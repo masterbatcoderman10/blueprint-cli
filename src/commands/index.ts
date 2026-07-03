@@ -3,7 +3,15 @@ import { contextCommand } from './context'
 import { doctorCommand } from './doctor'
 import { initCommand } from './init'
 import { linkCommand } from './link'
+import { alignmentCompleteCommand, migrateCommand } from './r11-6-foundation'
 
-export { boardCommand, contextCommand, doctorCommand, initCommand, linkCommand }
+export { alignmentCompleteCommand, boardCommand, contextCommand, doctorCommand, initCommand, linkCommand, migrateCommand }
 
-export const placeholderCommands = [initCommand, linkCommand, contextCommand, doctorCommand]
+export const placeholderCommands = [
+  initCommand,
+  linkCommand,
+  contextCommand,
+  doctorCommand,
+  alignmentCompleteCommand,
+  migrateCommand,
+]

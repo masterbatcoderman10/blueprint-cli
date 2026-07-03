@@ -42,6 +42,27 @@ export function renderCommandHelp(commandName: string): string {
     ].join('\n')
   }
 
+  if (commandName === 'alignment-complete') {
+    return [
+      'Usage: blueprint alignment-complete',
+      '',
+      'Mark supported root agent files as alignment-complete.',
+      '',
+      'Checks CLAUDE.md, AGENTS.md, GEMINI.md, and QWEN.md in the project root.',
+    ].join('\n')
+  }
+
+  if (commandName === 'migrate') {
+    return [
+      'Usage: blueprint migrate',
+      '',
+      'Migrate a legacy Blueprint project to skill mode.',
+      '',
+      'Installs the bundled skill payload, converts existing root agent files,',
+      'and refreshes the manifest for the migrated project.',
+    ].join('\n')
+  }
+
   return ''
 }
 

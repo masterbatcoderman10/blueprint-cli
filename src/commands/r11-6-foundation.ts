@@ -1,0 +1,178 @@
+import { readFile, rm, stat, writeFile } from 'node:fs/promises'
+import { join, resolve } from 'node:path'
+
+import { type AgentFileName } from '../init/types'
+import { copyFileSafe } from '../init/fs-utils'
+import { getCliVersion, TEMPLATE_VERSION, writeManifest } from '../doctor/manifest'
+import { resolveTemplatePath } from '../doctor/inventory'
+import { getSkillCanonicalFiles, SKILL_INSTALL_BASES, SUPPORTED_AGENT_FILES } from '../doctor/structure'
+import type { CommandDefinition } from '../runtime'
+
+export const ALIGNMENT_REQUIRED_MARKER = '<!-- blueprint-status: alignment-required -->'
+export const ALIGNMENT_COMPLETE_MARKER = '<!-- blueprint-status: alignment-complete -->'
+
+export type AlignmentMarkerState = 'required' | 'complete' | 'missing-marker' | 'absent'
+
+export interface SupportedRootAgentFileDiscovery {
+  fileName: AgentFileName
+  path: string
+}
+
+export interface SupportedRootAgentFileInspection extends SupportedRootAgentFileDiscovery {
+  state: AlignmentMarkerState
+}
+
+export interface SkillModeMigrationResult {
+  installedSkillRoots: string[]
+  convertedRootFiles: AgentFileName[]
+  manifestManagedFiles: AgentFileName[]
+}
+
+function skillTemplatePath(fileName: AgentFileName): string {
+  return join(__dirname, '../../templates/skill', fileName)
+}
+
+async function fileExists(filePath: string): Promise<boolean> {
+  try {
+    return (await stat(filePath)).isFile()
+  } catch {
+    return false
+  }
+}
+
+async function appendAlignmentMarker(filePath: string, marker: string): Promise<void> {
+  const content = await readFile(filePath, 'utf-8')
+  const normalized = content.endsWith('\n') ? content : `${content}\n`
+  await writeFile(filePath, `${normalized}${marker}\n`, 'utf-8')
+}
+
+async function copyRootAgentTemplate(projectRoot: string, fileName: AgentFileName): Promise<void> {
+  await copyFileSafe(skillTemplatePath(fileName), join(projectRoot, fileName))
+}
+
+export async function readAlignmentMarkerState(filePath: string): Promise<AlignmentMarkerState> {
+  if (!(await fileExists(filePath))) {
+    return 'absent'
+  }
+
+  const content = await readFile(filePath, 'utf-8')
+  if (content.includes(ALIGNMENT_COMPLETE_MARKER)) {
+    return 'complete'
+  }
+
+  if (content.includes(ALIGNMENT_REQUIRED_MARKER)) {
+    return 'required'
+  }
+
+  return 'missing-marker'
+}
+
+export async function inspectSupportedRootAgentFiles(
+  projectRoot: string,
+): Promise<SupportedRootAgentFileInspection[]> {
+  const normalizedRoot = resolve(projectRoot)
+  const inspected: SupportedRootAgentFileInspection[] = []
+
+  for (const fileName of SUPPORTED_AGENT_FILES as AgentFileName[]) {
+    const path = join(normalizedRoot, fileName)
+    inspected.push({
+      fileName,
+      path,
+      state: await readAlignmentMarkerState(path),
+    })
+  }
+
+  return inspected
+}
+
+export async function listExistingSupportedRootAgentFiles(
+  projectRoot: string,
+): Promise<SupportedRootAgentFileDiscovery[]> {
+  return (await inspectSupportedRootAgentFiles(projectRoot))
+    .filter((entry) => entry.state !== 'absent')
+    .map(({ fileName, path }) => ({
+      fileName,
+      path,
+    }))
+}
+
+export async function installBlueprintSkillPayloadRoots(projectRoot: string): Promise<string[]> {
+  const normalizedRoot = resolve(projectRoot)
+
+  for (const skillBase of SKILL_INSTALL_BASES) {
+    for (const relativePath of getSkillCanonicalFiles(skillBase)) {
+      await copyFileSafe(resolveTemplatePath(relativePath), join(normalizedRoot, relativePath))
+    }
+  }
+
+  return [...SKILL_INSTALL_BASES]
+}
+
+export async function convertExistingSupportedRootAgentFiles(projectRoot: string): Promise<AgentFileName[]> {
+  const normalizedRoot = resolve(projectRoot)
+  const converted: AgentFileName[] = []
+
+  for (const fileName of SUPPORTED_AGENT_FILES as AgentFileName[]) {
+    const filePath = join(normalizedRoot, fileName)
+    const state = await readAlignmentMarkerState(filePath)
+
+    if (state === 'absent') {
+      continue
+    }
+
+    await copyRootAgentTemplate(normalizedRoot, fileName)
+
+    if (state === 'complete') {
+      await appendAlignmentMarker(filePath, ALIGNMENT_COMPLETE_MARKER)
+    } else {
+      await appendAlignmentMarker(filePath, ALIGNMENT_REQUIRED_MARKER)
+    }
+
+    converted.push(fileName)
+  }
+
+  return converted
+}
+
+export async function removeDocsCoreDirectory(projectRoot: string): Promise<void> {
+  await rm(join(resolve(projectRoot), 'docs', 'core'), { force: true, recursive: true })
+}
+
+export async function updateOrBootstrapSkillModeManifest(
+  projectRoot: string,
+  managedFiles: AgentFileName[],
+): Promise<void> {
+  await writeManifest(resolve(projectRoot), {
+    templateVersion: TEMPLATE_VERSION,
+    cliVersion: await getCliVersion(),
+    managedFiles,
+  })
+}
+
+export async function migrateBlueprintProject(projectRoot: string): Promise<SkillModeMigrationResult> {
+  const existingFiles = await listExistingSupportedRootAgentFiles(projectRoot)
+  const installedSkillRoots = await installBlueprintSkillPayloadRoots(projectRoot)
+  const convertedRootFiles = await convertExistingSupportedRootAgentFiles(projectRoot)
+
+  await removeDocsCoreDirectory(projectRoot)
+  await updateOrBootstrapSkillModeManifest(
+    projectRoot,
+    existingFiles.map((entry) => entry.fileName),
+  )
+
+  return {
+    installedSkillRoots,
+    convertedRootFiles,
+    manifestManagedFiles: existingFiles.map((entry) => entry.fileName),
+  }
+}
+
+export const alignmentCompleteCommand: CommandDefinition = {
+  name: 'alignment-complete',
+  handler: async () => ({ exitCode: 0 }),
+}
+
+export const migrateCommand: CommandDefinition = {
+  name: 'migrate',
+  handler: async () => ({ exitCode: 0 }),
+}
