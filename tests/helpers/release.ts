@@ -1,11 +1,13 @@
 import { execFile, execSync, spawn } from 'node:child_process'
 import { access, cp, mkdtemp, mkdir, readFile, rm, stat, writeFile } from 'node:fs/promises'
 import { constants, existsSync, mkdirSync, rmSync, statSync } from 'node:fs'
+import { createRequire } from 'node:module'
 import { tmpdir } from 'node:os'
 import { dirname, join, resolve } from 'node:path'
 import { promisify } from 'node:util'
 
 const execFileAsync = promisify(execFile)
+const requireFromHere = createRequire(__filename)
 
 const workspaceRoot = resolve(__dirname, '..', '..')
 const npmExecutable = process.platform === 'win32' ? 'npm.cmd' : 'npm'
@@ -90,7 +92,8 @@ export async function installPackedCliFixture(): Promise<PackedCliFixture> {
 
     // Copy the already-compiled better-sqlite3 native binary from the workspace
     // to avoid triggering node-gyp in CI (which has no npm cache and takes >2 minutes).
-    const srcBuild = join(workspaceRoot, 'node_modules', 'better-sqlite3', 'build')
+    const betterSqliteRoot = dirname(requireFromHere.resolve('better-sqlite3/package.json'))
+    const srcBuild = join(betterSqliteRoot, 'build')
     const destBuild = join(project.rootDir, 'node_modules', 'better-sqlite3', 'build')
     if (existsSync(srcBuild)) {
       await cp(srcBuild, destBuild, { recursive: true })

@@ -14,7 +14,7 @@ their declared dependencies and scopes.
 
 ## Session Management in Orchestration
 
-Orchestration often manages multiple parallel streams. Each stream runs as an independent session (or set of sessions) with its own execution, review, and rework loops. 
+Orchestration often manages multiple parallel streams. Each stream runs as an independent session (or set of sessions) with its own execution, review, and rework loops.
 
 **Key principle:** Do not try to hold all phase state in the orchestrator's context. Instead:
 

@@ -181,6 +181,19 @@
       "milestone": "Revision 11 — Skill-Based Agent Surface",
       "created_at": 1781206929204,
       "updated_at": 1781207308499
+    },
+    {
+      "id": "BUG-R11-SKILL-002",
+      "title": "[BUG] Install skill payload for agents surface",
+      "description": "Symptom: skill-mode init installs the Blueprint skill only under .claude/skills/blueprint and the skill payload setup instructions name .claude paths.\nExpected: skill mode should install the Blueprint skill for at least .claude and .agents surfaces, and skill payload instructions should be relative to the installed skill directory rather than tied to Claude-specific paths.\nRoot Cause: src/init/archive-engine.ts hard-codes .claude/skills/blueprint as the only skill destination, and SKILL.md payload mirrors hard-code .claude/skills/blueprint/scripts/load-context.mjs in the setup gate.\nFix Approach: add regression coverage for dual .claude/.agents payload materialization plus relative skill setup guidance, update scaffold copying/reporting, and mirror SKILL.md payload changes across template, repo-root, and local installed skill surfaces.\nFiles Affected: src/init/archive-engine.ts, tests/revision-11/stream-d/scaffold-engine.test.ts, templates/skills/blueprint/SKILL.md, skills/blueprint/SKILL.md, .claude/skills/blueprint/SKILL.md, .agents/skills/blueprint/SKILL.md\n\nReproduction:\nRun skill-mode scaffold generation and observe only .claude/skills/blueprint/SKILL.md exists. Inspect templates/skills/blueprint/SKILL.md and observe setup gate command points to .claude/skills/blueprint/scripts/load-context.mjs.",
+      "state": "IN-REVIEW",
+      "phase": "R11",
+      "stream": "BUG",
+      "author": "Codex",
+      "implementation_notes": "Fixed skill-mode init to copy the Blueprint skill payload into every supported skill install base from src/doctor/structure.ts, currently .claude/skills/blueprint and .agents/skills/blueprint. Updated scaffold reporting so blueprint init lists both created skill directories. Changed SKILL.md setup-gate guidance in templates/skills/blueprint, skills/blueprint, the local .claude mirror, and the local .agents mirror to run node scripts/load-context.mjs relative to the installed skill directory instead of hard-coding a Claude-specific path. Updated README usage/anatomy text and MAS-208 in docs/srs.md to match the broadened support. Added regression coverage in scaffold-engine.test.ts for dual install roots and in skill-payload-mirror-contract.test.ts for relative setup guidance. Verification: focused scaffold/payload/doc tests passed; npm run typecheck passed; git diff --check passed; full npm test passed with 1323 passed and 2 skipped.",
+      "milestone": "Revision 11 — Skill-Based Agent Surface",
+      "created_at": 1781207624611,
+      "updated_at": 1781208007328
     }
   ],
   "comments": [

@@ -1,13 +1,15 @@
 import { spawn, execFileSync } from 'node:child_process'
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
-import { join } from 'node:path'
+import { dirname, join } from 'node:path'
+import { createRequire } from 'node:module'
 import { afterEach, beforeAll, describe, expect, it } from 'vitest'
 
 import { openDb } from '../../src/tracker/db'
 
 const packageRoot = process.cwd()
-const tsxPath = join(packageRoot, 'node_modules/.bin/tsx')
+const require = createRequire(import.meta.url)
+const tsxPath = join(dirname(require.resolve('tsx/package.json')), 'dist', 'cli.mjs')
 const srcIndexPath = join(packageRoot, 'src/index.ts')
 
 const tempDirs: string[] = []

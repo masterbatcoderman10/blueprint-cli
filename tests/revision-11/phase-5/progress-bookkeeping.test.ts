@@ -60,7 +60,7 @@ describe('R11-6.D.3 completion bookkeeping', () => {
     expect(content).toContain('Targeted Phase 6 command and doc-contract tests')
     expect(content).toContain('npm test')
     expect(content).toContain('npm run release:pack:verify')
-    expect(content).toContain('1314 passed, 2 skipped; 182 files passed, 1 skipped')
+    expect(content).toContain('1343 passed, 2 skipped; 189 files passed, 1 skipped')
     expect(content).toContain('R11 — Skill-Based Agent Surface ✓')
     expect(content).toContain('└── Phase 6 — Migrate & Alignment-Complete Commands ✓')
     expect(content).toContain('_None._')

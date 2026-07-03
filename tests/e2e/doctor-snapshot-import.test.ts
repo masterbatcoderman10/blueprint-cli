@@ -1,8 +1,9 @@
 import { execFileSync } from 'node:child_process'
 import { existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
-import { join } from 'node:path'
+import { dirname, join } from 'node:path'
 import { tmpdir } from 'node:os'
 import { afterEach, describe, expect, it } from 'vitest'
+import { createRequire } from 'node:module'
 
 import { spawn } from 'node:child_process'
 
@@ -13,7 +14,8 @@ import { executeRepairs } from '../../src/doctor/executor'
 import { importSnapshot, type TrackerSnapshot } from '../../src/tracker/export'
 
 const packageRoot = process.cwd()
-const tsxPath = join(packageRoot, 'node_modules', '.bin', 'tsx')
+const require = createRequire(import.meta.url)
+const tsxPath = join(dirname(require.resolve('tsx/package.json')), 'dist', 'cli.mjs')
 const srcIndexPath = join(packageRoot, 'src', 'index.ts')
 
 const tempDirs: string[] = []
