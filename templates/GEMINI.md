@@ -1,7 +1,7 @@
 # AGENTS.md
 
 <DeprecationNote>
-  Legacy mode is deprecated. Consider migrating to skill mode for native Claude Code skill discovery and reduced context overhead. See README install instructions or run `blueprint migrate` (coming in Revision 11 Phase 6).
+  Legacy mode is deprecated. Consider migrating to skill mode for native Claude Code skill discovery and reduced context overhead. See README install instructions or run `blueprint migrate` to convert the project in place.
 </DeprecationNote>
 
 <Blueprint>

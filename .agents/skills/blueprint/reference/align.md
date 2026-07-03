@@ -384,15 +384,12 @@ been done yet.
 
   7. Finalize alignment status
      After all alignment artifacts (PRD, SRS, project-progress) are
-     confirmed and committed, run the `alignment-complete` command
-     (deferred to Revision 11 Phase 6) which flips the
-     `<!-- blueprint-status: alignment-required -->` marker in the
-     project's agent entry-point file(s) to
-     `<!-- blueprint-status: alignment-complete -->`. This marker is
-     written by `blueprint init` during scaffold. Until the
-     `alignment-complete` command is available, record that alignment
-     is complete in project-progress.md — the marker flip will be
-     applied when the command ships.
+     confirmed and committed, run the `alignment-complete` command.
+     It flips the `<!-- blueprint-status: alignment-required -->`
+     marker in the project's agent entry-point file(s) to
+     `<!-- blueprint-status: alignment-complete -->` and reports
+     already-complete, missing-marker, and absent-file cases so the
+     alignment sweep is easy to verify.
 </DocumentProduction>
 
 ---

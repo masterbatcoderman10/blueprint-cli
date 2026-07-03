@@ -28,7 +28,8 @@ Underlying script entrypoints:
 - `npx skills add masterbatcoderman10/blueprint-cli --skill blueprint` is the only Phase 4 skill install pathway
 - Project-local install is the recommended path because it lands in `.claude/skills/blueprint/` where Claude Code discovers the skill natively
 - Avoid `-g` for the skill install path; that is the current Claude Code discovery sharp edge because global installs land outside the project-local discovery path
-- No fallback-installer workflow is promised in Phase 4; any first-party CLI install option remains deferred to Revision 11 Phase 6
+- No fallback-installer workflow is promised in Phase 4
+- If a legacy Blueprint project needs in-place conversion, use `blueprint migrate` after install
 
 ## Release Tag Contract
 
