@@ -48,14 +48,9 @@ describe('R11-6.D.3 completion bookkeeping', () => {
     expect(mas212).toContain('npm run release:pack:verify')
   })
 
-  it('T-R11-6.D.3.2 records Phase 6 completion and final Revision 11 status in project progress', async () => {
+  it('T-R11-6.D.3.2 records Phase 6 completion and durable Revision 11 completion history in project progress', async () => {
     const content = await readProjectProgress()
 
-    expect(content).toContain('**Current Milestone**: Revision 11 — Skill-Based Agent Surface (complete)')
-    expect(content).toContain('**Current Phase**: Complete — all planned Revision 11 phases done')
-    expect(content).toContain(
-      '**Status**: Revision 11 Phase 6 — Migrate & Alignment-Complete Commands is complete. Revision 11 — Skill-Based Agent Surface is complete.',
-    )
     expect(content).toContain('2026-07-03: Revision 11 Phase 6 — Migrate & Alignment-Complete Commands completed.')
     expect(content).toContain('Targeted Phase 6 command and doc-contract tests')
     expect(content).toContain('npm test')
@@ -63,6 +58,7 @@ describe('R11-6.D.3 completion bookkeeping', () => {
     expect(content).toContain('1343 passed, 2 skipped; 189 files passed, 1 skipped')
     expect(content).toContain('R11 — Skill-Based Agent Surface ✓')
     expect(content).toContain('└── Phase 6 — Migrate & Alignment-Complete Commands ✓')
-    expect(content).toContain('_None._')
+    expect(content).toContain('Identified Revision 11 — Skill-Based Agent Surface.')
+    expect(content).toContain('MAS-211 and MAS-212 are active.')
   })
 })

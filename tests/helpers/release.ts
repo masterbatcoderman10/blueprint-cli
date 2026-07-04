@@ -71,13 +71,13 @@ export async function createIsolatedTempProject(prefix = 'blueprint-test-'): Pro
 export async function installPackedCliFixture(): Promise<PackedCliFixture> {
   const packDir = await mkdtemp(join(tmpdir(), 'blueprint-pack-'))
   const project = await createIsolatedTempProject('blueprint-packed-cli-')
-  let releasePackLock: (() => Promise<void>) | undefined
 
   try {
-    releasePackLock = await acquirePackLock()
-    const packOutput = await runCommand(npmExecutable, ['pack', '--json', workspaceRoot], {
-      cwd: packDir,
-    })
+    const packOutput = await withPackLock(async () =>
+      runCommand(npmExecutable, ['pack', '--json', workspaceRoot], {
+        cwd: packDir,
+      }),
+    )
     const packResult = JSON.parse(packOutput.stdout) as Array<{ filename?: string }>
     const tarballName = packResult[0]?.filename
 
@@ -131,8 +131,6 @@ export async function installPackedCliFixture(): Promise<PackedCliFixture> {
     await project.cleanup()
     await rm(packDir, { recursive: true, force: true })
     throw error
-  } finally {
-    await releasePackLock?.()
   }
 }
 
@@ -154,6 +152,16 @@ export function runWorkspaceReleaseCommand(command: string | string[]): string |
     return Array.isArray(command) ? outputs : outputs[0]
   } finally {
     releasePackLock()
+  }
+}
+
+async function withPackLock<T>(operation: () => Promise<T>): Promise<T> {
+  const releasePackLock = await acquirePackLock()
+
+  try {
+    return await operation()
+  } finally {
+    await releasePackLock()
   }
 }
 

@@ -1,3 +1,4 @@
+import { execFileSync } from 'node:child_process'
 import { readFile, readdir } from 'node:fs/promises'
 import { join, relative, resolve, sep } from 'node:path'
 
@@ -81,6 +82,11 @@ export function getLocalSkillPayloadRelativePaths(): string[] {
 }
 
 async function listFilesIfPresent(root: string, relativeDir: string): Promise<string[]> {
+  const trackedFiles = await listTrackedFilesIfPresent(root, relativeDir)
+  if (trackedFiles !== null) {
+    return trackedFiles
+  }
+
   const absoluteDir = resolve(root, relativeDir)
 
   try {
@@ -91,6 +97,28 @@ async function listFilesIfPresent(root: string, relativeDir: string): Promise<st
       return []
     }
     throw error
+  }
+}
+
+async function listTrackedFilesIfPresent(root: string, relativeDir: string): Promise<string[] | null> {
+  try {
+    const output = execFileSync('git', ['-C', root, 'ls-files', '--', relativeDir], {
+      encoding: 'utf-8',
+      stdio: ['ignore', 'pipe', 'ignore'],
+    })
+
+    const trackedFiles = output
+      .split('\n')
+      .map((file) => file.trim())
+      .filter((file) => file.length > 0)
+
+    const presentFiles = await Promise.all(
+      trackedFiles.map(async (file) => ((await staticFileIfPresent(root, file)).length > 0 ? file : null)),
+    )
+
+    return presentFiles.filter((file): file is string => file !== null)
+  } catch {
+    return null
   }
 }
 

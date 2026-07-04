@@ -1,3 +1,4 @@
+import { execSync } from 'node:child_process'
 import { mkdtemp, mkdir, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
@@ -8,6 +9,7 @@ import { SKILL_PAYLOAD_INVENTORY } from '../../../src/release/skill-payload-inve
 import {
   ACTIVE_CROSS_REFERENCE_STATIC_FILES,
   ROOT_ENTRY_POINT_FILES,
+  auditActiveCrossReferences,
   getActiveCrossReferenceFiles,
   getLocalSkillPayloadInventory,
   getRootEntryPointTemplatePairs,
@@ -89,5 +91,52 @@ describe('R11-5.0.2 Phase 5 shared helpers', () => {
       'templates/skills/blueprint/reference/execute.md',
     ])
     expect(activeFiles).not.toContain('docs/milestones/revision-11/phase-history.md')
+  })
+
+  it('T-R11-5.0.2.4 ignores untracked copied skill templates when auditing a git-backed active surface', async () => {
+    const fixtureRoot = await mkdtemp(join(tmpdir(), 'blueprint-phase-5-git-audit-'))
+
+    await Promise.all([
+      mkdir(join(fixtureRoot, 'docs/core'), { recursive: true }),
+      mkdir(join(fixtureRoot, 'templates/skill'), { recursive: true }),
+      mkdir(join(fixtureRoot, 'templates/skills/blueprint/reference'), { recursive: true }),
+      mkdir(join(fixtureRoot, 'skills/blueprint/reference'), { recursive: true }),
+      mkdir(join(fixtureRoot, '.claude/skills/blueprint/reference'), { recursive: true }),
+    ])
+
+    await Promise.all([
+      writeFile(join(fixtureRoot, 'CLAUDE.md'), 'Invoke blueprint skill.\n', 'utf-8'),
+      writeFile(join(fixtureRoot, 'README.md'), '# readme\n', 'utf-8'),
+      writeFile(join(fixtureRoot, 'docs/core/execute.md'), '# active\n', 'utf-8'),
+      writeFile(join(fixtureRoot, 'docs/project-progress.md'), '# progress\n', 'utf-8'),
+      writeFile(join(fixtureRoot, 'docs/release-contract.md'), '# release contract\n', 'utf-8'),
+      writeFile(join(fixtureRoot, 'docs/releasing.md'), '# releasing\n', 'utf-8'),
+      writeFile(join(fixtureRoot, 'templates/skill/CLAUDE.md'), 'Invoke blueprint skill.\n', 'utf-8'),
+      writeFile(join(fixtureRoot, 'templates/skills/blueprint/reference/execute.md'), '# skill template\n', 'utf-8'),
+      writeFile(join(fixtureRoot, 'skills/blueprint/reference/execute.md'), '# repo skill\n', 'utf-8'),
+      writeFile(join(fixtureRoot, '.claude/skills/blueprint/reference/execute.md'), '# local skill\n', 'utf-8'),
+    ])
+
+    execSync('git init', { cwd: fixtureRoot, stdio: 'pipe' })
+    execSync(
+      'git add CLAUDE.md README.md docs/core/execute.md docs/project-progress.md docs/release-contract.md docs/releasing.md templates/skill/CLAUDE.md templates/skills/blueprint/reference/execute.md skills/blueprint/reference/execute.md .claude/skills/blueprint/reference/execute.md',
+      { cwd: fixtureRoot, stdio: 'pipe' },
+    )
+
+    await writeFile(
+      join(fixtureRoot, 'templates/skill/CLAUDE 2.md'),
+      [
+        'Invoke blueprint skill.',
+        '- Root-level docs (`docs/project-progress.md`, `docs/prd.md`, `docs/conventions.md`) are scaffolded as editable shells',
+        '- **Blueprint protocol docs** under `docs/core/`',
+        '',
+      ].join('\n'),
+      'utf-8',
+    )
+
+    const activeFiles = await getActiveCrossReferenceFiles(fixtureRoot)
+
+    expect(activeFiles).not.toContain('templates/skill/CLAUDE 2.md')
+    await expect(auditActiveCrossReferences(fixtureRoot)).resolves.toEqual([])
   })
 })
