@@ -18,23 +18,26 @@ const LEGACY_ROOT_SURFACES = [
   join(ROOT_DIR, 'templates', 'GEMINI.md'),
   join(ROOT_DIR, 'templates', 'QWEN.md'),
 ]
+const BOOTSTRAP_OUTCOMES = [
+  ['missing scaffold or tracker', 'STOP with install/init guidance'],
+  ['empty progress + `alignment-required`', 'Alignment only'],
+  ['empty progress + `alignment-complete`', 'Foundation Planning only'],
+  ['populated progress + `alignment-required`', 'rerun or repair Alignment'],
+  ['populated progress + no marker', 'normal routing'],
+  ['empty progress + no marker', 'repair guidance'],
+] as const
 
 describe('R12-1.0 bootstrap contract canon', () => {
   it('T-R12-1.0.1.1: describes all six bootstrap states and their route outcomes', () => {
     for (const skillPath of SKILL_MD_PATHS) {
       const content = readFileSync(skillPath, 'utf-8')
 
-      expect(content).toContain('missing scaffold or tracker')
-      expect(content).toContain('empty progress + `alignment-required`')
-      expect(content).toContain('Alignment only')
-      expect(content).toContain('empty progress + `alignment-complete`')
-      expect(content).toContain('Foundation Planning only')
-      expect(content).toContain('populated progress + `alignment-required`')
-      expect(content).toContain('rerun or repair Alignment')
-      expect(content).toContain('populated progress + no marker')
-      expect(content).toContain('normal routing')
-      expect(content).toContain('empty progress + no marker')
-      expect(content).toContain('repair guidance')
+      for (const [state, outcome] of BOOTSTRAP_OUTCOMES) {
+        expect(content).toContain(state)
+        expect(content).toContain(outcome)
+      }
+
+      expect(content).not.toContain('populated progress required')
     }
   })
 

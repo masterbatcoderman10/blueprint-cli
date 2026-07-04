@@ -45,6 +45,25 @@ interface FixtureDir {
   cleanup: () => Promise<void>
 }
 
+function expectSectionsInOrder(output: string): void {
+  const projectIdx = output.indexOf('## Project')
+  const milestoneIdx = output.indexOf('## Current Milestone')
+  const phaseIdx = output.indexOf('## Current Phase')
+  const progressStateIdx = output.indexOf('## Progress State')
+  const alignmentIdx = output.indexOf('## Alignment Markers')
+  const originIdx = output.indexOf('## Project Origin')
+  const revisionsIdx = output.indexOf('## Pending Revisions')
+  const trackerIdx = output.indexOf('## Tracker')
+
+  expect(projectIdx).toBeLessThan(milestoneIdx)
+  expect(milestoneIdx).toBeLessThan(phaseIdx)
+  expect(phaseIdx).toBeLessThan(progressStateIdx)
+  expect(progressStateIdx).toBeLessThan(alignmentIdx)
+  expect(alignmentIdx).toBeLessThan(originIdx)
+  expect(originIdx).toBeLessThan(revisionsIdx)
+  expect(revisionsIdx).toBeLessThan(trackerIdx)
+}
+
 async function createFixtureDir(): Promise<FixtureDir> {
   const tmpDir = await mkdtemp(join(resolve(__dirname), 'load-context-r12-'))
   return {
@@ -79,47 +98,51 @@ describe('R12-1.0.3 load-context bootstrap reporting', () => {
   })
 
   it.each(SCRIPT_PATHS)(
-    'T-R12-1.0.3.1: %s distinguishes empty progress shell from populated progress and reports tracker state in stable order',
+    'T-R12-1.0.3.1: %s distinguishes empty progress shell from populated progress with and without tracker state in stable order',
     async (scriptPath) => {
-      const shellFixture = await createFixtureDir()
-      fixtures.push(shellFixture)
-      await writeProgress(shellFixture.path, EMPTY_PROGRESS)
+      const scenarios = [
+        {
+          progress: EMPTY_PROGRESS,
+          tracker: false,
+          expectedProgressState: 'empty progress shell',
+          expectedTrackerState: 'not initialised',
+        },
+        {
+          progress: EMPTY_PROGRESS,
+          tracker: true,
+          expectedProgressState: 'empty progress shell',
+          expectedTrackerState: 'initialised at docs/.blueprint/tasks.db',
+        },
+        {
+          progress: POPULATED_PROGRESS,
+          tracker: false,
+          expectedProgressState: 'populated progress',
+          expectedTrackerState: 'not initialised',
+        },
+        {
+          progress: POPULATED_PROGRESS,
+          tracker: true,
+          expectedProgressState: 'populated progress',
+          expectedTrackerState: 'initialised at docs/.blueprint/tasks.db',
+        },
+      ] as const
 
-      const shell = await execFileAsync('node', [scriptPath], {
-        cwd: shellFixture.path,
-      })
+      for (const scenario of scenarios) {
+        const fixture = await createFixtureDir()
+        fixtures.push(fixture)
+        await writeProgress(fixture.path, scenario.progress)
+        if (scenario.tracker) {
+          await writeTrackerDb(fixture.path)
+        }
 
-      expect(shell.stdout).toContain('## Progress State\nempty progress shell')
-      expect(shell.stdout).toContain('## Tracker\nnot initialised')
+        const result = await execFileAsync('node', [scriptPath], {
+          cwd: fixture.path,
+        })
 
-      const populatedFixture = await createFixtureDir()
-      fixtures.push(populatedFixture)
-      await writeProgress(populatedFixture.path, POPULATED_PROGRESS)
-      await writeTrackerDb(populatedFixture.path)
-
-      const populated = await execFileAsync('node', [scriptPath], {
-        cwd: populatedFixture.path,
-      })
-
-      expect(populated.stdout).toContain('## Progress State\npopulated progress')
-      expect(populated.stdout).toContain('## Tracker\ninitialised at docs/.blueprint/tasks.db')
-
-      const projectIdx = populated.stdout.indexOf('## Project')
-      const milestoneIdx = populated.stdout.indexOf('## Current Milestone')
-      const phaseIdx = populated.stdout.indexOf('## Current Phase')
-      const progressStateIdx = populated.stdout.indexOf('## Progress State')
-      const alignmentIdx = populated.stdout.indexOf('## Alignment Markers')
-      const originIdx = populated.stdout.indexOf('## Project Origin')
-      const revisionsIdx = populated.stdout.indexOf('## Pending Revisions')
-      const trackerIdx = populated.stdout.indexOf('## Tracker')
-
-      expect(projectIdx).toBeLessThan(milestoneIdx)
-      expect(milestoneIdx).toBeLessThan(phaseIdx)
-      expect(phaseIdx).toBeLessThan(progressStateIdx)
-      expect(progressStateIdx).toBeLessThan(alignmentIdx)
-      expect(alignmentIdx).toBeLessThan(originIdx)
-      expect(originIdx).toBeLessThan(revisionsIdx)
-      expect(revisionsIdx).toBeLessThan(trackerIdx)
+        expect(result.stdout).toContain(`## Progress State\n${scenario.expectedProgressState}`)
+        expect(result.stdout).toContain(`## Tracker\n${scenario.expectedTrackerState}`)
+        expectSectionsInOrder(result.stdout)
+      }
     },
   )
 
