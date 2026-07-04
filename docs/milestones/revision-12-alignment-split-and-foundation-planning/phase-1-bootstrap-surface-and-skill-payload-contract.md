@@ -125,12 +125,73 @@ Stream B (Placeholder Entry Points and Dogfood Surface) ────────
 
 ---
 
+## Test Plan
+
+> Generated from task analysis. Formal tests are required for this phase because it changes bootstrap routing, scaffold output, skill-payload inventory, and context-brief behavior. Tests are written before implementation (TDD) during task execution. Framework: Vitest (`*.test.ts` under `tests/`, mirroring `src/`). Only the pure coverage-authoring tasks R12-1.C.1 and R12-1.C.2 are marked not separately testable; their evidence is the passing regression suites they introduce or extend.
+
+### Gate R12-1.0 Tests
+
+| Test ID | Task | Type | Description | Expected Result |
+|---------|------|------|-------------|-----------------|
+| T-R12-1.0.1.1 | R12-1.0.1 | unit (doc-contract) | Verify template and repo-root `SKILL.md` setup-gate text enumerates the six bootstrap states with the correct stop or route outcome for each | Both skill copies describe install/init stop, Alignment-only, Foundation Planning-only, populated+required block/rerun, populated+no-marker normal routing, and empty+no-marker repair guidance |
+| T-R12-1.0.1.2 | R12-1.0.1 | unit (doc-contract) | Verify the skill routing table adds `Foundation Planning` -> `reference/foundation-planning.md` only on the skill surface and keeps legacy/core routing unchanged | The new row exists exactly once in skill `SKILL.md`; no legacy `docs/core` module or legacy root route is introduced |
+| T-R12-1.0.2.1 | R12-1.0.2 | unit (doc-contract) | Verify both `reference/foundation-planning.md` files exist and lock the required preconditions: `alignment-complete`, empty progress shell, required setup blocks, and tracker availability | Template and repo-root copies contain the same precondition contract |
+| T-R12-1.0.2.2 | R12-1.0.2 | unit (doc-contract) | Verify both `reference/foundation-planning.md` files lock artifact order, one-artifact-at-a-time review, and the explicit non-goals | Both copies state `PRD Stage 1 -> SRS -> PRD Stage 2 -> project-progress`, require review between artifacts, and forbid milestone docs, phase docs, test plans, and tracker tasks |
+| T-R12-1.0.3.1 | R12-1.0.3 | integration | Run `load-context.mjs` against fixtures representing empty-progress shell and populated progress, with and without tracker state | The markdown brief distinguishes shell vs populated progress, reports tracker reachability, and keeps section ordering stable |
+| T-R12-1.0.3.2 | R12-1.0.3 | integration | Run `load-context.mjs` against fixtures covering supported-root marker states and `blueprint-origin: legacy-migration` | Output reports marker state per supported root and surfaces legacy-origin distinctly from markerless backcompat |
+| T-R12-1.0.4.1 | R12-1.0.4 | unit | Verify `getSkillCanonicalFiles(...)`, template/repo-root path helpers, and `SKILL_PAYLOAD_INVENTORY` derive a 24-file skill payload containing `reference/foundation-planning.md` | All derived path lists agree and the authoritative skill payload count is 24 |
+| T-R12-1.0.4.2 | R12-1.0.4 | unit | Verify the skill-payload expansion does not alter legacy `docs/core/**` canonical-file expectations | Skill inventory grows to 24 while legacy core required-structure and path expectations remain unchanged |
+
+### Stream A Tests
+
+| Test ID | Task | Type | Description | Expected Result |
+|---------|------|------|-------------|-----------------|
+| T-R12-1.A.1.1 | R12-1.A.1 | unit | Verify the repo-root `skills/blueprint/**` mirror includes `reference/foundation-planning.md` and remains byte-identical to `templates/skills/blueprint/**` | The new file exists in both roots and the mirror stays byte-identical |
+| T-R12-1.A.1.2 | R12-1.A.1 | unit | Parameterize missing, drifted, and extra-file mirror fixtures around `reference/foundation-planning.md` | Mirror-contract assertions fail for missing, drifted, or extra new-file cases |
+| T-R12-1.A.2.1 | R12-1.A.2 | unit (test-contract) | Verify release, package-artifact, and local-install assertions derive the expected 24-file skill surface from the shared inventory instead of a hardcoded 23-file list | Inventory, package, and local-install helpers stay aligned on the 24-file contract and the new path is covered automatically |
+| T-R12-1.A.2.2 | R12-1.A.2 | integration (negative fixture) | In local-install and packed-artifact fixtures, omit or drift only `reference/foundation-planning.md` and run the relevant assertion helpers | Both local-install and package verification fail with file-specific diagnostics for the new path |
+| T-R12-1.A.3.1 | R12-1.A.3 | unit (test-contract) | Verify Doctor/canonical-skill assertions derive template, repo-root, and packaged skill file sets from `getSkillCanonicalFiles(...)` | Count-sensitive helpers and assertion surfaces stay tied to the shared canonical file list |
+| T-R12-1.A.3.2 | R12-1.A.3 | unit (repair-fixture) | Create skill-mode Doctor fixtures missing or drifting `reference/foundation-planning.md` while leaving legacy `docs/core/**` surfaces untouched | Missing skill files plan a create-from-template repair, drifted skill files are reported without destructive replacement, and legacy-mode expectations remain unchanged |
+
+### Stream B Tests
+
+| Test ID | Task | Type | Description | Expected Result |
+|---------|------|------|-------------|-----------------|
+| T-R12-1.B.1.1 | R12-1.B.1 | unit | Verify `templates/skill/CLAUDE.md`, `templates/skill/AGENTS.md`, `templates/skill/GEMINI.md`, and `templates/skill/QWEN.md` are byte-identical bootstrap placeholders containing intro text, `<ProjectConventions>`, `<AgentOrchestration>`, then the trailing `alignment-required` marker | All four supported entry-point files match byte-for-byte and the marker is the last line |
+| T-R12-1.B.1.2 | R12-1.B.1 | unit | Verify the placeholder templates contain no live blueprint-cli-specific conventions/orchestration content and legacy top-level templates stay placeholder-free | Skill-mode templates stay generic and legacy templates do not gain the new blocks |
+| T-R12-1.B.2.1 | R12-1.B.2 | unit | Verify repo-root `CLAUDE.md`, `AGENTS.md`, `GEMINI.md`, and `QWEN.md` contain real `<ProjectConventions>` and `<AgentOrchestration>` blocks for dogfood use | Each live root file exposes both blocks |
+| T-R12-1.B.2.2 | R12-1.B.2 | unit (doc-contract) | Verify the repo-root dogfood files remain markerless and therefore compatible with the populated-progress + no-marker backcompat rule | No live root file contains `alignment-required` or `alignment-complete`, and the skill setup-gate contract still treats that state as normal routing |
+| T-R12-1.B.3.1 | R12-1.B.3 | integration | Run `copySkillModeAgentStubs` or a full skill-mode scaffold in a temporary fixture over the four supported root files | Generated root files contain both placeholder blocks exactly once and end with a single trailing `alignment-required` marker |
+
+### Stream C Tests
+
+| Test ID | Task | Type | Description | Expected Result |
+|---------|------|------|-------------|-----------------|
+| — | R12-1.C.1 | — | Not testable as separate automated coverage: this task is the setup-gate doc-contract suite update; evidence is the passing bootstrap-state and route-table assertions introduced for Gate R12-1.0.1. | — |
+| — | R12-1.C.2 | — | Not testable as separate automated coverage: this task is the `load-context.mjs` regression-suite update; evidence is the passing fixture-based script assertions introduced for Gate R12-1.0.3. | — |
+| T-R12-1.C.3.1 | R12-1.C.3 | unit (doc-contract) | Verify the negative Phase 1 boundary coverage asserts no `docs/core/foundation-planning.md`, no `templates/docs/core/foundation-planning.md`, no legacy root Foundation Planning route, and unchanged `alignment-complete` / `migrate` help-runtime semantics | Phase 1 cannot silently introduce legacy surfaces or pull Phase 4 command semantics forward |
+
+### Test Summary
+
+| Component | Total Tasks | Testable | Not Testable | Tests |
+|-----------|-------------|----------|--------------|-------|
+| Gate R12-1.0 | 4 | 4 | 0 | 8 |
+| Stream A | 3 | 3 | 0 | 6 |
+| Stream B | 3 | 3 | 0 | 5 |
+| Stream C | 3 | 1 | 2 | 1 |
+| **Total** | **13** | **11** | **2** | **20** |
+
+---
+
 ## Definition of Done
 
 - [ ] Gate R12-1.0 acceptance criteria pass.
 - [ ] Stream A acceptance criteria pass.
 - [ ] Stream B acceptance criteria pass.
 - [ ] Stream C acceptance criteria pass.
+- [ ] All tests in the Test Plan pass.
+- [ ] Full test suite is green (`npm test`).
+- [ ] `npm run release:pack:verify` is green after the 24-file payload update.
 - [ ] The canonical skill payload is 24 files in template, repo-root, Doctor, local-install, and package/release surfaces.
 - [ ] Foundation Planning exists only as a skill-surface file in this phase. No `docs/core/foundation-planning.md`, no `templates/docs/core/foundation-planning.md`, and no legacy root route are introduced.
 - [ ] Skill-mode template entry points carry `<ProjectConventions>`, `<AgentOrchestration>`, and trailing `alignment-required` placeholder ordering.
@@ -142,7 +203,7 @@ Stream B (Placeholder Entry Points and Dogfood Surface) ────────
 
 ## Test Scenarios
 
-> High-level sketch only. Formal test planning stays separate.
+> High-level supplement to the formal Test Plan above.
 
 ### Happy Path
 
