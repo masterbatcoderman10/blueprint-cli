@@ -8,11 +8,12 @@ import {
   FORBIDDEN_ROOT_LEGACY_BLOCKS,
   ROOT_ENTRY_POINT_FILES,
   assertRootEntryPointSkillModeContract,
+  extractAgentOrchestrationBlock,
   extractProjectConventionsBlock,
   getRootEntryPointTemplatePairs,
 } from './helpers'
 
-const EXPECTED_SKILL_STUB = `This project uses the Blueprint development system.
+const ROOT_ENTRY_POINT_INTRO = `This project uses the Blueprint development system.
 
 Invoke the \`blueprint\` skill at session start and before any planning,
 execution, review, tweak, bug, revision, or commit action.
@@ -20,31 +21,45 @@ execution, review, tweak, bug, revision, or commit action.
 The skill handles routing and workflow guidance for every phase.
 `
 
+const ALIGNMENT_REQUIRED_MARKER = '<!-- blueprint-status: alignment-required -->'
+
 describe('R11-5.A root entry-point skill-mode contract', () => {
   it('T-R11-5.A.1.1 verifies root entry points are skill-mode files with no legacy routing blocks', async () => {
     await assertRootEntryPointSkillModeContract()
   })
 
-  it('T-R11-5.A.1.2 keeps scaffold templates generic while root entry points keep project conventions', async () => {
+  it('T-R11-5.A.1.2 keeps scaffold templates generic placeholders while root entry points keep live split blocks', async () => {
     for (const { fileName, rootPath, templatePath } of getRootEntryPointTemplatePairs()) {
       const [rootContent, templateContent] = await Promise.all([
         readFile(rootPath, 'utf-8'),
         readFile(templatePath, 'utf-8'),
       ])
 
-      expect(templateContent, `templates/skill/${fileName}`).toBe(EXPECTED_SKILL_STUB)
-      expect(templateContent, `templates/skill/${fileName}`).not.toContain('<ProjectConventions>')
+      expect(templateContent, `templates/skill/${fileName}`).toContain(ROOT_ENTRY_POINT_INTRO.trimEnd())
+      expect(templateContent, `templates/skill/${fileName}`).toContain('<ProjectConventions>')
+      expect(templateContent, `templates/skill/${fileName}`).toContain('<AgentOrchestration>')
+      expect(templateContent.trimEnd().endsWith(ALIGNMENT_REQUIRED_MARKER), `templates/skill/${fileName}`).toBe(true)
+      expect(templateContent, `templates/skill/${fileName}`).not.toContain('Node.js >=18.0.0')
+      expect(templateContent, `templates/skill/${fileName}`).not.toContain('blueprint-agentic-development')
+      expect(templateContent, `templates/skill/${fileName}`).not.toContain('/ponytail')
       expect(rootContent, fileName).toContain('<ProjectConventions>')
+      expect(rootContent, fileName).toContain('<AgentOrchestration>')
+      expect(rootContent, fileName).not.toContain('alignment-required')
+      expect(rootContent, fileName).not.toContain('alignment-complete')
       expect(rootContent, fileName).not.toBe(templateContent)
     }
   })
 
-  it('T-R11-5.A.1.3 keeps ProjectConventions byte-identical across root files and template snippet', async () => {
-    const snippet = await readFile(join(process.cwd(), 'templates/skill/_project-conventions.snippet.md'), 'utf-8')
+  it('T-R11-5.A.1.3 keeps canonical ProjectConventions and AgentOrchestration blocks byte-identical across root files', async () => {
+    const [projectSnippet, orchestrationSnippet] = await Promise.all([
+      readFile(join(process.cwd(), 'templates/skill/_project-conventions.snippet.md'), 'utf-8'),
+      readFile(join(process.cwd(), 'templates/skill/_agent-orchestration.snippet.md'), 'utf-8'),
+    ])
 
     for (const { fileName, rootPath } of getRootEntryPointTemplatePairs()) {
       const content = await readFile(rootPath, 'utf-8')
-      expect(extractProjectConventionsBlock(content), fileName).toBe(snippet)
+      expect(extractProjectConventionsBlock(content), `${fileName} ProjectConventions`).toBe(projectSnippet)
+      expect(extractAgentOrchestrationBlock(content), `${fileName} AgentOrchestration`).toBe(orchestrationSnippet)
     }
   })
 
@@ -92,13 +107,21 @@ async function createSkillModeRootFixture(): Promise<string> {
     await readFile(join(process.cwd(), 'templates/skill/_project-conventions.snippet.md'), 'utf-8'),
     'utf-8',
   )
+  await writeFile(
+    join(fixtureRoot, 'templates/skill/_agent-orchestration.snippet.md'),
+    await readFile(join(process.cwd(), 'templates/skill/_agent-orchestration.snippet.md'), 'utf-8'),
+    'utf-8',
+  )
 
   return fixtureRoot
 }
 
 async function createFixtureRootEntryPointContent(): Promise<string> {
-  const snippet = await readFile(join(process.cwd(), 'templates/skill/_project-conventions.snippet.md'), 'utf-8')
-  return `${EXPECTED_SKILL_STUB}\n${snippet}`
+  const [projectSnippet, orchestrationSnippet] = await Promise.all([
+    readFile(join(process.cwd(), 'templates/skill/_project-conventions.snippet.md'), 'utf-8'),
+    readFile(join(process.cwd(), 'templates/skill/_agent-orchestration.snippet.md'), 'utf-8'),
+  ])
+  return `${ROOT_ENTRY_POINT_INTRO}\n${projectSnippet}\n${orchestrationSnippet}`
 }
 
 async function mkdtempInTmp(prefix: string): Promise<string> {

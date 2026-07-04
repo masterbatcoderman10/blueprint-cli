@@ -321,21 +321,32 @@ export async function assertLocalSkillPayloadMirror(templateDir: string, localDi
   )
 }
 
-export function extractProjectConventionsBlock(content: string): string {
-  const start = content.indexOf('<ProjectConventions>')
-  const end = content.indexOf('</ProjectConventions>')
+export function extractTaggedBlock(content: string, tagName: string): string {
+  const startTag = `<${tagName}>`
+  const endTag = `</${tagName}>`
+  const start = content.indexOf(startTag)
+  const end = content.indexOf(endTag)
 
   if (start === -1 || end === -1) {
     return ''
   }
 
-  const block = content.slice(start, end + '</ProjectConventions>'.length)
+  const block = content.slice(start, end + endTag.length)
   return block.endsWith('\n') ? block : `${block}\n`
+}
+
+export function extractProjectConventionsBlock(content: string): string {
+  return extractTaggedBlock(content, 'ProjectConventions')
+}
+
+export function extractAgentOrchestrationBlock(content: string): string {
+  return extractTaggedBlock(content, 'AgentOrchestration')
 }
 
 export async function assertRootEntryPointSkillModeContract(root = resolve(process.cwd())): Promise<void> {
   const pairs = getRootEntryPointTemplatePairs(root)
-  const canonicalSnippet = await readFile(resolve(root, 'templates/skill/_project-conventions.snippet.md'), 'utf-8')
+  const canonicalProjectConventions = await readFile(resolve(root, 'templates/skill/_project-conventions.snippet.md'), 'utf-8')
+  const canonicalAgentOrchestration = await readFile(resolve(root, 'templates/skill/_agent-orchestration.snippet.md'), 'utf-8')
 
   await Promise.all(
     pairs.map(async ({ fileName, rootPath }) => {
@@ -355,9 +366,18 @@ export async function assertRootEntryPointSkillModeContract(root = resolve(proce
         }
       }
 
+      if (rootContent.includes('alignment-required') || rootContent.includes('alignment-complete')) {
+        throw new Error(`${fileName} must stay markerless for populated-project backcompat`)
+      }
+
       const conventionsBlock = extractProjectConventionsBlock(rootContent)
-      if (conventionsBlock !== canonicalSnippet) {
+      if (conventionsBlock !== canonicalProjectConventions) {
         throw new Error(`${fileName} must use the canonical ProjectConventions snippet`)
+      }
+
+      const orchestrationBlock = extractAgentOrchestrationBlock(rootContent)
+      if (orchestrationBlock !== canonicalAgentOrchestration) {
+        throw new Error(`${fileName} must use the canonical AgentOrchestration snippet`)
       }
     }),
   )

@@ -10,13 +10,14 @@ const TEMPLATES_ALIGNMENT_PATH = join(ROOT_DIR, 'templates', 'docs', 'core', 'al
 
 const SKILL_TEMPLATE_FILES = ['CLAUDE.md', 'AGENTS.md', 'GEMINI.md', 'QWEN.md'] as const
 
-const EXPECTED_SKILL_STUB = `This project uses the Blueprint development system.
+const REQUIRED_SKILL_INTRO = `This project uses the Blueprint development system.
 
 Invoke the \`blueprint\` skill at session start and before any planning,
 execution, review, tweak, bug, revision, or commit action.
 
 The skill handles routing and workflow guidance for every phase.
 `
+const ALIGNMENT_REQUIRED_MARKER = '<!-- blueprint-status: alignment-required -->'
 
 function readTemplateBodies(root = ROOT_DIR): string[] {
   return SKILL_TEMPLATE_FILES.map((fileName) => readFileSync(join(root, 'templates', 'skill', fileName), 'utf-8'))
@@ -61,12 +62,16 @@ describe('T-R11-3.C.2: template/documents alignment mirror', () => {
 })
 
 describe('T-R11-3.C.3: skill-mode entry-point block-identity contract', () => {
-  it('T-R11-3.C.3.1: skill-mode templates stay minimal and byte-identical', () => {
+  it('T-R11-3.C.3.1: skill-mode templates stay placeholder-based and byte-identical', () => {
     const skillTemplateBodies = readTemplateBodies()
 
     for (const [index, body] of skillTemplateBodies.entries()) {
-      expect(body, `templates/skill/${SKILL_TEMPLATE_FILES[index]}`).toBe(EXPECTED_SKILL_STUB)
-      expect(body, `templates/skill/${SKILL_TEMPLATE_FILES[index]}`).not.toContain('<ProjectConventions>')
+      expect(body.startsWith(REQUIRED_SKILL_INTRO), `templates/skill/${SKILL_TEMPLATE_FILES[index]}`).toBe(true)
+      expect(body, `templates/skill/${SKILL_TEMPLATE_FILES[index]}`).toContain('<ProjectConventions>')
+      expect(body, `templates/skill/${SKILL_TEMPLATE_FILES[index]}`).toContain('<AgentOrchestration>')
+      expect(body.trimEnd().endsWith(ALIGNMENT_REQUIRED_MARKER), `templates/skill/${SKILL_TEMPLATE_FILES[index]}`).toBe(true)
+      expect(body, `templates/skill/${SKILL_TEMPLATE_FILES[index]}`).not.toContain('Node.js >=18.0.0')
+      expect(body, `templates/skill/${SKILL_TEMPLATE_FILES[index]}`).not.toContain('/ponytail')
     }
 
     assertSkillTemplateBodiesMatch()

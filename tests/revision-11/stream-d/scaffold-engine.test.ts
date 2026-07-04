@@ -15,13 +15,14 @@ import type { InitOptions, Mode } from '../../../src/init/types'
 
 const TEMPLATES_DIR = join(__dirname, '../../../templates')
 const EXPECTED_SKILL_INSTALL_BASES = ['.claude/skills/blueprint', '.agents/skills/blueprint'] as const
-const EXPECTED_SKILL_STUB = `This project uses the Blueprint development system.
+const REQUIRED_SKILL_INTRO = `This project uses the Blueprint development system.
 
 Invoke the \`blueprint\` skill at session start and before any planning,
 execution, review, tweak, bug, revision, or commit action.
 
 The skill handles routing and workflow guidance for every phase.
 `
+const ALIGNMENT_REQUIRED_MARKER = '<!-- blueprint-status: alignment-required -->'
 
 function makeInitOptions(overrides: Partial<InitOptions> = {}): InitOptions {
   return {
@@ -120,7 +121,7 @@ describe('T-R11-1.D.2 — Scaffold engine branched on Mode', () => {
       }
     })
 
-    it('produces skill-mode agent entry-point stubs from templates/skill/', async () => {
+    it('produces skill-mode placeholder entry points from templates/skill/', async () => {
       const options = makeInitOptions({
         mode: 'skill',
         agents: {
@@ -138,10 +139,18 @@ describe('T-R11-1.D.2 — Scaffold engine branched on Mode', () => {
         const scaffoldedPath = join(tmpDir, agentFile)
         expect(await fileExists(scaffoldedPath)).toBe(true)
 
-        const content = await readFile(scaffoldedPath, 'utf-8')
-        expect(content).toBe(EXPECTED_SKILL_STUB)
-        expect(content).not.toContain('<ProjectConventions>')
+        const [content, templateContent] = await Promise.all([
+          readFile(scaffoldedPath, 'utf-8'),
+          readFile(join(TEMPLATES_DIR, 'skill', agentFile), 'utf-8'),
+        ])
+        expect(content).toBe(templateContent)
+        expect(content.startsWith(REQUIRED_SKILL_INTRO)).toBe(true)
+        expect(content).toContain('<ProjectConventions>')
+        expect(content).toContain('<AgentOrchestration>')
+        expect(content.trimEnd().endsWith(ALIGNMENT_REQUIRED_MARKER)).toBe(true)
+        expect(content).not.toContain('Node.js >=18.0.0')
         expect(content).not.toContain('blueprint-agentic-development')
+        expect(content).not.toContain('/ponytail')
       }
     })
 
