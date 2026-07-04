@@ -16,7 +16,7 @@ const REQUIRED_INTENTS = [
   'commit',
 ]
 
-const EXPECTED_SKILL_STUB = `This project uses the Blueprint development system.
+const REQUIRED_SKILL_INTRO = `This project uses the Blueprint development system.
 
 Invoke the \`blueprint\` skill at session start and before any planning,
 execution, review, tweak, bug, revision, or commit action.
@@ -28,8 +28,6 @@ const FORBIDDEN_BLOCKS = [
   '<SessionStart>',
   '<HardRules>',
   '<ModuleRouting>',
-  '<ProjectConventions>',
-  '</ProjectConventions>',
 ]
 
 const FORBIDDEN_BLUEPRINT_CLI_DETAILS = [
@@ -37,7 +35,11 @@ const FORBIDDEN_BLUEPRINT_CLI_DETAILS = [
   'blueprint-agentic-development',
   'templates/docs/core/',
   'npm run release:check',
+  '/ponytail',
+  'gpt-5.4 xhigh',
+  'gpt-5.5 xhigh',
 ]
+const ALIGNMENT_REQUIRED_MARKER = '<!-- blueprint-status: alignment-required -->'
 
 const STUB_FILES = [
   { id: 'T-R11-1.C.1', task: 'R11-1.C.1', file: 'CLAUDE.md', platform: 'Claude Code' },
@@ -53,11 +55,16 @@ describe.each(STUB_FILES)('$id — templates/skill/$file doc contract', ({ id, f
     expect(existsSync(filePath)).toBe(true)
   })
 
-  it(`${id}: is the minimal skill invocation stub`, () => {
+  it(`${id}: is the generic placeholder entry-point surface`, () => {
     if (!existsSync(filePath)) return
     const content = readFileSync(filePath, 'utf-8')
 
-    expect(content).toBe(EXPECTED_SKILL_STUB)
+    expect(content.startsWith(REQUIRED_SKILL_INTRO)).toBe(true)
+    expect(content).toContain('<ProjectConventions>')
+    expect(content).toContain('</ProjectConventions>')
+    expect(content).toContain('<AgentOrchestration>')
+    expect(content).toContain('</AgentOrchestration>')
+    expect(content.trimEnd().endsWith(ALIGNMENT_REQUIRED_MARKER)).toBe(true)
   })
 
   it(`${id}: references the blueprint skill by name`, () => {

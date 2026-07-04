@@ -18,13 +18,14 @@ const TEMPLATES_DIR = resolve(ROOT_DIR, 'templates')
 const SNIPPET_PATH = resolve(TEMPLATES_DIR, 'skill', '_project-conventions.snippet.md')
 const AGENT_SKILL_FILES = ['CLAUDE.md', 'AGENTS.md', 'GEMINI.md', 'QWEN.md'] as const
 
-const EXPECTED_SKILL_STUB = `This project uses the Blueprint development system.
+const REQUIRED_SKILL_INTRO = `This project uses the Blueprint development system.
 
 Invoke the \`blueprint\` skill at session start and before any planning,
 execution, review, tweak, bug, revision, or commit action.
 
 The skill handles routing and workflow guidance for every phase.
 `
+const ALIGNMENT_REQUIRED_MARKER = '<!-- blueprint-status: alignment-required -->'
 
 function makeInitOptions(mode: Mode): InitOptions {
   return {
@@ -303,13 +304,16 @@ describe('R11-3.A.4: create canonical skill ProjectConventions snippet', () => {
 })
 
 describe('R11-3.A.5: keep skill templates generic after conventions sunset', () => {
-  it('T-R11-3.A.5.1: each skill template is the minimal generic invocation stub', async () => {
+  it('T-R11-3.A.5.1: each skill template is a generic placeholder surface', async () => {
     for (const fileName of AGENT_SKILL_FILES) {
       const content = await readFile(join(TEMPLATES_DIR, 'skill', fileName), 'utf-8')
-      expect(content).toBe(EXPECTED_SKILL_STUB)
-      expect(content).not.toContain('<ProjectConventions>')
+      expect(content.startsWith(REQUIRED_SKILL_INTRO)).toBe(true)
+      expect(content).toContain('<ProjectConventions>')
+      expect(content).toContain('<AgentOrchestration>')
+      expect(content.trimEnd().endsWith(ALIGNMENT_REQUIRED_MARKER)).toBe(true)
       expect(content).not.toContain('Node.js >=18.0.0')
       expect(content).not.toContain('blueprint-agentic-development')
+      expect(content).not.toContain('/ponytail')
     }
   })
 
