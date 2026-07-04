@@ -2,9 +2,9 @@
 
 **Project**: blueprint-cli
 **Tracker**: blueprint-cli
-**Current Milestone**: Revision 12 - Alignment Split and Foundation Planning (pending Phase 1 planning)
-**Current Phase**: Not Started - Revision 12 Phase 1 pending planning
-**Status**: Revision 12 - Alignment Split and Foundation Planning identified and revision document created. Phase 1 pending planning.
+**Current Milestone**: Revision 12 - Alignment Split and Foundation Planning (pending Phase 2 planning)
+**Current Phase**: Not Started - Revision 12 Phase 2 pending planning
+**Status**: Revision 12 Phase 1 complete. Phase 2 - Alignment Setup Split pending planning.
 
 ---
 
@@ -106,6 +106,7 @@
 - 2026-06-11: Revision 11 Phase 5 — Dogfood & Cross-Reference Verification completed. All tasks done, DoD satisfied, full test suite green (1314 passed, 2 skipped; 182 files passed, 1 skipped). Dogfood evidence: the installed setup gate passed with populated `docs/project-progress.md`, initialized `docs/.blueprint/tasks.db`, and successful `.claude/skills/blueprint/scripts/load-context.mjs` output; the real tweak run was recorded in `docs/tweaks/tweak-6-skill-mode-tweak-example.md`; the active-surface cross-reference audit stayed clean; `npm test -- tests/revision-11/phase-5`, `npm test`, and `npm run release:pack:verify` all passed.
 - 2026-07-03: Revision 11 Phase 6 — Migrate & Alignment-Complete Commands completed. Targeted Phase 6 command and doc-contract tests passed; full `npm test` passed (1343 passed, 2 skipped; 189 files passed, 1 skipped); `npm run release:pack:verify` passed. `blueprint alignment-complete` and `blueprint migrate` are implemented, documented, packaged, and covered by regression tests. MAS-211 and MAS-212 are active.
 - 2026-07-05: Identified Revision 12 - Alignment Split and Foundation Planning to split initial Blueprint setup into setup-only alignment and skill-only Foundation Planning. Impact spans M1 scaffold/Doctor/release surfaces, R3 alignment document production, R5 orchestration guidance, and R11 skill payload/setup gate/migrate/alignment-complete command behavior. SRS: MAS-203, MAS-208, MAS-209, MAS-210, MAS-211, and MAS-212 same-ID elaborations; no new IDs or supersessions. Revision document at `docs/milestones/revision-12-alignment-split-and-foundation-planning/revision-12-alignment-split-and-foundation-planning.md`; planning Q&A captured at `docs/milestones/revision-12-alignment-split-and-foundation-planning/revision-planning-q-and-a.md`.
+- 2026-07-05: Revision 12 Phase 1 — Bootstrap Surface and Skill Payload Contract completed. All tasks done, DoD satisfied, full test suite green, and release pack verification green.
 
 ---
 
@@ -171,8 +172,8 @@ R11 — Skill-Based Agent Surface ✓
 ├── Phase 4 — NPX Install Pathway & Release Surface ✓
 ├── Phase 5 — Dogfood & Cross-Reference Verification ✓
 └── Phase 6 — Migrate & Alignment-Complete Commands ✓
-R12 — Alignment Split and Foundation Planning ○
-├── Phase 1 — Bootstrap Surface and Skill Payload Contract ○
+R12 — Alignment Split and Foundation Planning ●
+├── Phase 1 — Bootstrap Surface and Skill Payload Contract ✓
 ├── Phase 2 — Alignment Setup Split ○
 ├── Phase 3 — Foundation Planning Module ○
 ├── Phase 4 — Command and Migration Semantics ○
@@ -189,4 +190,4 @@ M3 — Workflow Visibility Enhancements (Optional Future)
 
 | Revision | Name | Status | Notes |
 |----------|------|--------|-------|
-| R12 | Alignment Split and Foundation Planning | pending Phase 1 planning | Document: `docs/milestones/revision-12-alignment-split-and-foundation-planning/revision-12-alignment-split-and-foundation-planning.md` |
+| R12 | Alignment Split and Foundation Planning | pending Phase 2 planning | Phase 1 complete; Phase 2 pending planning. Document: `docs/milestones/revision-12-alignment-split-and-foundation-planning/revision-12-alignment-split-and-foundation-planning.md` |
