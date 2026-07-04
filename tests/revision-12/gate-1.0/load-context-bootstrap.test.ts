@@ -1,5 +1,5 @@
 import { execFile } from 'node:child_process'
-import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises'
+import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises'
 import { join, resolve } from 'node:path'
 import { promisify } from 'node:util'
 
@@ -12,6 +12,7 @@ const SCRIPT_PATHS = [
   join(ROOT_DIR, 'templates', 'skills', 'blueprint', 'scripts', 'load-context.mjs'),
   join(ROOT_DIR, 'skills', 'blueprint', 'scripts', 'load-context.mjs'),
 ]
+const PROJECT_PROGRESS_TEMPLATE_PATH = join(ROOT_DIR, 'templates', 'project-progress.md')
 
 const EMPTY_PROGRESS = `# Project Progress
 
@@ -162,6 +163,25 @@ describe('R12-1.0.3 load-context bootstrap reporting', () => {
 
       expect(backcompat.stdout).toContain('- `CLAUDE.md`: no marker')
       expect(backcompat.stdout).toContain('no legacy-migration marker')
+    },
+  )
+
+  it.each(SCRIPT_PATHS)(
+    'T-R12-1.0.3.3: %s treats scaffolded project-progress template as empty shell instead of populated progress',
+    async (scriptPath) => {
+      const fixture = await createFixtureDir()
+      fixtures.push(fixture)
+      await writeProgress(fixture.path, await readFile(PROJECT_PROGRESS_TEMPLATE_PATH, 'utf-8'))
+      await writeTrackerDb(fixture.path)
+
+      const scaffolded = await execFileAsync('node', [scriptPath], {
+        cwd: fixture.path,
+      })
+
+      expect(scaffolded.stdout).toContain('## Progress State\nempty progress shell')
+      expect(scaffolded.stdout).toContain('## Pending Revisions\n_none_')
+      expect(scaffolded.stdout).not.toContain('- ****')
+      expect(scaffolded.stdout).toContain('## Tracker\ninitialised at docs/.blueprint/tasks.db')
     },
   )
 })

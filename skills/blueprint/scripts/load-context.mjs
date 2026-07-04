@@ -66,6 +66,8 @@ function parsePendingRevisions(content) {
     if (cells.length >= 2) {
       // Skip the header row (comes before the separator)
       if (!dataStarted) continue
+      const hasMeaningfulData = cells.some((cell) => cell.length > 0 && !/^_.*_$/.test(cell))
+      if (!hasMeaningfulData) continue
       rows.push({
         revision: cells[0] || '',
         name: cells[1] || '',
