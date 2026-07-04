@@ -57,7 +57,7 @@ async function assertSkillPayloadMirror(
 }
 
 describe('R11-4.A skill payload mirror contract', () => {
-  it('T-R11-4.A.1.1/T-R11-4.A.1.2/T-R11-4.A.1.3 materializes the full 23-file repo-root mirror with byte identity and no extra files', async () => {
+  it('T-R11-4.A.1.1/T-R11-4.A.1.2/T-R11-4.A.1.3 materializes the full 24-file repo-root mirror with byte identity and no extra files', async () => {
     await assertSkillPayloadMirror(templateRoot, repoRoot)
   })
 

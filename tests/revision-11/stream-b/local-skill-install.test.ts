@@ -70,7 +70,7 @@ async function createLoadContextFixture(withTrackerDb: boolean): Promise<{ root:
 }
 
 describe('R11-5.B local skill install contract', () => {
-  it('T-R11-5.B.1.1/T-R11-5.B.1.2 materializes exactly the expected 23-file .claude install', async () => {
+  it('T-R11-5.B.1.1/T-R11-5.B.1.2 materializes exactly the expected 24-file .claude install', async () => {
     const localFiles = await listRelativeFiles(LOCAL_ROOT)
 
     expect(localFiles).toEqual(getLocalSkillPayloadRelativePaths().sort())
@@ -96,15 +96,15 @@ describe('R11-5.B local skill install contract', () => {
 
     try {
       await reseedFixture()
-      await unlink(join(fixtureLocalRoot, 'reference', 'align.md'))
+      await unlink(join(fixtureLocalRoot, 'reference', 'foundation-planning.md'))
       await expect(assertLocalSkillPayloadMirror(fixtureTemplateRoot, fixtureLocalRoot)).rejects.toThrow(
-        /align\.md/,
+        /foundation-planning\.md/,
       )
 
       await reseedFixture()
-      await writeFile(join(fixtureLocalRoot, 'reference', 'align.md'), '# drifted\n', 'utf-8')
+      await writeFile(join(fixtureLocalRoot, 'reference', 'foundation-planning.md'), '# drifted\n', 'utf-8')
       await expect(assertLocalSkillPayloadMirror(fixtureTemplateRoot, fixtureLocalRoot)).rejects.toThrow(
-        /align\.md/,
+        /foundation-planning\.md/,
       )
 
       await reseedFixture()
