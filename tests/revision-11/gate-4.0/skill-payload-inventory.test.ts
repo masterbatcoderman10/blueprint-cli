@@ -11,7 +11,7 @@ import {
 } from '../../../src/release/skill-payload-inventory'
 
 describe('R11-4.0 skill payload inventory', () => {
-  it('T-R11-4.0.1.1 exports the exact 23-file skill payload with template and repo-root path pairs', () => {
+  it('T-R11-4.0.1.1 exports the exact 24-file skill payload with template and repo-root path pairs', () => {
     const expectedTemplatePaths = getSkillCanonicalFiles(TEMPLATE_SKILL_PAYLOAD_ROOT)
     const expectedRepoRootPaths = getSkillCanonicalFiles(REPO_ROOT_SKILL_PAYLOAD_ROOT)
 
@@ -22,7 +22,13 @@ describe('R11-4.0 skill payload inventory', () => {
         packagePath: expectedRepoRootPaths[index],
       })),
     )
-    expect(SKILL_PAYLOAD_INVENTORY).toHaveLength(23)
+    expect(SKILL_PAYLOAD_INVENTORY).toHaveLength(24)
+    expect(getTemplateSkillPayloadPaths()).toContain(
+      'templates/skills/blueprint/reference/foundation-planning.md',
+    )
+    expect(getRepoRootSkillPayloadPaths()).toContain(
+      'skills/blueprint/reference/foundation-planning.md',
+    )
   })
 
   it('T-R11-4.0.1.2 derives every mirror and release helper path list from the shared inventory export', () => {

@@ -31,6 +31,7 @@ const SKILL_REFERENCE_FILES: string[] = [
   'commit-review.md',
   'commit.md',
   'execute.md',
+  'foundation-planning.md',
   'hierarchy.md',
   'orchestrate.md',
   'phase-complete.md',

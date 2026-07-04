@@ -31,7 +31,7 @@ describe('R11-5.0.2 Phase 5 shared helpers', () => {
     const root = resolve(process.cwd())
     const localInventory = getLocalSkillPayloadInventory()
 
-    expect(localInventory).toHaveLength(23)
+    expect(localInventory).toHaveLength(24)
     expect(localInventory.map((entry) => entry.templatePath)).toEqual(
       SKILL_PAYLOAD_INVENTORY.map((entry) => resolve(root, entry.templatePath)),
     )

@@ -17,8 +17,11 @@ import { readFile, stat } from 'node:fs/promises'
 import { join } from 'node:path'
 
 const PROGRESS_PATH = 'docs/project-progress.md'
-const BLUEPRINT_DIR = 'docs/.blueprint'
 const TASKS_DB = 'docs/.blueprint/tasks.db'
+const SUPPORTED_ROOT_FILES = ['CLAUDE.md', 'AGENTS.md', 'GEMINI.md', 'QWEN.md']
+const ALIGNMENT_REQUIRED_MARKER = '<!-- blueprint-status: alignment-required -->'
+const ALIGNMENT_COMPLETE_MARKER = '<!-- blueprint-status: alignment-complete -->'
+const LEGACY_MIGRATION_MARKER = '<!-- blueprint-origin: legacy-migration -->'
 
 // ── Parsing helpers ──────────────────────────────────────────────
 
@@ -86,6 +89,47 @@ async function probeTracker() {
   }
 }
 
+function classifyProgressState({ milestone, phase, pendingRevisions }) {
+  return milestone === null && phase === null && (!pendingRevisions || pendingRevisions.length === 0)
+    ? 'empty progress shell'
+    : 'populated progress'
+}
+
+async function probeRootFile(fileName) {
+  try {
+    const content = await readFile(join(process.cwd(), fileName), 'utf-8')
+    let state = 'no marker'
+    if (content.includes(ALIGNMENT_REQUIRED_MARKER)) {
+      state = 'alignment-required'
+    } else if (content.includes(ALIGNMENT_COMPLETE_MARKER)) {
+      state = 'alignment-complete'
+    }
+
+    return {
+      fileName,
+      state,
+      hasLegacyMigration: content.includes(LEGACY_MIGRATION_MARKER),
+    }
+  } catch (err) {
+    if (err && typeof err === 'object' && 'code' in err && err.code === 'ENOENT') {
+      return {
+        fileName,
+        state: 'missing',
+        hasLegacyMigration: false,
+      }
+    }
+    throw err
+  }
+}
+
+async function probeRootFiles() {
+  const results = []
+  for (const fileName of SUPPORTED_ROOT_FILES) {
+    results.push(await probeRootFile(fileName))
+  }
+  return results
+}
+
 // ── Main ─────────────────────────────────────────────────────────
 
 async function main() {
@@ -107,6 +151,11 @@ async function main() {
   const phase = extractField(content, 'Current Phase')
   const pendingRevisions = parsePendingRevisions(content)
   const trackerReady = await probeTracker()
+  const progressState = classifyProgressState({ milestone, phase, pendingRevisions })
+  const rootFileStates = await probeRootFiles()
+  const legacyMigrationFiles = rootFileStates
+    .filter((entry) => entry.hasLegacyMigration)
+    .map((entry) => `\`${entry.fileName}\``)
 
   // Build output
   const sections = []
@@ -119,6 +168,23 @@ async function main() {
 
   // ## Current Phase
   sections.push(`## Current Phase\n${phase ?? '_not set_'}`)
+
+  // ## Progress State
+  sections.push(`## Progress State\n${progressState}`)
+
+  // ## Alignment Markers
+  sections.push(
+    `## Alignment Markers\n${rootFileStates.map((entry) => `- \`${entry.fileName}\`: ${entry.state}`).join('\n')}`,
+  )
+
+  // ## Project Origin
+  sections.push(
+    `## Project Origin\n${
+      legacyMigrationFiles.length > 0
+        ? `legacy-migration marker present in ${legacyMigrationFiles.join(', ')}`
+        : 'no legacy-migration marker'
+    }`,
+  )
 
   // ## Pending Revisions
   if (pendingRevisions && pendingRevisions.length > 0) {

@@ -89,8 +89,9 @@ describe('R11-2.0 skill canonical structure helpers', () => {
     'bug.md',
     'commit-review.md',
     'commit.md',
-    'execute.md',
-    'hierarchy.md',
+  'execute.md',
+  'foundation-planning.md',
+  'hierarchy.md',
     'orchestrate.md',
     'phase-complete.md',
     'plan-milestone.md',
@@ -106,7 +107,7 @@ describe('R11-2.0 skill canonical structure helpers', () => {
     'tweak.md',
   ]
 
-  it('T-R11-2.0.2.1 returns the exact 23 project-relative skill files', () => {
+  it('T-R11-2.0.2.1 returns the exact 24 project-relative skill files', () => {
     const skillBase = '.claude/skills/blueprint'
     const expectedFiles = [
       `${skillBase}/SKILL.md`,
@@ -115,7 +116,7 @@ describe('R11-2.0 skill canonical structure helpers', () => {
     ]
 
     expect(getSkillCanonicalFiles(skillBase)).toEqual(expectedFiles)
-    expect(getSkillCanonicalFiles(skillBase)).toHaveLength(23)
+    expect(getSkillCanonicalFiles(skillBase)).toHaveLength(24)
     expect(getSkillCanonicalFiles(skillBase).some((path) => path.startsWith('docs/core/'))).toBe(false)
   })
 
@@ -144,7 +145,7 @@ describe('R11-2.0 skill template inventory resolution', () => {
       const entries = resolveAllSkillTemplatePaths(skillBase)
 
       expect(entries.map((entry) => entry.relativePath)).toEqual(getSkillCanonicalFiles(skillBase))
-      expect(entries).toHaveLength(23)
+      expect(entries).toHaveLength(24)
       for (const entry of entries) {
         expect(entry.absolutePath).toContain('templates/skills/blueprint')
         await expect(access(entry.absolutePath)).resolves.toBeUndefined()
