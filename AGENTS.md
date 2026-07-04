@@ -101,7 +101,7 @@ All `<AntiPatterns>` blocks in `docs/core/*.md` use the unfenced canonical XML s
 ## Orchestration Subagent Model
 
 - **Execution** :
-  - Use gpt-5.4-mini xhigh for primary execution.
+  - Use gpt-5.4 xhigh for primary execution.
   - Prompt to gpt-5.5 high if the same stream has failed the same sort of review 2 times in a row.
 - **Review** :
   - Use gpt-5.5 xhigh for review and for completion
