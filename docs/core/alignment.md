@@ -1,8 +1,9 @@
 # Alignment
 
-This module bootstraps a new Blueprint project by establishing agent
-setup only. It runs when project-progress.md is empty, meaning Blueprint
-has been scaffolded but planning has not started yet.
+This module establishes setup-only Alignment for a Blueprint project
+that still requires agent setup. It runs when project-progress.md is
+empty, and it also handles narrow setup repair when a populated project
+is forced back through Alignment.
 
 ---
 
@@ -18,6 +19,9 @@ has been scaffolded but planning has not started yet.
     It does NOT continue into Foundation Planning from Alignment.
 
   STEP 1 -- ASSESS SETUP CONTEXT
+    Choose the narrowest setup path that matches the project state:
+
+    EMPTY OR NEW SETUP
     Run a light scan of the project to gather setup context:
 
     CHECK -- existing supported root entry-point files and prior
@@ -27,6 +31,25 @@ has been scaffolded but planning has not started yet.
     project-specific constraints if present
     CHECK -- codebase structure and file organization only as needed
     to ground the setup guidance in the real project
+
+    MIGRATED-STATE FAST-TRACK
+    This branch applies only to populated progress plus `alignment-required` plus `blueprint-origin: legacy-migration`.
+    Treat it as a fast-track supported root entry-point setup repair.
+    Skip product discovery, codebase discovery, and git discovery.
+    Focus only on supported root entry-point setup repair for:
+      - existing supported root entry-point files and prior setup guidance
+      - <ProjectConventions>
+      - <AgentOrchestration>
+      - migration-created setup gaps that must be repaired
+
+    INCOMPLETE-ALIGNMENT REPAIR
+    This branch applies to populated progress plus `alignment-required` without `blueprint-origin: legacy-migration`.
+    Treat this as an inconsistent state.
+    Block normal workflows.
+    Alignment must be rerun or repaired before normal routing resumes.
+    This is a stop-state, not a normal routing case.
+    Keep the repair narrow and limited to supported root entry-point
+    setup state.
 
     The goal is only enough context to draft:
       - <ProjectConventions>
@@ -51,6 +74,13 @@ has been scaffolded but planning has not started yet.
 
     Do NOT ask setup questions that try to draft PRDs, SRS docs, milestone docs, phase docs, test plans, tracker tasks, or board activity.
 
+    For migrated-state fast-track repair:
+      - Read old/root guidance where available.
+      - Present what can be preserved in the repaired setup blocks.
+      - Ask for approval before preserving, correcting, or dropping any migrated guidance.
+      - Alignment owns preservation and correction of old guidance.
+      - Keep the conversation limited to confirmed setup repair.
+
     For <AgentOrchestration>, interview and confirm these locked headings:
       ## Harness Capabilities
       ## Role Defaults
@@ -63,6 +93,8 @@ has been scaffolded but planning has not started yet.
     Planning does not require subagent model defaults.
     Record only the skills and MCPs the user explicitly names.
     Do NOT scan installed skills or MCPs during Alignment.
+    Do NOT let `migrate` perform smart merge work.
+    Any stricter `migrate` command behavior stays deferred to Phase 4.
 
     Do NOT write approved setup blocks without explicit user approval.
     Do NOT treat the setup summary as final until the user confirms it
@@ -80,6 +112,9 @@ has been scaffolded but planning has not started yet.
     After explicit user approval, write the approved
     <ProjectConventions> and <AgentOrchestration> blocks into the
     supported root entry-point files that exist in the project.
+
+    For migrated-state fast-track repair, write only the confirmed
+    <ProjectConventions> and <AgentOrchestration> blocks.
 
     Scan these supported root entry-point files first:
       - CLAUDE.md
