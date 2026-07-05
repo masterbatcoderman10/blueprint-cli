@@ -3,10 +3,11 @@
  * Tests: T-2.0.1, T-2.0.2.1, T-2.0.2.2, T-2.0.3.1, T-2.0.3.2
  */
 
-import { describe, it, expect } from 'vitest'
+import { beforeAll, describe, it, expect } from 'vitest'
 import { readFileSync, existsSync } from 'fs'
-import { execSync } from 'child_process'
 import * as path from 'path'
+
+import { ensureSpaBuild } from '../helpers/ensure-spa-build'
 
 const ROOT = path.resolve(__dirname, '../../')
 const pkg = JSON.parse(readFileSync(path.join(ROOT, 'package.json'), 'utf-8'))
@@ -134,11 +135,11 @@ describe('T-2.0.2.1: build:spa output', () => {
   const distSpa = path.join(ROOT, 'dist/spa')
   const indexHtml = path.join(distSpa, 'index.html')
 
+  beforeAll(async () => {
+    await ensureSpaBuild({ rootDir: ROOT })
+  })
+
   it('dist/spa/index.html exists after build', () => {
-    if (!existsSync(distSpa)) {
-      // Build hasn't run yet — run it
-      execSync('npm run build:spa', { cwd: ROOT, stdio: 'inherit' })
-    }
     expect(existsSync(indexHtml)).toBe(true)
   })
 

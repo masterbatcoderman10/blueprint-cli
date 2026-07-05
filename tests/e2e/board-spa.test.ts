@@ -1,11 +1,12 @@
 import { spawn, execFileSync } from 'node:child_process'
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync } from 'node:fs'
+import { mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
 import { createRequire } from 'node:module'
 import { afterEach, beforeAll, describe, expect, it } from 'vitest'
 
 import { openDb } from '../../src/tracker/db'
+import { ensureSpaBuild } from '../helpers/ensure-spa-build'
 
 const packageRoot = process.cwd()
 const require = createRequire(import.meta.url)
@@ -110,10 +111,8 @@ afterEach(async () => {
 })
 
 describe('Stream D — board SPA E2E', () => {
-  beforeAll(() => {
-    if (!existsSync(join(packageRoot, 'dist', 'spa', 'index.html'))) {
-      execFileSync('npm', ['run', 'build:spa'], { cwd: packageRoot, stdio: 'inherit' })
-    }
+  beforeAll(async () => {
+    await ensureSpaBuild({ rootDir: packageRoot })
   })
   it(
     'D.3: serves SPA index.html, fingerprinted assets, and JSON API side-by-side',
