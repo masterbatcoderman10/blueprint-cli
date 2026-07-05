@@ -56,13 +56,18 @@ describe('R12-3.0 foundation planning contract canon', () => {
 
   it('T-R12-3.0.1.3: names the required context sources and locked planning references', () => {
     const content = read(TEMPLATE_FOUNDATION_PLANNING_PATH)
+    const contextSection =
+      content.match(/<FoundationPlanningContext>([\s\S]*?)<\/FoundationPlanningContext>/)?.[1] ?? ''
+    const srsSection =
+      content.match(/<FoundationPlanningSRS>([\s\S]*?)<\/FoundationPlanningSRS>/)?.[1] ?? ''
 
     expect(content).toMatch(/Foundation Planning begins from existing project files and approved setup\s+blocks\./)
     expect(content).toContain('<ProjectConventions>')
     expect(content).toContain('<AgentOrchestration>')
-    expect(content).toContain('Load `reference/planning.md` for one-document planning discipline.')
-    expect(content).toContain('Load `reference/plan-prd.md` for PRD-specific rules.')
-    expect(content).toContain('Load `reference/srs.md` for SRS-specific rules.')
+    expect(contextSection).toContain('Load `reference/planning.md` for one-document planning discipline.')
+    expect(contextSection).toContain('Load `reference/plan-prd.md` for PRD-specific rules.')
+    expect(contextSection).not.toContain('Load `reference/srs.md`')
+    expect(srsSection).toContain('Load `reference/srs.md`.')
     expect(content).toMatch(/reopen setup interviewing when the approved setup blocks are already\s+present/)
   })
 
