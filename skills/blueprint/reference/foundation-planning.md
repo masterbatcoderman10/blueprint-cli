@@ -63,7 +63,6 @@ resume.
   LOCKED REFERENCE LOADS:
     - Load `reference/planning.md` for one-document planning discipline.
     - Load `reference/plan-prd.md` for PRD-specific rules.
-    - Load `reference/srs.md` for SRS-specific rules.
 
   DO NOT:
     - reopen setup interviewing when the approved setup blocks are already

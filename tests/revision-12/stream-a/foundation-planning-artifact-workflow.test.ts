@@ -13,6 +13,12 @@ function read(filePath: string): string {
   return readFileSync(filePath, 'utf-8')
 }
 
+function section(content: string, tagName: string): string {
+  const match = content.match(new RegExp(`<${tagName}>([\\s\\S]*?)</${tagName}>`))
+  expect(match, `expected <${tagName}> section`).not.toBeNull()
+  return match![1]
+}
+
 describe('R12-3.A foundation planning artifact workflow', () => {
   it('T-R12-3.A.1.1: defines PRD Stage 1 as planning + plan-prd, product-scope-only interviewing, and a docs/prd.md draft', () => {
     for (const content of FOUNDATION_PLANNING_PATHS.map(read)) {
@@ -26,9 +32,13 @@ describe('R12-3.A foundation planning artifact workflow', () => {
 
   it('T-R12-3.A.1.2: blocks SRS until the PRD Stage 1 draft has gone through the full approval gate', () => {
     for (const content of FOUNDATION_PLANNING_PATHS.map(read)) {
+      expect(section(content, 'FoundationPlanningContext')).not.toContain('reference/srs.md')
       expect(content).toContain('Present the `docs/prd.md` path and a concise summary to the user.')
       expect(content).toContain('Apply targeted edits to `docs/prd.md`.')
       expect(content).toContain('Get explicit approval on PRD Stage 1 before SRS begins.')
+      expect(section(content, 'FoundationPlanningPRDStage1')).toContain(
+        'Do not load `reference/srs.md` or begin SRS drafting until the PRD',
+      )
     }
   })
 
