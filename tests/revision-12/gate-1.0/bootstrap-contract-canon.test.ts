@@ -70,11 +70,15 @@ describe('R12-1.0 bootstrap contract canon', () => {
     expect(contents[0]).toBe(contents[1])
 
     for (const content of contents) {
+      expect(content).toContain('Foundation Planning is a complete workflow')
       expect(content).toContain('alignment-complete')
       expect(content).toContain('empty progress shell')
       expect(content).toContain('<ProjectConventions>')
       expect(content).toContain('<AgentOrchestration>')
       expect(content.toLowerCase()).toContain('tracker')
+      expect(content).not.toContain('Phase 1 only establishes')
+      expect(content).not.toContain('future workflow')
+      expect(content).not.toContain('workflow remains Phase 3 work')
     }
   })
 
