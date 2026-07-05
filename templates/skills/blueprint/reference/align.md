@@ -1,6 +1,6 @@
 ---
 name: align
-description: Establish setup-only Alignment by assessing project context, writing approved agent setup blocks, marking alignment complete, and stopping; routes alignment intent when project-progress.md is empty
+description: Establish setup-only Alignment by assessing project context, handling supported-root setup repair when populated projects are forced back through Alignment, writing approved agent setup blocks, marking alignment complete, and stopping; routes alignment intent when project-progress.md is empty
 ---
 # Alignment
 
@@ -19,7 +19,7 @@ is forced back through Alignment.
   HARD BOUNDARY:
     Alignment is setup-only.
     It does NOT produce PRDs, SRS docs, milestone docs, phase docs,
-    test plans, tracker tasks, board updates, or docs/project-progress.md.
+    test plans, tracker tasks, board mutations, or docs/project-progress.md.
     It does NOT continue into Foundation Planning from Alignment.
 
   STEP 1 -- ASSESS SETUP CONTEXT
@@ -39,6 +39,7 @@ is forced back through Alignment.
     MIGRATED-STATE FAST-TRACK
     This branch applies only to populated progress plus `alignment-required` plus `blueprint-origin: legacy-migration`.
     Treat it as a fast-track supported root entry-point setup repair.
+    Use this as the post-migration fast-track repair path.
     Skip product discovery, codebase discovery, and git discovery.
     Focus only on supported root entry-point setup repair for:
       - existing supported root entry-point files and prior setup guidance
@@ -76,7 +77,7 @@ is forced back through Alignment.
     time, let each answer close gaps in the setup guidance, and get
     explicit confirmation before writing any approved setup blocks.
 
-    Do NOT ask setup questions that try to draft PRDs, SRS docs, milestone docs, phase docs, test plans, tracker tasks, or board activity.
+    Do NOT ask setup questions that try to draft PRDs, SRS docs, milestone docs, phase docs, test plans, tracker tasks, or board mutations.
 
     For migrated-state fast-track repair:
       - Read old/root guidance where available.
@@ -113,7 +114,7 @@ is forced back through Alignment.
     Treat these blocks as agent setup guidance, not as planning artifacts.
 
   STEP 4 -- WRITE APPROVED SETUP BLOCKS
-    After explicit user approval, write the approved
+    After explicit user approval, write only the approved
     <ProjectConventions> and <AgentOrchestration> blocks into the
     supported root entry-point files that exist in the project.
 
@@ -129,7 +130,7 @@ is forced back through Alignment.
     Respect absent supported files.
     Write every existing supported file.
     <ProjectConventions> must remain byte-identical across those files.
-    <AgentOrchestration> may differ by harness or file.
+    <AgentOrchestration> must be present in every written supported file, but its contents are not required to be byte-identical and may differ by harness or file.
 
     Do NOT write approved setup blocks without explicit user approval.
     Do NOT write partial drafts, placeholder planning docs, or
@@ -144,7 +145,7 @@ is forced back through Alignment.
     Then tell the user to start a fresh session or clear context before Foundation Planning.
     Alignment stops after this handoff.
     Legacy mode does not gain a Foundation Planning route.
-    Do NOT create milestone docs, phase docs, test plans, tracker tasks, or board activity during Alignment.
+    Do NOT create milestone docs, phase docs, test plans, tracker tasks, or board mutations during Alignment.
     Do NOT continue into Foundation Planning from Alignment.
 </AlignmentFlow>
 

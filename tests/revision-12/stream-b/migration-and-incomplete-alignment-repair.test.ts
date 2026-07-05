@@ -16,6 +16,7 @@ describe('R12-2.B migration and incomplete-alignment repair contract', () => {
     for (const content of [read(LEGACY_ALIGNMENT_PATH), read(SKILL_TEMPLATE_ALIGNMENT_PATH)]) {
       expect(content).toContain('populated progress plus `alignment-required` plus `blueprint-origin: legacy-migration`')
       expect(content).toContain('fast-track')
+      expect(content).toContain('post-migration fast-track repair path')
       expect(content).toContain('supported root entry-point setup repair')
       expect(content).toContain('Skip product discovery, codebase discovery, and git discovery')
     }

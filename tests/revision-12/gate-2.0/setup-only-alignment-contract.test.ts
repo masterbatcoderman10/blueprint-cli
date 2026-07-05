@@ -13,13 +13,26 @@ function read(filePath: string): string {
   return readFileSync(filePath, 'utf-8')
 }
 
+function stripFrontmatter(content: string): string {
+  return content.replace(/^---\n[\s\S]*?\n---\n/, '')
+}
+
+function frontmatterDescription(content: string): string {
+  const match = content.match(/^---\n[\s\S]*?\ndescription:\s*(.+)\n---\n/)
+
+  return match?.[1] ?? ''
+}
+
 describe('R12-2.0 setup-only alignment contract', () => {
   it('T-R12-2.0.1.1: rewrites legacy Alignment as a setup-only workflow and removes downstream document production', () => {
     const content = read(LEGACY_ALIGNMENT_PATH)
 
     expect(content).toContain('Alignment is setup-only')
+    expect(content).toContain('The goal is only enough context to draft:')
+    expect(content).toContain('Draft only the approved setup blocks:')
     expect(content).toContain('<ProjectConventions>')
     expect(content).toContain('<AgentOrchestration>')
+    expect(content).toMatch(/write only the approved\s+<ProjectConventions> and <AgentOrchestration> blocks/)
     expect(content).not.toContain('<DocumentProduction>')
     expect(content).not.toContain('docs/prd.md — Stage 1 (body only)')
     expect(content).not.toContain('docs/srs.md')
@@ -46,11 +59,14 @@ describe('R12-2.0 setup-only alignment contract', () => {
 
   it('T-R12-2.0.3.1: rewrites the skill align reference around the setup-only contract', () => {
     const content = read(SKILL_TEMPLATE_ALIGNMENT_PATH)
+    const description = frontmatterDescription(content)
 
     expect(content).toContain('setup-only Alignment')
     expect(content).toContain('routes alignment intent when project-progress.md is empty')
+    expect(description).toContain('supported-root setup repair')
     expect(content).toContain('<ProjectConventions>')
     expect(content).toContain('<AgentOrchestration>')
+    expect(stripFrontmatter(content)).toBe(read(LEGACY_ALIGNMENT_PATH))
     expect(content).not.toContain('producing foundational documents')
     expect(content).not.toContain('<DocumentProduction>')
     expect(content).not.toContain('docs/prd.md — Stage 1 (body only)')

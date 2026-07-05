@@ -30,7 +30,7 @@ describe('R12-2.A setup interview and block authoring contract', () => {
   it('T-R12-2.A.1.2: explicitly forbids setup questioning from drifting into downstream planning artifacts', () => {
     for (const content of [read(LEGACY_ALIGNMENT_PATH), read(SKILL_TEMPLATE_ALIGNMENT_PATH)]) {
       expect(content).toContain(
-        'Do NOT ask setup questions that try to draft PRDs, SRS docs, milestone docs, phase docs, test plans, tracker tasks, or board activity.',
+        'Do NOT ask setup questions that try to draft PRDs, SRS docs, milestone docs, phase docs, test plans, tracker tasks, or board mutations.',
       )
     }
   })
@@ -63,7 +63,9 @@ describe('R12-2.A setup interview and block authoring contract', () => {
       expect(content).toContain('Respect absent supported files.')
       expect(content).toContain('Write every existing supported file.')
       expect(content).toContain('<ProjectConventions> must remain byte-identical across those files.')
-      expect(content).toContain('<AgentOrchestration> may differ by harness or file.')
+      expect(content).toContain(
+        '<AgentOrchestration> must be present in every written supported file, but its contents are not required to be byte-identical and may differ by harness or file.',
+      )
     }
   })
 
@@ -85,7 +87,7 @@ describe('R12-2.A setup interview and block authoring contract', () => {
     for (const content of [read(LEGACY_ALIGNMENT_PATH), read(SKILL_TEMPLATE_ALIGNMENT_PATH)]) {
       expect(content).toContain('Legacy mode does not gain a Foundation Planning route.')
       expect(content).toContain(
-        'Do NOT create milestone docs, phase docs, test plans, tracker tasks, or board activity during Alignment.',
+        'Do NOT create milestone docs, phase docs, test plans, tracker tasks, or board mutations during Alignment.',
       )
     }
   })
