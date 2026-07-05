@@ -63,7 +63,6 @@ resume.
   LOCKED REFERENCE LOADS:
     - Load `reference/planning.md` for one-document planning discipline.
     - Load `reference/plan-prd.md` for PRD-specific rules.
-    - Load `reference/srs.md` for SRS-specific rules.
 
   DO NOT:
     - reopen setup interviewing when the approved setup blocks are already
@@ -92,6 +91,79 @@ resume.
     - keep milestone and phase document creation for later workflows
     - populated `docs/project-progress.md` unlocks normal Blueprint routing
 </FoundationPlanningSequence>
+
+---
+
+<FoundationPlanningPRDStage1>
+  PRD Stage 1 is the first artifact.
+
+  PRD STAGE 1 WORKFLOW:
+    - Load `reference/planning.md` and `reference/plan-prd.md`.
+    - Interview only for product scope.
+    - Draft the PRD Stage 1 body to `docs/prd.md`.
+    - Write only the PRD body sections that Stage 1 allows.
+    - Present the `docs/prd.md` path and a concise summary to the user.
+    - Apply targeted edits to `docs/prd.md`.
+    - Get explicit approval on PRD Stage 1 before SRS begins.
+
+  HARD RULE:
+    Do not load `reference/srs.md` or begin SRS drafting until the PRD
+    Stage 1 draft is approved.
+</FoundationPlanningPRDStage1>
+
+---
+
+<FoundationPlanningSRS>
+  SRS is the second artifact.
+
+  SRS WORKFLOW:
+    - Load `reference/srs.md`.
+    - Use the approved PRD Stage 1 artifact plus direct user Q&A as SRS inputs.
+    - Derive stable requirement IDs under the `reference/srs.md` rules.
+    - Preserve the SRS structure and metadata rules from `reference/srs.md`.
+    - Draft the SRS to `docs/srs.md`.
+    - Present the `docs/srs.md` path and a concise summary to the user.
+    - Apply targeted edits to `docs/srs.md`.
+    - Get explicit approval on the SRS before returning to PRD Stage 2.
+
+  HARD RULE:
+    Do not rerun Alignment while drafting the SRS.
+</FoundationPlanningSRS>
+
+---
+
+<FoundationPlanningPRDStage2>
+  PRD Stage 2 is the third artifact.
+
+  PRD STAGE 2 WORKFLOW:
+    - Reload `reference/plan-prd.md` for PRD Stage 2.
+    - Return to `docs/prd.md`.
+    - Project milestones from the approved SRS.
+    - Reference SRS IDs from milestone descriptions.
+    - Do not create milestone documents during PRD Stage 2.
+    - Present the `docs/prd.md` path and a concise summary for PRD Stage 2.
+    - Apply targeted milestone edits to `docs/prd.md`.
+    - Get explicit approval on PRD Stage 2 before project-progress begins.
+</FoundationPlanningPRDStage2>
+
+---
+
+<FoundationPlanningProjectProgress>
+  `docs/project-progress.md` is the final artifact.
+
+  PROJECT-PROGRESS WORKFLOW:
+    - Populate the `docs/project-progress.md` shell last.
+    - Set the first PRD milestone as the current pending milestone-planning target.
+    - Keep the current phase at pending milestone planning.
+    - Populated progress unlocks normal Blueprint routing.
+    - Present the `docs/project-progress.md` path and a concise summary to the user.
+    - Apply targeted edits to `docs/project-progress.md`.
+    - Get explicit approval on `docs/project-progress.md` before Foundation Planning is complete.
+    - Do not create phase docs while finalizing `docs/project-progress.md`.
+    - Do not create test plans while finalizing `docs/project-progress.md`.
+    - Do not create tracker tasks while finalizing `docs/project-progress.md`.
+    - Do not mutate the board while finalizing `docs/project-progress.md`.
+</FoundationPlanningProjectProgress>
 
 ---
 
