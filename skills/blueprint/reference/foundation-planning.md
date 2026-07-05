@@ -1,19 +1,22 @@
 ---
 name: foundation-planning
-description: Lock bootstrap-only sequencing and boundaries for Foundation Planning after alignment completes; routes Foundation Planning intent
+description: Define the full bootstrap-only Foundation Planning workflow after Alignment completes; routes Foundation Planning intent
 ---
 # Foundation Planning
 
-This module defines the locked bootstrap contract for Foundation Planning.
-Phase 1 only establishes when this workflow is allowed, what order it
-follows, and what it must not do. The deeper interviewing and drafting
-workflow remains Phase 3 work.
+Foundation Planning is a complete workflow. It turns approved Alignment
+setup plus the existing Blueprint scaffold files into the first planning
+artifacts. It begins after Alignment completes and ends only after
+`docs/project-progress.md` is populated so normal Blueprint routing can
+resume.
 
 ---
 
 <FoundationPlanningPreconditions>
-  Foundation Planning is bootstrap-only. It may run ONLY when all of the
-  following are true:
+  Foundation Planning is bootstrap-only. Only `alignment-complete` plus
+  empty progress may proceed.
+
+  Foundation Planning may run ONLY when all of the following are true:
     - supported root files report `alignment-complete`
     - `docs/project-progress.md` is still an empty progress shell
     - required setup blocks exist and are complete:
@@ -21,15 +24,54 @@ workflow remains Phase 3 work.
       - `<AgentOrchestration>`
     - `docs/.blueprint/tasks.db` exists and tracker is available
 
-  IF any precondition fails:
-    - STOP
-    - do not draft or update PRD, SRS, or project-progress
-    - redirect to init/repair, Alignment, or normal planning flows as appropriate
+  STOP MATRIX:
+    - If the tracker is missing or unavailable, STOP and instruct the user
+      to run `blueprint init`.
+    - If required setup blocks are missing or incomplete, STOP without
+      repairing them.
+    - If `alignment-required` is present, STOP and redirect to Alignment.
+    - If progress is already populated, STOP and route to normal
+      planning/revision workflows.
+    - If progress is empty and no supported marker is present, STOP with
+      repair guidance.
 
   MARKER RULE:
-    Foundation Planning reads marker state only. Alignment owns marker
-    mutation. Foundation Planning does not rewrite supported root files.
+    Foundation Planning reads marker state only.
+    Alignment owns marker mutation and setup repair.
+    Foundation Planning does not rewrite supported root files.
+
+  HARD RULE:
+    If any precondition fails, do not draft or update PRD, SRS, or
+    project-progress.
 </FoundationPlanningPreconditions>
+
+---
+
+<FoundationPlanningContext>
+  Foundation Planning begins from existing project files and approved setup
+  blocks.
+
+  REQUIRED CONTEXT SOURCES:
+    - existing scaffold files:
+      - `docs/prd.md`
+      - `docs/srs.md`
+      - `docs/project-progress.md`
+    - approved setup blocks:
+      - `<ProjectConventions>`
+      - `<AgentOrchestration>`
+
+  LOCKED REFERENCE LOADS:
+    - Load `reference/planning.md` for one-document planning discipline.
+    - Load `reference/plan-prd.md` for PRD-specific rules.
+    - Load `reference/srs.md` for SRS-specific rules.
+
+  DO NOT:
+    - reopen setup interviewing when the approved setup blocks are already
+      present
+    - mutate markers
+    - repair setup blocks
+    - load `reference/plan-test.md`
+</FoundationPlanningContext>
 
 ---
 
@@ -47,9 +89,8 @@ workflow remains Phase 3 work.
     - do not skip artifacts
     - do not reorder artifacts
     - do not batch artifacts together
-    - load `reference/plan-prd.md` for PRD rules
-    - load `reference/srs.md` for SRS rules
-    - load `reference/planning.md` for one-document planning discipline
+    - keep milestone and phase document creation for later workflows
+    - populated `docs/project-progress.md` unlocks normal Blueprint routing
 </FoundationPlanningSequence>
 
 ---
@@ -67,12 +108,16 @@ workflow remains Phase 3 work.
   HARD RULE:
     Do not advance to the next artifact until the current artifact has
     explicit approval.
+
+  CONTEXT RULE:
+    If context becomes crowded, stop and continue in a fresh session rather
+    than batching more than one artifact.
 </FoundationPlanningReviewGate>
 
 ---
 
 <FoundationPlanningNonGoals>
-  Phase 1 boundaries are explicit:
+  Foundation Planning does NOT:
     - no milestone docs
     - no phase docs
     - no test plans
@@ -80,8 +125,6 @@ workflow remains Phase 3 work.
     - no board mutations
     - no `docs/core/foundation-planning.md`
     - no `templates/docs/core/foundation-planning.md`
-
-  The deeper interviewing and drafting workflow remains Phase 3 work.
 </FoundationPlanningNonGoals>
 
 ---
@@ -91,14 +134,14 @@ workflow remains Phase 3 work.
 <AntiPatterns>
   <AntiPattern name="Batching Bootstrap Artifacts">
     <BadExample>Drafting PRD Stage 1, SRS, PRD Stage 2, and project-progress together, or moving to the next artifact before the current one has explicit approval.</BadExample>
-    <Why>Foundation Planning is a gated bootstrap workflow. Each artifact can change what comes next. Batching hides mistakes and breaks the locked review sequence.</Why>
+    <Why>Foundation Planning is a gated workflow. Each artifact informs the next one. Batching hides mistakes and breaks the approval boundary between artifacts.</Why>
   </AntiPattern>
   <AntiPattern name="Crossing Into Later Planning">
     <BadExample>Creating milestone docs, phase docs, test plans, or tracker tasks during Foundation Planning because the information seems obvious.</BadExample>
-    <Why>Foundation Planning only establishes bootstrap planning artifacts. Milestones, phases, tests, and tracker work belong to later sessions and later modules.</Why>
+    <Why>Foundation Planning ends at populated `docs/project-progress.md`. Milestones, phases, tests, tracker work, and board activity belong to later workflows.</Why>
   </AntiPattern>
   <AntiPattern name="Mutating Alignment State">
     <BadExample>Rewriting alignment markers, filling missing setup blocks, or otherwise trying to complete Alignment from inside Foundation Planning.</BadExample>
-    <Why>Alignment owns setup completion and marker mutation. Foundation Planning treats setup as a precondition and must stop when setup is incomplete.</Why>
+    <Why>Alignment owns setup completion, setup repair, and marker mutation. Foundation Planning treats setup as a precondition and must stop when setup is incomplete.</Why>
   </AntiPattern>
 </AntiPatterns>
