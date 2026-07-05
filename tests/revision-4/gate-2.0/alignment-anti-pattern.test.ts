@@ -11,24 +11,24 @@ describe(`T-R4-2.0.1.1: docs/core/alignment.md contains the "Don't Rush" anti-pa
   it('places the new guidance in a standalone Anti-Patterns section as an XML code block', async () => {
     const liveContent = await readFile(LIVE_ALIGNMENT_PATH, 'utf-8')
     const antiPatternsIndex = liveContent.lastIndexOf('## Anti-Patterns')
-    const documentProductionEndIndex = liveContent.indexOf('</DocumentProduction>')
+    const alignmentFlowEndIndex = liveContent.indexOf('</AlignmentFlow>')
 
     expect(antiPatternsIndex).toBeGreaterThan(-1)
-    expect(documentProductionEndIndex).toBeGreaterThan(-1)
-    expect(antiPatternsIndex).toBeGreaterThan(documentProductionEndIndex)
+    expect(alignmentFlowEndIndex).toBeGreaterThan(-1)
+    expect(antiPatternsIndex).toBeGreaterThan(alignmentFlowEndIndex)
     expect(liveContent).toContain('<AntiPatterns>')
     expect(liveContent).toContain(`<AntiPattern name="Don't Rush">`)
     expect(liveContent).toContain(
-      'The agent finishes analysis, writes the ProjectConventions section to disk, and only afterward asks whether the user approves the current stage.',
+      'The agent writes `<ProjectConventions>` or `<AgentOrchestration>` to disk before the user explicitly approves the current setup draft.',
     )
     expect(liveContent).toContain(
-      'The agent shows a current-stage draft, gets partial feedback, but still proceeds to write the next document in the flow before the user explicitly approves the current one.',
+      'The agent gets partial feedback on setup guidance but still pushes ahead to write files or move into Foundation Planning before the current setup stage is approved.',
     )
     expect(liveContent).toContain(
-      'The agent keeps pressing with questions like "Can I move to the next step now?" while the current-stage draft is still unapproved or open questions remain unresolved.',
+      'The agent turns setup alignment into product planning by drafting PRD, SRS, milestone, phase, test-plan, tracker-task, board, or project-progress artifacts.',
     )
     expect(liveContent).toContain(
-      'The confirmation loop exists to keep each stage trustworthy: show the current-stage draft, ask for approval, close open questions, then continue.',
+      'Alignment exists to establish agent setup only.',
     )
   })
 })

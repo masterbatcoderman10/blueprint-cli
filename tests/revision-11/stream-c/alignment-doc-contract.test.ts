@@ -37,9 +37,11 @@ describe('T-R11-3.C.1: alignment protocol sunsetting conventions.md', () => {
     const alignment = readFileSync(ALIGNMENT_PATH, 'utf-8')
 
     expect(alignment).not.toContain('conventions.md')
-    expect(alignment).toContain('selected project entry-point file')
+    expect(alignment).toContain('Alignment is setup-only')
     expect(alignment).toContain('<ProjectConventions>')
-    expect(alignment).toContain('Do NOT write the ProjectConventions section')
+    expect(alignment).toContain('<AgentOrchestration>')
+    expect(alignment).toContain('supported root entry-point files')
+    expect(alignment).toContain('Do NOT write approved setup blocks')
     expect(alignment).toContain('without explicit user approval')
   })
 
@@ -47,8 +49,9 @@ describe('T-R11-3.C.1: alignment protocol sunsetting conventions.md', () => {
     const alignment = readFileSync(ALIGNMENT_PATH, 'utf-8')
 
     expect(alignment).toContain('Anti-Patterns')
-    expect(alignment).toContain('<BadExample>The agent finishes analysis, writes the ProjectConventions section to disk')
-    expect(alignment).toContain('and only afterward asks whether the user approves the current stage.')
+    expect(alignment).toContain(
+      '<BadExample>The agent writes `<ProjectConventions>` or `<AgentOrchestration>` to disk before the user explicitly approves the current setup draft.</BadExample>',
+    )
   })
 })
 

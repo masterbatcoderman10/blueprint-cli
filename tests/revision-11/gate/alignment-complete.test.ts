@@ -18,8 +18,9 @@ describe('T-R11-1.0.4 — alignment.md alignment-complete step', () => {
     expect(content).toContain('already-complete, missing-marker, and absent-file cases')
     expect(content).not.toMatch(/Revision 11 Phase 6|deferred/)
 
-    // Must indicate it runs after alignment artifacts are confirmed and committed
-    expect(content.toLowerCase()).toMatch(/confirmed.*committed|committed.*confirmed/)
+    // Must indicate it runs after approved setup-block edits and stops at the handoff
+    expect(content).toContain('After the approved setup block edits are written, run `blueprint alignment-complete`.')
+    expect(content).toContain('start a fresh session or clear context before Foundation Planning')
   })
 
   it('T-R11-1.0.4.2: both marker strings appear verbatim', () => {
