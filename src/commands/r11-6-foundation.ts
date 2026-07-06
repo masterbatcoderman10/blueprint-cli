@@ -1,4 +1,4 @@
-import { readFile, rm, stat, writeFile } from 'node:fs/promises'
+import { readFile, rm, writeFile } from 'node:fs/promises'
 import { join, resolve } from 'node:path'
 
 import { type AgentFileName } from '../init/types'
@@ -8,19 +8,24 @@ import { resolveTemplatePath } from '../doctor/inventory'
 import { detectProjectMode, getSkillCanonicalFiles, SKILL_INSTALL_BASES, SUPPORTED_AGENT_FILES } from '../doctor/structure'
 import { findProjectRoot, projectRootErrorMessage } from '../tracker/project-root'
 import type { CommandDefinition } from '../runtime'
+import {
+  inspectSupportedRootAgentFiles,
+  readAlignmentMarkerState,
+  validateAlignmentCompletionRootFiles,
+  type AlignmentMarkerState,
+  type RootSetupBlockFailure,
+  type SupportedRootAgentFileInspection,
+} from './root-entry-point-setup'
 
 export const ALIGNMENT_REQUIRED_MARKER = '<!-- blueprint-status: alignment-required -->'
 export const ALIGNMENT_COMPLETE_MARKER = '<!-- blueprint-status: alignment-complete -->'
+export const LEGACY_MIGRATION_MARKER = '<!-- blueprint-origin: legacy-migration -->'
 
-export type AlignmentMarkerState = 'required' | 'complete' | 'missing-marker' | 'absent'
+export type { AlignmentMarkerState, SupportedRootAgentFileInspection } from './root-entry-point-setup'
 
 export interface SupportedRootAgentFileDiscovery {
   fileName: AgentFileName
   path: string
-}
-
-export interface SupportedRootAgentFileInspection extends SupportedRootAgentFileDiscovery {
-  state: AlignmentMarkerState
 }
 
 export interface SkillModeMigrationResult {
@@ -37,16 +42,18 @@ export interface AlignmentCompleteResult {
   skipped: AgentFileName[]
 }
 
-function skillTemplatePath(fileName: AgentFileName): string {
-  return join(__dirname, '../../templates/skill', fileName)
+export interface AlignmentCompletionPlumbingResult {
+  changed: AgentFileName[]
+  alreadyComplete: AgentFileName[]
+  markerless: AgentFileName[]
+  skipped: AgentFileName[]
+  failed: RootSetupBlockFailure[]
+  legacyOriginCleaned: AgentFileName[]
+  warnings: string[]
 }
 
-async function fileExists(filePath: string): Promise<boolean> {
-  try {
-    return (await stat(filePath)).isFile()
-  } catch {
-    return false
-  }
+function skillTemplatePath(fileName: AgentFileName): string {
+  return join(__dirname, '../../templates/skill', fileName)
 }
 
 async function appendAlignmentMarker(filePath: string, marker: string): Promise<void> {
@@ -68,6 +75,56 @@ function renderAlignmentCompleteSummary(result: AlignmentCompleteResult): string
   ].filter((line): line is string => line !== null)
 
   return sections.join('\n')
+}
+
+function removeLegacyMigrationMarker(content: string): { updated: string; removed: boolean } {
+  const lines = content.split('\n')
+  const filtered = lines.filter((line) => line !== LEGACY_MIGRATION_MARKER)
+
+  return {
+    updated: filtered.join('\n'),
+    removed: filtered.length !== lines.length,
+  }
+}
+
+export async function runAlignmentCompletionPlumbing(projectRoot: string): Promise<AlignmentCompletionPlumbingResult> {
+  const validation = await validateAlignmentCompletionRootFiles(projectRoot)
+  const result: AlignmentCompletionPlumbingResult = {
+    changed: [],
+    alreadyComplete: validation.alreadyComplete.map((entry) => entry.fileName),
+    markerless: validation.markerless.map((entry) => entry.fileName),
+    skipped: validation.absent.map((entry) => entry.fileName),
+    failed: validation.failures,
+    legacyOriginCleaned: [],
+    warnings: validation.failures.map((failure) => failure.message),
+  }
+
+  if (validation.failures.length > 0) {
+    return result
+  }
+
+  for (const entry of [...validation.required, ...validation.alreadyComplete]) {
+    const content = await readFile(entry.path, 'utf-8')
+    const markerUpdated =
+      entry.state === 'required'
+        ? content.replaceAll(ALIGNMENT_REQUIRED_MARKER, ALIGNMENT_COMPLETE_MARKER)
+        : content
+    const legacyCleaned = removeLegacyMigrationMarker(markerUpdated)
+
+    if (legacyCleaned.updated !== content) {
+      await writeFile(entry.path, legacyCleaned.updated, 'utf-8')
+    }
+
+    if (entry.state === 'required') {
+      result.changed.push(entry.fileName)
+    }
+
+    if (legacyCleaned.removed) {
+      result.legacyOriginCleaned.push(entry.fileName)
+    }
+  }
+
+  return result
 }
 
 async function completeAlignmentMarkers(projectRoot: string): Promise<AlignmentCompleteResult> {
@@ -105,40 +162,7 @@ async function completeAlignmentMarkers(projectRoot: string): Promise<AlignmentC
   return result
 }
 
-export async function readAlignmentMarkerState(filePath: string): Promise<AlignmentMarkerState> {
-  if (!(await fileExists(filePath))) {
-    return 'absent'
-  }
-
-  const content = await readFile(filePath, 'utf-8')
-  if (content.includes(ALIGNMENT_COMPLETE_MARKER)) {
-    return 'complete'
-  }
-
-  if (content.includes(ALIGNMENT_REQUIRED_MARKER)) {
-    return 'required'
-  }
-
-  return 'missing-marker'
-}
-
-export async function inspectSupportedRootAgentFiles(
-  projectRoot: string,
-): Promise<SupportedRootAgentFileInspection[]> {
-  const normalizedRoot = resolve(projectRoot)
-  const inspected: SupportedRootAgentFileInspection[] = []
-
-  for (const fileName of SUPPORTED_AGENT_FILES as AgentFileName[]) {
-    const path = join(normalizedRoot, fileName)
-    inspected.push({
-      fileName,
-      path,
-      state: await readAlignmentMarkerState(path),
-    })
-  }
-
-  return inspected
-}
+export { inspectSupportedRootAgentFiles, readAlignmentMarkerState }
 
 export async function listExistingSupportedRootAgentFiles(
   projectRoot: string,
