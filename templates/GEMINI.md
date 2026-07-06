@@ -35,7 +35,7 @@
         (Alignment analyzes knowledge-base docs and codebase to bootstrap project state.)
     → IF docs/knowledge-base/ does NOT exist:
         Load docs/core/alignment.md. Follow its protocol.
-        (Alignment analyzes codebase if it exists, or proceeds to PRD planning.)
+        (Alignment analyzes codebase if it exists to bootstrap project state.)
 </SessionStart>
 
 ---
