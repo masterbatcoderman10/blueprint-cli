@@ -111,7 +111,7 @@
 - 2026-07-05: Revision 12 Phase 2 — Alignment Setup Split completed. All tasks done, DoD satisfied, full test suite green (1379 passed, 2 skipped; 198 files passed, 1 skipped).
 - 2026-07-05: Revision 12 Phase 3 — Foundation Planning Module completed. All tasks done, DoD satisfied, full test suite green (1402 passed, 2 skipped; 202 files passed, 1 skipped).
 - 2026-07-06: Revision 12 Phase 4 — Command and Migration Semantics completed. All tasks done, DoD satisfied, full test suite green (1420 passed, 2 skipped; 205 files passed, 1 skipped).
-- 2026-07-06: Revision 12 Phase 5 — Revision Integration Verification and Bookkeeping completed. All tasks done, Stream A audit stayed clean, targeted Revision 12 / Revision 11 verification passed, `npm test` passed (1420 passed, 2 skipped; 205 files passed, 1 skipped), and `npm run release:pack:verify` passed.
+- 2026-07-06: Revision 12 Phase 5 — Revision Integration Verification and Bookkeeping completed. All tasks done, Stream A audit and cleanup completed cleanly, targeted Revision 12 / Revision 11 verification passed, `npm test` passed (1420 passed, 2 skipped; 205 files passed, 1 skipped), and `npm run release:pack:verify` passed.
 - 2026-07-06: Revision 12 — Alignment Split and Foundation Planning completed. All phases done.
 
 ---
