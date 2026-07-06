@@ -2,9 +2,9 @@
 
 **Project**: blueprint-cli
 **Tracker**: blueprint-cli
-**Current Milestone**: Revision 12 - Alignment Split and Foundation Planning (pending Phase 4 planning)
-**Current Phase**: TBD — pending phase planning for Revision 12 Phase 4 — Command and Migration Semantics
-**Status**: Revision 12 Phase 3 - Foundation Planning Module complete. Phase 4 - Command and Migration Semantics is next and pending phase planning.
+**Current Milestone**: Revision 12 - Alignment Split and Foundation Planning (pending Phase 5 execution)
+**Current Phase**: Revision 12 Phase 5 — Revision Integration Verification and Bookkeeping (planned; pending execution)
+**Status**: Revision 12 Phase 4 - Command and Migration Semantics complete. Phase 5 - Revision Integration Verification and Bookkeeping is next.
 
 ---
 
@@ -110,6 +110,7 @@
 - 2026-07-05: Revision 12 same-ID SRS elaborations were applied for MAS-203, MAS-208, MAS-209, MAS-210, MAS-211, and MAS-212 from the Alignment Split and Foundation Planning Q&A. Revision 12 Phase 3 — Foundation Planning Module was planned with Phase 2 — Alignment Setup Split as its sole execution dependency. Phase document: `docs/milestones/revision-12-alignment-split-and-foundation-planning/phase-3-foundation-planning-module.md`.
 - 2026-07-05: Revision 12 Phase 2 — Alignment Setup Split completed. All tasks done, DoD satisfied, full test suite green (1379 passed, 2 skipped; 198 files passed, 1 skipped).
 - 2026-07-05: Revision 12 Phase 3 — Foundation Planning Module completed. All tasks done, DoD satisfied, full test suite green (1402 passed, 2 skipped; 202 files passed, 1 skipped).
+- 2026-07-06: Revision 12 Phase 4 — Command and Migration Semantics completed. All tasks done, DoD satisfied, full test suite green (1420 passed, 2 skipped; 205 files passed, 1 skipped).
 
 ---
 
@@ -179,8 +180,8 @@ R12 — Alignment Split and Foundation Planning ●
 ├── Phase 1 — Bootstrap Surface and Skill Payload Contract ✓
 ├── Phase 2 — Alignment Setup Split ✓
 ├── Phase 3 — Foundation Planning Module ✓
-├── Phase 4 — Command and Migration Semantics ○
-└── Phase 5 — SRS, Docs, Verification, and Bookkeeping ○
+├── Phase 4 — Command and Migration Semantics ✓
+└── Phase 5 — Revision Integration Verification and Bookkeeping ○
 M2 — Cross-Project Context (Optional Post-MVP)
 └── Phase 1 — TBD ○
 M3 — Workflow Visibility Enhancements (Optional Future)
@@ -193,4 +194,4 @@ M3 — Workflow Visibility Enhancements (Optional Future)
 
 | Revision | Name | Status | Notes |
 |----------|------|--------|-------|
-| R12 | Alignment Split and Foundation Planning | pending Phase 4 planning | Phase 1, Phase 2, and Phase 3 complete; Phase 4 — Command and Migration Semantics is next and pending phase planning. Phase 5 remains pending. Documents: `docs/milestones/revision-12-alignment-split-and-foundation-planning/revision-12-alignment-split-and-foundation-planning.md`, `docs/milestones/revision-12-alignment-split-and-foundation-planning/phase-3-foundation-planning-module.md` |
+| R12 | Alignment Split and Foundation Planning | pending Phase 5 execution | Phase 1, Phase 2, Phase 3, and Phase 4 complete; Phase 5 — Revision Integration Verification and Bookkeeping remains pending. Documents: `docs/milestones/revision-12-alignment-split-and-foundation-planning/revision-12-alignment-split-and-foundation-planning.md`, `docs/milestones/revision-12-alignment-split-and-foundation-planning/phase-3-foundation-planning-module.md` |
