@@ -2,9 +2,9 @@
 
 **Project**: blueprint-cli
 **Tracker**: blueprint-cli
-**Current Milestone**: Revision 12 - Alignment Split and Foundation Planning (pending Phase 5 execution)
-**Current Phase**: Revision 12 Phase 5 — Revision Integration Verification and Bookkeeping (planned; pending execution)
-**Status**: Revision 12 Phase 4 - Command and Migration Semantics complete. Phase 5 - Revision Integration Verification and Bookkeeping is next.
+**Current Milestone**: Revision 12 — Alignment Split and Foundation Planning (complete)
+**Current Phase**: Complete — all planned Revision 12 phases done
+**Status**: Revision 12 Phase 5 — Revision Integration Verification and Bookkeeping is complete. Revision 12 — Alignment Split and Foundation Planning is complete.
 
 ---
 
@@ -111,6 +111,8 @@
 - 2026-07-05: Revision 12 Phase 2 — Alignment Setup Split completed. All tasks done, DoD satisfied, full test suite green (1379 passed, 2 skipped; 198 files passed, 1 skipped).
 - 2026-07-05: Revision 12 Phase 3 — Foundation Planning Module completed. All tasks done, DoD satisfied, full test suite green (1402 passed, 2 skipped; 202 files passed, 1 skipped).
 - 2026-07-06: Revision 12 Phase 4 — Command and Migration Semantics completed. All tasks done, DoD satisfied, full test suite green (1420 passed, 2 skipped; 205 files passed, 1 skipped).
+- 2026-07-06: Revision 12 Phase 5 — Revision Integration Verification and Bookkeeping completed. All tasks done, Stream A audit stayed clean, targeted Revision 12 / Revision 11 verification passed, `npm test` passed (1420 passed, 2 skipped; 205 files passed, 1 skipped), and `npm run release:pack:verify` passed.
+- 2026-07-06: Revision 12 — Alignment Split and Foundation Planning completed. All phases done.
 
 ---
 
@@ -176,12 +178,12 @@ R11 — Skill-Based Agent Surface ✓
 ├── Phase 4 — NPX Install Pathway & Release Surface ✓
 ├── Phase 5 — Dogfood & Cross-Reference Verification ✓
 └── Phase 6 — Migrate & Alignment-Complete Commands ✓
-R12 — Alignment Split and Foundation Planning ●
+R12 — Alignment Split and Foundation Planning ✓
 ├── Phase 1 — Bootstrap Surface and Skill Payload Contract ✓
 ├── Phase 2 — Alignment Setup Split ✓
 ├── Phase 3 — Foundation Planning Module ✓
 ├── Phase 4 — Command and Migration Semantics ✓
-└── Phase 5 — Revision Integration Verification and Bookkeeping ○
+└── Phase 5 — Revision Integration Verification and Bookkeeping ✓
 M2 — Cross-Project Context (Optional Post-MVP)
 └── Phase 1 — TBD ○
 M3 — Workflow Visibility Enhancements (Optional Future)
@@ -192,6 +194,4 @@ M3 — Workflow Visibility Enhancements (Optional Future)
 
 ## Pending Revisions
 
-| Revision | Name | Status | Notes |
-|----------|------|--------|-------|
-| R12 | Alignment Split and Foundation Planning | pending Phase 5 execution | Phase 1, Phase 2, Phase 3, and Phase 4 complete; Phase 5 — Revision Integration Verification and Bookkeeping remains pending. Documents: `docs/milestones/revision-12-alignment-split-and-foundation-planning/revision-12-alignment-split-and-foundation-planning.md`, `docs/milestones/revision-12-alignment-split-and-foundation-planning/phase-3-foundation-planning-module.md` |
+_None._
