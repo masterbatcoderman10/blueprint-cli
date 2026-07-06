@@ -57,6 +57,9 @@ The system must enforce that the SRS is used for progressive clarification rathe
 
 The system must provide an orchestration protocol module (`docs/core/orchestrate.md`) that turns an agent into an orchestrator capable of executing a fully-planned phase by dispatching parallel subagents per the phase's parallelization map and running each stream's `execute → review → address → rereview` loop independently.
 
+- Alignment setup must capture harness capabilities, role defaults, failure escalation, review/phase-completion guidance, user-named skills/MCPs, and project-specific notes in a dedicated `<AgentOrchestration>` block on supported root agent entry-point files.
+- `<AgentOrchestration>` may vary by harness or root entry-point file, while `<ProjectConventions>` remains byte-identical across supported root files.
+- The setup block records orchestration defaults only; stream spawning policy and execute/review lifecycle ownership remain with `docs/core/orchestrate.md`.
 - The protocol must define orchestrator invocation as an opt-in routing intent, leaving `execution.md` as the default direct-execution path.
 - The protocol must faithfully consume the parallelization map produced by `phase-planning.md` (gate first; independent streams in parallel; dependent streams wait on named predecessors).
 - Each stream's execute-review-address-rereview loop must be independent — one stream finishing execution must trigger its own review immediately, without waiting for slower streams in the same phase.
@@ -122,16 +125,16 @@ The system must provide a **change-first tweak workflow** that replaces the trac
 
 The system must provide a single `blueprint` skill installed into supported project-local skill roots (`.claude/skills/blueprint/` and `.agents/skills/blueprint/`) as the recommended primary agent surface, alongside the existing `.md` core module mode (which remains supported but is deprecated by MAS-209).
 
-- The skill must consist of `SKILL.md` (frontmatter `name` + ironclad-invocation `description`; setup gate; shared-laws reference; intent-keyed commands/routing table mirroring the root `<ModuleRouting>` 1:1), one `reference/*.md` file per `docs/core/*.md` module (1:1 mapping, with file renames where applicable: `alignment.md` → `align.md`, `phase-planning.md` → `plan-phase.md`, `milestone-planning.md` → `plan-milestone.md`, `prd-planning.md` → `plan-prd.md`, `test-planning.md` → `plan-test.md`, `bug-resolution.md` → `bug.md`, `execution.md` → `execute.md`, `git-execution-workflow.md` → `commit.md`, `git-review-workflow.md` → `commit-review.md`, `phase-completion.md` → `phase-complete.md`, `revision-planning.md` → `revision.md`, `srs-planning.md` → `srs.md`, `tweak-planning.md` → `tweak.md`), plus the new shared `reference/anti-patterns.md` laws file, plus `scripts/load-context.mjs` for project-state context loading.
-- The setup gate must require populated `docs/project-progress.md`, an initialised tracker (`docs/.blueprint/tasks.db` and `docs/.blueprint/` directory present), and must instruct the agent to install `blueprint-cli` (`npm i -g blueprint-agentic-development`) if the tracker is missing.
+- The skill must consist of `SKILL.md` (frontmatter `name` + ironclad-invocation `description`; setup gate; shared-laws reference; intent-keyed commands/routing table mirroring the root `<ModuleRouting>` table for legacy-supported routes, plus the skill-only Foundation Planning route), 20 renamed `reference/*.md` mirrors for legacy `docs/core/*.md` modules (`alignment.md` → `align.md`, `phase-planning.md` → `plan-phase.md`, `milestone-planning.md` → `plan-milestone.md`, `prd-planning.md` → `plan-prd.md`, `test-planning.md` → `plan-test.md`, `bug-resolution.md` → `bug.md`, `execution.md` → `execute.md`, `git-execution-workflow.md` → `commit.md`, `git-review-workflow.md` → `commit-review.md`, `phase-completion.md` → `phase-complete.md`, `revision-planning.md` → `revision.md`, `srs-planning.md` → `srs.md`, `tweak-planning.md` → `tweak.md`), the skill-only `reference/foundation-planning.md`, the shared `reference/anti-patterns.md` laws file, and `scripts/load-context.mjs` for project-state context loading.
+- The live skill payload must contain 24 files total: `SKILL.md`, 20 renamed core-module reference mirrors, `reference/foundation-planning.md`, `reference/anti-patterns.md`, and `scripts/load-context.mjs`.
+- The setup gate must apply the bootstrap state machine: missing scaffold or tracker -> stop with install/init guidance; empty progress + `alignment-required` -> Alignment only; empty progress + `alignment-complete` -> Foundation Planning only; populated progress + `alignment-required` -> stop normal routing and rerun or repair Alignment (fast-track when `blueprint-origin: legacy-migration` is present); populated progress + no marker -> allow normal routing; empty progress + no marker -> stop with repair guidance.
 - The `SKILL.md` frontmatter `description` must use ironclad-invocation phrasing (superpowers-style mandatory invocation) so that any planning, execution, review, tweak, bug, revision, or commit request inside a Blueprint project auto-activates the skill.
-- The intent-keyed commands/routing table inside `SKILL.md` must mirror the current root `CLAUDE.md` `<ModuleRouting>` table 1:1 — every routable intent in the legacy table maps to the corresponding renamed reference file.
-- `reference/*.md` files must carry verbatim content from the corresponding `docs/core/*.md` module body, prepended with skill-style frontmatter (`name`, `description`). No content rewriting; behaviour parity preserved per Revision 11 §2.3.
+- The intent-keyed commands/routing table inside `SKILL.md` must mirror the current legacy root routing table 1:1 where legacy routing still exists. Foundation Planning is routed only from the skill surface and does not create a legacy/core route.
+- `reference/*.md` files must carry verbatim content from the corresponding `docs/core/*.md` module body, prepended with skill-style frontmatter (`name`, `description`), except `reference/foundation-planning.md`, which is a skill-only workflow and has no `docs/core` mirror.
 - The shared `reference/anti-patterns.md` file must contain only the canonical `<AntiPatterns>` shape spec established by Revision 10 Phase 2 (canonical shape: `<AntiPatterns>` wrapper, `<AntiPattern name="...">` with bare `name=`, required `<BadExample>` + `<Why>`, optional `<GoodExample>` and domain-prefixed variants). `<AntiPatterns>` blocks within `reference/*.md` must conform to this shape.
-- `scripts/load-context.mjs` must print a markdown brief to stdout summarising current project state (project name, current milestone, current phase, pending revisions, tracker reachability).
-- `blueprint init` must offer a mode choice with `skill` recommended (default) and `legacy` marked "not recommended"; selecting skill mode must emit the skill payload into `<target>/.claude/skills/blueprint/**` and `<target>/.agents/skills/blueprint/**`, and scaffold minimal one-liner skill-mode entry-point variants (CLAUDE.md / AGENTS.md / GEMINI.md / QWEN.md) that point at the skill (no `<SessionStart>` / `<HardRules>` / `<ModuleRouting>` blocks — the skill owns routing); selecting legacy mode must preserve the existing scaffold behaviour unchanged.
-- During Revision 11 Phase 1, the skill payload is shipped from `templates/skills/blueprint/**` only (scaffold source); the repo-root `skills/blueprint/**` payload required for the vercel-labs/skills npx pathway and the byte-identical template-mirror test are deferred to Phase 4.
-- The skill must ship in the published npm tarball under `skills/blueprint/` (Phase 4) and be scaffolded into new projects by `blueprint init` when the user selects skill mode (Phase 1).
+- `scripts/load-context.mjs` must print a markdown brief to stdout summarising current project state (project name, current milestone, current phase, pending revisions, tracker reachability, and bootstrap marker context).
+- `blueprint init` must offer a mode choice with `skill` recommended (default) and `legacy` marked "not recommended"; selecting skill mode must emit the skill payload into `<target>/.claude/skills/blueprint/**` and `<target>/.agents/skills/blueprint/**`, and scaffold skill-mode entry-point variants (CLAUDE.md / AGENTS.md / GEMINI.md / QWEN.md) with split-block placeholders for `<ProjectConventions>` and `<AgentOrchestration>` plus `<!-- blueprint-status: alignment-required -->`; selecting legacy mode must preserve the existing scaffold behaviour unchanged.
+- The repo-root `skills/blueprint/**` payload and the authoritative `templates/skills/blueprint/**` surface must remain byte-identical, and the published npm tarball must ship `skills/blueprint/**` for project-local install and release verification.
 
 #### MAS-209 - Dual-Source Deprecation Path
 
@@ -145,7 +148,9 @@ The system must support both skill mode and legacy `.md` core module mode as a t
 - Skill-mode entry-point templates (`templates/skill/CLAUDE.md`, `templates/skill/AGENTS.md`, `templates/skill/GEMINI.md`, `templates/skill/QWEN.md`) must carry a byte-identical `<ProjectConventions>` section containing the migrated content from the sunsetted `conventions.md` (Tech Stack, Libraries & Tools, File Structure, Coding Standards, Testing, Anti-Patterns, Anti-Pattern Block Shape, Agent Tools, Releasing, Project-Specific Notes).
 - Legacy-mode entry-point templates (`templates/CLAUDE.md`, `templates/AGENTS.md`, `templates/GEMINI.md`, `templates/QWEN.md`) must drop the `Load docs/conventions.md` line from `<SessionStart>` STEP 1 and must gain a top-of-file one-line `<DeprecationNote>` block recommending migration to skill mode. They must remain byte-identical to each other (per the existing R10 Phase 1 7-variant block-identity contract; this phase reduces that contract to the legacy-mode variants and extends a parallel one to the skill-mode variants).
 - `docs/core/alignment.md` and its template mirror (`templates/docs/core/alignment.md`) must drop every reference to `conventions.md`. The conventions-gathering behaviour must be rewritten to read from and write into the `<ProjectConventions>` section of the project's entry-point file instead of a separate document.
-- No automatic in-place migration. A future `blueprint migrate` command (deferred to Revision 11 Phase 6) is the explicit migration path; this requirement does not introduce it.
+- Mode detection and routing must respect the bootstrap state machine: empty progress + `alignment-required` routes only to Alignment; empty progress + `alignment-complete` routes only to Foundation Planning; populated progress + `alignment-required` blocks normal workflows and reruns Alignment; populated progress + no marker remains a legacy-compatible normal-routing state; empty progress + no marker stops with repair guidance.
+- Legacy `.md` core routing must not gain a `Foundation Planning` module or root-table entry. Foundation Planning remains skill-only while legacy/core mode stays supported.
+- No automatic in-place migration. `blueprint migrate` is the explicit conversion path and it forces fresh Alignment after conversion.
 
 #### MAS-210 - NPX Skill Install Pathway
 
@@ -154,7 +159,7 @@ The system must support a single primary NPX install pathway for the `blueprint`
 - Users must be able to install the skill into a project by running `npx skills add masterbatcoderman10/blueprint-cli --skill blueprint`.
 - The public GitHub repository must expose the skill payload at repo-root `skills/blueprint/**` so `vercel-labs/skills` can discover it without Blueprint-specific install code.
 - `templates/skills/blueprint/**` remains the authoritative scaffold and Doctor source. The repo-root `skills/blueprint/**` payload must be a byte-identical mirror of that authoritative template surface.
-- The mirrored repo-root skill payload must include the full 23-file skill surface: `SKILL.md`, 20 renamed `reference/*.md` mirrors, shared `reference/anti-patterns.md`, and `scripts/load-context.mjs`.
+- The mirrored repo-root skill payload must include the full 24-file skill surface: `SKILL.md`, 20 renamed `reference/*.md` mirrors, the skill-only `reference/foundation-planning.md`, shared `reference/anti-patterns.md`, and `scripts/load-context.mjs`.
 - The published npm tarball must include `skills/blueprint/**` in addition to the existing `dist/` and `templates/` surfaces, and release-artifact verification must fail if the repo-root skill payload is absent or incomplete.
 - README, `docs/release-contract.md`, and `docs/releasing.md` must document `npx skills add masterbatcoderman10/blueprint-cli --skill blueprint` as the recommended project-local skill install path.
 - Documentation must explicitly call out the current `-g` global-install sharp edge in `vercel-labs/skills` and recommend project-local install for Claude Code discovery.
@@ -166,10 +171,14 @@ The system must support a single primary NPX install pathway for the `blueprint`
 The system must provide a direct `blueprint alignment-complete` CLI command that records completion of Blueprint alignment by updating alignment-status markers in supported root agent entry-point files.
 
 - The command must scan the supported root agent files that exist in the target project (`CLAUDE.md`, `AGENTS.md`, `GEMINI.md`, `QWEN.md`).
-- For each existing supported file, the command must replace `<!-- blueprint-status: alignment-required -->` with `<!-- blueprint-status: alignment-complete -->`.
-- The command must be idempotent: files already containing `<!-- blueprint-status: alignment-complete -->` are reported as already complete and left unchanged.
-- Files with neither supported marker must be reported as missing an alignment marker, not silently changed.
+- For every existing marked supported file, the command must validate required setup blocks before any marker change: `<ProjectConventions>` and `<AgentOrchestration>` must exist, required blocks must not contain `Alignment pending.`, and `<ProjectConventions>` must be byte-identical across marked supported files.
+- `<AgentOrchestration>` must exist on every marked supported file, but the command must not enforce internal heading content or byte identity for that block.
+- Files with `<!-- blueprint-status: alignment-required -->` must flip to `<!-- blueprint-status: alignment-complete -->` only if all relevant existing files pass validation.
+- The command must be idempotent: files already containing `<!-- blueprint-status: alignment-complete -->` are validated, reported as already complete, and left unchanged.
+- Files with neither supported marker must be reported as missing an alignment marker with one-line repair guidance, not silently changed.
 - Missing supported root agent files must be skipped without error.
+- If any relevant existing file fails validation, the command must fail, print warnings naming the file and problem, and flip nothing.
+- On success, the command must remove `<!-- blueprint-origin: legacy-migration -->` from processed supported root files.
 - The command must fail clearly when run outside a Blueprint project.
 
 #### MAS-212 - In-Place Skill Migration Command
@@ -178,11 +187,12 @@ The system must provide a direct `blueprint migrate` CLI command that converts a
 
 - The command must work on Blueprint projects regardless of their current detected mode and must be safe to rerun.
 - The command must install the bundled Blueprint skill payload into the supported project-local skill roots (`.claude/skills/blueprint/**` and `.agents/skills/blueprint/**`), matching the authoritative `templates/skills/blueprint/**` payload.
-- The command must convert every supported root agent entry-point file that exists in the target codebase (`CLAUDE.md`, `AGENTS.md`, `GEMINI.md`, `QWEN.md`) to the corresponding skill-mode template from `templates/skill/**`.
-- Conversion must preserve an existing alignment marker state per file when one exists. When no marker exists, the converted file must receive `<!-- blueprint-status: alignment-required -->` so post-migration alignment status is explicit.
+- The command must convert every supported root agent entry-point file that exists in the target codebase (`CLAUDE.md`, `AGENTS.md`, `GEMINI.md`, `QWEN.md`) to the corresponding skill-mode template from `templates/skill/**`, preserving the split-block placeholder contract for `<ProjectConventions>` and `<AgentOrchestration>`.
+- Converted supported root agent entry-point files must receive `<!-- blueprint-origin: legacy-migration -->` and `<!-- blueprint-status: alignment-required -->`. Migration must never preserve `alignment-complete`.
+- The command must not attempt smart-merge preservation of prior guidance. Old-guidance preservation and repair belong to the follow-up Alignment rerun, with explicit user approval.
 - The command must delete the legacy `docs/core/**` tree outright after the skill payload and root entry points are in place. It must not archive `docs/core/**`.
 - The command must update or bootstrap `docs/.blueprint/manifest.json` so `managedFiles` matches the supported root agent files that exist in the codebase after migration.
-- After migration, Doctor mode detection must report skill mode and the legacy deprecation banner must no longer emit.
+- After migration, Doctor mode detection must report skill mode, the legacy deprecation banner must no longer emit, and bootstrap routing must treat populated progress plus `alignment-required` plus `blueprint-origin: legacy-migration` as fast-track Alignment repair.
 - The command must fail clearly when run outside a Blueprint project.
 
 ### Should Have
@@ -274,6 +284,7 @@ Change log:
 - 2026-05-17 - Created from Revision 5
 - 2026-05-17 - Activated in Revision 5 Phase 1 (Gate R5-1.0)
 - 2026-05-20 - Elaborated by Revision 8 planning: bug-task orchestration is a formal stream-like orchestration scope; bugs revealed by review or phase completion must be delegated to executor agents and phase completion rerun until clean. Meaning unchanged; ID unchanged.
+- 2026-07-06 - Elaborated by Revision 12 Phase 5 audit: Alignment now records harness capabilities, role defaults, failure escalation, and user-named skills/MCPs in a dedicated `<AgentOrchestration>` block, while stream spawn policy remains owned by `orchestrate.md`. Meaning unchanged; ID unchanged.
 
 ### MAS-204
 - Title: Built-in Task Tracker
@@ -355,6 +366,7 @@ Change log:
 - 2026-05-24 - Phase 1 scope extended: `blueprint init` (both modes) writes a hardcoded `<!-- blueprint-status: alignment-required -->` marker into every scaffolded agent entry-point file (CLAUDE / AGENTS / GEMINI / QWEN) after the template copy step; `docs/core/alignment.md` and its template mirror gain a final alignment step instructing the agent to run the deferred `alignment-complete` command which flips the marker to `<!-- blueprint-status: alignment-complete -->`. The `alignment-complete` command itself is deferred to Revision 11 Phase 6 (alongside the planned `migrate` command). Meaning unchanged; ID unchanged.
 - 2026-05-25 - Activated by Revision 11 Phase 2. Doctor mode detection, mode-aware canonical-set enforcement, skill-aware repair, and mode header in report implement the dual-source coexistence surface described in this requirement.
 - 2026-06-11 - Bug fix: skill-mode init now emits the same Blueprint skill payload into both `.claude/skills/blueprint/**` and `.agents/skills/blueprint/**`; `SKILL.md` setup-gate guidance now points at `scripts/load-context.mjs` relative to the installed skill directory instead of a Claude-specific project path. Meaning clarified; ID unchanged.
+- 2026-07-06 - Elaborated by Revision 12 Phase 5 audit: the skill setup gate now uses the bootstrap state machine; Foundation Planning is a skill-only route; the skill payload and packaged mirror now contain 24 files including `reference/foundation-planning.md`. Meaning unchanged; ID unchanged.
 
 ### MAS-209
 - Title: Dual-Source Deprecation Path
@@ -369,6 +381,7 @@ Change log:
 Change log:
 - 2026-05-25 - Created from Revision 11 Phase 3 planning (pre-phase SRS repair, per user direction to land SRS updates before phase doc commits rather than as in-phase tasks). Locked sub-detail bullets recorded: CLI deprecation banner content (`[deprecation] consider migrating to skill mode`, stderr, single line, emitted before any other output); banner skip rule (root help only — `blueprint`, `blueprint --help`, `blueprint -h`); banner still prints on `--version`, command-level help, `blueprint doctor`, and all other dispatched commands; suppression surface (`--no-deprecation-banner` flag accepted anywhere in argv; `BLUEPRINT_SUPPRESS_DEPRECATION=1` env var for persistence); mode detection reuses Phase 2 `detectProjectMode()` from `src/doctor/structure.ts` (presence of `.claude/skills/blueprint/SKILL.md` or `.agents/skills/blueprint/SKILL.md` ⇒ skill ⇒ no banner); `docs/conventions.md` deletion across source and both template mirrors plus `src/init/archive-engine.ts` shellFiles cleanup and Doctor legacy canonical-set drop; skill-mode entry-point templates gain byte-identical `<ProjectConventions>` section across CLAUDE / AGENTS / GEMINI / QWEN containing the migrated conventions content; legacy-mode entry-point templates drop the `Load docs/conventions.md` SessionStart line and gain a top-of-file `<DeprecationNote>` block; `docs/core/alignment.md` and its template mirror drop all `conventions.md` references and rewrite conventions-gathering to read/write the `<ProjectConventions>` section of the project entry-point file; no automatic in-place migration (deferred to `blueprint migrate` in Phase 6). Status remains `approved-pending-implementation` until Revision 11 Phase 3 completion.
 - 2026-05-26 - Transitioned to active. Revision 11 Phase 3 complete: CLI deprecation banner behavior, conventions sunset, legacy entry-point deprecation notes, skill-mode `<ProjectConventions>` injection, and alignment rewrite were implemented and verified.
+- 2026-07-06 - Elaborated by Revision 12 Phase 5 audit: dual-source routing now preserves the bootstrap state machine, and legacy/core mode does not gain a Foundation Planning route; `blueprint migrate` remains explicit, not automatic. Meaning unchanged; ID unchanged.
 
 ### MAS-210
 - Title: NPX Skill Install Pathway
@@ -383,6 +396,7 @@ Change log:
 Change log:
 - 2026-06-09 - Created from Revision 11 Phase 4 planning (pre-phase SRS repair, per user direction to land SRS updates before phase doc commits rather than as in-phase tasks). Locked sub-detail bullets recorded: single supported Phase 4 install path is `npx skills add masterbatcoderman10/blueprint-cli --skill blueprint`; `vercel-labs/skills` discovery surface is repo-root `skills/blueprint/**`; `templates/skills/blueprint/**` remains authoritative while `skills/blueprint/**` is a byte-identical mirror; the mirrored payload includes 23 files (`SKILL.md`, 20 renamed `reference/*.md`, shared `reference/anti-patterns.md`, `scripts/load-context.mjs`); the npm tarball must ship `skills/blueprint/**` and release verification must enforce it; README and release docs must recommend project-local install and document the current `-g` sharp edge; no bundled fallback installer is included in Phase 4; real GitHub install verification is manual smoke only. Status remains `approved-pending-implementation` until Revision 11 Phase 4 completion.
 - 2026-06-09 - Transitioned to active after manual smoke against public ref `r11-4-phase4-smoke` at commit `98e36d81dde09b6ce46693899aed6e43b6216c7d` using `npx skills add masterbatcoderman10/blueprint-cli#r11-4-phase4-smoke --skill blueprint --agent claude-code -y --copy`; verified project-local `.claude/skills/blueprint/` and no unrelated scaffold.
+- 2026-07-06 - Elaborated by Revision 12 Phase 5 audit: the repo-root and packaged skill payload counts increased to 24 files with the addition of the skill-only `reference/foundation-planning.md`. Meaning unchanged; ID unchanged.
 
 ### MAS-211
 - Title: Alignment-Complete Command
@@ -397,6 +411,7 @@ Change log:
 Change log:
 - 2026-07-03 - Created from Revision 11 Phase 6 planning. Locked sub-detail bullets recorded: direct `blueprint alignment-complete` command; scans existing supported root agent files (`CLAUDE.md`, `AGENTS.md`, `GEMINI.md`, `QWEN.md`); replaces `<!-- blueprint-status: alignment-required -->` with `<!-- blueprint-status: alignment-complete -->`; already-complete files are idempotent no-ops; missing-marker files are reported rather than silently changed; missing supported files are skipped; command fails clearly outside a Blueprint project. Status remains `approved-pending-implementation` until Phase 6 execution activates it.
 - 2026-07-03 - Transitioned to active after Revision 11 Phase 6 completion and verification. `blueprint alignment-complete` now ships as the direct marker-flip command for supported root agent files; targeted Phase 6 command/doc-contract tests, full `npm test`, and `npm run release:pack:verify` pass.
+- 2026-07-06 - Elaborated by Revision 12 Phase 5 audit: `alignment-complete` now validates required blocks, byte-identical `<ProjectConventions>`, no-partial-flip behavior, missing-marker reporting, and legacy-migration cleanup before flipping markers. Meaning unchanged; ID unchanged.
 
 ### MAS-212
 - Title: In-Place Skill Migration Command
@@ -411,6 +426,7 @@ Change log:
 Change log:
 - 2026-07-03 - Created from Revision 11 Phase 6 planning. Locked sub-detail bullets recorded: direct `blueprint migrate` command; works from legacy or skill mode and is safe to rerun; installs bundled skill payload into both `.claude/skills/blueprint/**` and `.agents/skills/blueprint/**`; converts every supported root agent file that exists in the target codebase to its skill-mode template; preserves existing alignment marker state and adds `<!-- blueprint-status: alignment-required -->` when a converted file has no marker; deletes `docs/core/**` outright with no archive; updates or bootstraps `docs/.blueprint/manifest.json` so `managedFiles` matches existing supported root files; post-migration Doctor detects skill mode and the legacy deprecation banner stops; command fails clearly outside a Blueprint project. Status remains `approved-pending-implementation` until Phase 6 execution activates it.
 - 2026-07-03 - Transitioned to active after Revision 11 Phase 6 completion and verification. `blueprint migrate` now ships as the in-place legacy-to-skill conversion command; targeted Phase 6 command/doc-contract tests, full `npm test`, and `npm run release:pack:verify` pass.
+- 2026-07-06 - Elaborated by Revision 12 Phase 5 audit: `migrate` now forces fresh Alignment, writes `blueprint-origin: legacy-migration` plus `alignment-required`, converts root files to split-block placeholders, and leaves old-guidance preservation to the Alignment rerun. Meaning unchanged; ID unchanged.
 
 ---
 
