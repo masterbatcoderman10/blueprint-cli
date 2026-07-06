@@ -130,6 +130,12 @@ describe('R12-4.0 command contract foundation', () => {
         code: 'duplicate_close_tag',
       },
       {
+        name: 'dangling duplicated opening tag after a complete block',
+        tagName: 'ProjectConventions',
+        content: '<ProjectConventions>\nbody\n</ProjectConventions>\n<ProjectConventions>\n',
+        code: 'duplicate_open_tag',
+      },
+      {
         name: 'placeholder content',
         tagName: 'ProjectConventions',
         content: '<ProjectConventions>\nAlignment pending.\n</ProjectConventions>\n',
@@ -237,6 +243,43 @@ describe('R12-4.0 command contract foundation', () => {
     ])
     expect(mismatchedResult.failures.some((failure) => failure.fileName === 'GEMINI.md')).toBe(false)
     await expect(readFile(join(mismatchedProjectDir, 'QWEN.md'), 'utf-8')).rejects.toBeDefined()
+  })
+
+  it('T-R12-4.0.2.3: still reports a ProjectConventions mismatch when the same marked file also has an AgentOrchestration error', async () => {
+    const projectDir = await makeProjectDir('blueprint-r12-4-mismatch-plus-other-error-')
+    const sharedProjectConventions = makeBlock('ProjectConventions', '  shared')
+    const differentProjectConventions = makeBlock('ProjectConventions', '  different')
+    const validAgentOrchestration = makeBlock('AgentOrchestration', '  orchestration')
+
+    await writeSupportedRootFileFixture(projectDir, 'CLAUDE.md', {
+      markerState: 'required',
+      projectConventions: sharedProjectConventions,
+      agentOrchestration: validAgentOrchestration,
+    })
+    await writeSupportedRootFileFixture(projectDir, 'AGENTS.md', {
+      markerState: 'complete',
+      projectConventions: differentProjectConventions,
+      agentOrchestrationVariant: 'missing',
+    })
+
+    const result = await validateAlignmentCompletionRootFiles(projectDir)
+
+    expect(result.failures).toEqual(
+      expect.arrayContaining([
+        {
+          fileName: 'AGENTS.md',
+          blockName: 'AgentOrchestration',
+          code: 'missing_open_tag',
+          message: expect.stringContaining('AGENTS.md'),
+        },
+        {
+          fileName: 'AGENTS.md',
+          blockName: 'ProjectConventions',
+          code: 'project_conventions_mismatch',
+          message: expect.stringContaining('AGENTS.md'),
+        },
+      ]),
+    )
   })
 
   it('T-R12-4.0.4: command fixture helpers create valid, missing, placeholder, mismatched, markerless, absent, and legacy-origin root-file scenarios without duplicated setup', async () => {

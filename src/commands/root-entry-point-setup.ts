@@ -87,7 +87,7 @@ export function extractRequiredRootSetupBlock(
   }
 
   const duplicateStartIndex = content.indexOf(startTag, startIndex + startTag.length)
-  if (duplicateStartIndex !== -1 && duplicateStartIndex < endIndex) {
+  if (duplicateStartIndex !== -1) {
     return buildFailure(fileName, blockName, 'duplicate_open_tag', `duplicate opening tag ${startTag}`)
   }
 
@@ -161,7 +161,7 @@ export async function validateAlignmentCompletionRootFiles(
     absent: [],
     failures: [],
   }
-  const validatedMarkedFiles: Array<{
+  const validatedProjectConventions: Array<{
     fileName: AgentFileName
     projectConventionsBlock: string
   }> = []
@@ -191,15 +191,15 @@ export async function validateAlignmentCompletionRootFiles(
       result.failures.push(agentOrchestration.failure)
     }
 
-    if (projectConventions.ok && agentOrchestration.ok) {
-      validatedMarkedFiles.push({
+    if (projectConventions.ok) {
+      validatedProjectConventions.push({
         fileName: entry.fileName,
         projectConventionsBlock: projectConventions.block,
       })
     }
   }
 
-  const [canonical, ...rest] = validatedMarkedFiles
+  const [canonical, ...rest] = validatedProjectConventions
   if (canonical) {
     for (const entry of rest) {
       if (entry.projectConventionsBlock !== canonical.projectConventionsBlock) {
