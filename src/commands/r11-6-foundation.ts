@@ -77,6 +77,23 @@ function renderAlignmentCompleteSummary(result: AlignmentCompleteResult): string
   return sections.join('\n')
 }
 
+function renderAlignmentCompletionPlumbingSummary(result: AlignmentCompletionPlumbingResult): string {
+  const sections = [
+    'Validated marked files before any marker changes.',
+    result.changed.length > 0 ? `Changed: ${result.changed.join(', ')}` : null,
+    result.alreadyComplete.length > 0 ? `Already complete: ${result.alreadyComplete.join(', ')}` : null,
+    result.markerless.length > 0
+      ? `Markerless supported files remain unchanged; repair them manually: ${result.markerless.join(', ')}`
+      : null,
+    result.skipped.length > 0 ? `Skipped absent: ${result.skipped.join(', ')}` : null,
+    result.legacyOriginCleaned.length > 0
+      ? `Removed legacy-origin markers: ${result.legacyOriginCleaned.join(', ')}`
+      : null,
+  ].filter((line): line is string => line !== null)
+
+  return sections.join('\n')
+}
+
 function removeLegacyMigrationMarker(content: string): { updated: string; removed: boolean } {
   const lines = content.split('\n')
   const filtered = lines.filter((line) => line !== LEGACY_MIGRATION_MARKER)
@@ -265,8 +282,18 @@ export const alignmentCompleteCommand: CommandDefinition = {
   handler: async () => {
     try {
       const projectRoot = findProjectRoot(process.cwd())
-      const result = await completeAlignmentMarkers(projectRoot)
-      const summary = renderAlignmentCompleteSummary(result)
+      const result = await runAlignmentCompletionPlumbing(projectRoot)
+
+      if (result.failed.length > 0) {
+        for (const warning of result.warnings) {
+          process.stderr.write(`${warning}\n`)
+        }
+
+        process.stderr.write('Blueprint alignment-complete failed: validation failed before any marker changes.\n')
+        return { exitCode: 1 }
+      }
+
+      const summary = renderAlignmentCompletionPlumbingSummary(result)
 
       if (summary.length > 0) {
         process.stdout.write(`${summary}\n`)

@@ -46,11 +46,11 @@ export function renderCommandHelp(commandName: string): string {
     return [
       'Usage: blueprint alignment-complete',
       '',
-      'Mark supported root agent files as alignment-complete.',
+      'Validate marked supported root agent files and mark required files as alignment-complete.',
       '',
-      'Rewrites alignment-required markers to alignment-complete, reports already-complete',
-      'and missing-marker files, skips absent files, and fails outside a Blueprint project',
-      'with the project-root error.',
+      'Validates marked files before any marker changes, fails without partial marker flips',
+      'when required setup blocks are invalid, reports markerless supported files with repair guidance,',
+      'skips absent files, and removes legacy-migration origin markers only from processed marked files.',
     ].join('\n')
   }
 

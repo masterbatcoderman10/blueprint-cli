@@ -6,7 +6,11 @@ import { afterEach, describe, expect, it } from 'vitest'
 
 import { invokeCli } from '../../helpers/cli'
 import { renderCommandHelp } from '../../../src/help/command'
-import { writeMarkerState } from '../gate/helpers'
+import type { AgentFileName } from '../../../src/init/types'
+import {
+  type AlignmentMarkerStateFixture,
+  writeSupportedRootFileFixture,
+} from '../gate/helpers'
 
 const tempDirs: string[] = []
 
@@ -17,13 +21,21 @@ async function makeProjectDir(prefix = 'blueprint-r11-6-alignment-complete-'): P
 }
 
 async function makeAlignmentProject(
-  states: Array<[string, 'required' | 'complete' | 'missing-marker' | 'absent']>,
+  states: Array<[AgentFileName, AlignmentMarkerStateFixture]>,
 ): Promise<string> {
   const projectDir = await makeProjectDir()
   await mkdir(join(projectDir, 'docs', '.blueprint'), { recursive: true })
 
   for (const [fileName, state] of states) {
-    await writeMarkerState(projectDir, fileName, state)
+    await writeSupportedRootFileFixture(projectDir, fileName, {
+      markerState: state,
+      ...(state === 'missing-marker'
+        ? {
+            projectConventionsVariant: 'missing' as const,
+            agentOrchestrationVariant: 'missing' as const,
+          }
+        : {}),
+    })
   }
 
   return projectDir
@@ -58,9 +70,10 @@ describe('R11-6.A.1 alignment-complete command behavior', () => {
     const result = await runAlignmentComplete(projectDir)
 
     expect(result.exitCode).toBe(0)
+    expect(result.stdout).toContain('Validated marked files before any marker changes.')
     expect(result.stdout).toContain('Changed: CLAUDE.md, AGENTS.md, GEMINI.md, QWEN.md')
     expect(result.stdout).not.toContain('Already complete:')
-    expect(result.stdout).not.toContain('Missing marker:')
+    expect(result.stdout).not.toContain('Markerless supported files remain unchanged; repair them manually:')
     expect(result.stdout).not.toContain('Skipped absent:')
 
     for (const fileName of ['CLAUDE.md', 'AGENTS.md', 'GEMINI.md', 'QWEN.md'] as const) {
@@ -91,9 +104,10 @@ describe('R11-6.A.1 alignment-complete command behavior', () => {
     const secondRun = await runAlignmentComplete(projectDir)
 
     expect(secondRun.exitCode).toBe(0)
+    expect(secondRun.stdout).toContain('Validated marked files before any marker changes.')
     expect(secondRun.stdout).toContain('Already complete: CLAUDE.md, AGENTS.md, GEMINI.md, QWEN.md')
     expect(secondRun.stdout).not.toContain('Changed:')
-    expect(secondRun.stdout).not.toContain('Missing marker:')
+    expect(secondRun.stdout).not.toContain('Markerless supported files remain unchanged; repair them manually:')
     expect(secondRun.stdout).not.toContain('Skipped absent:')
 
     expect(await readFile(join(projectDir, 'CLAUDE.md'), 'utf-8')).toBe(before.CLAUDE)
@@ -113,8 +127,9 @@ describe('R11-6.A.1 alignment-complete command behavior', () => {
     const result = await runAlignmentComplete(projectDir)
 
     expect(result.exitCode).toBe(0)
+    expect(result.stdout).toContain('Validated marked files before any marker changes.')
     expect(result.stdout).toContain('Changed: CLAUDE.md, AGENTS.md')
-    expect(result.stdout).toContain('Missing marker: GEMINI.md')
+    expect(result.stdout).toContain('Markerless supported files remain unchanged; repair them manually: GEMINI.md')
     expect(result.stdout).toContain('Skipped absent: QWEN.md')
 
     expect(await readFile(join(projectDir, 'GEMINI.md'), 'utf-8')).not.toContain('alignment-complete')
@@ -135,14 +150,14 @@ describe('R11-6.A.1 alignment-complete command behavior', () => {
 })
 
 describe('R11-6.A.2 alignment-complete help copy', () => {
-  it('documents changed, already-complete, missing-marker, skipped, and outside-project outcomes', () => {
+  it('documents validation-before-mutation, markerless repair guidance, absent-file skipping, and legacy-origin cleanup', () => {
     const help = renderCommandHelp('alignment-complete')
 
     expect(help).toContain('Usage: blueprint alignment-complete')
-    expect(help).toContain('Rewrites alignment-required markers to alignment-complete')
-    expect(help).toContain('already-complete')
-    expect(help).toContain('missing-marker')
+    expect(help).toContain('Validates marked files before any marker changes')
+    expect(help).toContain('partial marker flips')
+    expect(help).toContain('markerless supported files with repair guidance')
     expect(help).toContain('skips absent files')
-    expect(help).toContain('outside a Blueprint project')
+    expect(help).toContain('legacy-migration origin markers')
   })
 })
