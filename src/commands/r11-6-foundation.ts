@@ -56,14 +56,26 @@ function skillTemplatePath(fileName: AgentFileName): string {
   return join(__dirname, '../../templates/skill', fileName)
 }
 
-async function appendAlignmentMarker(filePath: string, marker: string): Promise<void> {
-  const content = await readFile(filePath, 'utf-8')
-  const normalized = content.endsWith('\n') ? content : `${content}\n`
-  await writeFile(filePath, `${normalized}${marker}\n`, 'utf-8')
+function renderForcedRealignmentTemplateContent(templateContent: string): string {
+  const normalized = templateContent.endsWith('\n') ? templateContent : `${templateContent}\n`
+
+  if (normalized.includes(ALIGNMENT_REQUIRED_MARKER)) {
+    return normalized.replace(
+      ALIGNMENT_REQUIRED_MARKER,
+      `${LEGACY_MIGRATION_MARKER}\n${ALIGNMENT_REQUIRED_MARKER}`,
+    )
+  }
+
+  return `${normalized}${LEGACY_MIGRATION_MARKER}\n${ALIGNMENT_REQUIRED_MARKER}\n`
 }
 
-async function copyRootAgentTemplate(projectRoot: string, fileName: AgentFileName): Promise<void> {
-  await copyFileSafe(skillTemplatePath(fileName), join(projectRoot, fileName))
+async function writeForcedRealignmentTemplate(projectRoot: string, fileName: AgentFileName): Promise<void> {
+  const templateContent = await readFile(skillTemplatePath(fileName), 'utf-8')
+  await writeFile(
+    join(projectRoot, fileName),
+    renderForcedRealignmentTemplateContent(templateContent),
+    'utf-8',
+  )
 }
 
 function renderAlignmentCompleteSummary(result: AlignmentCompleteResult): string {
@@ -218,13 +230,7 @@ export async function convertExistingSupportedRootAgentFiles(projectRoot: string
       continue
     }
 
-    await copyRootAgentTemplate(normalizedRoot, fileName)
-
-    if (state === 'complete') {
-      await appendAlignmentMarker(filePath, ALIGNMENT_COMPLETE_MARKER)
-    } else {
-      await appendAlignmentMarker(filePath, ALIGNMENT_REQUIRED_MARKER)
-    }
+    await writeForcedRealignmentTemplate(normalizedRoot, fileName)
 
     converted.push(fileName)
   }
@@ -250,30 +256,33 @@ export async function updateOrBootstrapSkillModeManifest(
 export async function migrateBlueprintProject(projectRoot: string): Promise<SkillModeMigrationResult> {
   const modeDetection = await detectProjectMode(projectRoot)
   const installedSkillRoots = await installBlueprintSkillPayloadRoots(projectRoot)
+  const existingFiles = await listExistingSupportedRootAgentFiles(projectRoot)
+  const manifestManagedFiles = existingFiles.map((entry) => entry.fileName)
 
   if (modeDetection.mode === 'skill') {
+    await updateOrBootstrapSkillModeManifest(projectRoot, manifestManagedFiles)
+
     return {
       projectMode: 'skill',
       installedSkillRoots,
       convertedRootFiles: [],
-      manifestManagedFiles: [],
+      manifestManagedFiles,
     }
   }
 
-  const existingFiles = await listExistingSupportedRootAgentFiles(projectRoot)
   const convertedRootFiles = await convertExistingSupportedRootAgentFiles(projectRoot)
 
   await removeDocsCoreDirectory(projectRoot)
   await updateOrBootstrapSkillModeManifest(
     projectRoot,
-    existingFiles.map((entry) => entry.fileName),
+    manifestManagedFiles,
   )
 
   return {
     projectMode: 'legacy',
     installedSkillRoots,
     convertedRootFiles,
-    manifestManagedFiles: existingFiles.map((entry) => entry.fileName),
+    manifestManagedFiles,
   }
 }
 
@@ -324,6 +333,10 @@ export const migrateCommand: CommandDefinition = {
       console.log(
         `Installed ${result.installedSkillRoots.length} skill roots, converted ${result.convertedRootFiles.length} root files, removed docs/core, and updated the manifest.`,
       )
+      console.log(
+        'Migration forces fresh Alignment: converted root files receive `blueprint-origin: legacy-migration`, end in `alignment-required`, and never preserve `alignment-complete`.',
+      )
+      console.log('The Alignment workflow owns preservation or correction of old guidance.')
       return { exitCode: 0 }
     } catch (error) {
       console.error(error instanceof Error ? error.message : String(error))
