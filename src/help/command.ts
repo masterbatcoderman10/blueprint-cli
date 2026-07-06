@@ -58,10 +58,13 @@ export function renderCommandHelp(commandName: string): string {
     return [
       'Usage: blueprint migrate',
       '',
-      'Migrate a legacy Blueprint project to skill mode.',
+      'Migrate a legacy Blueprint project to skill mode. Migration forces fresh Alignment.',
       '',
-      'Installs the bundled skill payload, converts existing root agent files,',
-      'deletes `docs/core/**`, and refreshes the manifest for the migrated project.',
+      'Installs the bundled skill payload, converts existing root agent files to',
+      'placeholder setup blocks, writes `blueprint-origin: legacy-migration`,',
+      'never preserves alignment-complete, deletes `docs/core/**` for legacy',
+      'conversions, and refreshes the manifest for the migrated project.',
+      'Old-guidance preservation stays with the Alignment workflow.',
     ].join('\n')
   }
 
