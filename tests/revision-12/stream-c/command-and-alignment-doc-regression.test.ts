@@ -10,6 +10,7 @@ const COMMAND_COPY_PATHS = [
   'docs/release-contract.md',
   'docs/releasing.md',
   'src/help/command.ts',
+  'src/help/implemented-commands.ts',
 ] as const
 
 const ALIGNMENT_COPY_PATHS = [
@@ -22,6 +23,8 @@ const ALIGNMENT_COPY_PATHS = [
 ] as const
 
 const STALE_COMMAND_PHRASES = [
+  'Mark supported root agent files as alignment-complete.',
+  'Migrate a Blueprint project to skill mode.',
   'preserve an existing alignment marker state',
   'preserves existing alignment marker state',
   'Any stricter `migrate` command behavior belongs to Phase 4 and stays out of scope during Alignment.',
@@ -39,14 +42,19 @@ describe('R12-4.C active-doc regression guards', () => {
     const releaseContract = read('docs/release-contract.md')
     const releaseGuide = read('docs/releasing.md')
     const commandHelp = read('src/help/command.ts')
+    const implementedCommands = read('src/help/implemented-commands.ts')
 
     expect(readme).toContain('forces fresh Alignment, never preserves alignment-complete')
     expect(releaseContract).toContain('fails without partial marker flips')
     expect(releaseGuide).toContain('fails without partial marker flips')
     expect(commandHelp).toContain('fails without partial marker flips')
     expect(commandHelp).toContain('never preserves alignment-complete')
+    expect(implementedCommands).toContain('Validate marked supported root agent files; no partial marker flips.')
+    expect(implementedCommands).toContain(
+      'Migrate a Blueprint project to skill mode; force fresh Alignment and never preserve alignment-complete.',
+    )
 
-    for (const content of [readme, releaseContract, releaseGuide, commandHelp]) {
+    for (const content of [readme, releaseContract, releaseGuide, commandHelp, implementedCommands]) {
       for (const phrase of STALE_COMMAND_PHRASES) {
         expect(content).not.toContain(phrase)
       }

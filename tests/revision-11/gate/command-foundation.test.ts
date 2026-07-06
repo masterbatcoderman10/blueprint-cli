@@ -71,7 +71,7 @@ describe('R11-6.0.1 supported root agent file discovery', () => {
 })
 
 describe('R11-6.0.2 skill-mode migration helpers', () => {
-  it('migrates a legacy project into both skill roots, preserves markers, removes docs/core, and bootstraps the manifest', async () => {
+  it('migrates a legacy project into both skill roots, forces fresh alignment-required markers, removes docs/core, and bootstraps the manifest', async () => {
     const project = await createGateProject()
 
     try {
@@ -90,8 +90,11 @@ describe('R11-6.0.2 skill-mode migration helpers', () => {
       expect(result.convertedRootFiles).toEqual(['CLAUDE.md', 'AGENTS.md', 'GEMINI.md'])
       expect(result.manifestManagedFiles).toEqual(['CLAUDE.md', 'AGENTS.md', 'GEMINI.md'])
       expect(await readFile(join(project.rootDir, 'CLAUDE.md'), 'utf-8')).toContain('alignment-required')
-      expect(await readFile(join(project.rootDir, 'AGENTS.md'), 'utf-8')).toContain('alignment-complete')
+      expect(await readFile(join(project.rootDir, 'CLAUDE.md'), 'utf-8')).toContain('blueprint-origin: legacy-migration')
+      expect(await readFile(join(project.rootDir, 'AGENTS.md'), 'utf-8')).toContain('alignment-required')
+      expect(await readFile(join(project.rootDir, 'AGENTS.md'), 'utf-8')).toContain('blueprint-origin: legacy-migration')
       expect(await readFile(join(project.rootDir, 'GEMINI.md'), 'utf-8')).toContain('alignment-required')
+      expect(await readFile(join(project.rootDir, 'GEMINI.md'), 'utf-8')).toContain('blueprint-origin: legacy-migration')
       expect(await readAlignmentMarkerState(join(project.rootDir, 'QWEN.md'))).toBe('absent')
       expect(await readFile(join(project.rootDir, '.claude', 'skills', 'blueprint', 'SKILL.md'), 'utf-8')).toContain('blueprint')
       expect(await readFile(join(project.rootDir, '.agents', 'skills', 'blueprint', 'SKILL.md'), 'utf-8')).toContain('blueprint')
@@ -130,12 +133,19 @@ describe('R11-6.0.3 command registration and help summaries', () => {
     expect(renderRootHelp()).toContain('alignment-complete')
     expect(renderRootHelp()).toContain('migrate')
     expect(renderRootHelp()).toContain(
-      '  alignment-complete  Mark supported root agent files as alignment-complete.',
+      '  alignment-complete  Validate marked supported root agent files; no partial marker flips.',
+    )
+    expect(renderRootHelp()).toContain(
+      '  migrate             Migrate a Blueprint project to skill mode; force fresh Alignment and never preserve alignment-complete.',
     )
     expect(renderCommandHelp('alignment-complete')).toContain('alignment-complete')
     expect(renderCommandHelp('migrate')).toContain('migrate')
     expect(rootHelp.stdout).toContain('alignment-complete')
     expect(rootHelp.stdout).toContain('migrate')
+    expect(rootHelp.stdout).toContain('Validate marked supported root agent files; no partial marker flips.')
+    expect(rootHelp.stdout).toContain(
+      'Migrate a Blueprint project to skill mode; force fresh Alignment and never preserve alignment-complete.',
+    )
     expect(alignmentHelp.stdout).toContain('alignment-complete')
     expect(migrateHelp.stdout).toContain('migrate')
     expect(alignmentRun.exitCode).toBe(0)

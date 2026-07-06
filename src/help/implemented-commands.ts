@@ -14,11 +14,11 @@ export const implementedCommands: ImplementedCommand[] = [
   },
   {
     name: 'alignment-complete',
-    summary: 'Mark supported root agent files as alignment-complete.',
+    summary: 'Validate marked supported root agent files; no partial marker flips.',
   },
   {
     name: 'migrate',
-    summary: 'Migrate a Blueprint project to skill mode.',
+    summary: 'Migrate a Blueprint project to skill mode; force fresh Alignment and never preserve alignment-complete.',
   },
 ]
 
