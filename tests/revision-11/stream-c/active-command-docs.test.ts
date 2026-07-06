@@ -6,6 +6,7 @@ import { describe, expect, it } from 'vitest'
 const ROOT_DIR = resolve(__dirname, '../../../')
 
 const README_PATH = join(ROOT_DIR, 'README.md')
+const RELEASE_CONTRACT_PATH = join(ROOT_DIR, 'docs', 'release-contract.md')
 const RELEASE_GUIDE_PATH = join(ROOT_DIR, 'docs', 'releasing.md')
 const ARCHIVAL_PHASE_DOC_PATH = join(
   ROOT_DIR,
@@ -37,24 +38,41 @@ function readDoc(relativePath: string): string {
 describe('R11-6.C active command doc contract', () => {
   it('describes alignment-complete and migrate as available on active surfaces without Phase 6 deferral language', () => {
     const readme = readDoc('README.md')
+    const releaseContract = readDoc('docs/release-contract.md')
     const releaseGuide = readDoc('docs/releasing.md')
-    const migrateHelp = readDoc('src/help/command.ts')
+    const commandHelp = readDoc('src/help/command.ts')
     const templateAgents = TEMPLATE_AGENT_PATHS.map(readDoc)
     const alignmentDocs = ALIGNMENT_DOC_PATHS.map(readDoc)
 
     expect(readme).toContain('blueprint alignment-complete')
     expect(readme).toContain('blueprint migrate')
+    expect(readme).toContain('Validate marked supported root agent files before marking required files as alignment-complete')
+    expect(readme).toContain('forces fresh Alignment, never preserves alignment-complete')
     expect(readme).toContain('Runtime help currently guides users through `init`, `doctor`, `alignment-complete`, and `migrate`')
     expect(readme).toContain('deletes `docs/core/**`')
     expect(readme).not.toContain('Revision 11 Phase 6')
 
+    expect(releaseContract).toContain('currently implemented commands: `init`, `doctor`, `alignment-complete`, and `migrate`')
+    expect(releaseContract).toContain('`blueprint alignment-complete` validates marked supported root agent files before any marker changes')
+    expect(releaseContract).toContain('`blueprint migrate` forces fresh Alignment for converted legacy root entry points')
+    expect(releaseContract).toContain('never preserves `alignment-complete`')
+    expect(releaseContract).toContain('Command-specific help is available via `blueprint help <command>` or `<command> --help` for `init`, `doctor`, `alignment-complete`, and `migrate`')
+
     expect(releaseGuide).toContain('blueprint migrate')
+    expect(releaseGuide).toContain('blueprint alignment-complete')
+    expect(releaseGuide).toContain('validates marked supported root agent files before any marker changes')
+    expect(releaseGuide).toContain('forces fresh Alignment')
+    expect(releaseGuide).toContain('never preserves `alignment-complete`')
     expect(releaseGuide).toContain('deletes `docs/core/**`')
     expect(releaseGuide).not.toContain('Revision 11 Phase 6')
 
-    expect(migrateHelp).toContain('Usage: blueprint migrate')
-    expect(migrateHelp).toContain('deletes `docs/core/**`')
-    expect(migrateHelp).not.toContain('Revision 11 Phase 6')
+    expect(commandHelp).toContain('Usage: blueprint alignment-complete')
+    expect(commandHelp).toContain('Validates marked files before any marker changes')
+    expect(commandHelp).toContain('Usage: blueprint migrate')
+    expect(commandHelp).toContain('forces fresh Alignment')
+    expect(commandHelp).toContain('never preserves alignment-complete')
+    expect(commandHelp).toContain('deletes `docs/core/**`')
+    expect(commandHelp).not.toContain('Revision 11 Phase 6')
 
     for (const content of templateAgents) {
       expect(content).toContain('blueprint migrate')

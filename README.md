@@ -126,8 +126,8 @@ The payoff is controlled parallelism. Agents can move quickly without all sharin
 |---------|--------|---------|
 | `blueprint init` | Implemented | Scaffold Blueprint docs, templates, root agent files, and tracker storage |
 | `blueprint doctor` | Implemented | Audit and repair Blueprint project structure |
-| `blueprint alignment-complete` | Implemented | Mark supported root agent files as alignment-complete |
-| `blueprint migrate` | Implemented | Convert a legacy Blueprint project to skill mode in place; `blueprint migrate` deletes `docs/core/**` |
+| `blueprint alignment-complete` | Implemented | Validate marked supported root agent files before marking required files as alignment-complete |
+| `blueprint migrate` | Implemented | Convert a legacy Blueprint project to skill mode in place; forces fresh Alignment, never preserves alignment-complete, and deletes `docs/core/**` during legacy conversion |
 | `blueprint board` | Implemented | Run the local tracker board |
 | `blueprint board status` | Implemented | Show the active board server, if one is running |
 | `blueprint board stop` | Implemented | Stop the active board server |

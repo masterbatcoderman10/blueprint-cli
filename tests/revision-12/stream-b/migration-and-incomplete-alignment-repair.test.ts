@@ -32,10 +32,12 @@ describe('R12-2.B migration and incomplete-alignment repair contract', () => {
     }
   })
 
-  it('T-R12-2.B.2.2: keeps migrate mechanical and defers smart-merge behavior to Phase 4', () => {
+  it('T-R12-2.B.2.2: keeps migrate mechanical while leaving preserved-guidance decisions to Alignment', () => {
     for (const content of [read(LEGACY_ALIGNMENT_PATH), read(SKILL_TEMPLATE_ALIGNMENT_PATH)]) {
       expect(content).toContain('Do NOT let `migrate` perform smart merge work.')
-      expect(content).toContain('Any stricter `migrate` command behavior belongs to Phase 4 and stays out of scope during Alignment.')
+      expect(content).toContain('`blueprint migrate` already forces fresh Alignment and never preserves `alignment-complete`.')
+      expect(content).toContain('Old-guidance preservation stays with Alignment, with explicit user approval.')
+      expect(content).not.toContain('Any stricter `migrate` command behavior belongs to Phase 4 and stays out of scope during Alignment.')
     }
   })
 

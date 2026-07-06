@@ -99,7 +99,8 @@ is forced back through Alignment.
     Record only the skills and MCPs the user explicitly names.
     Do NOT scan installed skills or MCPs during Alignment.
     Do NOT let `migrate` perform smart merge work.
-    Any stricter `migrate` command behavior belongs to Phase 4 and stays out of scope during Alignment.
+    `blueprint migrate` already forces fresh Alignment and never preserves `alignment-complete`.
+    Old-guidance preservation stays with Alignment, with explicit user approval.
 
     Do NOT write approved setup blocks without explicit user approval.
     Do NOT treat the setup summary as final until the user confirms it

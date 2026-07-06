@@ -53,6 +53,15 @@ describe('T-R11-3.C.1: alignment protocol sunsetting conventions.md', () => {
       '<BadExample>The agent writes `<ProjectConventions>` or `<AgentOrchestration>` to disk before the user explicitly approves the current setup draft.</BadExample>',
     )
   })
+
+  it('T-R12-4.C.2.1: alignment guidance treats migrate behavior as current while keeping preservation approval-gated', () => {
+    for (const alignment of [readFileSync(ALIGNMENT_PATH, 'utf-8'), readFileSync(TEMPLATES_ALIGNMENT_PATH, 'utf-8')]) {
+      expect(alignment).toContain('Do NOT let `migrate` perform smart merge work.')
+      expect(alignment).toContain('`blueprint migrate` already forces fresh Alignment and never preserves `alignment-complete`.')
+      expect(alignment).toContain('Old-guidance preservation stays with Alignment, with explicit user approval.')
+      expect(alignment).not.toContain('Any stricter `migrate` command behavior belongs to Phase 4 and stays out of scope during Alignment.')
+    }
+  })
 })
 
 describe('T-R11-3.C.2: template/documents alignment mirror', () => {

@@ -45,13 +45,15 @@ This document is the Phase 4 source of truth for the public M1 release baseline.
 
 ## M1 Public Boundary
 
-- Public M1 CLI scope is limited to the currently implemented commands: `init` and `doctor`
+- Public M1 CLI scope is limited to the currently implemented commands: `init`, `doctor`, `alignment-complete`, and `migrate`
+- `blueprint alignment-complete` validates marked supported root agent files before any marker changes and fails without partial marker flips when required setup blocks are invalid
+- `blueprint migrate` forces fresh Alignment for converted legacy root entry points, never preserves `alignment-complete`, and deletes `docs/core/**` during legacy conversion
 - `blueprint link` and `blueprint context` are documented as coming soon and are not part of the current implemented guidance surface
 - This release baseline does not promise unreleased milestone features, cross-project context automation, or workflow visibility features from later milestones
 
 ## Help and Recovery Surface
 
-- Root invocation (`blueprint`, `blueprint --help`, `blueprint -h`) displays usage guidance with the implemented command list
-- Command-specific help is available via `blueprint help <command>` or `<command> --help` for `init` and `doctor`
+- Root invocation (`blueprint`, `blueprint --help`, `blueprint -h`) displays usage guidance with the implemented command list (`init`, `doctor`, `alignment-complete`, `migrate`)
+- Command-specific help is available via `blueprint help <command>` or `<command> --help` for `init`, `doctor`, `alignment-complete`, and `migrate`
 - Unknown command recovery provides generic guidance toward `init` and `doctor` without surfacing placeholder commands
 - The help surface explicitly excludes `link` and `context` from guided output while preserving their coming-soon documentation references
